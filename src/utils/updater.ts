@@ -2,7 +2,7 @@ import axios from 'axios';
 import semver from 'semver';
 import pkg from '../../package.json';
 
-const CHECK_URL = 'https://api.github.com/repos/Geocld/XStreaming/releases';
+const CHECK_URL = 'https://api.github.com/repos/Geocld/PeaSyo/releases';
 
 const updater = () => {
   const {version} = pkg;

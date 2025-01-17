@@ -46,6 +46,7 @@ import AboutScreen from './pages/About';
 import FeedbackScreen from './pages/Feedback';
 import VirtualGamepadSettingsScreen from './pages/VirtualGamepadSettings';
 import CustomGamepadScreen from './pages/CustomGamepad';
+import updater from './utils/updater';
 
 import {useTranslation} from 'react-i18next';
 
@@ -116,6 +117,32 @@ function App() {
   const {t} = useTranslation();
   const colorScheme = useColorScheme();
   const settings = getSettings();
+
+  if (settings.check_update) {
+    updater().then((infos: any) => {
+      if (infos) {
+        const {latestVer, version, url} = infos;
+        Alert.alert(
+          t('Warning'),
+          t(`Check new version ${latestVer}, current version is ${version}`),
+          [
+            {
+              text: t('Cancel'),
+              style: 'default',
+              onPress: () => {},
+            },
+            {
+              text: t('Download'),
+              style: 'default',
+              onPress: () => {
+                Linking.openURL(url).catch(_ => {});
+              },
+            },
+          ],
+        );
+      }
+    });
+  }
 
   // console.log('bind_usb_device:', settings.bind_usb_device);
   if (settings.bind_usb_device !== undefined) {
