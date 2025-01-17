@@ -1,11 +1,11 @@
 <p align="center">
   <a href="https://github.com/Geocld/PeaSyo">
-    <img src="https://raw.githubusercontent.com/Geocld/PeaSyo/main/images/logo.png" width="546">
+    <img src="https://raw.githubusercontent.com/Geocld/PeaSyo/main/images/logo.png" width="100">
   </a>
 </p>
 <p align="center">
   <a href="https://github.com/Geocld/PeaSyo">
-    <img src="https://raw.githubusercontent.com/Geocld/PeaSyo/main/images/logo-text.png" width="546">
+    <img src="https://raw.githubusercontent.com/Geocld/PeaSyo/main/images/logo-text.png" width="300">
   </a>
 </p>
 
