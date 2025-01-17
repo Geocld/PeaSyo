@@ -1,0 +1,18 @@
+export const CONTROLLERS = {
+  CROSS: 1,
+  MOON: 2,
+  BOX: 4,
+  PYRAMID: 8,
+  DPAD_LEFT: 16,
+  DPAD_RIGHT: 32,
+  DPAD_UP: 64,
+  DPAD_DOWN: 128,
+  L1: 256,
+  R1: 512,
+  L3: 1024,
+  R3: 2048,
+  OPTIONS: 4096,
+  SHARE: 8192,
+  TOUCHPAD: 16384,
+  PS: 32768,
+};

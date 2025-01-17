@@ -1,0 +1,339 @@
+// SPDX-License-Identifier: LicenseRef-AGPL-3.0-only-OpenSSL
+
+#include "audio-decoder.h"
+
+#include <jni.h>
+
+#include <media/NdkMediaCodec.h>
+#include <media/NdkMediaFormat.h>
+
+#include <string.h>
+#include <time.h>
+#include <sys/time.h>
+#include <math.h>
+
+#define INPUT_BUFFER_TIMEOUT_MS 10
+
+static void *android_chiaki_audio_decoder_output_thread_func(void *user);
+static void android_chiaki_audio_decoder_header(ChiakiAudioHeader *header, void *user);
+static void android_chiaki_audio_decoder_frame(uint8_t *buf, size_t buf_size, void *user);
+static void android_chiaki_audio_haptics_decoder_header(ChiakiAudioHeader *header, void *user);
+static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_size, void *user);
+
+ChiakiErrorCode android_chiaki_audio_decoder_init(AndroidChiakiAudioDecoder *decoder, ChiakiLog *log)
+{
+	decoder->log = log;
+	memset(&decoder->audio_header, 0, sizeof(decoder->audio_header));
+	decoder->codec = NULL;
+	decoder->timestamp_cur = 0;
+
+	decoder->cb_user = NULL;
+	decoder->settings_cb = NULL;
+	decoder->frame_cb = NULL;
+
+	return chiaki_mutex_init(&decoder->codec_mutex, true);
+}
+
+void android_chiaki_audio_decoder_shutdown_codec(AndroidChiakiAudioDecoder *decoder)
+{
+	chiaki_mutex_lock(&decoder->codec_mutex);
+	ssize_t codec_buf_index = AMediaCodec_dequeueInputBuffer(decoder->codec, -1);
+	if(codec_buf_index >= 0)
+	{
+		CHIAKI_LOGI(decoder->log, "Audio Decoder sending EOS buffer");
+		AMediaCodec_queueInputBuffer(decoder->codec, (size_t)codec_buf_index, 0, 0, decoder->timestamp_cur++, AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
+	}
+	else
+		CHIAKI_LOGE(decoder->log, "Failed to get input buffer for shutting down Audio Decoder!");
+	chiaki_mutex_unlock(&decoder->codec_mutex);
+	chiaki_thread_join(&decoder->output_thread, NULL);
+	AMediaCodec_delete(decoder->codec);
+	decoder->codec = NULL;
+}
+
+void android_chiaki_audio_decoder_fini(AndroidChiakiAudioDecoder *decoder)
+{
+	if(decoder->codec)
+		android_chiaki_audio_decoder_shutdown_codec(decoder);
+	chiaki_mutex_fini(&decoder->codec_mutex);
+}
+
+void android_chiaki_audio_decoder_get_sink(AndroidChiakiAudioDecoder *decoder, ChiakiAudioSink *sink)
+{
+	sink->user = decoder;
+	sink->header_cb = android_chiaki_audio_decoder_header;
+	sink->frame_cb = android_chiaki_audio_decoder_frame;
+}
+
+void android_chiaki_audio_haptics_decoder_get_sink(ChiakiSession *session, AndroidChiakiAudioDecoder *decoder, ChiakiAudioSink *sink)
+{
+    sink->user = session;
+    sink->header_cb = android_chiaki_audio_haptics_decoder_header;
+    sink->frame_cb = android_chiaki_audio_haptics_decoder_frame;
+}
+
+static void *android_chiaki_audio_decoder_output_thread_func(void *user)
+{
+	AndroidChiakiAudioDecoder *decoder = user;
+
+	while(1)
+	{
+		AMediaCodecBufferInfo info;
+		ssize_t codec_buf_index = AMediaCodec_dequeueOutputBuffer(decoder->codec, &info, -1);
+		if(codec_buf_index >= 0)
+		{
+			if(decoder->settings_cb)
+			{
+				size_t codec_buf_size;
+				uint8_t *codec_buf = AMediaCodec_getOutputBuffer(decoder->codec, (size_t)codec_buf_index, &codec_buf_size);
+				size_t samples_count = info.size / sizeof(int16_t);
+//				CHIAKI_LOGD(decoder->log, "audio Got %llu samples => %f ms of audio", (unsigned long long)samples_count, 1000.0f * (float)(samples_count / 2) / (float)decoder->audio_header.rate);
+				decoder->frame_cb((int16_t *)codec_buf, samples_count, decoder->cb_user);
+			}
+			AMediaCodec_releaseOutputBuffer(decoder->codec, (size_t)codec_buf_index, false);
+			if(info.flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM)
+			{
+				CHIAKI_LOGI(decoder->log, "AMediaCodec for Audio Decoder reported EOS");
+				break;
+			}
+		}
+	}
+
+	CHIAKI_LOGI(decoder->log, "Audio Decoder Output Thread exiting");
+
+	return NULL;
+}
+
+static void android_chiaki_audio_haptics_decoder_header(ChiakiAudioHeader *header, void *user){}
+
+static void android_chiaki_audio_decoder_header(ChiakiAudioHeader *header, void *user)
+{
+	AndroidChiakiAudioDecoder *decoder = user;
+	chiaki_mutex_lock(&decoder->codec_mutex);
+	memcpy(&decoder->audio_header, header, sizeof(decoder->audio_header));
+
+	if(decoder->codec)
+	{
+		CHIAKI_LOGI(decoder->log, "Audio decoder already initialized, shutting down the old one");
+		android_chiaki_audio_decoder_shutdown_codec(decoder);
+	}
+
+	const char *mime = "audio/opus";
+	decoder->codec = AMediaCodec_createDecoderByType(mime);
+	if(!decoder->codec)
+	{
+		CHIAKI_LOGE(decoder->log, "Failed to create AMediaCodec for mime type %s", mime);
+		goto beach;
+	}
+
+	AMediaFormat *format = AMediaFormat_new();
+	AMediaFormat_setString(format, AMEDIAFORMAT_KEY_MIME, mime);
+	AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_CHANNEL_COUNT, header->channels);
+	AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_SAMPLE_RATE, header->rate);
+	// AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_PCM_ENCODING)
+
+	AMediaCodec_configure(decoder->codec, format, NULL, NULL, 0); // TODO: check result
+	AMediaCodec_start(decoder->codec); // TODO: check result
+
+	AMediaFormat_delete(format);
+
+	ChiakiErrorCode err = chiaki_thread_create(&decoder->output_thread, android_chiaki_audio_decoder_output_thread_func, decoder);
+	if(err != CHIAKI_ERR_SUCCESS)
+	{
+		CHIAKI_LOGE(decoder->log, "Failed to create output thread for AMediaCodec");
+		AMediaCodec_delete(decoder->codec);
+		decoder->codec = NULL;
+	}
+
+	uint8_t opus_id_head[0x13];
+	memcpy(opus_id_head, "OpusHead", 8);
+	opus_id_head[0x8] = 1; // version
+	opus_id_head[0x9] = header->channels;
+	uint16_t pre_skip = 3840;
+	opus_id_head[0xa] = (uint8_t)(pre_skip & 0xff);
+	opus_id_head[0xb] = (uint8_t)(pre_skip >> 8);
+	opus_id_head[0xc] = (uint8_t)(header->rate & 0xff);
+	opus_id_head[0xd] = (uint8_t)((header->rate >> 0x8) & 0xff);
+	opus_id_head[0xe] = (uint8_t)((header->rate >> 0x10) & 0xff);
+	opus_id_head[0xf] = (uint8_t)(header->rate >> 0x18);
+	uint16_t output_gain = 0;
+	opus_id_head[0x10] = (uint8_t)(output_gain & 0xff);
+	opus_id_head[0x11] = (uint8_t)(output_gain >> 8);
+	opus_id_head[0x12] = 0; // channel map
+	//AMediaFormat_setBuffer(format, AMEDIAFORMAT_KEY_CSD_0, opus_id_head, sizeof(opus_id_head));
+	android_chiaki_audio_decoder_frame(opus_id_head, sizeof(opus_id_head), decoder);
+
+	uint64_t pre_skip_ns = 0;
+	uint8_t csd1[8] = { (uint8_t)(pre_skip_ns & 0xff), (uint8_t)((pre_skip_ns >> 0x8) & 0xff), (uint8_t)((pre_skip_ns >> 0x10) & 0xff), (uint8_t)((pre_skip_ns >> 0x18) & 0xff),
+						(uint8_t)((pre_skip_ns >> 0x20) & 0xff), (uint8_t)((pre_skip_ns >> 0x28) & 0xff), (uint8_t)((pre_skip_ns >> 0x30) & 0xff), (uint8_t)(pre_skip_ns >> 0x38)};
+	android_chiaki_audio_decoder_frame(csd1, sizeof(csd1), decoder);
+
+	uint64_t pre_roll_ns = 0;
+	uint8_t csd2[8] = { (uint8_t)(pre_roll_ns & 0xff), (uint8_t)((pre_roll_ns >> 0x8) & 0xff), (uint8_t)((pre_roll_ns >> 0x10) & 0xff), (uint8_t)((pre_roll_ns >> 0x18) & 0xff),
+						(uint8_t)((pre_roll_ns >> 0x20) & 0xff), (uint8_t)((pre_roll_ns >> 0x28) & 0xff), (uint8_t)((pre_roll_ns >> 0x30) & 0xff), (uint8_t)(pre_roll_ns >> 0x38)};
+	android_chiaki_audio_decoder_frame(csd2, sizeof(csd2), decoder);
+
+	if(decoder->settings_cb)
+		decoder->settings_cb(header->channels, header->rate, decoder->cb_user);
+
+beach:
+	chiaki_mutex_unlock(&decoder->codec_mutex);
+}
+
+static void android_chiaki_audio_decoder_frame(uint8_t *buf, size_t buf_size, void *user)
+{
+	AndroidChiakiAudioDecoder *decoder = user;
+	chiaki_mutex_lock(&decoder->codec_mutex);
+
+	if(!decoder->codec)
+	{
+		CHIAKI_LOGE(decoder->log, "Received audio data, but decoder is not initialized!");
+		goto beach;
+	}
+
+	while(buf_size > 0)
+	{
+		ssize_t codec_buf_index = AMediaCodec_dequeueInputBuffer(decoder->codec, INPUT_BUFFER_TIMEOUT_MS * 1000);
+		if(codec_buf_index < 0)
+		{
+			CHIAKI_LOGE(decoder->log, "Failed to get input audio buffer");
+			return;
+		}
+
+		size_t codec_buf_size;
+		uint8_t *codec_buf = AMediaCodec_getInputBuffer(decoder->codec, (size_t)codec_buf_index, &codec_buf_size);
+		size_t codec_sample_size = buf_size;
+		if(codec_sample_size > codec_buf_size)
+		{
+			CHIAKI_LOGD(decoder->log, "Sample is bigger than audio buffer, splitting");
+			codec_sample_size = codec_buf_size;
+		}
+		memcpy(codec_buf, buf, codec_sample_size);
+		AMediaCodec_queueInputBuffer(decoder->codec, (size_t)codec_buf_index, 0, codec_sample_size, decoder->timestamp_cur++, 0); // timestamp just raised by 1 for maximum realtime
+		buf += codec_sample_size;
+		buf_size -= codec_sample_size;
+	}
+
+beach:
+	chiaki_mutex_unlock(&decoder->codec_mutex);
+}
+
+// 获取当前时间戳(毫秒)
+static uint64_t get_current_time_ms() {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (uint64_t)(tv.tv_sec) * 1000 + (uint64_t)(tv.tv_usec) / 1000;
+}
+
+#define STABLE_THRESHOLD 2         // 判定为稳定需要的次数
+#define VALUE_CHANGE_THRESHOLD 2  // 数值变化阈值(百分比)
+#define EVENT_COOLDOWN_MS 30      // 事件发送冷却时间(毫秒)
+#define CHANNEL_DIFF_THRESHOLD 0   // 左右差异阈值
+
+static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_size, void *user) {
+    if (buf_size < 25) {
+        return;
+    }
+    ChiakiSession *session = user;
+
+    static AudioHapticsState *state = NULL;
+    if (!state) {
+        state = calloc(1, sizeof(AudioHapticsState));
+        state->last_frame_time = get_current_time_ms();
+        state->is_vibrating = false;
+        state->stable_count = 0;
+        state->is_initialized = false;
+    }
+
+    int16_t amplitudel = 0, amplituder = 0;
+    int32_t suml = 0, sumr = 0;
+    const size_t sample_size = 2 * sizeof(int16_t); // stereo samples
+
+    size_t buf_count = buf_size / sample_size;
+    for (size_t i = 0; i < buf_count; i++){
+        size_t cur = i * sample_size;
+
+        memcpy(&amplitudel, buf + cur, sizeof(int16_t));
+        memcpy(&amplituder, buf + cur + sizeof(int16_t), sizeof(int16_t));
+        suml += amplitudel;
+        sumr += amplituder;
+    }
+    uint16_t left = 0, right = 0;
+    left = suml / buf_count;
+    right = sumr / buf_count;
+
+    uint16_t left_format = left >> 8;
+    uint16_t right_format = right >> 8;
+
+    CHIAKI_LOGD(session->log, "left: %d, right: %d", left_format, right_format);
+
+    uint64_t current_time = get_current_time_ms();
+    bool should_vibrate = false;
+
+    // 检查是否可以发送新的事件
+    bool can_send_event = (current_time - state->last_event_time) >= EVENT_COOLDOWN_MS;
+
+    if (can_send_event) {
+        // 场景1：左右声道差异检测
+        if (abs(left_format - right_format) > CHANNEL_DIFF_THRESHOLD) {
+            should_vibrate = true;
+//            CHIAKI_LOGD(session->log, "Vibration triggered by channel difference: L=%d, R=%d", left8, right8);
+        }
+
+        // 场景2：检测数值突变
+        if (!should_vibrate && state->is_initialized) {
+            // 只在当前值和稳定值都不为0时计算变化率
+            float left_change = 0, right_change = 0;
+
+            if (state->stable_left > 0 && left_format > 0) {
+                left_change = fabsf((float)(left_format - state->stable_left) / state->stable_left) * 100;
+            }
+
+            if (state->stable_right > 0 && right_format > 0) {
+                right_change = fabsf((float)(right_format - state->stable_right) / state->stable_right) * 100;
+            }
+
+            // 只有当变化率在有效范围内才触发振动
+            if ((left_change >= VALUE_CHANGE_THRESHOLD && left_change < 30) ||
+                (right_change >= VALUE_CHANGE_THRESHOLD && right_change < 30)) {
+                should_vibrate = true;
+                state->stable_count = 0;
+//                CHIAKI_LOGD(session->log, "Vibration triggered by sudden change: L=%d%%, R=%d%%",
+//                            (int)left_change, (int)right_change);
+            }
+        }
+    }
+
+    // 更新稳定状态
+    if (left_format != 0 && right_format != 0) {
+        if (abs(left_format - state->last_left) <= 5 &&
+            abs(right_format - state->last_right) <= 5) {
+            state->stable_count++;
+            if (state->stable_count >= STABLE_THRESHOLD) {
+                state->stable_left = left_format;
+                state->stable_right = right_format;
+                state->is_initialized = true;
+            }
+        } else {
+            state->stable_count = 0;
+        }
+    }
+
+    // 触发振动事件（仅在需要时发送）
+    if ((should_vibrate || (state->is_vibrating && (left_format == 0 && right_format == 0))) && can_send_event) {
+        ChiakiEvent event = { 0 };
+        event.type = CHIAKI_EVENT_RUMBLE;
+        event.rumble.unknown = buf[0];
+        event.rumble.left = should_vibrate ? left_format : 0;
+        event.rumble.right = should_vibrate ? right_format : 0;
+        session->event_cb(&event, session->event_cb_user);
+
+        state->is_vibrating = should_vibrate;
+        state->last_event_time = current_time;
+    }
+
+    // 更新状态
+    state->last_left = left_format;
+    state->last_right = right_format;
+    state->last_frame_time = current_time;
+}
