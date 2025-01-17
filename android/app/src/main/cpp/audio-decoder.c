@@ -225,9 +225,9 @@ static uint64_t get_current_time_ms() {
     return (uint64_t)(tv.tv_sec) * 1000 + (uint64_t)(tv.tv_usec) / 1000;
 }
 
-#define STABLE_THRESHOLD 2         // 判定为稳定需要的次数
-#define VALUE_CHANGE_THRESHOLD 2  // 数值变化阈值(百分比)
-#define EVENT_COOLDOWN_MS 30      // 事件发送冷却时间(毫秒)
+#define STABLE_THRESHOLD 3         // 判定为稳定需要的次数
+#define VALUE_CHANGE_THRESHOLD 5  // 数值变化阈值(百分比)
+#define EVENT_COOLDOWN_MS 50      // 事件发送冷却时间(毫秒)
 #define CHANNEL_DIFF_THRESHOLD 0   // 左右差异阈值
 
 static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_size, void *user) {
@@ -262,40 +262,36 @@ static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_
     left = suml / buf_count;
     right = sumr / buf_count;
 
-    uint16_t left_format = left >> 8;
-    uint16_t right_format = right >> 8;
-
-    CHIAKI_LOGD(session->log, "left: %d, right: %d", left_format, right_format);
+    uint16_t left8 = left >> 8;
+    uint16_t right8 = right >> 8;
 
     uint64_t current_time = get_current_time_ms();
     bool should_vibrate = false;
 
-    // 检查是否可以发送新的事件
     bool can_send_event = (current_time - state->last_event_time) >= EVENT_COOLDOWN_MS;
 
     if (can_send_event) {
         // 场景1：左右声道差异检测
-        if (abs(left_format - right_format) > CHANNEL_DIFF_THRESHOLD) {
+        if (abs(left8 - right8) > CHANNEL_DIFF_THRESHOLD) {
             should_vibrate = true;
 //            CHIAKI_LOGD(session->log, "Vibration triggered by channel difference: L=%d, R=%d", left8, right8);
         }
 
         // 场景2：检测数值突变
         if (!should_vibrate && state->is_initialized) {
-            // 只在当前值和稳定值都不为0时计算变化率
             float left_change = 0, right_change = 0;
 
-            if (state->stable_left > 0 && left_format > 0) {
-                left_change = fabsf((float)(left_format - state->stable_left) / state->stable_left) * 100;
+            if (state->stable_left > 0 && left8 > 0) {
+                left_change = fabsf((float)(left8 - state->stable_left) / state->stable_left) * 100;
             }
 
-            if (state->stable_right > 0 && right_format > 0) {
-                right_change = fabsf((float)(right_format - state->stable_right) / state->stable_right) * 100;
+            if (state->stable_right > 0 && right8 > 0) {
+                right_change = fabsf((float)(right8 - state->stable_right) / state->stable_right) * 100;
             }
 
             // 只有当变化率在有效范围内才触发振动
-            if ((left_change >= VALUE_CHANGE_THRESHOLD && left_change < 30) ||
-                (right_change >= VALUE_CHANGE_THRESHOLD && right_change < 30)) {
+            if ((left_change > VALUE_CHANGE_THRESHOLD && left_change < 30) ||
+                (right_change > VALUE_CHANGE_THRESHOLD && right_change < 30)) {
                 should_vibrate = true;
                 state->stable_count = 0;
 //                CHIAKI_LOGD(session->log, "Vibration triggered by sudden change: L=%d%%, R=%d%%",
@@ -305,27 +301,24 @@ static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_
     }
 
     // 更新稳定状态
-    if (left_format != 0 && right_format != 0) {
-        if (abs(left_format - state->last_left) <= 5 &&
-            abs(right_format - state->last_right) <= 5) {
-            state->stable_count++;
-            if (state->stable_count >= STABLE_THRESHOLD) {
-                state->stable_left = left_format;
-                state->stable_right = right_format;
-                state->is_initialized = true;
-            }
-        } else {
-            state->stable_count = 0;
+    if (abs(left8 - state->last_left) <= VALUE_CHANGE_THRESHOLD &&
+        abs(right8 - state->last_right) <= VALUE_CHANGE_THRESHOLD) {
+        state->stable_count++;
+        if (state->stable_count >= STABLE_THRESHOLD) {
+            state->stable_left = left8;
+            state->stable_right = right8;
+            state->is_initialized = true;
         }
+    } else {
+        state->stable_count = 0;
     }
 
-    // 触发振动事件（仅在需要时发送）
-    if ((should_vibrate || (state->is_vibrating && (left_format == 0 && right_format == 0))) && can_send_event) {
+    if ((should_vibrate || (state->is_vibrating && (left8 == 0 && right8 == 0))) && can_send_event) {
         ChiakiEvent event = { 0 };
         event.type = CHIAKI_EVENT_RUMBLE;
         event.rumble.unknown = buf[0];
-        event.rumble.left = should_vibrate ? left_format : 0;
-        event.rumble.right = should_vibrate ? right_format : 0;
+        event.rumble.left = should_vibrate ? left8 : 0;
+        event.rumble.right = should_vibrate ? right8 : 0;
         session->event_cb(&event, session->event_cb_user);
 
         state->is_vibrating = should_vibrate;
@@ -333,7 +326,7 @@ static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_
     }
 
     // 更新状态
-    state->last_left = left_format;
-    state->last_right = right_format;
+    state->last_left = left8;
+    state->last_right = right8;
     state->last_frame_time = current_time;
 }
