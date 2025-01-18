@@ -34,6 +34,7 @@ import kotlinx.coroutines.sync.Mutex
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.withLock
+import java.lang.Math.abs
 
 sealed class StreamState
 object StreamStateIdle: StreamState()
@@ -57,9 +58,31 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 	private val vibrateMutex = Mutex()
 	private val vibrateScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
+	private val STABLE_THRESHOLD = 3         // 判定为稳定需要的次数
+	private val VALUE_CHANGE_THRESHOLD = 5   // 数值变化阈值(百分比)
+	private val EVENT_COOLDOWN_MS = 50L      // 事件发送冷却时间(毫秒)
+	private val CHANNEL_DIFF_THRESHOLD = 0
+
+	private data class AudioHapticsState(
+		var lastLeft: Int = 0,
+		var lastRight: Int = 0,
+		var stableLeft: Int = 0,
+		var stableRight: Int = 0,
+		var stableCount: Int = 0,
+		var isInitialized: Boolean = false,
+		var isVibrating: Boolean = false,
+		var lastEventTime: Long = System.currentTimeMillis()
+	)
+
+	private var currentState = ControllerState()
+
+	// 在类中添加状态变量
+	private val hapticsState = AudioHapticsState()
+
 	fun setControllerState(controllerState: ControllerState) {
 //		Log.d("StreamView", "session setControllerState: $controllerState")
 		session?.setControllerState(controllerState)
+		currentState = controllerState.copy()
 	}
 
 	fun shutdown()
@@ -166,27 +189,88 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 			is RumbleEvent -> {
 //				Log.d("StreamView", "RumbleEvent: $event")
 				if (rumble) {
-					if (usbMode) {
-						val INPUT_MAX = 256
-						val OUTPUT_MAX = 32767
-						val VIBRATION_DURATION = 60L
 
-						val left = (event.left * OUTPUT_MAX / INPUT_MAX).coerceAtMost(OUTPUT_MAX)
-						val right = (event.right * OUTPUT_MAX / INPUT_MAX).coerceAtMost(OUTPUT_MAX)
+					val currentTime = System.currentTimeMillis()
+					var shouldVibrate = false
+					val left = event.left
+					val right = event.right
 
-						getMainActivity()?.handleRumble(left.toShort(), right.toShort())
+					val canSendEvent = (currentTime - hapticsState.lastEventTime) >= EVENT_COOLDOWN_MS
 
-						Handler(Looper.getMainLooper()).postDelayed({
-							getMainActivity()?.handleRumble(0, 0)
-						}, VIBRATION_DURATION)
+					if (canSendEvent) {
+						// 场景1：左右声道差异检测
+						if (abs(left - right) > CHANNEL_DIFF_THRESHOLD) {
+							shouldVibrate = true
+							//Log.d("StreamView", "Vibration triggered by channel difference: L=$left8, R=$right8")
+						}
+
+						// 场景2：检测数值突变
+						if (!shouldVibrate && hapticsState.isInitialized) {
+							val leftChange = if (hapticsState.stableLeft > 0 && left > 0) {
+								abs((left - hapticsState.stableLeft).toFloat() / hapticsState.stableLeft) * 100
+							} else 0f
+
+							val rightChange = if (hapticsState.stableRight > 0 && right > 0) {
+								abs((right - hapticsState.stableRight).toFloat() / hapticsState.stableRight) * 100
+							} else 0f
+
+							// 只有当变化率在有效范围内才触发振动
+							if ((leftChange > VALUE_CHANGE_THRESHOLD && leftChange < 30) ||
+								(rightChange > VALUE_CHANGE_THRESHOLD && rightChange < 30)) {
+								shouldVibrate = true
+								hapticsState.stableCount = 0
+								//Log.d("StreamView", "Vibration triggered by sudden change: L=${leftChange}%, R=${rightChange}%")
+							}
+						}
+
+						// 场景3：有按键按下且监听到振动
+						if (!shouldVibrate && (currentState.buttons > 0u || currentState.l2State > 0u || currentState.r2State > 0u) && (left > 0 || right > 0)) {
+							shouldVibrate = true
+//							Log.d("StreamView", "situation3...")
+						}
+					}
+
+					// 更新稳定状态
+					if (abs(left - hapticsState.lastLeft) <= VALUE_CHANGE_THRESHOLD &&
+						abs(right - hapticsState.lastRight) <= VALUE_CHANGE_THRESHOLD) {
+						hapticsState.stableCount++
+						if (hapticsState.stableCount >= STABLE_THRESHOLD) {
+							hapticsState.stableLeft = left
+							hapticsState.stableRight = right
+							hapticsState.isInitialized = true
+						}
 					} else {
-						vibrateScope.launch {
-							// 使用 Mutex 确保同一时间只有一个振动在执行
-							vibrateMutex.withLock {
-								var gamepadManager = Gamepad(reactContext)
-								gamepadManager.vibrate(60, event.left, event.right, 0, 0, rumbleIntensity)
-								// 等待振动完成
-								delay(60)
+						hapticsState.stableCount = 0
+					}
+
+					if ((shouldVibrate || (hapticsState.isVibrating && (left == 0 && right == 0))) && canSendEvent) {
+						hapticsState.isVibrating = shouldVibrate
+						hapticsState.lastEventTime = currentTime
+
+						if (shouldVibrate) {
+							if (usbMode) {
+								val INPUT_MAX = 256
+								val OUTPUT_MAX = 32767
+								val VIBRATION_DURATION = 60L
+
+								val left = (event.left * OUTPUT_MAX / INPUT_MAX).coerceAtMost(OUTPUT_MAX)
+								val right = (event.right * OUTPUT_MAX / INPUT_MAX).coerceAtMost(OUTPUT_MAX)
+
+								getMainActivity()?.handleRumble(left.toShort(), right.toShort())
+
+								Handler(Looper.getMainLooper()).postDelayed({
+									getMainActivity()?.handleRumble(0, 0)
+								}, VIBRATION_DURATION)
+							} else {
+								vibrateScope.launch {
+									// 使用 Mutex 确保同一时间只有一个振动在执行
+									vibrateMutex.withLock {
+										var gamepadManager = Gamepad(reactContext)
+										gamepadManager.vibrate(60, event.left, event.right, 0, 0, rumbleIntensity)
+										// 等待振动完成
+										delay(60)
+									}
+								}
 							}
 						}
 					}
