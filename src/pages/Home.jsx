@@ -225,23 +225,51 @@ function HomeScreen({navigation, route}) {
   const handleLocalStream = item => {
     const isPS5 = item.apName === 'PS5';
 
-    // Send wakeup packet
-    const credential = RegistryManager.getCredential(item.rpRegistKey);
-    if (!credential) {
-      ToastAndroid.show(t('CredentialIsEmpty'), ToastAndroid.SHORT);
-      return;
-    }
-    wakeup(item.host, credential);
-
     setLoading(true);
-    setLoadingText(t('Waking'));
+    // Find local console
+    discoverDevices(isPS5)
+      .then(results => {
+        if (results.length) {
+          results.forEach(res => {
+            if (res.id === item.consoleId) {
+              // Update console host
+              item.host = res.address.address;
+              if (res.status === 'STANDBY') {
+                // Send wake packet
+                const credential = RegistryManager.getCredential(item.rpRegistKey);
+                if (!credential) {
+                  ToastAndroid.show(t('CredentialIsEmpty'), ToastAndroid.SHORT);
+                  return;
+                }
+                wakeup(item.host, credential);
 
-    checkConsoleWake(isPS5, item)
-      .then(() => {
-        handleToLocalStream(item);
+                setLoadingText(t('Waking'));
+
+                checkConsoleWake(isPS5, item)
+                  .then(() => {
+                    setTimeout(() => {
+                      handleToLocalStream(item);
+                    }, 10 * 1000);
+                  })
+                  .catch(e => {
+                    handleToLocalStream(item);
+                  });
+              } else if (res.status === 'AWAKE') {
+                // To Stream page
+                handleToLocalStream(item);
+              } else {
+                ToastAndroid.show('Console not found', ToastAndroid.LONG);
+              }
+            }
+          });
+        } else {
+          ToastAndroid.show('Console not found', ToastAndroid.LONG);
+          setLoading(false);
+        }
       })
       .catch(e => {
-        handleToLocalStream(item);
+        ToastAndroid.show(e, ToastAndroid.LONG);
+        setLoading(false);
       });
   };
 
