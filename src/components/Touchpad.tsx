@@ -44,7 +44,11 @@ const Touchpad: React.FC<Props> = ({isPS5 = true, onTap, onTouch}) => {
   const touchId1 = useSharedValue(-1);
   const touchId2 = useSharedValue(-1);
 
-  const opacity = useSharedValue(0);
+  const opacity = useSharedValue(SHOW_OPACITY);
+
+  React.useEffect(() => {
+    opacity.value = withDelay(5000, withTiming(0));
+  }, []);
 
   const normalizeCoordinates = (x: number, y: number) => {
     'worklet';

@@ -140,6 +140,8 @@ export default {
     OnlyConnect: 'Connect only',
     WakeAndConnect: 'Wake and connect',
     Waking: 'Waking...',
+    FindConsole: 'Finding console...',
+    ConsoleNotFound: 'Console not found. Please ensure your device and console are on the same network, and the console is in standby or powered on',
     // Regsistry
     RegistTips:
       'Note: Only supports registering PS5 or PS4 (firmware version 8 or above) consoles',

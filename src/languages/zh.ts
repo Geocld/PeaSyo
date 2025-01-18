@@ -138,6 +138,8 @@ export default {
     OnlyConnect: '仅连接',
     WakeAndConnect: '唤醒并连接',
     Waking: '正在唤醒主机...',
+    FindConsole: '正在寻找主机...',
+    ConSoleNotFound: '没有找到主机，请确保设备和主机正在同一个局域网，并且主机处于待机或开机状态。',
     // Regsistry
     RegistTips: '注意: 仅支持注册PS5或PS4(固件版本8+以上)主机',
     LookConsole: '正在寻找终端',

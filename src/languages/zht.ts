@@ -138,6 +138,8 @@ export default {
     OnlyConnect: '僅連接',
     WakeAndConnect: '喚醒並連接',
     Waking: '正在喚醒主機...',
+    FindConsole: '正在寻找主機...',
+    ConsoleNotFound: '沒有找到主機，請確保設備和主機正在同一個局域網，並且主機處於待機或開機狀態。',
     // Regsistry
     RegistTips: '注意：僅支援註冊 PS5 或 PS4（固件版本 8 以上）主機',
     LookConsole: '正在尋找終端',

@@ -91,14 +91,14 @@ function HomeScreen({navigation, route}) {
       // Return from Login screen
       if (route.params?.xalUrl) {
         const xalUrl = route.params?.xalUrl;
-        console.log('xalUrl:', xalUrl);
+        // console.log('xalUrl:', xalUrl);
 
         setLoading(true);
         setLoadingText(t('Loading'));
         // Get token from auth code
         getTokenFromRedirectUri(xalUrl)
           .then(accessToken => {
-            console.log('Get access token:', accessToken);
+            // console.log('Get access token:', accessToken);
             if (accessToken.length) {
               getUserInfoFromToken(accessToken)
                 .then(userInfo => {
@@ -226,15 +226,17 @@ function HomeScreen({navigation, route}) {
     const isPS5 = item.apName === 'PS5';
 
     setLoading(true);
+    setLoadingText(t('FindConsole'));
     // Find local console
     discoverDevices(isPS5)
       .then(results => {
         if (results.length) {
           results.forEach(res => {
-            if (res.id === item.consoleId) {
+            if (res.id === item.consoleId || res.address.address === item.host) {
               // Update console host
               item.host = res.address.address;
               if (res.status === 'STANDBY') {
+                setLoadingText(t('Waking'));
                 // Send wake packet
                 const credential = RegistryManager.getCredential(item.rpRegistKey);
                 if (!credential) {
@@ -242,8 +244,6 @@ function HomeScreen({navigation, route}) {
                   return;
                 }
                 wakeup(item.host, credential);
-
-                setLoadingText(t('Waking'));
 
                 checkConsoleWake(isPS5, item)
                   .then(() => {
@@ -258,12 +258,22 @@ function HomeScreen({navigation, route}) {
                 // To Stream page
                 handleToLocalStream(item);
               } else {
-                ToastAndroid.show('Console not found', ToastAndroid.LONG);
+                Alert.alert(t('Warning'), t('ConSoleNotFound'), [
+                  {
+                    text: t('Confirm'),
+                    style: 'default',
+                  },
+                ]);
               }
             }
           });
         } else {
-          ToastAndroid.show('Console not found', ToastAndroid.LONG);
+          Alert.alert(t('Warning'), t('ConSoleNotFound'), [
+            {
+              text: t('Confirm'),
+              style: 'default',
+            },
+          ]);
           setLoading(false);
         }
       })
@@ -382,7 +392,7 @@ function HomeScreen({navigation, route}) {
   };
 
   const handleWakeAndToStream = (host, credential) => {
-    console.log('handleWakeAndToStream', host, credential);
+    log.info('handleWakeAndToStream', host, credential);
     const settings = getSettings();
     const hasValidUsbDevice = UsbRumbleManager.getHasValidUsbDevice();
     const isUsbMode = settings.bind_usb_device && hasValidUsbDevice;
