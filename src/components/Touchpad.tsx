@@ -28,6 +28,8 @@ const DOT_SPACING = 15;
 
 const SHOW_OPACITY = 0.2;
 
+const MAX_TOUCH_ID = 120;
+
 type Props = {
   isPS5: boolean;
   onTap: (isPressed: boolean, nextId: number, touches: any[]) => void;
@@ -104,10 +106,17 @@ const Touchpad: React.FC<Props> = ({isPS5 = true, onTap, onTouch}) => {
 
       runOnJS(onTouch)(0, _nextId, touches);
 
-      currentId.value = _currentId;
-      nextId.value = _nextId;
-      touchId1.value = _touchId1;
-      touchId2.value = _touchId2;
+      if (_nextId >= MAX_TOUCH_ID) {
+        currentId.value = -1;
+        nextId.value = -1;
+        touchId1.value = -1;
+        touchId2.value = -1;
+      } else {
+        currentId.value = _currentId;
+        nextId.value = _nextId;
+        touchId1.value = _touchId1;
+        touchId2.value = _touchId2;
+      }
     })
     .onTouchesUp(e => {
       if (isMoving.value) {
@@ -159,8 +168,13 @@ const Touchpad: React.FC<Props> = ({isPS5 = true, onTap, onTouch}) => {
 
       runOnJS(onTap)(true, _nextId, touches);
 
-      currentId.value = _currentId;
-      nextId.value = _nextId;
+      if (_nextId >= MAX_TOUCH_ID) {
+        currentId.value = -1;
+        nextId.value = -1;
+      } else {
+        currentId.value = _currentId;
+        nextId.value = _nextId;
+      }
     })
     .onEnd(e => {
       const normalXY = normalizeCoordinates(e.x, e.y);
@@ -191,8 +205,13 @@ const Touchpad: React.FC<Props> = ({isPS5 = true, onTap, onTouch}) => {
 
       runOnJS(onTap)(true, _nextId, touches);
 
-      currentId.value = _currentId;
-      nextId.value = _nextId;
+      if (_nextId >= MAX_TOUCH_ID) {
+        currentId.value = -1;
+        nextId.value = -1;
+      } else {
+        currentId.value = _currentId;
+        nextId.value = _nextId;
+      }
     })
     .onEnd(e => {
       const normalXY = normalizeCoordinates(e.x, e.y);

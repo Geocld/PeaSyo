@@ -119,11 +119,10 @@ function StreamScreen({navigation, route}) {
     nextId: number,
     touches: any[],
   ) => {
-    console.log('handleTouchpadTap isPressed:', isPressed);
+    // console.log('handleTouchpadTap isPressed:', isPressed);
     if (!isPressed) {
       setTimeout(() => {
         streamViewRef.current?.tap(isPressed, nextId, touches);
-        streamViewRef.current?.requestFocus();
       }, 150);
     } else {
       streamViewRef.current?.tap(isPressed, nextId, touches);
@@ -131,8 +130,8 @@ function StreamScreen({navigation, route}) {
   };
 
   const handleTouch = (mask: number, nextId: number, touches: any[]) => {
+    // console.log('handleTouch touches:', touches)
     streamViewRef.current?.touch(mask, nextId, touches);
-    streamViewRef.current?.requestFocus();
   };
 
   React.useEffect(() => {
