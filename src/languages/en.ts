@@ -65,6 +65,8 @@ export default {
       'Use high-performance video rendering. By default, high-performance rendering is used, but note that streaming will stop when the app is sent to the background. If you need to frequently switch to the background while maintaining streaming, please turn off high-performance rendering mode',
     Sensor: 'Sensor',
     SensorDesc: 'Use device sensors',
+    'Invert Sensor': 'Invert Sensor',
+    InvertSensorDesc: 'If you find the sensor direction is reversed in the game, please enable sensor inversion',
     'Show performance': 'Show performance info',
     'Always display the performance panel':
       'Always display the performance panel',

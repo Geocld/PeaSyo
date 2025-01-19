@@ -80,6 +80,7 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
     private int rumbleIntensity;
     private boolean usbMode;
     private boolean useSensor;
+    private boolean sensorInvert;
     private float deadZone;
     private int edgeCompensation;
     private boolean isShortTrigger;
@@ -95,6 +96,7 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         this.rumbleIntensity = 3;
         this.usbMode = false;
         this.useSensor = false;
+        this.sensorInvert = false;
         this.deadZone = 0.2f;
         this.edgeCompensation = 0;
         this.isShortTrigger = false;
@@ -232,6 +234,7 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         boolean usbMode = streamInfo.getBoolean("usbMode");
         String videoFormat = streamInfo.getString("videoFormat");
         boolean useSensor = streamInfo.getBoolean("useSensor");
+        boolean sensorInvert = streamInfo.getBoolean("sensorInvert");
         float deadZone = (float)streamInfo.getDouble("deadZone");
         int edgeCompensation = streamInfo.getInt("edgeCompensation");
         boolean shortTrigger = streamInfo.getBoolean("shortTrigger");
@@ -245,6 +248,7 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         this.rumbleIntensity = rumbleIntensity;
         this.usbMode = usbMode;
         this.useSensor = useSensor;
+        this.sensorInvert = sensorInvert;
         this.deadZone = deadZone;
         this.edgeCompensation = edgeCompensation;
         this.isShortTrigger = shortTrigger;
@@ -826,10 +830,17 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
                 case Sensor.TYPE_GAME_ROTATION_VECTOR:
                     float[] quaternion = new float[4];
                     SensorManager.getQuaternionFromVector(quaternion, event.values);
-                    controllerState.setOrientX(-quaternion[2]);
-                    controllerState.setOrientY(quaternion[3]);
-                    controllerState.setOrientZ(-quaternion[1]);
-                    controllerState.setOrientW(quaternion[0]);
+                    if (StreamTextureView.this.sensorInvert) {
+                        controllerState.setOrientX(quaternion[2]);
+                        controllerState.setOrientY(-quaternion[3]);
+                        controllerState.setOrientZ(quaternion[1]);
+                        controllerState.setOrientW(quaternion[0]);
+                    } else {
+                        controllerState.setOrientX(-quaternion[2]);
+                        controllerState.setOrientY(quaternion[3]);
+                        controllerState.setOrientZ(-quaternion[1]);
+                        controllerState.setOrientW(quaternion[0]);
+                    }
                     break;
             }
 

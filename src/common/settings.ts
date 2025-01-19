@@ -104,6 +104,16 @@ const settings = [
     ],
   },
   {
+    name: 'sensor_invert',
+    type: 'radio',
+    title: t('Invert Sensor'),
+    description: t('InvertSensorDesc'),
+    data: [
+      {value: true, text: t('Enable')},
+      {value: false, text: t('Disable')},
+    ],
+  },
+  {
     name: 'show_performance',
     type: 'radio',
     title: t('Show performance'),

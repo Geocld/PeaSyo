@@ -24,7 +24,7 @@ import {debugFactory} from '../utils/debug';
 
 const CONNECTED = 'connected';
 
-const {FullScreenManager, PipManager} = NativeModules;
+const {FullScreenManager, GamepadManager} = NativeModules;
 
 const eventEmitter = new NativeEventEmitter();
 
@@ -171,6 +171,7 @@ function StreamScreen({navigation, route}) {
       rumble_intensity,
       video_format,
       sensor,
+      sensor_invert,
       dead_zone,
       edge_compensation,
       short_trigger,
@@ -222,6 +223,7 @@ function StreamScreen({navigation, route}) {
       usbMode: route.params?.isUsbMode || false,
       videoFormat: video_format,
       useSensor: sensor,
+      sensorInvert: sensor_invert,
       deadZone: dead_zone,
       edgeCompensation: edge_compensation,
       shortTrigger: short_trigger,
@@ -235,6 +237,7 @@ function StreamScreen({navigation, route}) {
     FullScreenManager.immersiveModeOn();
 
     navigation.addListener('beforeRemove', e => {
+      GamepadManager.vibrate(0, 0, 0, 0, 0, 3);
       if (isExiting.current) {
         e.preventDefault();
         return;

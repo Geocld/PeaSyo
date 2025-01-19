@@ -17,6 +17,7 @@ export type Settings = {
   rumble: boolean;
   rumble_intensity: number;
   sensor: boolean;
+  sensor_invert: boolean;
   bind_usb_device: boolean;
   dead_zone: number;
   edge_compensation: number;
@@ -45,6 +46,7 @@ const defaultSettings: Settings = {
   rumble: true,
   rumble_intensity: 3,
   sensor: false,
+  sensor_invert: false,
   bind_usb_device: false,
   dead_zone: 0.2,
   edge_compensation: 0,

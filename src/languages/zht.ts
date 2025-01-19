@@ -66,6 +66,8 @@ export default {
       '使用高性能視頻渲染，默認使用高性能渲染，但要注意應用退到後台會停止串流，如果需要頻繁切換後台並保持串流，請關閉高性能渲染模式',
     Sensor: '傳感器',
     SensorDesc: '使用設備傳感器',
+    'Invert Sensor': '反轉傳感器',
+    InvertSensorDesc: '如果你發現傳感器在遊戲中方向相反，請打開反轉傳感器',
     'Show performance': '性能信息顯示',
     'Always display the performance panel': '始終顯示性能信息',
     'Performance show style': '性能展示樣式',
