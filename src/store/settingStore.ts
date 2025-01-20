@@ -25,6 +25,7 @@ export type Settings = {
   video_format: string;
   show_virtual_gamead: boolean;
   show_touchpad: boolean;
+  touchpad_type: number; // 0 - default, 1 - full
   virtual_gamepad_opacity: number;
   custom_virtual_gamepad: string;
   gamepad_maping: Record<string, number>;
@@ -54,6 +55,7 @@ const defaultSettings: Settings = {
   video_format: '',
   show_virtual_gamead: false,
   show_touchpad: true,
+  touchpad_type: 0,
   virtual_gamepad_opacity: 0.6,
   custom_virtual_gamepad: '',
   gamepad_maping: {},

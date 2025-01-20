@@ -100,6 +100,7 @@ function SettingsScreen({navigation}) {
       <Spinner
         visible={loading}
         textContent={t('Loading')}
+        color={'#DF6069'}
         textStyle={styles.spinnerTextStyle}
       />
 

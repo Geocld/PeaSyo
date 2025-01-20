@@ -69,7 +69,7 @@ const PerfPanel: React.FC<Props> = ({resolution = '', performance = {}}) => {
     if (value === undefined) {
       return '-1';
     }
-    return value.toFixed(2);
+    return value.toFixed(1);
   };
 
   const computedDt = (value: number | undefined): string => {

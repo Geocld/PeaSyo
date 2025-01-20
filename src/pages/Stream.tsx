@@ -48,6 +48,7 @@ function StreamScreen({navigation, route}) {
   const [settings, setSettings] = React.useState<any>({});
   const [streamInfo, setStreamInfo] = React.useState<any>(null);
   const [resolution, setResolution] = React.useState('');
+  const [isTouchpadFull, setIsTouchpadFull] = React.useState(false);
 
   const stateEventListener = React.useRef<any>(undefined);
   // const rumbleEventListener = React.useRef<any>(undefined);
@@ -177,6 +178,7 @@ function StreamScreen({navigation, route}) {
       short_trigger,
       gamepad_maping,
       useSurface,
+      touchpad_type,
     } = _settings;
     if (_resolution === 360) {
       width = 640;
@@ -205,6 +207,8 @@ function StreamScreen({navigation, route}) {
     }
 
     setResolution(`${width} x ${height}`);
+    const _isTouchpadFull = touchpad_type === 1;
+    setIsTouchpadFull(_isTouchpadFull);
 
     const _streamInfo = {
       ps5: _consoleInfo.apName === 'PS5',
@@ -283,7 +287,7 @@ function StreamScreen({navigation, route}) {
 
           setTimeout(() => {
             // Alway show virtual gamepad
-            if (_settings.show_virtual_gamead) {
+            if (_settings.show_virtual_gamead && !_isTouchpadFull) {
               setShowVirtualGamepad(true);
             }
 
@@ -513,6 +517,26 @@ function StreamScreen({navigation, route}) {
     }
   };
 
+  const renderTouchpad = () => {
+    if (!showTouchpad || !consoleInfo) {
+      return null;
+    }
+    const {touchpad_type} = settings;
+    const touchpadStyle =
+      touchpad_type === 0 ? styles.touchpad : styles.touchpadFull;
+
+    return (
+      <View style={touchpadStyle}>
+        <Touchpad
+          isPS5={consoleInfo.apName === 'PS5'}
+          isFull={isTouchpadFull}
+          onTap={handleTouchpadTap}
+          onTouch={handleTouch}
+        />
+      </View>
+    );
+  };
+
   return (
     <View>
       {showInitOverlay && (
@@ -531,15 +555,7 @@ function StreamScreen({navigation, route}) {
 
       {renderVirtualGamepad()}
 
-      {showTouchpad && consoleInfo && (
-        <View style={styles.touchpad}>
-          <Touchpad
-            isPS5={consoleInfo.apName === 'PS5'}
-            onTap={handleTouchpadTap}
-            onTouch={handleTouch}
-          />
-        </View>
-      )}
+      {renderTouchpad()}
 
       {showModal && (
         <View style={styles.modal}>
@@ -556,7 +572,7 @@ function StreamScreen({navigation, route}) {
                     }}
                   />
                 )}
-                {connectState === CONNECTED && (
+                {connectState === CONNECTED && !isTouchpadFull && (
                   <List.Item
                     title={t('Toggle Virtual Gamepad')}
                     background={background}
@@ -656,6 +672,15 @@ const styles = StyleSheet.create({
     top: 10,
     left: '25%',
     right: '25%',
+    zIndex: 99,
+    alignItems: 'center',
+  },
+  touchpadFull: {
+    position: 'absolute',
+    top: 10,
+    left: 0,
+    right: 0,
+    bottom: 0,
     zIndex: 99,
     alignItems: 'center',
   },

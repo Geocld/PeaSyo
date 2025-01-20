@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, Dimensions} from 'react-native';
 import {GestureDetector, Gesture} from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
@@ -32,11 +32,17 @@ const MAX_TOUCH_ID = 120;
 
 type Props = {
   isPS5: boolean;
+  isFull?: boolean;
   onTap: (isPressed: boolean, nextId: number, touches: any[]) => void;
   onTouch: (mask: number, nextId: number, touches: any[]) => void;
 };
 
-const Touchpad: React.FC<Props> = ({isPS5 = true, onTap, onTouch}) => {
+const Touchpad: React.FC<Props> = ({
+  isPS5 = true,
+  isFull = false,
+  onTap,
+  onTouch,
+}) => {
   const isMoving = useSharedValue(false);
 
   const currentId = useSharedValue(-1);
@@ -44,11 +50,14 @@ const Touchpad: React.FC<Props> = ({isPS5 = true, onTap, onTouch}) => {
   const touchId1 = useSharedValue(-1);
   const touchId2 = useSharedValue(-1);
 
-  const opacity = useSharedValue(SHOW_OPACITY);
+  const opacity = useSharedValue(0);
 
-  React.useEffect(() => {
-    opacity.value = withDelay(5000, withTiming(0));
-  }, []);
+  let {width: dWidth, height: dHeight} = Dimensions.get('window');
+  dWidth = dWidth - 20;
+  dHeight = dHeight - 20;
+
+  const padWidth = isFull ? dWidth : VIEW_WIDTH;
+  const padHeight = isFull ? dHeight : VIEW_HEIGHT;
 
   const normalizeCoordinates = (x: number, y: number) => {
     'worklet';
@@ -56,11 +65,11 @@ const Touchpad: React.FC<Props> = ({isPS5 = true, onTap, onTouch}) => {
     const touchpadHeight = isPS5 ? PS5_TOUCHPAD_HEIGHT : TOUCHPAD_HEIGHT;
 
     const normX = Math.min(
-      Math.max(0, Math.round((x * touchpadWidth) / VIEW_WIDTH)),
+      Math.max(0, Math.round((x * touchpadWidth) / padWidth)),
       touchpadWidth - 1,
     );
     const normY = Math.min(
-      Math.max(0, Math.round((y * touchpadHeight) / VIEW_HEIGHT)),
+      Math.max(0, Math.round((y * touchpadHeight) / padHeight)),
       touchpadHeight - 1,
     );
     return {x: normX, y: normY};
@@ -233,6 +242,10 @@ const Touchpad: React.FC<Props> = ({isPS5 = true, onTap, onTouch}) => {
     const columns = Math.ceil(VIEW_WIDTH / DOT_SPACING);
     const dots: any[] = [];
 
+    if (isFull) {
+      return null;
+    }
+
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < columns; col++) {
         dots.push(
@@ -256,15 +269,20 @@ const Touchpad: React.FC<Props> = ({isPS5 = true, onTap, onTouch}) => {
   const animatedStyle = useAnimatedStyle(() => {
     return {
       opacity: opacity.value,
-      width: VIEW_WIDTH,
-      height: VIEW_HEIGHT,
+      width: padWidth,
+      height: padHeight,
     };
   });
 
   return (
     <GestureDetector gesture={gesture}>
-      <View style={styles.container}>
-        <Animated.View style={[styles.overlay, animatedStyle]}>
+      <View style={{width: padWidth, height: padHeight}}>
+        <Animated.View
+          style={[
+            styles.overlay,
+            {width: padWidth, height: padHeight},
+            animatedStyle,
+          ]}>
           {generateDots()}
         </Animated.View>
       </View>
@@ -273,17 +291,11 @@ const Touchpad: React.FC<Props> = ({isPS5 = true, onTap, onTouch}) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    width: VIEW_WIDTH,
-    height: VIEW_HEIGHT,
-  },
   overlay: {
     backgroundColor: '#f0f0f0',
     overflow: 'hidden',
     position: 'relative',
     borderRadius: 10,
-    width: VIEW_WIDTH,
-    height: VIEW_HEIGHT,
   },
   dot: {
     width: DOT_SIZE,

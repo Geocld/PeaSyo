@@ -273,13 +273,8 @@ function HomeScreen({navigation, route}) {
             }
           });
         } else {
-          Alert.alert(t('Warning'), t('ConSoleNotFound'), [
-            {
-              text: t('Confirm'),
-              style: 'default',
-            },
-          ]);
           setLoading(false);
+          handleToLocalStream(item);
         }
       })
       .catch(e => {
