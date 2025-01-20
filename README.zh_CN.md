@@ -15,7 +15,7 @@
 
 ## Intro
 
-PeaSyo，也称貔貅（pixiu），使用中国古代神兽命名，是一款为PS4/5串流应用，支持远程唤醒、远程串流、按键映射、手柄振动等丰富的功能，你可以在任意Android设备上使用貔貅游玩PlayStation游戏。
+PeaSyo，也称貔貅（pixiu），使用中国古代神兽命名，是一款PS4/5串流应用，支持远程唤醒、远程串流、按键映射、手柄振动等丰富的功能，你可以在任意Android设备上使用貔貅游玩PlayStation游戏。
 
 
 > 声明: PeaSyo与Sony、PlayStation没有关联。所有权和商标属于其各自所有者。
