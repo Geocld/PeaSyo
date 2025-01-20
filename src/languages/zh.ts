@@ -21,6 +21,8 @@ export default {
     Disable: '关',
     Light: '明亮',
     Dark: '暗黑',
+    'Update Warning': '新版本提示',
+    Download: '下载',
     Feedback: '反馈及支持',
     Logout: '退出登录',
     Current: '当前',

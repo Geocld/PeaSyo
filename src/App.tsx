@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Alert,
-  Linking,
-  useColorScheme,
-  NativeModules,
-  View,
-} from 'react-native';
+import {Alert, Linking, useColorScheme, NativeModules} from 'react-native';
 import {
   PaperProvider,
   MD3DarkTheme,
@@ -121,10 +115,12 @@ function App() {
   if (settings.check_update) {
     updater().then((infos: any) => {
       if (infos) {
-        const {latestVer, version, url} = infos;
+        const {latestVer, version, updateText, url} = infos;
         Alert.alert(
-          t('Warning'),
-          t(`Check new version ${latestVer}, current version is ${version}`),
+          t('Update Warning'),
+          t(
+            `Check new version ${latestVer}, current version is ${version}. \n\n Update: \n\n ${updateText}`,
+          ),
           [
             {
               text: t('Cancel'),
