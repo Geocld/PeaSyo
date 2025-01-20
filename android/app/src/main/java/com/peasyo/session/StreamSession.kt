@@ -76,7 +76,6 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 
 	private var currentState = ControllerState()
 
-	// 在类中添加状态变量
 	private val hapticsState = AudioHapticsState()
 
 	fun setControllerState(controllerState: ControllerState) {
@@ -92,6 +91,16 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 		session = null
 		_state.value = StreamStateIdle
 		//surfaceTexture?.release()
+
+		// Stop rumble
+		if (rumble) {
+			if (usbMode) {
+				getMainActivity()?.handleRumble(0, 0)
+			} else {
+				var gamepadManager = Gamepad(reactContext)
+				gamepadManager.vibrate(60, 0, 0, 0, 0, rumbleIntensity)
+			}
+		}
 	}
 
 	fun sleep() {
@@ -161,12 +170,11 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 		return reactContext?.currentActivity as? MainActivity
 	}
 
-	// 事件回调，直接将事件传递到RN
 	private fun eventCallback(event: Event)
 	{
 		when(event)
 		{
-			is ConnectedEvent -> { // 连接成功事件
+			is ConnectedEvent -> { // 连接成功
 				_state.postValue(StreamStateConnected)
 
 				val params = Arguments.createMap().apply {
@@ -198,13 +206,13 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 					val canSendEvent = (currentTime - hapticsState.lastEventTime) >= EVENT_COOLDOWN_MS
 
 					if (canSendEvent) {
-						// 场景1：左右声道差异检测
+						// Situation1：left != right
 						if (abs(left - right) > CHANNEL_DIFF_THRESHOLD) {
 							shouldVibrate = true
 							//Log.d("StreamView", "Vibration triggered by channel difference: L=$left8, R=$right8")
 						}
 
-						// 场景2：检测数值突变
+						// Situation2：rumble change
 						if (!shouldVibrate && hapticsState.isInitialized) {
 							val leftChange = if (hapticsState.stableLeft > 0 && left > 0) {
 								abs((left - hapticsState.stableLeft).toFloat() / hapticsState.stableLeft) * 100
@@ -214,7 +222,6 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 								abs((right - hapticsState.stableRight).toFloat() / hapticsState.stableRight) * 100
 							} else 0f
 
-							// 只有当变化率在有效范围内才触发振动
 							if ((leftChange > VALUE_CHANGE_THRESHOLD && leftChange < 30) ||
 								(rightChange > VALUE_CHANGE_THRESHOLD && rightChange < 30)) {
 								shouldVibrate = true
@@ -223,14 +230,13 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 							}
 						}
 
-						// 场景3：有按键按下且监听到振动
+						// Situation3：Rumble with click
 						if (!shouldVibrate && (currentState.buttons > 0u || currentState.l2State > 0u || currentState.r2State > 0u) && (left > 0 || right > 0)) {
 							shouldVibrate = true
 //							Log.d("StreamView", "situation3...")
 						}
 					}
 
-					// 更新稳定状态
 					if (abs(left - hapticsState.lastLeft) <= VALUE_CHANGE_THRESHOLD &&
 						abs(right - hapticsState.lastRight) <= VALUE_CHANGE_THRESHOLD) {
 						hapticsState.stableCount++

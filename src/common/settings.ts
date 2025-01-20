@@ -57,6 +57,7 @@ const settings = [
     type: 'radio',
     title: t('Stream bitrate'),
     description: t('BitrateDesc'),
+    tips: t('BitrateTips'),
     data: [
       {value: 'auto', text: t('Auto')},
       {value: 'custom', text: t('Custom')},

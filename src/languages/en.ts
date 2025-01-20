@@ -53,6 +53,8 @@ export default {
     'Stream bitrate': 'Bitrate',
     BitrateDesc:
       'Set the maximum streaming bitrate. Note that the streaming bitrate of PS4/5 is dynamic',
+    BitrateTips:
+      'Note that excessive bitrate may cause video artifacts. If artifacts occur, please reduce the bitrate accordingly',
     Auto: 'Auto',
     Custom: 'Custom',
     Codec: 'Video Codec',

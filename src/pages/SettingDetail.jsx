@@ -88,7 +88,7 @@ function SettingDetailScreen({navigation, route}) {
           settings.bitrate = 10000;
           break;
         case 1080:
-          settings.bitrate = 30000;
+          settings.bitrate = 27000;
           break;
         default:
           break;

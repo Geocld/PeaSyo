@@ -202,7 +202,7 @@ function StreamScreen({navigation, route}) {
       width = 1920;
       height = 1080;
       if (bitrate_mode === 'auto') {
-        bitrate = 30000; // 30000kbps
+        bitrate = 27000; // 27000kbps
       }
     }
 
@@ -263,6 +263,7 @@ function StreamScreen({navigation, route}) {
           if (useSurface) {
             // Will exit if use surfaceView
             streamViewRef.current?.stopSession();
+            GamepadManager.vibrate(0, 0, 0, 0, 0, 3);
             if (_settings.sensor) {
               streamViewRef.current?.stopSensor();
             }
@@ -323,6 +324,7 @@ function StreamScreen({navigation, route}) {
                 onPress: () => {
                   setLoading(true);
                   streamViewRef.current?.stopSession();
+                  GamepadManager.vibrate(0, 0, 0, 0, 0, 3);
                   if (_settings.sensor) {
                     streamViewRef.current?.stopSensor();
                   }
@@ -454,6 +456,7 @@ function StreamScreen({navigation, route}) {
       setShowTouchpad(false);
     } catch (e) {}
     setTimeout(() => {
+      GamepadManager.vibrate(0, 0, 0, 0, 0, 3);
       navigation.navigate({
         name: 'Home',
       });

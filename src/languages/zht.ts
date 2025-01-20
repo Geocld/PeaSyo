@@ -56,6 +56,7 @@ export default {
     Zoom: '縮放',
     'Stream bitrate': '碼率',
     BitrateDesc: '設置串流最高碼率，需要注意的是PS4/5的串流碼率是動態的',
+    BitrateTips: '注意過高碼率可能會導致視頻花屏，如出現花屏，請適當降低碼率',
     Auto: '自動',
     Codec: '視頻解碼器',
     CodecDesc: '設置視頻播放解碼，H264使用AVC解碼，H265使用HEVC解碼',

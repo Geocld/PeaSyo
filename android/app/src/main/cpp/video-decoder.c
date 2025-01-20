@@ -71,8 +71,6 @@ void android_chiaki_video_decoder_fini(AndroidChiakiVideoDecoder *decoder)
 void android_chiaki_video_decoder_set_surface(AndroidChiakiVideoDecoder *decoder, JNIEnv *env, jobject surface)
 {
     CHIAKI_LOGI(decoder->log, "StreamView android_chiaki_video_decoder_set_surface");
-
-    // 这里不能锁进程，否则会导致RN ui渲染进程卡住
 	chiaki_mutex_lock(&decoder->codec_mutex);
 
 	if(!surface)
@@ -88,7 +86,6 @@ void android_chiaki_video_decoder_set_surface(AndroidChiakiVideoDecoder *decoder
 		return;
 	}
 
-    CHIAKI_LOGI(decoder->log, "StreamView android_chiaki_video_decoder_set_surface22222");
 	// 实时渲染视频
 	if(decoder->codec)
 	{
@@ -124,7 +121,17 @@ void android_chiaki_video_decoder_set_surface(AndroidChiakiVideoDecoder *decoder
 	AMediaFormat_setString(format, AMEDIAFORMAT_KEY_MIME, mime);
 	AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_WIDTH, decoder->target_width);
 	AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_HEIGHT, decoder->target_height);
+
+#if __ANDROID_API__ >= 28
+    AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_LATENCY, 1);
+    AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_OPERATING_RATE, INT32_MAX);
+    AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_PRIORITY, 0);
+    AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_ALLOW_FRAME_DROP, 1);
+#else
     AMediaFormat_setInt32(format, "low-latency", 1);
+    AMediaFormat_setInt32(format, "operating-rate", 120);
+    AMediaFormat_setInt32(format, "priority", 0);
+#endif
 
 	media_status_t r = AMediaCodec_configure(decoder->codec, format, decoder->window, NULL, 0);
 	if(r != AMEDIA_OK)
