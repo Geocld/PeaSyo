@@ -66,3 +66,6 @@ Run development build:
 ```
 npm run android
 ```
+
+## LICENSE
+PeaSyo strictly follows the [AGPL v3 License]((./LICENSE)). If other projects reference or use implementations from this project, please strictly comply with this license.
