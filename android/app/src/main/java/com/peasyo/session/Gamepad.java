@@ -208,6 +208,7 @@ public class Gamepad {
                 if (!isRealGamepad) {
                     continue;
                 }
+                hasRealGamepad = true;
 
                 Log.d("GamepadManager", "isGameControllerDevice:" + dev.getName());
 
