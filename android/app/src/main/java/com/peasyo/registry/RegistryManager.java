@@ -50,32 +50,29 @@ public class RegistryManager extends ReactContextBaseJavaModule {
 
         Log.d("RegistryManager", "registry registInfo" + registInfo);
 
-        // 开始注册设备
         Regist regist = new Regist(registInfo, log.getLog(), event -> {
-            // 注册回调
             Log.d("RegistryManager", "registEvent callback" + event);
             if (event instanceof RegistEventCanceled) {
                 Log.d("RegistryManager", "registEvent RegistEventCanceled");
             } else if (event instanceof RegistEventFailed) {
                 Log.d("RegistryManager", "registEvent RegistEventFailed");
+                WritableMap params = Arguments.createMap();
+                params.putString("rpKey", "");
+                promise.resolve(params);
+
             } else if (event instanceof RegistEventSuccess) {
                 Log.d("RegistryManager", "registEvent RegistEventSuccess");
                 RegistHost registHost = ((RegistEventSuccess) event).getHost();
                 Log.d("RegistryManager", "registEvent registHost" + registHost);
 
-                // TODO: registHost里的byteArray需要转为string再传会js保存
-                // 将 byte[] 转为 Base64 编码字符串
+                // byte[] to Base64
                 String serverMacStr = java.util.Base64.getEncoder().encodeToString(registHost.getServerMac());
                 String rpRegistKeyStr = java.util.Base64.getEncoder().encodeToString(registHost.getRpRegistKey());
                 String rpKeyStr = java.util.Base64.getEncoder().encodeToString(registHost.getRpKey());
 
-                Log.d("RegistryManager", "registEvent serverMacStr" + serverMacStr);
-                Log.d("RegistryManager", "registEvent rpRegistKeyStr" + rpRegistKeyStr);
-                Log.d("RegistryManager", "registEvent rpKeyStr" + rpKeyStr);
-
-                // 将 Base64 字符串还原为 byte[]
-//                byte[] serverMac = java.util.Base64.getDecoder().decode(serverMacStr);
-//                Log.d("RegistryManager", "registEvent serverMac" + new String(serverMac));
+//                Log.d("RegistryManager", "registEvent serverMacStr" + serverMacStr);
+//                Log.d("RegistryManager", "registEvent rpRegistKeyStr" + rpRegistKeyStr);
+//                Log.d("RegistryManager", "registEvent rpKeyStr" + rpKeyStr);
 
                 WritableMap params = Arguments.createMap();
                 params.putString("apSsid", registHost.getApSsid());

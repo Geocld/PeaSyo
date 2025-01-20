@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {
   StyleSheet,
   View,
+  Alert,
   ScrollView,
   NativeModules,
   ToastAndroid,
@@ -100,7 +101,6 @@ function RegistryScreen({navigation}) {
       return;
     }
 
-    // return;
     RegistryManager.registry(
       dicoverVersion === DiscoveryVersions.PS5 ? 1000100 : 1000, // (PS5-1000100, PS4(10)-1000)
       host, // host,eg. 192.168.1.1
@@ -109,6 +109,15 @@ function RegistryScreen({navigation}) {
       parseInt(pin, 10), // PIN
     ).then((result: RegistedInfo) => {
       log.info('registry result:', result);
+      if (!result.rpKey) {
+        Alert.alert(t('Warning'), t('RegistFailed'), [
+          {
+            text: t('Confirm'),
+            style: 'default',
+          },
+        ]);
+        return;
+      }
 
       // Save regist infos
       const registedConsole = {

@@ -141,7 +141,8 @@ export default {
     WakeAndConnect: '喚醒並連接',
     Waking: '正在喚醒主機...',
     FindConsole: '正在寻找主機...',
-    ConsoleNotFound: '沒有找到主機，請確保設備和主機正在同一個局域網，並且主機處於待機或開機狀態。',
+    ConsoleNotFound:
+      '沒有找到主機，請確保設備和主機正在同一個局域網，並且主機處於待機或開機狀態。',
     // Regsistry
     RegistTips: '注意：僅支援註冊 PS5 或 PS4（固件版本 8 以上）主機',
     LookConsole: '正在尋找終端',
@@ -153,6 +154,8 @@ export default {
     SelectConsoleType: '請選擇主機類型',
     SelectConsole: '請選擇主機',
     NoConsole: '沒有搜索到主機，請手動輸入主機IP',
+    RegistFailed:
+      '註冊失敗，請檢查PIN碼是否正確，同時檢查主機登錄賬號跟當前賬號是否匹配',
     // Map
     MapDesc: '請按下手柄按鍵，按下的按鍵將映射到:',
     MapDesc2: '成功映射後本窗口會自動關閉',

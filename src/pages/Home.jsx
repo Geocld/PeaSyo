@@ -232,13 +232,18 @@ function HomeScreen({navigation, route}) {
       .then(results => {
         if (results.length) {
           results.forEach(res => {
-            if (res.id === item.consoleId || res.address.address === item.host) {
+            if (
+              res.id === item.consoleId ||
+              res.address.address === item.host
+            ) {
               // Update console host
               item.host = res.address.address;
               if (res.status === 'STANDBY') {
                 setLoadingText(t('Waking'));
                 // Send wake packet
-                const credential = RegistryManager.getCredential(item.rpRegistKey);
+                const credential = RegistryManager.getCredential(
+                  item.rpRegistKey,
+                );
                 if (!credential) {
                   ToastAndroid.show(t('CredentialIsEmpty'), ToastAndroid.SHORT);
                   return;

@@ -66,7 +66,8 @@ export default {
     Sensor: 'Sensor',
     SensorDesc: 'Use device sensors',
     'Invert Sensor': 'Invert Sensor',
-    InvertSensorDesc: 'If you find the sensor direction is reversed in the game, please enable sensor inversion',
+    InvertSensorDesc:
+      'If you find the sensor direction is reversed in the game, please enable sensor inversion',
     'Show performance': 'Show performance info',
     'Always display the performance panel':
       'Always display the performance panel',
@@ -143,7 +144,8 @@ export default {
     WakeAndConnect: 'Wake and connect',
     Waking: 'Waking...',
     FindConsole: 'Finding console...',
-    ConsoleNotFound: 'Console not found. Please ensure your device and console are on the same network, and the console is in standby or powered on',
+    ConsoleNotFound:
+      'Console not found. Please ensure your device and console are on the same network, and the console is in standby or powered on',
     // Regsistry
     RegistTips:
       'Note: Only supports registering PS5 or PS4 (firmware version 8 or above) consoles',
@@ -156,6 +158,8 @@ export default {
     SelectConsoleType: 'Please select console type',
     SelectConsole: 'Please select a console',
     NoConsole: 'No console found, please enter the host IP manually',
+    RegistFailed:
+      'Registration failed. Please check if the PIN code is correct and verify that the host login account matches the current account',
     // Map
     MapDesc: 'Press the gamepad button to map it to:',
     MapDesc2: 'This window will close automatically after successful mapping',

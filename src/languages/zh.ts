@@ -141,7 +141,8 @@ export default {
     WakeAndConnect: '唤醒并连接',
     Waking: '正在唤醒主机...',
     FindConsole: '正在寻找主机...',
-    ConSoleNotFound: '没有找到主机，请确保设备和主机正在同一个局域网，并且主机处于待机或开机状态。',
+    ConSoleNotFound:
+      '没有找到主机，请确保设备和主机正在同一个局域网，并且主机处于待机或开机状态。',
     // Regsistry
     RegistTips: '注意: 仅支持注册PS5或PS4(固件版本8+以上)主机',
     LookConsole: '正在寻找终端',
@@ -153,6 +154,8 @@ export default {
     SelectConsoleType: '请选择主机类型',
     SelectConsole: '请选择主机',
     NoConsole: '没有搜索到主机，请手动输入主机IP',
+    RegistFailed:
+      '注册失败，请检查PIN码是否正确，同时检查主机登录账号跟当前账号是否匹配',
     // Map
     MapDesc: '请按下手柄按键，按下的按键将映射到:',
     MapDesc2: '成功映射后本窗口会自动关闭',
