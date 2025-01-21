@@ -3,10 +3,12 @@ import {
   StyleSheet,
   View,
   Alert,
+  FlatList,
+  Dimensions,
   NativeModules,
   ToastAndroid,
 } from 'react-native';
-import {Button, Text, Portal, Dialog, TextInput} from 'react-native-paper';
+import {Button, Text, Portal, Dialog, TextInput, FAB} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {getIpAddressesForHostname} from 'react-native-dns-lookup';
@@ -39,6 +41,7 @@ function HomeScreen({navigation, route}) {
 
   const [isLogined, setIsLogined] = useState(false);
   const [consoles, setConsoles] = useState([]);
+  const [numColumns, setNumColumns] = React.useState(2);
 
   const isFocused = useIsFocused();
   const _isFocused = React.useRef(isFocused);
@@ -73,18 +76,6 @@ function HomeScreen({navigation, route}) {
           const _consoles = getConsoles();
           log.info('consoles:', _consoles);
           setConsoles(_consoles);
-
-          if (_consoles.length) {
-            navigation.setOptions({
-              headerRight: () => (
-                <Button
-                  mode="text"
-                  onPress={() => navigation.navigate('Registry')}>
-                  {t('Registry')}
-                </Button>
-              ),
-            });
-          }
         }
       }
 
@@ -133,6 +124,18 @@ function HomeScreen({navigation, route}) {
           });
       }
     }
+
+    const updateLayout = () => {
+      const {width, height} = Dimensions.get('window');
+      setNumColumns(width > height ? 4 : 2);
+    };
+
+    updateLayout();
+    const subscription = Dimensions.addEventListener('change', updateLayout);
+
+    return () => {
+      subscription?.remove();
+    };
   }, [t, route.params?.xalUrl, navigation]);
 
   const renderLogin = () => {
@@ -168,18 +171,29 @@ function HomeScreen({navigation, route}) {
       return <View style={styles.centerContainer}>{renderRegistry()}</View>;
     } else if (consoles.length) {
       return (
-        <View>
-          {consoles.map((item, idx) => {
-            return (
-              <ConsoleItem
-                key={idx}
-                consoleItem={item}
-                onPress={() => handleLocalStream(item)}
-                onPressRemote={() => handleRemoteStream(item)}
-              />
-            );
-          })}
-        </View>
+        <>
+          <FlatList
+            data={consoles}
+            numColumns={numColumns}
+            key={numColumns}
+            contentContainerStyle={styles.listContainer}
+            renderItem={({item}) => {
+              return (
+                <View
+                  style={[
+                    styles.consoleItem,
+                    numColumns === 4 ? styles.listItemH : styles.listItemV,
+                  ]}>
+                  <ConsoleItem
+                    consoleItem={item}
+                    onPress={() => handleLocalStream(item)}
+                    onPressRemote={() => handleRemoteStream(item)}
+                  />
+                </View>
+              );
+            }}
+          />
+        </>
       );
     } else {
       return null;
@@ -414,6 +428,53 @@ function HomeScreen({navigation, route}) {
     }, 60 * 1000);
   };
 
+  const [state, setState] = React.useState({open: false});
+
+  const onStateChange = ({open}) => setState({open});
+
+  const {open} = state;
+
+  const renderFab = () => {
+    const fabActionsLogin = [
+      {
+        icon: 'square-edit-outline',
+        label: t('Manager'),
+        onPress: () => navigation.navigate('Consoles'),
+      },
+      {
+        icon: 'plus',
+        label: t('Registry'),
+        onPress: () => navigation.navigate('Registry'),
+      },
+    ];
+
+    const ts = new TokenStore();
+    ts.load();
+    const token = ts.getToken();
+
+    let actions = [
+      {
+        icon: 'cog-outline',
+        label: t('Settings'),
+        onPress: () => navigation.navigate('Settings'),
+      },
+    ];
+
+    if (token && token.account_id) {
+      actions = actions.concat(fabActionsLogin);
+    }
+
+    return (
+      <FAB.Group
+        open={open}
+        visible
+        icon={open ? 'wrench' : 'wrench-outline'}
+        actions={actions}
+        onStateChange={onStateChange}
+      />
+    );
+  };
+
   return (
     <>
       <Portal>
@@ -463,6 +524,8 @@ function HomeScreen({navigation, route}) {
       />
 
       {renderContent()}
+
+      {renderFab()}
     </>
   );
 }
@@ -488,6 +551,18 @@ const styles = StyleSheet.create({
   spinnerTextStyle: {
     color: '#DF6069',
     textAlign: 'center',
+  },
+  listContainer: {},
+  consoleItem: {
+    padding: 10,
+  },
+  listItemH: {
+    width: '25%',
+    justifyContent: 'center',
+  },
+  listItemV: {
+    width: '50%',
+    justifyContent: 'center',
   },
 });
 

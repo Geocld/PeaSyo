@@ -6,7 +6,6 @@ import {
   MD3LightTheme,
   adaptNavigationTheme,
 } from 'react-native-paper';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import {createStackNavigator} from '@react-navigation/stack';
 import {
@@ -14,7 +13,6 @@ import {
   DarkTheme as NavigationDarkTheme,
   DefaultTheme as NavigationDefaultTheme,
 } from '@react-navigation/native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
 import merge from 'deepmerge';
 import {Provider} from 'react-redux';
@@ -48,7 +46,6 @@ import {SystemBars} from 'react-native-edge-to-edge';
 
 import './i18n';
 
-const Tab = createBottomTabNavigator();
 const RootStack = createStackNavigator();
 
 const {UsbRumbleManager} = NativeModules;
@@ -70,42 +67,6 @@ const paperDarkTheme = {
 
 const CombinedDefaultTheme = merge(paperLightTheme, LightTheme);
 const CombinedDarkTheme = merge(paperDarkTheme, DarkTheme);
-
-const TabIcon = (route: any, params: any) => {
-  const {focused, color, size} = params;
-  let iconName;
-  if (route.name === 'Home') {
-    iconName = focused ? 'game-controller' : 'game-controller-outline';
-  } else if (route.name === 'Settings') {
-    iconName = focused ? 'settings' : 'settings-outline';
-  }
-  return <Ionicons name={iconName} size={size} color={color} />;
-};
-
-function HomeTabs() {
-  const {t} = useTranslation();
-
-  return (
-    <Tab.Navigator
-      screenOptions={({route}) => ({
-        tabBarIcon: ({focused, color, size}) =>
-          TabIcon(route, {focused, color, size}),
-        tabBarActiveTintColor: '#DF6069',
-        tabBarInactiveTintColor: 'gray',
-      })}>
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{tabBarLabel: t('Consoles'), title: t('Consoles')}}
-      />
-      <Tab.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{tabBarLabel: t('Settings'), title: t('Settings')}}
-      />
-    </Tab.Navigator>
-  );
-}
 
 function App() {
   const {t} = useTranslation();
@@ -165,9 +126,9 @@ function App() {
             <RootStack.Navigator>
               <RootStack.Group>
                 <RootStack.Screen
-                  name="Main"
-                  component={HomeTabs}
-                  options={{headerShown: false}}
+                  name="Home"
+                  component={HomeScreen}
+                  options={{title: t('Consoles')}}
                 />
                 <RootStack.Screen
                   name="Login"
@@ -183,6 +144,11 @@ function App() {
                   name="Registry"
                   component={RegistryScreen}
                   options={{title: t('Registry')}}
+                />
+                <RootStack.Screen
+                  name="Settings"
+                  component={SettingsScreen}
+                  options={{title: t('Settings')}}
                 />
                 <RootStack.Screen
                   name="Consoles"

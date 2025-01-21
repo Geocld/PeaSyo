@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, View, useColorScheme} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {Card, Text, Button} from 'react-native-paper';
 import {useTranslation} from 'react-i18next';
 import {SvgXml} from 'react-native-svg';
@@ -15,25 +15,29 @@ const ConsoleItem = (props: any) => {
     <Card style={styles.wrap}>
       <Card.Content>
         <View style={styles.consoleInfos}>
-          <View style={styles.infoLeft}>
+          <Text variant="titleLarge" style={styles.textCenter}>
+            {consoleItem.serverNickname}
+          </Text>
+          <View style={styles.image}>
             <SvgXml
               // xml={theme === 'dark' ? icons.ConsoleDark : icons.ConsoleLight}
               xml={icons.ConsoleIcon}
-              width={60}
-              height={60}
+              width={'100%'}
+              height={80}
             />
           </View>
-          <View style={styles.infoRight}>
-            <Text variant="titleLarge">{consoleItem.serverNickname}</Text>
-            {consoleItem.consoleId && (
-              <Text variant="labelSmall">ID.{consoleItem.consoleId}</Text>
-            )}
-            <Text variant="labelSmall">IP: {consoleItem.host}</Text>
-            <Text variant="labelSmall">
-              {t('RegistryTime')}:{' '}
-              {dayjs(consoleItem.registedTime).format('YYYY.MM.DD HH:mm')}
+          {consoleItem.consoleId && (
+            <Text variant="labelSmall" style={styles.textCenter}>
+              ID.{consoleItem.consoleId}
             </Text>
-          </View>
+          )}
+          <Text variant="labelSmall" style={styles.textCenter}>
+            IP: {consoleItem.host}
+          </Text>
+          <Text variant="labelSmall" style={styles.textCenter}>
+            {t('RegistryTime')}:{' '}
+            {dayjs(consoleItem.registedTime).format('YYYY.MM.DD HH:mm')}
+          </Text>
         </View>
         {props.isEdit ? (
           <View style={styles.footer}>
@@ -61,6 +65,7 @@ const ConsoleItem = (props: any) => {
               onPress={props.onPress}>
               {t('LocalStream')}
             </Button>
+
             <Button
               mode="outlined"
               background={{
@@ -79,22 +84,11 @@ const ConsoleItem = (props: any) => {
 };
 
 const styles = StyleSheet.create({
-  wrap: {
-    marginTop: 20,
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  consoleInfos: {
-    display: 'flex',
-    flexDirection: 'row',
-  },
-  infoLeft: {
-    width: 70,
-  },
-  infoRight: {
-    flex: 1,
-    display: 'flex',
-    justifyContent: 'center',
+  wrap: {},
+  consoleInfos: {},
+  image: {},
+  textCenter: {
+    textAlign: 'center',
   },
   footer: {
     paddingTop: 10,

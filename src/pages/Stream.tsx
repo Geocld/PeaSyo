@@ -242,10 +242,6 @@ function StreamScreen({navigation, route}) {
 
     navigation.addListener('beforeRemove', e => {
       GamepadManager.vibrate(0, 0, 0, 0, 0, 3);
-      if (isExiting.current) {
-        e.preventDefault();
-        return;
-      }
       if (e.data.action.type !== 'GO_BACK') {
         navigation.dispatch(e.data.action);
       } else {

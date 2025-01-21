@@ -126,7 +126,6 @@ void android_chiaki_video_decoder_set_surface(AndroidChiakiVideoDecoder *decoder
     AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_LATENCY, 1);
     AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_OPERATING_RATE, INT32_MAX);
     AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_PRIORITY, 0);
-    AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_ALLOW_FRAME_DROP, 1);
 #else
     AMediaFormat_setInt32(format, "low-latency", 1);
     AMediaFormat_setInt32(format, "operating-rate", 120);

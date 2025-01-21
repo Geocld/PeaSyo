@@ -130,14 +130,6 @@ function SettingsScreen({navigation}) {
           onPress={() => navigation.navigate('Transfer')}
         />
 
-        {token && token.account_id && (
-          <SettingItem
-            title={t('Consoles manager')}
-            description={t('ConsolesDesc')}
-            onPress={() => navigation.navigate('Consoles')}
-          />
-        )}
-
         <SettingItem
           title={t('Reset')}
           description={t('Reset all settings to default')}

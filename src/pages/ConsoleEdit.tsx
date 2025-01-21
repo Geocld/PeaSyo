@@ -123,7 +123,7 @@ function ConsoleEditScreen({navigation, route}) {
         <TextInput label={t('RegistedTime')} value={time || '---'} disabled />
       </View>
 
-      <View style={[styles.wrap, {paddingBottom: 50}]}>
+      <View style={[styles.wrap]}>
         <Button mode="outlined" style={styles.button} onPress={handleSave}>
           {t('Save')}
         </Button>

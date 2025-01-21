@@ -142,7 +142,7 @@ export default {
     ParseError102:
       'Domain resolution failed (102). Ensure your domain is valid. If using an IPv6 domain, make sure your network supports IPv6.',
     RemoteDesc:
-      'To play remotely, enter the host IP or router’s public IP. Supported formats: example.com / 192.168.1.1 / 2001:db8:85a3::8a2e:370:7334',
+      'To play remotely, enter the host IP or router’s public IP. Supported formats:\n example.com \n 192.168.1.1 \n 2001:db8:85a3::8a2e:370:7334',
     RemoteHost: 'Remote address',
     WakeConsole: 'Wake up console',
     WakeDesc:
@@ -153,6 +153,8 @@ export default {
     FindConsole: 'Finding console...',
     ConsoleNotFound:
       'Console not found. Please ensure your device and console are on the same network, and the console is in standby or powered on',
+    Manager: 'Manage consoles',
+    ConsoleEdit: 'Edit consoles',
     // Regsistry
     RegistTips:
       'Note: Only supports registering PS5 or PS4 (firmware version 8 or above) consoles',

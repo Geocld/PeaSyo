@@ -268,13 +268,15 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 									getMainActivity()?.handleRumble(0, 0)
 								}, VIBRATION_DURATION)
 							} else {
-								vibrateScope.launch {
-									// 使用 Mutex 确保同一时间只有一个振动在执行
-									vibrateMutex.withLock {
-										var gamepadManager = Gamepad(reactContext)
-										gamepadManager.vibrate(60, event.left, event.right, 0, 0, rumbleIntensity)
-										// 等待振动完成
-										delay(60)
+								var gamepadManager = Gamepad(reactContext)
+								if(left == 0 || right == 0) {
+									gamepadManager.vibrate(60, event.left, event.right, 0, 0, rumbleIntensity)
+								} else {
+									vibrateScope.launch {
+										vibrateMutex.withLock {
+											gamepadManager.vibrate(60, event.left, event.right, 0, 0, rumbleIntensity)
+											delay(60)
+										}
 									}
 								}
 							}

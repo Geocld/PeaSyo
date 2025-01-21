@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {StyleSheet, View, ScrollView} from 'react-native';
+import {StyleSheet, View, FlatList, Dimensions} from 'react-native';
 import {Button, Text} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
 import {useTranslation} from 'react-i18next';
@@ -19,6 +19,7 @@ type Console = {
 function ConsolesScreen({navigation}) {
   const {t} = useTranslation();
   const [consoles, setConsoles] = useState<Console[]>([]);
+  const [numColumns, setNumColumns] = React.useState(2);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -32,6 +33,18 @@ function ConsolesScreen({navigation}) {
     const _consoles = getConsoles();
     log.info('consoles:', _consoles);
     setConsoles(_consoles);
+
+    const updateLayout = () => {
+      const {width, height} = Dimensions.get('window');
+      setNumColumns(width > height ? 4 : 2);
+    };
+
+    updateLayout();
+    const subscription = Dimensions.addEventListener('change', updateLayout);
+
+    return () => {
+      subscription?.remove();
+    };
   }, [navigation, t]);
 
   const renderRegistry = () => {
@@ -49,7 +62,13 @@ function ConsolesScreen({navigation}) {
     );
   };
 
-  const handleEdit = idx => {
+  const handleEdit = item => {
+    let idx = 0;
+    consoles.forEach((_console, i) => {
+      if (_console.id === item.id) {
+        idx = i;
+      }
+    });
     navigation.navigate({
       name: 'ConsoleEdit',
       params: {
@@ -59,24 +78,35 @@ function ConsolesScreen({navigation}) {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       {consoles.length ? (
-        <View>
-          {consoles.map((item, idx) => {
-            return (
-              <ConsoleItem
-                key={idx}
-                consoleItem={item}
-                isEdit
-                onPressEdit={() => handleEdit(idx)}
-              />
-            );
-          })}
-        </View>
+        <>
+          <FlatList
+            data={consoles}
+            numColumns={numColumns}
+            key={numColumns}
+            contentContainerStyle={styles.listContainer}
+            renderItem={({item}) => {
+              return (
+                <View
+                  style={[
+                    styles.consoleItem,
+                    numColumns === 4 ? styles.listItemH : styles.listItemV,
+                  ]}>
+                  <ConsoleItem
+                    consoleItem={item}
+                    isEdit
+                    onPressEdit={() => handleEdit(item)}
+                  />
+                </View>
+              );
+            }}
+          />
+        </>
       ) : (
         <View style={styles.centerContainer}>{renderRegistry()}</View>
       )}
-    </ScrollView>
+    </View>
   );
 }
 
@@ -93,6 +123,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     marginBottom: 10,
+  },
+  listContainer: {},
+  consoleItem: {
+    padding: 10,
+  },
+  listItemH: {
+    width: '25%',
+    justifyContent: 'center',
+  },
+  listItemV: {
+    width: '50%',
+    justifyContent: 'center',
   },
 });
 

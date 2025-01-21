@@ -140,7 +140,7 @@ export default {
     ParseError102:
       '域名解析失败(102),请确保你的域名有效，如果你正在尝试使用ipv6域名，请保证你当前网络环境支持ipv6.',
     RemoteDesc:
-      '进行远程游玩需要输入主机IP或路由器公网IP,支持格式如：example.com/192.168.1.1/2001:db8:85a3::8a2e:370:7334',
+      '进行远程游玩需要输入主机IP或路由器公网IP,支持格式如：\nexample.com\n192.168.1.1\n2001:db8:85a3::8a2e:370:7334',
     RemoteHost: '远程地址',
     WakeConsole: '唤醒主机',
     WakeDesc: '如果主机处于休眠状态，是否要唤醒主机，唤醒耗时大约一分钟。',
@@ -150,6 +150,8 @@ export default {
     FindConsole: '正在寻找主机...',
     ConSoleNotFound:
       '没有找到主机，请确保设备和主机正在同一个局域网，并且主机处于待机或开机状态。',
+    Manager: '主机管理',
+    ConsoleEdit: '编辑主机',
     // Regsistry
     RegistTips: '注意: 仅支持注册PS5或PS4(固件版本8+以上)主机',
     LookConsole: '正在寻找终端',
