@@ -112,11 +112,11 @@ const PerfPanel: React.FC<Props> = ({resolution = '', performance = {}}) => {
             {isHorizon ? '| ' : ''}
           </Text>
         </View>
-        <View>
+        {/* <View>
           <Text style={styles.text}>
             {t('FPS')}: {computedFps(performance.fps)} {isHorizon ? '| ' : ''}
           </Text>
-        </View>
+        </View> */}
         <View>
           <Text style={styles.text}>
             {t('DT')}: {computedDt(performance.decodeTime)} ({codec})

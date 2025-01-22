@@ -75,11 +75,24 @@ const Touchpad: React.FC<Props> = ({
     return {x: normX, y: normY};
   };
 
+  const showTouchpad = () => {
+    'worklet';
+    opacity.value = withTiming(SHOW_OPACITY, { duration: 150 });
+  };
+
+  const hideTouchpad = () => {
+    'worklet';
+    opacity.value = withDelay(500, withTiming(0, { duration: 150 }));
+  };
+
   // 移动
   const pan = Gesture.Pan()
     .maxPointers(2)
     .minDistance(30)
     .runOnJS(true)
+    .onTouchesDown(() => {
+      showTouchpad();
+    })
     .onTouchesMove(e => {
       // console.log('pan onTouchesMove');
       opacity.value = SHOW_OPACITY;
@@ -135,7 +148,7 @@ const Touchpad: React.FC<Props> = ({
       if (isMoving.value) {
         // console.log('pan onTouchesUp:', e);
         isMoving.value = false;
-        opacity.value = withDelay(2000, withTiming(0));
+        hideTouchpad();
 
         const changedTouches = e.changedTouches;
 
@@ -164,6 +177,9 @@ const Touchpad: React.FC<Props> = ({
   const singleTap = Gesture.Tap()
     .maxDuration(SHORT_BUTTON_PRESS_DURATION_MS)
     .maxDistance(10)
+    .onBegin(() => {
+      showTouchpad();
+    })
     .onStart(e => {
       console.log('Single tap:', e);
 
@@ -193,7 +209,7 @@ const Touchpad: React.FC<Props> = ({
       const normalXY = normalizeCoordinates(e.x, e.y);
       const touches = [normalXY.x, normalXY.y, -1, 0, 0, -1];
 
-      opacity.value = withDelay(2000, withTiming(0));
+      hideTouchpad();
 
       runOnJS(onTap)(false, nextId.value, touches);
     });
@@ -201,6 +217,9 @@ const Touchpad: React.FC<Props> = ({
   // 长按
   const longPress = Gesture.LongPress()
     .minDuration(BUTTON_HOLD_DELAY_MS)
+    .onBegin(() => {
+      showTouchpad();
+    })
     .onStart(e => {
       console.log('LongPress start:', e);
 
@@ -230,7 +249,7 @@ const Touchpad: React.FC<Props> = ({
       const normalXY = normalizeCoordinates(e.x, e.y);
       const touches = [normalXY.x, normalXY.y, -1, 0, 0, -1];
 
-      opacity.value = withDelay(2000, withTiming(0));
+      hideTouchpad();
 
       runOnJS(onTap)(false, nextId.value, touches);
     });

@@ -416,7 +416,10 @@ function StreamScreen({navigation, route}) {
             setShowInitOverlay(false);
           }
 
-          streamViewRef.current?.startSession();
+          setTimeout(() => {
+            streamViewRef.current?.startSession();
+          }, 100);
+
         }, 300);
       }, 100);
     }, 500);
