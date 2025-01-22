@@ -127,7 +127,7 @@ function HomeScreen({navigation, route}) {
 
     const updateLayout = () => {
       const {width, height} = Dimensions.get('window');
-      setNumColumns(width > height ? 4 : 2);
+      setNumColumns(width > height ? 3 : 2);
     };
 
     updateLayout();
@@ -182,7 +182,7 @@ function HomeScreen({navigation, route}) {
                 <View
                   style={[
                     styles.consoleItem,
-                    numColumns === 4 ? styles.listItemH : styles.listItemV,
+                    numColumns === 3 ? styles.listItemH : styles.listItemV,
                   ]}>
                   <ConsoleItem
                     consoleItem={item}
@@ -557,7 +557,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   listItemH: {
-    width: '25%',
+    width: '30%',
     justifyContent: 'center',
   },
   listItemV: {
