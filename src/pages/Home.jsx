@@ -43,6 +43,10 @@ function HomeScreen({navigation, route}) {
   const [consoles, setConsoles] = useState([]);
   const [numColumns, setNumColumns] = React.useState(2);
 
+  const [state, setState] = React.useState({open: false});
+  const onStateChange = ({open}) => setState({open});
+  const {open} = state;
+
   const isFocused = useIsFocused();
   const _isFocused = React.useRef(isFocused);
 
@@ -427,12 +431,6 @@ function HomeScreen({navigation, route}) {
       });
     }, 60 * 1000);
   };
-
-  const [state, setState] = React.useState({open: false});
-
-  const onStateChange = ({open}) => setState({open});
-
-  const {open} = state;
 
   const renderFab = () => {
     const fabActionsLogin = [
