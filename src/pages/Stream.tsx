@@ -419,7 +419,6 @@ function StreamScreen({navigation, route}) {
           setTimeout(() => {
             streamViewRef.current?.startSession();
           }, 100);
-
         }, 300);
       }, 100);
     }, 500);
