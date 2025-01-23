@@ -119,7 +119,7 @@ void android_chiaki_video_decoder_set_surface(AndroidChiakiVideoDecoder *decoder
     AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_WIDTH, decoder->target_width);
     AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_HEIGHT, decoder->target_height);
 
-    AMediaFormat_setInt32(format, "color-standard", 6); // 广色域标准
+    AMediaFormat_setInt32(format, "color-standard", 0); // 广色域标准
     AMediaFormat_setInt32(format, "color-transfer", 6); // PQ (Perceptual Quantizer) HDR传输特性
     AMediaFormat_setInt32(format, "color-range", 2); // 完整颜色范围
 
