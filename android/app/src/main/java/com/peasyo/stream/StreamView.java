@@ -107,12 +107,17 @@ public class StreamView extends FrameLayout {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         Log.d(TAG, "onAttachedToWindow");
+        requestPointerCapture();
+        setOnCapturedPointerListener((v, event) -> {
+            return true;
+        });
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         Log.d(TAG, "onDetachedFromWindow");
+        releasePointerCapture();
     }
 
     private void initView(Context context) {
