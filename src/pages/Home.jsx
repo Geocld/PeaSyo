@@ -205,6 +205,7 @@ function HomeScreen({navigation, route}) {
   };
 
   const checkConsoleWake = (isPS5, item, attempts = 0) => {
+    console.log('checkConsoleWake:', item, isPS5)
     const MAX_ATTEMPTS = 10;
 
     return new Promise((resolve, reject) => {
@@ -249,11 +250,13 @@ function HomeScreen({navigation, route}) {
     discoverDevices(isPS5)
       .then(results => {
         if (results.length) {
+          let hasMatch = false;
           results.forEach(res => {
             if (
               res.id === item.consoleId ||
               res.address.address === item.host
             ) {
+              hasMatch = true;
               // Update console host
               item.host = res.address.address;
               if (res.status === 'STANDBY') {
@@ -290,6 +293,11 @@ function HomeScreen({navigation, route}) {
               }
             }
           });
+
+          if (!hasMatch) {
+            setLoading(false);
+            handleToLocalStream(item);
+          }
         } else {
           setLoading(false);
           handleToLocalStream(item);
