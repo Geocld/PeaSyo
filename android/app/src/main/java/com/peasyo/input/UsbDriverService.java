@@ -205,6 +205,11 @@ public class UsbDriverService extends Service implements UsbDriverListener {
                 UsbRumbleManager.setUsbController("Xbox360WirelessDongle");
                 controller = new Xbox360WirelessDongle(device, connection, nextDeviceId++, this);
             }
+            else if (DualSenseController.canClaimDevice(device)) {
+                Log.d("UsbDriverService", "DualSenseController");
+                UsbRumbleManager.setUsbController("DualSenseController");
+                controller = new DualSenseController(device, connection, nextDeviceId++, this);
+            }
             else {
                 // Unreachable
                 return;
@@ -291,7 +296,8 @@ public class UsbDriverService extends Service implements UsbDriverListener {
         return ((!kernelSupportsXboxOne() || !isRecognizedInputDevice(device) || claimAllAvailable) && XboxOneController.canClaimDevice(device)) ||
                 ((!isRecognizedInputDevice(device) || claimAllAvailable) && Xbox360Controller.canClaimDevice(device)) ||
                 // We must not call isRecognizedInputDevice() because wireless controllers don't share the same product ID as the dongle
-                ((!kernelSupportsXbox360W() || claimAllAvailable) && Xbox360WirelessDongle.canClaimDevice(device));
+                ((!kernelSupportsXbox360W() || claimAllAvailable) && Xbox360WirelessDongle.canClaimDevice(device)) ||
+                DualSenseController.canClaimDevice((device));
     }
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")

@@ -75,9 +75,9 @@ function DebugScreen({navigation, route}) {
         onPress={() => {
           UsbRumbleManager.rumble(32767, 32767);
 
-          setTimeout(() => {
-            UsbRumbleManager.rumble(0, 0);
-          }, 500);
+          // setTimeout(() => {
+          //   UsbRumbleManager.rumble(0, 0);
+          // }, 500);
         }}
       />
 
