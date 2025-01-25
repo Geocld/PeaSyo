@@ -1,6 +1,6 @@
 {
   "name": "peasyo",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
   "scripts": {
     "android": "react-native run-android",

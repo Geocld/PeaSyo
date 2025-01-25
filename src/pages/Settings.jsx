@@ -17,6 +17,7 @@ import {useTranslation} from 'react-i18next';
 import {debugFactory} from '../utils/debug';
 import settingsMeta from '../common/settings';
 import {TokenStore} from '../store/tokenStore';
+import pkg from '../../package.json';
 
 const {UsbRumbleManager} = NativeModules;
 
@@ -143,7 +144,7 @@ function SettingsScreen({navigation}) {
         </View>
         <SettingItem
           title={t('About')}
-          description={t('About Peasyo')}
+          description={`${t('About Peasyo')}\nv${pkg.version}`}
           onPress={() => navigation.navigate('About')}
         />
 

@@ -236,10 +236,10 @@ function HomeScreen({navigation, route}) {
                   return;
                 }
                 // Send wake packet
-                wakeup(item.host, credential);
+                wakeup(item.host, credential, isPS5);
 
                 setTimeout(() => {
-                  wakeup(item.host, credential);
+                  wakeup(item.host, credential, isPS5);
 
                   setTimeout(() => {
                     handleToLocalStream(item);
@@ -383,12 +383,13 @@ function HomeScreen({navigation, route}) {
   };
 
   const handleWakeAndToStream = (host, credential) => {
+    const isPS5 = currentConsole.apName.indexOf('PS5') > -1;
     log.info('handleWakeAndToStream', host, credential);
     const settings = getSettings();
     const hasValidUsbDevice = UsbRumbleManager.getHasValidUsbDevice();
     const isUsbMode = settings.bind_usb_device && hasValidUsbDevice;
 
-    wakeup(host, credential);
+    wakeup(host, credential, isPS5);
 
     setLoadingText(t('Waking'));
     // Wait for one min
