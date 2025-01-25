@@ -12,7 +12,7 @@ function AboutScreen({navigation, route}) {
         </View>
         <View>
           <Text variant="titleMedium">
-            PeaSyo is an open-source mobile client for PlayStation 4/5 console
+            PeaSyo is an open-source Android client for PlayStation 4/5 console
             streaming, great inspired by
             <LinkText url={'https://github.com/streetpea/chiaki-ng'}>
               chiaki-ng
@@ -39,7 +39,7 @@ function AboutScreen({navigation, route}) {
       <View style={styles.block}>
         <View style={styles.title}>
           <Text variant="titleLarge">
-            Are you looking for an Xbox streaming app?
+            Are you looking for an Xbox streaming client?
           </Text>
         </View>
 
