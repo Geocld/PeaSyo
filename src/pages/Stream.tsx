@@ -211,7 +211,7 @@ function StreamScreen({navigation, route}) {
     setIsTouchpadFull(_isTouchpadFull);
 
     const _streamInfo = {
-      ps5: _consoleInfo.apName === 'PS5',
+      ps5: _consoleInfo.apName.indexOf('PS5') > -1,
       host: route.params?.isRemote
         ? _consoleInfo.remoteHost
         : _consoleInfo.host,
@@ -529,7 +529,7 @@ function StreamScreen({navigation, route}) {
     return (
       <View style={touchpadStyle}>
         <Touchpad
-          isPS5={consoleInfo.apName === 'PS5'}
+          isPS5={consoleInfo.apName.indexOf('PS5') > -1}
           isFull={isTouchpadFull}
           onTap={handleTouchpadTap}
           onTouch={handleTouch}

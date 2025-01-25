@@ -25,6 +25,7 @@ export interface IDiscoveredDevice {
 export const discoverDevices = (
   isPS5: boolean,
 ): Promise<IDiscoveredDevice[]> => {
+  console.log('discoverDevices calling...')
   return new Promise((resolve, reject) => {
     const version = isPS5 ? DiscoveryVersions.PS5 : DiscoveryVersions.PS4;
     const port = isPS5 ? DiscoveryPort.PS5 : DiscoveryPort.PS4;

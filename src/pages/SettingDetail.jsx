@@ -139,7 +139,7 @@ function SettingDetailScreen({navigation, route}) {
                 value={value2}
                 minimumValue={2000}
                 maximumValue={99999}
-                step={1}
+                step={100}
                 lowerLimit={2000}
                 onValueChange={val => {
                   setValue2(val);

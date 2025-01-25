@@ -204,45 +204,8 @@ function HomeScreen({navigation, route}) {
     }
   };
 
-  const checkConsoleWake = (isPS5, item, attempts = 0) => {
-    console.log('checkConsoleWake:', item, isPS5)
-    const MAX_ATTEMPTS = 10;
-
-    return new Promise((resolve, reject) => {
-      discoverDevices(isPS5)
-        .then(results => {
-          if (results.length) {
-            results.forEach(res => {
-              if (res.address.address === item.host) {
-                if (res.status === 'STANDBY' && attempts < MAX_ATTEMPTS) {
-                  // Continue to check if under max attempts
-                  setTimeout(() => {
-                    checkConsoleWake(isPS5, item, attempts + 1)
-                      .then(() => {
-                        resolve();
-                      })
-                      .catch(e => {
-                        reject(e);
-                      });
-                  }, 6000);
-                } else {
-                  // Resolve if either not in STANDBY or max attempts reached
-                  resolve();
-                }
-              }
-            });
-          } else {
-            resolve();
-          }
-        })
-        .catch(e => {
-          reject(e);
-        });
-    });
-  };
-
   const handleLocalStream = item => {
-    const isPS5 = item.apName === 'PS5';
+    const isPS5 = item.apName.indexOf('PS5') > -1;
 
     setLoading(true);
     setLoadingText(t('FindConsole'));
@@ -258,10 +221,13 @@ function HomeScreen({navigation, route}) {
             ) {
               hasMatch = true;
               // Update console host
-              item.host = res.address.address;
+              if (item.host !== res.address.address) {
+                item.host = res.address.address;
+              }
+              
               if (res.status === 'STANDBY') {
                 setLoadingText(t('Waking'));
-                // Send wake packet
+  
                 const credential = RegistryManager.getCredential(
                   item.rpRegistKey,
                 );
@@ -269,17 +235,16 @@ function HomeScreen({navigation, route}) {
                   ToastAndroid.show(t('CredentialIsEmpty'), ToastAndroid.SHORT);
                   return;
                 }
+                // Send wake packet
                 wakeup(item.host, credential);
 
-                checkConsoleWake(isPS5, item)
-                  .then(() => {
-                    setTimeout(() => {
-                      handleToLocalStream(item);
-                    }, 10 * 1000);
-                  })
-                  .catch(e => {
+                setTimeout(() => {
+                  wakeup(item.host, credential);
+
+                  setTimeout(() => {
                     handleToLocalStream(item);
-                  });
+                  }, 30 * 1000);
+                }, 5000);
               } else if (res.status === 'AWAKE') {
                 // To Stream page
                 handleToLocalStream(item);
