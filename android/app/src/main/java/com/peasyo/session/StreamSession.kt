@@ -71,7 +71,8 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 		var stableCount: Int = 0,
 		var isInitialized: Boolean = false,
 		var isVibrating: Boolean = false,
-		var lastEventTime: Long = System.currentTimeMillis()
+		var lastEventTime: Long = System.currentTimeMillis(),
+		var lastActionTime: Long = System.currentTimeMillis()
 	)
 
 	private var currentState = ControllerState()
@@ -82,6 +83,10 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 //		Log.d("StreamView", "session setControllerState: $controllerState")
 		session?.setControllerState(controllerState)
 		currentState = controllerState.copy()
+
+		if (controllerState.buttons > 0u || controllerState.l2State > 0u || controllerState.r2State > 0u || controllerState.leftX > 0.2 || controllerState.leftY > 0.2 || controllerState.rightX > 0.2 || controllerState.rightY > 0.2) {
+			hapticsState.lastActionTime = System.currentTimeMillis()
+		}
 	}
 
 	fun shutdown()
@@ -231,7 +236,8 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 						}
 
 						// Situation3：Rumble with click
-						if (!shouldVibrate && (currentState.buttons > 0u || currentState.l2State > 0u || currentState.r2State > 0u) && (left > 0 || right > 0)) {
+						val diff = currentTime - hapticsState.lastActionTime
+						if (!shouldVibrate && (diff < 1000L) && (left > 0 || right > 0)) {
 							shouldVibrate = true
 //							Log.d("StreamView", "situation3...")
 						}
