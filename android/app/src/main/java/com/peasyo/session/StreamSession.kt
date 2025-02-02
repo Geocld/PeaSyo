@@ -75,6 +75,8 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 		var lastActionTime: Long = System.currentTimeMillis()
 	)
 
+	private var lastProcessedEvent = RumbleEvent(0, 0)
+
 	private var currentState = ControllerState()
 
 	private val hapticsState = AudioHapticsState()
@@ -205,8 +207,8 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 
 					val currentTime = System.currentTimeMillis()
 					var shouldVibrate = false
-					val left = event.left
-					val right = event.right
+					var left = event.left
+					var right = event.right
 
 					val canSendEvent = (currentTime - hapticsState.lastEventTime) >= EVENT_COOLDOWN_MS
 
@@ -259,6 +261,30 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 						hapticsState.isVibrating = shouldVibrate
 						hapticsState.lastEventTime = currentTime
 
+						if (abs(event.left - lastProcessedEvent.left) <= 0  && abs(event.right - lastProcessedEvent.right) <= 0 ) {
+							return
+						}
+
+						lastProcessedEvent = event
+
+						if (left > right) {
+							right = left
+						}
+
+						if (right > left) {
+							left = right
+						}
+
+						if (left < 10) {
+							left = 0
+						}
+
+						if (right < 10) {
+							right = 0
+						}
+
+						Log.d("StreamView", "RumbleEvent: $event")
+
 						if (shouldVibrate) {
 							if (usbMode) {
 								val INPUT_MAX = 256
@@ -276,11 +302,11 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 							} else {
 								var gamepadManager = Gamepad(reactContext)
 								if(left == 0 || right == 0) {
-									gamepadManager.vibrate(60, event.left, event.right, 0, 0, rumbleIntensity)
+									gamepadManager.vibrate(60, left, right, 0, 0, rumbleIntensity)
 								} else {
 									vibrateScope.launch {
 										vibrateMutex.withLock {
-											gamepadManager.vibrate(60, event.left, event.right, 0, 0, rumbleIntensity)
+											gamepadManager.vibrate(60, left, right, 0, 0, rumbleIntensity)
 											delay(60)
 										}
 									}
