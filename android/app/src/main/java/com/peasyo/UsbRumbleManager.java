@@ -81,4 +81,43 @@ public class UsbRumbleManager extends ReactContextBaseJavaModule {
             mainActivity.handleRumbleTrigger(_leftTrigger, _rightTrigger);
         }
     }
+
+    @ReactMethod
+    private void sendCommand() {
+        MainActivity mainActivity = (MainActivity) getCurrentActivity();
+        if (mainActivity != null) {
+            byte[] reportData = new byte[] {
+                    0x02, // Report ID
+                    (byte)0xff, // valid_flag0
+                    (byte)0xf7, // valid_flag1
+                    0x00, // right trigger rumble
+                    0x00, // left trigger rumble
+                    0x00, 0x00, 0x00, 0x00,
+                    0x00,  // mute_button_led (0: mute LED off  | 1: mute LED on)
+                    0x10, // power_save_control(mute led on  = 0x00, off = 0x10)
+                    0x06,          // R2 trigger effect mode
+                    (byte)0x0a, // R2 trigger effect parameter 1
+                    (byte)0xff, // R2 trigger effect parameter 2
+                    (byte)0x14, // R2 trigger effect parameter 3
+                    0x00,       // R2 trigger effect parameter 4
+                    0x00,       // R2 trigger effect parameter 5
+                    0x00,       // R2 trigger effect parameter 6
+                    0x00,       // R2 trigger effect parameter 7
+                    0x00, 0x00, 0x00,
+                    0x01,       // L2 trigger effect mode
+                    0x28,       // L2 trigger effect parameter 1
+                    (byte)0xE6, // L2 trigger effect parameter 2
+                    0x00,       // L2 trigger effect parameter 3
+                    0x00,       // L2 trigger effect parameter 4
+                    0x00,       // L2 trigger effect parameter 5
+                    0x00,       // L2 trigger effect parameter 6
+                    0x00,       // L2 trigger effect parameter 7
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x02, 0x00, 0x02, 0x00,
+                    0x00,       // player leds
+                    (byte)0x12, (byte)0xff, (byte)0x1c // RGB values
+            };
+            mainActivity.handleSendCommand(reportData);
+        }
+    }
 }

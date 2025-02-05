@@ -36,6 +36,7 @@ import NativeGameMapScreen from './pages/NativeGameMap';
 import GameMapDetailScreen from './pages/GameMapDetail';
 import AboutScreen from './pages/About';
 import FeedbackScreen from './pages/Feedback';
+import DualSenseScreen from './pages/DualSense';
 import VirtualGamepadSettingsScreen from './pages/VirtualGamepadSettings';
 import CustomGamepadScreen from './pages/CustomGamepad';
 import updater from './utils/updater';
@@ -164,6 +165,11 @@ function App() {
                   name="Transfer"
                   component={TransferScreen}
                   options={{title: t('Transfer')}}
+                />
+                <RootStack.Screen
+                  name="DualSense"
+                  component={DualSenseScreen}
+                  options={{title: t('DualSense')}}
                 />
                 <RootStack.Screen name="Debug" component={DebugScreen} />
                 <RootStack.Screen

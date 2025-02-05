@@ -186,6 +186,13 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
         }
     }
 
+    public void handleSendCommand(byte[] data) {
+        for (int i = 0; i < usbDeviceContexts.size(); i++) {
+            UsbDeviceContext deviceContext = usbDeviceContexts.valueAt(i);
+            deviceContext.device.sendCommand(data);
+        }
+    }
+
     public void stop() {
         if (stopped) {
             return;
@@ -728,8 +735,6 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
             return;
         }
 
-//        this.activityContext.xxx
-
         Vector2d leftStickVector = populateCachedVector(leftStickX, leftStickY);
 
         context.leftStickX = (short) (leftStickVector.getX() * 0x7FFE);
@@ -774,7 +779,7 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
 //            Log.d("UsbDriverService reportControllerState", "leftStickY:" + _leftStickY);
 //        }
 
-        // TODO: send data to RN there
+        // Send data to RN there
         WritableMap params = Arguments.createMap();
         params.putInt("flags", buttonFlags);
         params.putDouble("leftTrigger", leftTrigger);
@@ -788,6 +793,39 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
             this.activityContext.sendEvent("onGamepadReport", params);
         }
 
+    }
+
+    @Override
+    public void reportDsControllerState(int controllerId, int buttonFlags,
+                                      float leftStickX, float leftStickY,
+                                      float rightStickX, float rightStickY,
+                                      float leftTrigger, float rightTrigger,
+                                      int gyrox, int gyroy, int gyroz,
+                                      int accelx, int accely, int accelz,
+                                      int touch0id, int touch0x, int touch0y,
+                                      int touch1id, int touch1x, int touch1y) {
+        if (buttonFlags != 0) {
+            Log.d("UsbDriverService reportDsControllerState", "ds buttonFlags:" + buttonFlags);
+        }
+
+        WritableMap params = Arguments.createMap();
+        params.putInt("flags", buttonFlags);
+        params.putDouble("leftTrigger", leftTrigger);
+        params.putDouble("rightTrigger", rightTrigger);
+        params.putDouble("leftStickX", leftStickX);
+        params.putDouble("leftStickY", -leftStickY);
+        params.putDouble("rightStickX", rightStickX);
+        params.putDouble("rightStickY", -rightStickY);
+        params.putDouble("gyrox", gyrox);
+        params.putDouble("gyroy", gyroy);
+        params.putDouble("gyroz", gyroz);
+        params.putDouble("accelx", accelx);
+        params.putDouble("accely", accely);
+        params.putDouble("accelz", accelz);
+
+        if(this.activityContext != null) {
+            this.activityContext.sendEvent("onDsGamepadReport", params);
+        }
     }
 
     @Override

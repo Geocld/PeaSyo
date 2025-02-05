@@ -24,13 +24,12 @@ public abstract class AbstractDualSenseController extends AbstractController {
         super(deviceId, listener, device.getVendorId(), device.getProductId());
         this.device = device;
         this.connection = connection;
-//        this.type = MoonBridgsANALOG_TRIGGERS | MoonBridge.LI_CCAP_RUMBLE;
         this.buttonFlags =
-                ControllerPacket.A_FLAG | ControllerPacket.B_FLAG | ControllerPacket.X_FLAG | ControllerPacket.Y_FLAG |
-                        ControllerPacket.UP_FLAG | ControllerPacket.DOWN_FLAG | ControllerPacket.LEFT_FLAG | ControllerPacket.RIGHT_FLAG |
-                        ControllerPacket.LB_FLAG | ControllerPacket.RB_FLAG |
-                        ControllerPacket.LS_CLK_FLAG | ControllerPacket.RS_CLK_FLAG |
-                        ControllerPacket.BACK_FLAG | ControllerPacket.PLAY_FLAG | ControllerPacket.SPECIAL_BUTTON_FLAG;
+                DSControllerPacket.DPAD_UP_FLAG | DSControllerPacket.DPAD_DOWN_FLAG | DSControllerPacket.DPAD_LEFT_FLAG | DSControllerPacket.DPAD_RIGHT_FLAG |
+                        DSControllerPacket.SQUARE_FLAG | DSControllerPacket.CROSS_FLAG | DSControllerPacket.CIRCLE_FLAG | DSControllerPacket.TRIANGLE_FLAG |
+                        DSControllerPacket.L1_FLAG | DSControllerPacket.R1_FLAG |
+                        DSControllerPacket.L3_FLAG | DSControllerPacket.R3_FLAG |
+                        DSControllerPacket.CREATE_FLAG | DSControllerPacket.OPTIONS_FLAG | DSControllerPacket.PS_FLAG | DSControllerPacket.TOUCHPAD_FLAG | DSControllerPacket.MUTE_FLAG;
     }
 
     private Thread createInputThread() {
@@ -86,7 +85,7 @@ public abstract class AbstractDualSenseController extends AbstractController {
 
                     if (handleRead(ByteBuffer.wrap(buffer, 0, res).order(ByteOrder.LITTLE_ENDIAN))) {
                         // Report input if handleRead() returns true
-                        reportInput();
+                        reportDsInput();
                     }
                 }
             }

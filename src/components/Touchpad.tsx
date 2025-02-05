@@ -77,12 +77,12 @@ const Touchpad: React.FC<Props> = ({
 
   const showTouchpad = () => {
     'worklet';
-    opacity.value = withTiming(SHOW_OPACITY, { duration: 150 });
+    opacity.value = withTiming(SHOW_OPACITY, {duration: 150});
   };
 
   const hideTouchpad = () => {
     'worklet';
-    opacity.value = withDelay(500, withTiming(0, { duration: 150 }));
+    opacity.value = withDelay(500, withTiming(0, {duration: 150}));
   };
 
   // 移动

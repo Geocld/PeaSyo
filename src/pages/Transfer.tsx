@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  View,
-  Alert,
-  ScrollView,
-  Platform,
-  PermissionsAndroid,
-} from 'react-native';
+import {StyleSheet, View, Alert, ScrollView} from 'react-native';
 import {Button, Text, Divider} from 'react-native-paper';
 import {useTranslation} from 'react-i18next';
 import RNFS from 'react-native-fs';
@@ -123,37 +116,6 @@ function TransferScreen({navigation}) {
     }
   };
 
-  const requestStoragePermission = async () => {
-    try {
-      if (~Platform.Version >= 33) {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.MANAGE_EXTERNAL_STORAGE,
-          {
-            title: t('StorePermission'),
-            message: t('PermissionMsg'),
-            buttonNeutral: t('AskLater'),
-            buttonNegative: t('Cancel'),
-            buttonPositive: t('Confirm'),
-          },
-        );
-
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          return true;
-        } else {
-          return false;
-        }
-      } else {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-        );
-        return granted === PermissionsAndroid.RESULTS.GRANTED;
-      }
-    } catch (err) {
-      console.warn(err);
-      return false;
-    }
-  };
-
   const handleExport = async () => {
     const ts = new TokenStore();
     ts.load();
@@ -165,7 +127,7 @@ function TransferScreen({navigation}) {
       consoles,
     };
 
-    const hasPermission = await requestStoragePermission();
+    // const hasPermission = await requestStoragePermission();
 
     // if (!hasPermission) {
     //   Alert.alert(t('Warning'), t('NoPermission'));
@@ -177,7 +139,7 @@ function TransferScreen({navigation}) {
   };
 
   const handleImport = async () => {
-    const hasPermission = await requestStoragePermission();
+    // const hasPermission = await requestStoragePermission();
     // if (!hasPermission) {
     //   Alert.alert(t('Warning'), t('NoPermission'));
     //   return;

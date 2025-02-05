@@ -30,82 +30,146 @@ public class DualSenseController extends AbstractDualSenseController {
         super(device, connection, deviceId, listener);
     }
 
+    private float normalizeThumbStickAxis(int value) {
+        return (2.0f * value / 255.0f) - 1.0f;
+    }
+
+    private float normalizeTriggerAxis(int value) {
+        return value / 255.0f;
+    }
+
     @Override
     protected boolean handleRead(ByteBuffer buffer) {
 //        Log.d("UsbDriverService", "dualsenseController.java handleRead: " + buffer);
-        if (buffer.remaining() < 14) {
-            Log.d("UsbDriverService DualController.java", "Read too small: "+buffer.remaining());
+        if (buffer.remaining() != 64) {
+            Log.d("UsbDriverService DualController.java", "No Daulsense input: " + buffer.remaining());
             return false;
         }
 
-        // Skip first short
-        buffer.position(buffer.position() + 2);
-        byte b = buffer.get();
-//        Log.d("UsbDriverService", "dualsenseController.java handleRead buffer: " + b);
-        return false;
-    }
+        // Skip first byte
+        buffer.get();
 
-    public static class OutputState {
-        public int motorRight = 0;
-        public int motorLeft = 0;
-        public boolean micLight = false;
-        public TriggerEffect leftTriggerEffect = TriggerEffect.OFF;
-        public TriggerEffect rightTriggerEffect = TriggerEffect.OFF;
-        public byte[] leftTriggerEffectData = new byte[8];
-        public byte[] rightTriggerEffectData = new byte[8];
-        public int playerLight = 0;
-        public int playerLightBrightness = 0;
-        public byte[] lightbar = new byte[3];
-    }
+        // Process D-pad (buttons0 & 0x0F)
+        int dpad = buffer.get(8) & 0x0F;
+        setDsButtonFlag(DSControllerPacket.DPAD_UP_FLAG, dpad == 0 || dpad == 1 || dpad == 7);
+        setDsButtonFlag(DSControllerPacket.DPAD_DOWN_FLAG, dpad == 3 || dpad == 4 || dpad == 5);
+        setDsButtonFlag(DSControllerPacket.DPAD_LEFT_FLAG, dpad == 5 || dpad == 6 || dpad == 7);
+        setDsButtonFlag(DSControllerPacket.DPAD_RIGHT_FLAG, dpad == 1 || dpad == 2 || dpad == 3);
 
-    public enum TriggerEffect {
-        OFF,
-        CONTINUOUS,
-        SECTION,
-        EFFECT_A,
-        EFFECT_B,
-        EFFECT_C,
-        CALIBRATION
-    }
+        // Process face buttons (buttons0)
+        int buttons0 = buffer.get(8);
+        setDsButtonFlag(DSControllerPacket.SQUARE_FLAG, (buttons0 & 0x10) != 0);
+        setDsButtonFlag(DSControllerPacket.CROSS_FLAG, (buttons0 & 0x20) != 0);
+        setDsButtonFlag(DSControllerPacket.CIRCLE_FLAG, (buttons0 & 0x40) != 0);
+        setDsButtonFlag(DSControllerPacket.TRIANGLE_FLAG, (buttons0 & 0x80) != 0);
 
-    private boolean sendLedCommand() {
-        Log.d("UsbDriverService DualController.java", "sendLedCommand");
+        // Process shoulder buttons and other controls (buttons1)
+        int buttons1 = buffer.get(9);
+        setDsButtonFlag(DSControllerPacket.L1_FLAG, (buttons1 & 0x01) != 0);
+        setDsButtonFlag(DSControllerPacket.R1_FLAG, (buttons1 & 0x02) != 0);
+//        setDsButtonFlag(DSControllerPacket.L2_FLAG, (buttons1 & 0x04) != 0);
+//        setDsButtonFlag(DSControllerPacket.R2_FLAG, (buttons1 & 0x08) != 0);
+        setDsButtonFlag(DSControllerPacket.CREATE_FLAG, (buttons1 & 0x10) != 0);
+        setDsButtonFlag(DSControllerPacket.OPTIONS_FLAG, (buttons1 & 0x20) != 0);
+        setDsButtonFlag(DSControllerPacket.L3_FLAG, (buttons1 & 0x40) != 0);
+        setDsButtonFlag(DSControllerPacket.R3_FLAG, (buttons1 & 0x80) != 0);
 
-        byte[] reportData = new byte[] {
-                0x02, // Report ID
-                (byte)0xff, // valid_flag0
-                (byte)0xf7, // valid_flag1
-                0x00, // right trigger rumble
-                0x00, // left trigger rumble
-                0x00, 0x00, 0x00, 0x00,
-                0x00,  // mute_button_led (0: mute LED off  | 1: mute LED on)
-                0x10, // power_save_control(mute led on  = 0x00, off = 0x10)
-                0x26, // R2 trigger effect mode
-                (byte)0x90, // R2 trigger effect parameter 1
-                (byte)0xa0, // R2 trigger effect parameter 2
-                (byte)0xff, // R2 trigger effect parameter 3
-                0x00,
-                0x00,
-                0x00, 0x00,
-                0x00, 0x00, 0x00,
-                0x26, // L2 trigger effect mode
-                (byte)0x90, // L2 trigger effect parameter 1
-                (byte)0xa0, // L2 trigger effect parameter 2
-                (byte)0xff, // L2 trigger effect parameter 3
-                0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x02, 0x00, 0x02, 0x00,
-                0x00, // player leds
-                (byte)0xff, (byte)0xff, (byte)0xff // RGB values
-        };
+        // Process special buttons (buttons2)
+        int buttons2 = buffer.get(10);
+        setDsButtonFlag(DSControllerPacket.PS_FLAG, (buttons2 & 0x01) != 0);
+        setDsButtonFlag(DSControllerPacket.TOUCHPAD_FLAG, (buttons2 & 0x02) != 0);
+        setDsButtonFlag(DSControllerPacket.MUTE_FLAG, (buttons2 & 0x04) != 0);
 
-        int res = connection.bulkTransfer(outEndpt, reportData, reportData.length, 3000);
-        Log.e("UsbDriverService Xbox360Controller.java", "Transfer result: " + res);
-        if (res != reportData.length) {
-            Log.d("UsbDriverService Xbox360Controller.java", "LED set transfer failed: " + res);
-            return false;
-        }
+        // Process analog sticks
+        int axes0 = buffer.get(1) & 0xFF;
+        int axes1 = buffer.get(2) & 0xFF;
+        int axes2 = buffer.get(3) & 0xFF;
+        int axes3 = buffer.get(4) & 0xFF;
+        int axes4 = buffer.get(5) & 0xFF;
+        int axes5 = buffer.get(6) & 0xFF;
 
+        float lsx = normalizeThumbStickAxis(axes0);
+        float lsy = normalizeThumbStickAxis(axes1);
+        float rsx = normalizeThumbStickAxis(axes2);
+        float rsy = normalizeThumbStickAxis(axes3);
+        float l2axis = normalizeTriggerAxis(axes4);
+        float r2axis = normalizeTriggerAxis(axes5);
+
+        leftTrigger = l2axis;
+        rightTrigger = r2axis;
+//        Log.d("UsbDriverService DualController.java", "leftTrigger: " + leftTrigger);
+//        Log.d("UsbDriverService DualController.java", "rightTrigger: " + rightTrigger);
+
+        leftStickX = lsx;
+        leftStickY = lsy;
+//        Log.d("UsbDriverService DualController.java", "leftStickX: " + leftStickX);
+//        Log.d("UsbDriverService DualController.java", "leftStickY: " + leftStickY);
+
+        rightStickX = rsx;
+        rightStickY = rsy;
+//        Log.d("UsbDriverService DualController.java", "rightStickX: " + rightStickX);
+//        Log.d("UsbDriverService DualController.java", "rightStickY: " + rightStickY);
+
+        // IMU data
+        int gyroX0 = buffer.get(16) & 0xFF;
+        int gyroX1 = buffer.get(17) & 0xFF;
+        int gyroY0 = buffer.get(18) & 0xFF;
+        int gyroY1 = buffer.get(19) & 0xFF;
+        int gyroZ0 = buffer.get(20) & 0xFF;
+        int gyroZ1 = buffer.get(21) & 0xFF;
+        int accelX0 = buffer.get(22) & 0xFF;
+        int accelX1 = buffer.get(23) & 0xFF;
+        int accelY0 = buffer.get(24) & 0xFF;
+        int accelY1 = buffer.get(25) & 0xFF;
+        int accelZ0 = buffer.get(26) & 0xFF;
+        int accelZ1 = buffer.get(27) & 0xFF;
+
+        int gyrox = (gyroX1 << 8) | gyroX0;
+        if (gyrox > 0x7FFF) gyrox -= 0x10000;
+        int gyroy = (gyroY1 << 8) | gyroY0;
+        if (gyroy > 0x7FFF) gyroy -= 0x10000;
+        int gyroz = (gyroZ1 << 8) | gyroZ0;
+        if (gyroz > 0x7FFF) gyroz -= 0x10000;
+
+//        Log.d("UsbDriverService DualController.java", "gyrox: " + gyrox);
+//        Log.d("UsbDriverService DualController.java", "gyroy: " + gyroy);
+//        Log.d("UsbDriverService DualController.java", "gyroz: " + gyroz);
+
+        int accelx = (accelX1 << 8) | accelX0;
+        if (accelx > 0x7FFF) accelx -= 0x10000;
+        int accely = (accelY1 << 8) | accelY0;
+        if (accely > 0x7FFF) accely -= 0x10000;
+        int accelz = (accelZ1 << 8) | accelZ0;
+        if (accelz > 0x7FFF) accelz -= 0x10000;
+
+//        Log.d("UsbDriverService DualController.java", "accelx: " + accelx);
+//        Log.d("UsbDriverService DualController.java", "accely: " + accely);
+//        Log.d("UsbDriverService DualController.java", "accelz: " + accelz);
+
+        // Touch pad
+        int touch00 = buffer.get(33) & 0xFF;
+        int touch01 = buffer.get(34) & 0xFF;
+        int touch02 = buffer.get(35) & 0xFF;
+        int touch03 = buffer.get(36) & 0xFF;
+        int touch10 = buffer.get(37) & 0xFF;
+        int touch11 = buffer.get(38) & 0xFF;
+        int touch12 = buffer.get(39) & 0xFF;
+        int touch13 = buffer.get(40) & 0xFF;
+
+        touch0id = touch00 & 0x7F;
+        touch0x = ((touch02 & 0x0F) << 8) | touch01;
+        touch0y = (touch03 << 4) | ((touch02 & 0xF0) >> 4);
+
+//        Log.d("UsbDriverService DualController.java", "touch0active: " + touch0active);
+//        Log.d("UsbDriverService DualController.java", "touch0id: " + touch0id);
+//        Log.d("UsbDriverService DualController.java", "touch0x: " + touch0x);
+//        Log.d("UsbDriverService DualController.java", "touch0y: " + touch0y);
+
+        touch1id = touch10 & 0x7F;
+        touch1x = ((touch12 & 0x0F) << 8) | touch11;
+        touch1y = (touch13 << 4) | ((touch12 & 0xF0) >> 4);
+
+        // Return true to send input
         return true;
     }
 
@@ -117,7 +181,6 @@ public class DualSenseController extends AbstractDualSenseController {
 
     @Override
     public void rumble(short lowFreqMotor, short highFreqMotor) {
-        sendLedCommand();
 //        byte[] data = {
 //                0x00, 0x08, 0x00,
 //                (byte)(lowFreqMotor >> 8), (byte)(highFreqMotor >> 8),
@@ -132,5 +195,16 @@ public class DualSenseController extends AbstractDualSenseController {
     @Override
     public void rumbleTriggers(short leftTrigger, short rightTrigger) {
         // Trigger motors not present on Xbox 360 controllers
+    }
+
+    @Override
+    public void sendCommand(byte[] data) {
+        Log.d("UsbDriverService DualController.java", "sendCommand");
+
+        int res = connection.bulkTransfer(outEndpt, data, data.length, 1000);
+        Log.e("UsbDriverService DualController.java", "Command transfer result: " + res);
+        if (res != data.length) {
+            Log.d("UsbDriverService DualController.java", "Command set transfer failed: " + res);
+        }
     }
 }

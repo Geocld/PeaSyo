@@ -98,6 +98,10 @@ public class MainActivity extends ReactActivity implements UsbDriverService.UsbD
     this.controllerHandler.handleRumbleTriggers(leftTrigger, rightTrigger);
   }
 
+  public void handleSendCommand(byte[] data) {
+    this.controllerHandler.handleSendCommand(data);
+  }
+
   public void sendEvent(String eventName, WritableMap params) {
     ReactContext reactContext = getReactInstanceManager().getCurrentReactContext();
 

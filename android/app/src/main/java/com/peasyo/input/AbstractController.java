@@ -12,6 +12,11 @@ public abstract class AbstractController {
     protected float leftTrigger, rightTrigger;
     protected float rightStickX, rightStickY;
     protected float leftStickX, leftStickY;
+
+    // DualSense
+    protected int gyrox, gyroy, gyroz, accelx, accely, accelz;
+    protected int touch0id, touch0x, touch0y, touch1id, touch1x, touch1y;
+
     protected short capabilities;
     protected byte type;
 
@@ -48,9 +53,26 @@ public abstract class AbstractController {
         }
     }
 
+    protected void setDsButtonFlag(int buttonFlag, boolean isPressed) {
+        if (isPressed) {
+            buttonFlags |= buttonFlag;
+        } else {
+            buttonFlags &= ~buttonFlag;
+        }
+    }
+
     protected void reportInput() {
         listener.reportControllerState(deviceId, buttonFlags, leftStickX, leftStickY,
                 rightStickX, rightStickY, leftTrigger, rightTrigger);
+    }
+
+    protected void reportDsInput() {
+        listener.reportDsControllerState(deviceId, buttonFlags, leftStickX, leftStickY,
+                rightStickX, rightStickY, leftTrigger, rightTrigger,
+                gyrox, gyroy, gyroz,
+                accelx, accely, accelz,
+                touch0id, touch0x, touch0y,
+                touch1id, touch1x, touch1y);
     }
 
     public abstract boolean start();
@@ -66,6 +88,8 @@ public abstract class AbstractController {
     public abstract void rumble(short lowFreqMotor, short highFreqMotor);
 
     public abstract void rumbleTriggers(short leftTrigger, short rightTrigger);
+
+    public abstract void sendCommand(byte[] data);
 
     protected void notifyDeviceRemoved() {
         listener.deviceRemoved(this);

@@ -219,6 +219,9 @@ public class XboxOneController extends AbstractXboxController {
         sendRumblePacket();
     }
 
+    @Override
+    public void sendCommand(byte[] data) {}
+
     private static class InitPacket {
         final int vendorId;
         final int productId;

@@ -92,6 +92,14 @@ function DebugScreen({navigation, route}) {
           }, 1000);
         }}
       />
+
+      <SettingItem
+        title={'DS5'}
+        description={'Test Dualsense controller'}
+        onPress={() => {
+          UsbRumbleManager.sendCommand();
+        }}
+      />
     </ScrollView>
   );
 }
