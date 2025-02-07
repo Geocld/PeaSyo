@@ -507,7 +507,7 @@ public class StreamView extends FrameLayout {
     }
 
     public void setControllerState(ControllerState controllerState) {
-        Log.d(TAG, "setControllerState:" + controllerState);
+//        Log.d(TAG, "setControllerState:" + controllerState);
 
 //        adjustSensorValuesForRotation();
 
@@ -651,13 +651,13 @@ public class StreamView extends FrameLayout {
         }
     }
 
-    private static final float MOVE_THRESHOLD = 50;
     private float initialX, initialY;
-
     private int currentId = -1;
     private int nextId = -1;
     private int touchId1 = -1;
     private int touchId2 = -1;
+
+    private boolean isTouchpadTap = false;
 
     private void handleTouchpadMoveStart(MotionEvent event) {
         currentId = currentId + 1;
@@ -687,7 +687,6 @@ public class StreamView extends FrameLayout {
         float secondX = 0;
         float secondY = 0;
 
-        // 获取触摸点的数量
         int pointerCount = event.getPointerCount();
 
         if (pointerCount >= 2) {
@@ -730,8 +729,41 @@ public class StreamView extends FrameLayout {
     public boolean handleGenericMotionEvent(MotionEvent event) {
         InputDevice inputDevice = event.getDevice();
 
-        // Touchpad
-        if ((event.getSource() & InputDevice.SOURCE_TOUCHPAD) != 0) {
+        // Touchpad tap
+        if ((inputDevice.getSources() & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD) {
+            if (event.getAction() == MotionEvent.ACTION_BUTTON_PRESS ||
+                    event.getAction() == MotionEvent.ACTION_BUTTON_RELEASE) {
+
+                currentId = currentId + 1;
+                nextId = currentId + 1;
+                touchId1 = currentId;
+
+                ControllerTouch[] touches = new ControllerTouch[] {
+                        new ControllerTouch((short)event.getX(), (short)event.getY(), (byte)touchId1),
+                        new ControllerTouch((short)0, (short)0, (byte)-1)
+                };
+
+                if (event.getAction() == MotionEvent.ACTION_BUTTON_PRESS) {
+                    handleTouchpadTap(true, (byte)nextId, touches);
+                    isTouchpadTap = true;
+                } else {
+                    handleTouchpadTap(false, (byte)-1, touches);
+                    isTouchpadTap = false;
+                }
+
+                if (nextId >= 120) {
+                    currentId = -1;
+                    nextId = -1;
+                    touchId1 = -1;
+                    touchId2 = -1;
+                }
+
+                return true;
+            }
+        }
+
+        // Touchpad move
+        if ((event.getSource() & InputDevice.SOURCE_TOUCHPAD) != 0 && !isTouchpadTap) {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
                     initialX = event.getX();

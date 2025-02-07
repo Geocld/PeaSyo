@@ -660,8 +660,140 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         }
     }
 
+    private float initialX, initialY;
+    private int currentId = -1;
+    private int nextId = -1;
+    private int touchId1 = -1;
+    private int touchId2 = -1;
+
+    private boolean isTouchpadTap = false;
+
+    private void handleTouchpadMoveStart(MotionEvent event) {
+        currentId = currentId + 1;
+        nextId = currentId + 1;
+        touchId1 = currentId;
+
+        int pointerCount = event.getPointerCount();
+        if (pointerCount >= 2) {
+            currentId = currentId + 1;
+            nextId = currentId + 1;
+            touchId2 = currentId;
+        }
+
+        if (nextId >= 120) {
+            currentId = -1;
+            nextId = -1;
+            touchId1 = -1;
+            touchId2 = -1;
+        }
+    }
+
+    private void handleTouchpadMove(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+//        Log.d(TAG, "Touchpad moved to X=" + x + ", Y=" + y);
+
+        float secondX = 0;
+        float secondY = 0;
+
+        int pointerCount = event.getPointerCount();
+
+        if (pointerCount >= 2) {
+            secondX = event.getX(1);
+            secondY = event.getY(1);
+
+//            Log.d(TAG, "Second finger coordinates: X=" + secondX + ", Y=" + secondY);
+        }
+
+        ControllerTouch[] touches = new ControllerTouch[] {
+                new ControllerTouch((short)x, (short)y, (byte)touchId1),
+                new ControllerTouch((short)secondX, (short)secondY, (byte)touchId2)
+        };
+        handleTouchpadTap(false, (byte)nextId, touches);
+    }
+
+    private void handleTouchpadMoveEnd(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+
+        float secondX = 0;
+        float secondY = 0;
+
+        int pointerCount = event.getPointerCount();
+
+        if (pointerCount >= 2) {
+            int secondPointerIndex = 1;
+
+            secondX = event.getX(secondPointerIndex);
+            secondY = event.getY(secondPointerIndex);
+        }
+
+        ControllerTouch[] touches = new ControllerTouch[] {
+                new ControllerTouch((short)x, (short)y, (byte)-1),
+                new ControllerTouch((short)secondX, (short)secondY, (byte)-1)
+        };
+        handleTouchpadTap(false, (byte)nextId, touches);
+    }
+
     public boolean handleGenericMotionEvent(MotionEvent event) {
         InputDevice inputDevice = event.getDevice();
+
+        // Touchpad tap
+        if ((inputDevice.getSources() & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD) {
+            if (event.getAction() == MotionEvent.ACTION_BUTTON_PRESS ||
+                    event.getAction() == MotionEvent.ACTION_BUTTON_RELEASE) {
+
+                currentId = currentId + 1;
+                nextId = currentId + 1;
+                touchId1 = currentId;
+
+                ControllerTouch[] touches = new ControllerTouch[] {
+                        new ControllerTouch((short)event.getX(), (short)event.getY(), (byte)touchId1),
+                        new ControllerTouch((short)0, (short)0, (byte)-1)
+                };
+
+                if (event.getAction() == MotionEvent.ACTION_BUTTON_PRESS) {
+                    handleTouchpadTap(true, (byte)nextId, touches);
+                    isTouchpadTap = true;
+                } else {
+                    handleTouchpadTap(false, (byte)-1, touches);
+                    isTouchpadTap = false;
+                }
+
+                if (nextId >= 120) {
+                    currentId = -1;
+                    nextId = -1;
+                    touchId1 = -1;
+                    touchId2 = -1;
+                }
+
+                return true;
+            }
+        }
+
+        // Touchpad move
+        if ((event.getSource() & InputDevice.SOURCE_TOUCHPAD) != 0 && !isTouchpadTap) {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    initialX = event.getX();
+                    initialY = event.getY();
+                    handleTouchpadMoveStart(event);
+
+                    return true;
+                case MotionEvent.ACTION_UP:
+                    handleTouchpadMoveEnd(event);
+                    return true;
+                case MotionEvent.ACTION_MOVE:
+                    float currentX = event.getX();
+                    float currentY = event.getY();
+                    float deltaX = currentX - initialX;
+                    float deltaY = currentY - initialY;
+//                    float distance = (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                    handleTouchpadMove(event);
+
+                    return true;
+            }
+        }
 
         if ((event.getSource() & InputDevice.SOURCE_CLASS_JOYSTICK) != InputDevice.SOURCE_CLASS_JOYSTICK) {
             return false;
