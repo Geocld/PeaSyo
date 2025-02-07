@@ -802,6 +802,7 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
                                       float leftTrigger, float rightTrigger,
                                       int gyrox, int gyroy, int gyroz,
                                       int accelx, int accely, int accelz,
+                                      boolean touch0active, boolean touch1active,
                                       int touch0id, int touch0x, int touch0y,
                                       int touch1id, int touch1x, int touch1y) {
         if (buttonFlags != 0) {
@@ -822,6 +823,14 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
         params.putDouble("accelx", accelx);
         params.putDouble("accely", accely);
         params.putDouble("accelz", accelz);
+        params.putBoolean("touch0active", touch0active);
+        params.putInt("touch0id", touch0id);
+        params.putInt("touch0x", touch0x);
+        params.putInt("touch0y", touch0y);
+        params.putBoolean("touch1active", touch1active);
+        params.putInt("touch1id", touch1id);
+        params.putInt("touch1x", touch1x);
+        params.putInt("touch1y", touch1x);
 
         if(this.activityContext != null) {
             this.activityContext.sendEvent("onDsGamepadReport", params);

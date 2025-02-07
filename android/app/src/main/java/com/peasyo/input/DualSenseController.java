@@ -156,6 +156,7 @@ public class DualSenseController extends AbstractDualSenseController {
         int touch12 = buffer.get(39) & 0xFF;
         int touch13 = buffer.get(40) & 0xFF;
 
+        touch0active = (touch00 & 0x80) == 0;
         touch0id = touch00 & 0x7F;
         touch0x = ((touch02 & 0x0F) << 8) | touch01;
         touch0y = (touch03 << 4) | ((touch02 & 0xF0) >> 4);
@@ -165,9 +166,12 @@ public class DualSenseController extends AbstractDualSenseController {
 //        Log.d("UsbDriverService DualController.java", "touch0x: " + touch0x);
 //        Log.d("UsbDriverService DualController.java", "touch0y: " + touch0y);
 
+        touch1active = (touch10 & 0x80) == 0;
         touch1id = touch10 & 0x7F;
         touch1x = ((touch12 & 0x0F) << 8) | touch11;
         touch1y = (touch13 << 4) | ((touch12 & 0xF0) >> 4);
+
+//        Log.d("UsbDriverService DualController.java", "touch1active: " + touch1active);
 
         // Return true to send input
         return true;

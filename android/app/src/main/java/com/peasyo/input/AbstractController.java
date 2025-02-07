@@ -16,6 +16,7 @@ public abstract class AbstractController {
     // DualSense
     protected int gyrox, gyroy, gyroz, accelx, accely, accelz;
     protected int touch0id, touch0x, touch0y, touch1id, touch1x, touch1y;
+    protected boolean touch0active, touch1active;
 
     protected short capabilities;
     protected byte type;
@@ -71,6 +72,7 @@ public abstract class AbstractController {
                 rightStickX, rightStickY, leftTrigger, rightTrigger,
                 gyrox, gyroy, gyroz,
                 accelx, accely, accelz,
+                touch0active, touch1active,
                 touch0id, touch0x, touch0y,
                 touch1id, touch1x, touch1y);
     }

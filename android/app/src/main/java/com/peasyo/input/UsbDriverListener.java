@@ -12,6 +12,7 @@ public interface UsbDriverListener {
                                float leftTrigger, float rightTrigger,
                                int gyrox, int gyroy, int gyroz,
                                int accelx, int accely, int accelz,
+                                 boolean touch0active, boolean touch1active,
                                  int touch0id, int touch0x, int touch0y,
                                  int touch1id, int touch1x, int touch1y);
 

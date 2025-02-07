@@ -51,12 +51,14 @@ public class UsbDriverService extends Service implements UsbDriverListener {
     public void reportDsControllerState(int controllerId, int buttonFlags, float leftStickX, float leftStickY,
                                       float rightStickX, float rightStickY, float leftTrigger, float rightTrigger,
                                         int gyrox, int gyroy, int gyroz, int accelx, int accely, int accelz,
+                                        boolean touch0active, boolean touch1active,
                                         int touch0id, int touch0x, int touch0y,
                                         int touch1id, int touch1x, int touch1y) {
         // Call through to the client's listener
         if (listener != null) {
             listener.reportDsControllerState(controllerId, buttonFlags, leftStickX, leftStickY, rightStickX, rightStickY, leftTrigger, rightTrigger,
                     gyrox, gyroy, gyroz, accelx, accely, accelz,
+                    touch0active, touch1active,
                     touch0id, touch0x, touch0y,
                     touch1id, touch1x, touch1y);
         }
