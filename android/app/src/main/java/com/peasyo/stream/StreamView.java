@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Build;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.InputDevice;
@@ -506,7 +507,7 @@ public class StreamView extends FrameLayout {
     }
 
     public void setControllerState(ControllerState controllerState) {
-//        Log.d(TAG, "setControllerState:" + controllerState);
+        Log.d(TAG, "setControllerState:" + controllerState);
 
 //        adjustSensorValuesForRotation();
 
@@ -609,11 +610,11 @@ public class StreamView extends FrameLayout {
         rx = normaliseAxis(rx);
         ry = normaliseAxis(ry);
 
-        Log.d(TAG, "left axisX:" + x);
-        Log.d(TAG, "left axisY:" + y);
-
-        Log.d(TAG, "right axisX:" + rx);
-        Log.d(TAG, "right axisY:" + ry);
+//        Log.d(TAG, "left axisX:" + x);
+//        Log.d(TAG, "left axisY:" + y);
+//
+//        Log.d(TAG, "right axisX:" + rx);
+//        Log.d(TAG, "right axisY:" + ry);
 
         controllerState.setLeftX(signedAxis(x));
         controllerState.setLeftY(signedAxis(y));
@@ -650,9 +651,110 @@ public class StreamView extends FrameLayout {
         }
     }
 
+    private static final float MOVE_THRESHOLD = 50;
+    private float initialX, initialY;
+
+    private int currentId = -1;
+    private int nextId = -1;
+    private int touchId1 = -1;
+    private int touchId2 = -1;
+
+    private void handleTouchpadMoveStart(MotionEvent event) {
+        currentId = currentId + 1;
+        nextId = currentId + 1;
+        touchId1 = currentId;
+
+        int pointerCount = event.getPointerCount();
+        if (pointerCount >= 2) {
+            currentId = currentId + 1;
+            nextId = currentId + 1;
+            touchId2 = currentId;
+        }
+
+        if (nextId >= 120) {
+            currentId = -1;
+            nextId = -1;
+            touchId1 = -1;
+            touchId2 = -1;
+        }
+    }
+
+    private void handleTouchpadMove(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+//        Log.d(TAG, "Touchpad moved to X=" + x + ", Y=" + y);
+
+        float secondX = 0;
+        float secondY = 0;
+
+        // 获取触摸点的数量
+        int pointerCount = event.getPointerCount();
+
+        if (pointerCount >= 2) {
+            secondX = event.getX(1);
+            secondY = event.getY(1);
+
+//            Log.d(TAG, "Second finger coordinates: X=" + secondX + ", Y=" + secondY);
+        }
+
+        ControllerTouch[] touches = new ControllerTouch[] {
+                new ControllerTouch((short)x, (short)y, (byte)touchId1),
+                new ControllerTouch((short)secondX, (short)secondY, (byte)touchId2)
+        };
+        handleTouchpadTap(false, (byte)nextId, touches);
+    }
+
+    private void handleTouchpadMoveEnd(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+
+        float secondX = 0;
+        float secondY = 0;
+
+        int pointerCount = event.getPointerCount();
+
+        if (pointerCount >= 2) {
+            int secondPointerIndex = 1;
+
+            secondX = event.getX(secondPointerIndex);
+            secondY = event.getY(secondPointerIndex);
+        }
+
+        ControllerTouch[] touches = new ControllerTouch[] {
+                new ControllerTouch((short)x, (short)y, (byte)-1),
+                new ControllerTouch((short)secondX, (short)secondY, (byte)-1)
+        };
+        handleTouchpadTap(false, (byte)nextId, touches);
+    }
+
     public boolean handleGenericMotionEvent(MotionEvent event) {
         InputDevice inputDevice = event.getDevice();
 
+        // Touchpad
+        if ((event.getSource() & InputDevice.SOURCE_TOUCHPAD) != 0) {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    initialX = event.getX();
+                    initialY = event.getY();
+                    handleTouchpadMoveStart(event);
+
+                    return true;
+                case MotionEvent.ACTION_UP:
+                    handleTouchpadMoveEnd(event);
+                    return true;
+                case MotionEvent.ACTION_MOVE:
+                    float currentX = event.getX();
+                    float currentY = event.getY();
+                    float deltaX = currentX - initialX;
+                    float deltaY = currentY - initialY;
+//                    float distance = (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                    handleTouchpadMove(event);
+
+                    return true;
+            }
+        }
+
+        // Joystick & Dpad
         if ((event.getSource() & InputDevice.SOURCE_CLASS_JOYSTICK) != InputDevice.SOURCE_CLASS_JOYSTICK) {
             return false;
         }
@@ -746,8 +848,8 @@ public class StreamView extends FrameLayout {
                 }
             }
 
-            Log.d(TAG, "Left Trigger:" + lTrigger);
-            Log.d(TAG, "Right Trigger:" + rTrigger);
+//            Log.d(TAG, "Left Trigger:" + lTrigger);
+//            Log.d(TAG, "Right Trigger:" + rTrigger);
             // Short trigger
             if (this.isShortTrigger) {
                 float triggerMax = this.deadZone + 0.1f;

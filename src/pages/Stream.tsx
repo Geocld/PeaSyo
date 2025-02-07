@@ -302,8 +302,6 @@ function StreamScreen({navigation, route}) {
             if (_settings.sensor) {
               streamViewRef.current?.startSensor();
             }
-
-            streamViewRef.current?.requestFocus();
           }, 100);
 
           // Performance
