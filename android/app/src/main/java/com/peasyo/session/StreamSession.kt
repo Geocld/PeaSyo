@@ -239,9 +239,8 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 
 						// Situation3：Rumble with click
 						val diff = currentTime - hapticsState.lastActionTime
-						if (!shouldVibrate && (diff < 1000L) && (left > 0 || right > 0)) {
+						if (!shouldVibrate && (diff < 1500L) && (left > 0 || right > 0)) {
 							shouldVibrate = true
-//							Log.d("StreamView", "situation3...")
 						}
 					}
 
@@ -304,10 +303,17 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 								if(left == 0 || right == 0) {
 									gamepadManager.vibrate(60, left, right, 0, 0, rumbleIntensity)
 								} else {
+//									val params = Arguments.createMap().apply {
+//										putInt("left", left)
+//										putInt("right", right)
+//									}
+//									sendEvent("rumble", params)
+									gamepadManager.vibrate(60, left, right, 0, 0, rumbleIntensity)
 									vibrateScope.launch {
 										vibrateMutex.withLock {
 											gamepadManager.vibrate(60, left, right, 0, 0, rumbleIntensity)
 											delay(60)
+											gamepadManager.vibrate(0, 0, 0, 0, 0, rumbleIntensity)
 										}
 									}
 								}
