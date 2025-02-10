@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.InputDevice;
@@ -176,6 +177,10 @@ public class StreamView extends FrameLayout {
                 int newHeight = viewHeight - 1;
 
                 setMeasuredDimension(newWidth, newHeight);
+                super.onMeasure(
+                        MeasureSpec.makeMeasureSpec(newWidth, MeasureSpec.EXACTLY),
+                        MeasureSpec.makeMeasureSpec(newHeight, MeasureSpec.EXACTLY)
+                );
                 break;
             case SCALE_MODE_ZOOM: // 缩放
                 if (viewHeight > viewWidth * aspectRatio) {
@@ -192,6 +197,10 @@ public class StreamView extends FrameLayout {
                     calculatedHeight = (int)(viewHeight * zoomFactor);
                 }
                 setMeasuredDimension(calculatedWidth, calculatedHeight);
+                super.onMeasure(
+                        MeasureSpec.makeMeasureSpec(calculatedWidth, MeasureSpec.EXACTLY),
+                        MeasureSpec.makeMeasureSpec(calculatedHeight, MeasureSpec.EXACTLY)
+                );
                 break;
             case SCALE_MODE_FIT: // 保持比例
             default:
@@ -281,8 +290,12 @@ public class StreamView extends FrameLayout {
         // 添加媒体流视图
         session.attachToSurfaceView(surface);
 
-        // 开始session
-        session.resume();
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                session.resume();
+            }
+        }, 1000);
     }
 
     public void startSession() {

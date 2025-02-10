@@ -190,6 +190,10 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
                 int newHeight = viewHeight - 1;
 
                 setMeasuredDimension(newWidth, newHeight);
+                super.onMeasure(
+                        MeasureSpec.makeMeasureSpec(newWidth, MeasureSpec.EXACTLY),
+                        MeasureSpec.makeMeasureSpec(newHeight, MeasureSpec.EXACTLY)
+                );
                 break;
             case SCALE_MODE_ZOOM: // 缩放
                 if (viewHeight > viewWidth * aspectRatio) {
@@ -206,6 +210,10 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
                     calculatedHeight = (int)(viewHeight * zoomFactor);
                 }
                 setMeasuredDimension(calculatedWidth, calculatedHeight);
+                super.onMeasure(
+                        MeasureSpec.makeMeasureSpec(calculatedWidth, MeasureSpec.EXACTLY),
+                        MeasureSpec.makeMeasureSpec(calculatedHeight, MeasureSpec.EXACTLY)
+                );
                 break;
             case SCALE_MODE_FIT: // 保持比例
             default:

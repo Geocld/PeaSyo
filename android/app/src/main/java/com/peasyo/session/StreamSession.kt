@@ -373,10 +373,10 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 
 			override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int)
 			{
-//				val surface = holder.surface
-//				Log.d("StreamView", "surfaceChanged:" + surface)
-//				this@StreamSession.surface = surface
-//				session?.setSurface(surface)
+				val surface = holder.surface
+				Log.d("StreamView", "surfaceChanged:" + surface)
+				this@StreamSession.surface = surface
+				session?.setSurface(surface)
 			}
 
 			override fun surfaceDestroyed(holder: SurfaceHolder)
