@@ -70,7 +70,7 @@ public class StreamTextureViewManager extends SimpleViewManager<StreamTextureVie
                 case "H264":
                     codec = Codec.CODEC_H264;
                     break;
-                case "H265-HRD":
+                case "H265-HDR":
                     codec = Codec.CODEC_H265_HDR;
                     break;
                 default:

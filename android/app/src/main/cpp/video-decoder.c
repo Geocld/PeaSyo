@@ -11,10 +11,11 @@
 #include <string.h>
 
 #define INPUT_BUFFER_TIMEOUT_MS 10
+#define REMOTE_INPUT_BUFFER_TIMEOUT_MS 500
 
 static void *android_chiaki_video_decoder_output_thread_func(void *user);
 
-ChiakiErrorCode android_chiaki_video_decoder_init(AndroidChiakiVideoDecoder *decoder, ChiakiLog *log, int32_t target_width, int32_t target_height, ChiakiCodec codec)
+ChiakiErrorCode android_chiaki_video_decoder_init(AndroidChiakiVideoDecoder *decoder, ChiakiLog *log, int32_t target_width, int32_t target_height, ChiakiCodec codec, bool remote)
 {
     decoder->log = log;
     decoder->codec = NULL;
@@ -26,6 +27,8 @@ ChiakiErrorCode android_chiaki_video_decoder_init(AndroidChiakiVideoDecoder *dec
 
     decoder->stats.total_decode_time_ns = 0;
     decoder->stats.decoded_frames = 0;
+
+    decoder->is_remote = remote;
 
     return chiaki_mutex_init(&decoder->codec_mutex, false);
 }
@@ -66,12 +69,11 @@ void android_chiaki_video_decoder_set_surface(AndroidChiakiVideoDecoder *decoder
 {
     CHIAKI_LOGI(decoder->log, "StreamView android_chiaki_video_decoder_set_surface");
 
-    // 这里不能锁进程，否则会导致RN ui渲染进程卡住?
 	chiaki_mutex_lock(&decoder->codec_mutex);
 
     if(!surface)
     {
-        CHIAKI_LOGI(decoder->log, "StreamView android_chiaki_video_decoder_set_surface111111");
+        CHIAKI_LOGI(decoder->log, "StreamView android_chiaki_video_decoder_set_surface");
         if(decoder->codec)
         {
             kill_decoder(decoder);
@@ -119,9 +121,13 @@ void android_chiaki_video_decoder_set_surface(AndroidChiakiVideoDecoder *decoder
     AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_WIDTH, decoder->target_width);
     AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_HEIGHT, decoder->target_height);
 
-    AMediaFormat_setInt32(format, "color-standard", 0); // 广色域标准
-    AMediaFormat_setInt32(format, "color-transfer", 6); // PQ (Perceptual Quantizer) HDR传输特性
-    AMediaFormat_setInt32(format, "color-range", 2); // 完整颜色范围
+    // HDR settings
+    AMediaFormat_setInt32(format, "color-standard", 0);
+    AMediaFormat_setInt32(format, "color-transfer", 6);
+    AMediaFormat_setInt32(format, "color-range", 2);
+
+    int bufferSize = 2 * 1024 * 1024;
+    AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_MAX_INPUT_SIZE, bufferSize);
 
     media_status_t r = AMediaCodec_configure(decoder->codec, format, decoder->window, NULL, 0);
     if(r != AMEDIA_OK)
@@ -132,7 +138,6 @@ void android_chiaki_video_decoder_set_surface(AndroidChiakiVideoDecoder *decoder
     }
 
     // 启动解码器
-    // 该方法定义在NdkMediaCodec.h中
     r = AMediaCodec_start(decoder->codec);
     AMediaFormat_delete(format);
     if(r != AMEDIA_OK)
@@ -181,7 +186,8 @@ bool android_chiaki_video_decoder_video_sample(uint8_t *buf, size_t buf_size, vo
     while(buf_size > 0)
     {
         // send video stream to MediaCodec
-        ssize_t codec_buf_index = AMediaCodec_dequeueInputBuffer(decoder->codec, INPUT_BUFFER_TIMEOUT_MS * 1000);
+        int timeout_ms = decoder->is_remote ? REMOTE_INPUT_BUFFER_TIMEOUT_MS : INPUT_BUFFER_TIMEOUT_MS;
+        ssize_t codec_buf_index = AMediaCodec_dequeueInputBuffer(decoder->codec, timeout_ms * 1000);
         if(codec_buf_index < 0)
         {
             CHIAKI_LOGE(decoder->log, "Failed to get input buffer");

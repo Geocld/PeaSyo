@@ -24,6 +24,8 @@ typedef struct android_chiaki_video_decoder_t
 	int32_t target_height;
 	ChiakiCodec target_codec;
 
+    bool is_remote;
+
     struct {
         uint64_t total_decode_time_ns;
         uint32_t decoded_frames;
@@ -41,7 +43,7 @@ typedef struct android_chiaki_video_decoder_t
     double avg_decode_time;
 } AndroidChiakiVideoDecoder;
 
-ChiakiErrorCode android_chiaki_video_decoder_init(AndroidChiakiVideoDecoder *decoder, ChiakiLog *log, int32_t target_width, int32_t target_height, ChiakiCodec codec);
+ChiakiErrorCode android_chiaki_video_decoder_init(AndroidChiakiVideoDecoder *decoder, ChiakiLog *log, int32_t target_width, int32_t target_height, ChiakiCodec codec, bool remote);
 void android_chiaki_video_decoder_fini(AndroidChiakiVideoDecoder *decoder);
 void android_chiaki_video_decoder_set_surface(AndroidChiakiVideoDecoder *decoder, JNIEnv *env, jobject surface);
 bool android_chiaki_video_decoder_video_sample(uint8_t *buf, size_t buf_size, void *user);

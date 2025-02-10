@@ -3,8 +3,10 @@ import {
   Alert,
   StyleSheet,
   View,
+  ScrollView,
   AppState,
   ToastAndroid,
+  Dimensions,
   NativeModules,
   NativeEventEmitter,
 } from 'react-native';
@@ -41,6 +43,7 @@ function StreamScreen({navigation, route}) {
   const [showTouchpad, setShowTouchpad] = React.useState(false);
   const streamViewRef = React.useRef<any>(null);
   const [showModal, setShowModal] = React.useState(false);
+  const [modalMaxHeight, setModalMaxHeight] = React.useState(250);
   const [showStreamView, setShowStreamView] = React.useState(false);
   const [avgPerformance, setAvgPerformance] = React.useState({});
   const [showPerformance, setShowPerformance] = React.useState(false);
@@ -390,6 +393,9 @@ function StreamScreen({navigation, route}) {
       Orientation.lockToLandscape();
 
       setTimeout(() => {
+        const {height: dHeight} = Dimensions.get('window');
+        setModalMaxHeight(dHeight - 50);
+
         setShowStreamView(true);
 
         if (useSurface) {
@@ -403,6 +409,7 @@ function StreamScreen({navigation, route}) {
         }
 
         setLoading(true);
+
         setLoadingText(t('Connecting'));
         setTimeout(() => {
           if (useSurface) {
@@ -560,74 +567,76 @@ function StreamScreen({navigation, route}) {
         <View style={styles.modal}>
           <Card>
             <Card.Content>
-              <List.Section>
-                {connectState === CONNECTED && (
-                  <List.Item
-                    title={t('Toggle Performance')}
-                    background={background}
-                    onPress={() => {
-                      setShowPerformance(!showPerformance);
-                      handleCloseModal();
-                    }}
-                  />
-                )}
-                {connectState === CONNECTED && !isTouchpadFull && (
-                  <List.Item
-                    title={t('Toggle Virtual Gamepad')}
-                    background={background}
-                    onPress={() => {
-                      setShowVirtualGamepad(!showVirtualGamepad);
-                      handleCloseModal();
-                    }}
-                  />
-                )}
-                {connectState === CONNECTED && (
-                  <List.Item
-                    title={t('Toggle Touchpad')}
-                    background={background}
-                    onPress={() => {
-                      setShowTouchpad(!showTouchpad);
-                      handleCloseModal();
-                    }}
-                  />
-                )}
-                {connectState === CONNECTED && (
-                  <List.Item
-                    title={t('Press PS')}
-                    background={background}
-                    onPress={() => {
-                      handlePressIn('PS');
-                      setTimeout(() => handlePressOut('PS'), 200);
-                      handleCloseModal();
-                    }}
-                  />
-                )}
-                {connectState === CONNECTED && (
-                  <List.Item
-                    title={t('Disconnect and sleep')}
-                    background={background}
-                    onPress={() => {
-                      streamViewRef.current?.sleep();
-                      setTimeout(() => {
+              <ScrollView style={{maxHeight: modalMaxHeight}}>
+                <List.Section>
+                  {connectState === CONNECTED && (
+                    <List.Item
+                      title={t('Toggle Performance')}
+                      background={background}
+                      onPress={() => {
+                        setShowPerformance(!showPerformance);
                         handleCloseModal();
-                        handleExit();
-                      }, 1000);
+                      }}
+                    />
+                  )}
+                  {connectState === CONNECTED && !isTouchpadFull && (
+                    <List.Item
+                      title={t('Toggle Virtual Gamepad')}
+                      background={background}
+                      onPress={() => {
+                        setShowVirtualGamepad(!showVirtualGamepad);
+                        handleCloseModal();
+                      }}
+                    />
+                  )}
+                  {connectState === CONNECTED && (
+                    <List.Item
+                      title={t('Toggle Touchpad')}
+                      background={background}
+                      onPress={() => {
+                        setShowTouchpad(!showTouchpad);
+                        handleCloseModal();
+                      }}
+                    />
+                  )}
+                  {connectState === CONNECTED && (
+                    <List.Item
+                      title={t('Press PS')}
+                      background={background}
+                      onPress={() => {
+                        handlePressIn('PS');
+                        setTimeout(() => handlePressOut('PS'), 200);
+                        handleCloseModal();
+                      }}
+                    />
+                  )}
+                  {connectState === CONNECTED && (
+                    <List.Item
+                      title={t('Disconnect and sleep')}
+                      background={background}
+                      onPress={() => {
+                        streamViewRef.current?.sleep();
+                        setTimeout(() => {
+                          handleCloseModal();
+                          handleExit();
+                        }, 1000);
+                      }}
+                    />
+                  )}
+                  <List.Item
+                    title={t('Disconnect')}
+                    background={background}
+                    onPress={() => {
+                      handleExit();
                     }}
                   />
-                )}
-                <List.Item
-                  title={t('Disconnect')}
-                  background={background}
-                  onPress={() => {
-                    handleExit();
-                  }}
-                />
-                <List.Item
-                  title={t('Cancel')}
-                  background={background}
-                  onPress={() => handleCloseModal()}
-                />
-              </List.Section>
+                  <List.Item
+                    title={t('Cancel')}
+                    background={background}
+                    onPress={() => handleCloseModal()}
+                  />
+                </List.Section>
+              </ScrollView>
             </Card.Content>
           </Card>
         </View>

@@ -61,6 +61,7 @@ const ConsoleItem = (props: any) => {
                 color: 'rgba(255, 255, 255, 0.2)',
                 foreground: true,
               }}
+              labelStyle={{marginHorizontal: 0}}
               style={styles.button}
               onPress={props.onPress}>
               {t('LocalStream')}
@@ -73,6 +74,7 @@ const ConsoleItem = (props: any) => {
                 color: 'rgba(255, 255, 255, 0.2)',
                 foreground: true,
               }}
+              labelStyle={{marginHorizontal: 0}}
               onPress={props.onPressRemote}>
               {t('RemoteStream')}
             </Button>

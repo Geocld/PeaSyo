@@ -298,6 +298,16 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
 	connect_info.ps5 = ps5;
 	connect_info.enable_dualsense=ps5;
 
+    jboolean is_remote = JNI_TRUE;
+
+    const char* host_cstr = (*env)->GetStringUTFChars(env, host_string, NULL);
+    if (host_cstr != NULL) {
+        if (strncmp(host_cstr, "192.168", 7) == 0) {
+            is_remote = JNI_FALSE;
+        }
+        (*env)->ReleaseStringUTFChars(env, host_string, host_cstr);
+    }
+
 	const char *str_borrow = E->GetStringUTFChars(env, host_string, NULL);
 	connect_info.host = host_str = strdup(str_borrow);
 	E->ReleaseStringUTFChars(env, host_string, str_borrow);
@@ -348,7 +358,7 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
 	memset(session, 0, sizeof(AndroidChiakiSession));
 	session->log = log;
 	err = android_chiaki_video_decoder_init(&session->video_decoder, log, connect_info.video_profile.width, connect_info.video_profile.height,
-			connect_info.ps5 ? connect_info.video_profile.codec : CHIAKI_CODEC_H264);
+			connect_info.ps5 ? connect_info.video_profile.codec : CHIAKI_CODEC_H264, is_remote);
 	if(err != CHIAKI_ERR_SUCCESS)
 	{
 		free(session);
