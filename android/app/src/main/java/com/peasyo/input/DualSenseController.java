@@ -51,17 +51,17 @@ public class DualSenseController extends AbstractDualSenseController {
 
         // Process D-pad (buttons0 & 0x0F)
         int dpad = buffer.get(8) & 0x0F;
-        setDsButtonFlag(DSControllerPacket.DPAD_UP_FLAG, dpad == 0 || dpad == 1 || dpad == 7);
-        setDsButtonFlag(DSControllerPacket.DPAD_DOWN_FLAG, dpad == 3 || dpad == 4 || dpad == 5);
-        setDsButtonFlag(DSControllerPacket.DPAD_LEFT_FLAG, dpad == 5 || dpad == 6 || dpad == 7);
-        setDsButtonFlag(DSControllerPacket.DPAD_RIGHT_FLAG, dpad == 1 || dpad == 2 || dpad == 3);
+        setDsButtonFlag(DSControllerPacket.UP_FLAG, dpad == 0 || dpad == 1 || dpad == 7);
+        setDsButtonFlag(DSControllerPacket.DOWN_FLAG, dpad == 3 || dpad == 4 || dpad == 5);
+        setDsButtonFlag(DSControllerPacket.LEFT_FLAG, dpad == 5 || dpad == 6 || dpad == 7);
+        setDsButtonFlag(DSControllerPacket.RIGHT_FLAG, dpad == 1 || dpad == 2 || dpad == 3);
 
         // Process face buttons (buttons0)
         int buttons0 = buffer.get(8);
-        setDsButtonFlag(DSControllerPacket.SQUARE_FLAG, (buttons0 & 0x10) != 0);
+        setDsButtonFlag(DSControllerPacket.BOX_FLAG, (buttons0 & 0x10) != 0);
         setDsButtonFlag(DSControllerPacket.CROSS_FLAG, (buttons0 & 0x20) != 0);
-        setDsButtonFlag(DSControllerPacket.CIRCLE_FLAG, (buttons0 & 0x40) != 0);
-        setDsButtonFlag(DSControllerPacket.TRIANGLE_FLAG, (buttons0 & 0x80) != 0);
+        setDsButtonFlag(DSControllerPacket.MOON_FLAG, (buttons0 & 0x40) != 0);
+        setDsButtonFlag(DSControllerPacket.PYRAMID_FLAG, (buttons0 & 0x80) != 0);
 
         // Process shoulder buttons and other controls (buttons1)
         int buttons1 = buffer.get(9);
@@ -69,7 +69,7 @@ public class DualSenseController extends AbstractDualSenseController {
         setDsButtonFlag(DSControllerPacket.R1_FLAG, (buttons1 & 0x02) != 0);
 //        setDsButtonFlag(DSControllerPacket.L2_FLAG, (buttons1 & 0x04) != 0);
 //        setDsButtonFlag(DSControllerPacket.R2_FLAG, (buttons1 & 0x08) != 0);
-        setDsButtonFlag(DSControllerPacket.CREATE_FLAG, (buttons1 & 0x10) != 0);
+        setDsButtonFlag(DSControllerPacket.SHARE_FLAG, (buttons1 & 0x10) != 0);
         setDsButtonFlag(DSControllerPacket.OPTIONS_FLAG, (buttons1 & 0x20) != 0);
         setDsButtonFlag(DSControllerPacket.L3_FLAG, (buttons1 & 0x40) != 0);
         setDsButtonFlag(DSControllerPacket.R3_FLAG, (buttons1 & 0x80) != 0);
@@ -124,23 +124,31 @@ public class DualSenseController extends AbstractDualSenseController {
         int accelZ0 = buffer.get(26) & 0xFF;
         int accelZ1 = buffer.get(27) & 0xFF;
 
-        int gyrox = (gyroX1 << 8) | gyroX0;
-        if (gyrox > 0x7FFF) gyrox -= 0x10000;
-        int gyroy = (gyroY1 << 8) | gyroY0;
-        if (gyroy > 0x7FFF) gyroy -= 0x10000;
-        int gyroz = (gyroZ1 << 8) | gyroZ0;
-        if (gyroz > 0x7FFF) gyroz -= 0x10000;
+        int _gyrox = (gyroX1 << 8) | gyroX0;
+        if (_gyrox > 0x7FFF) _gyrox -= 0x10000;
+        int _gyroy = (gyroY1 << 8) | gyroY0;
+        if (_gyroy > 0x7FFF) _gyroy -= 0x10000;
+        int _gyroz = (gyroZ1 << 8) | gyroZ0;
+        if (_gyroz > 0x7FFF) _gyroz -= 0x10000;
+
+        gyrox = _gyrox;
+        gyroy = _gyroy;
+        gyroz = _gyroz;
 
 //        Log.d("UsbDriverService DualController.java", "gyrox: " + gyrox);
 //        Log.d("UsbDriverService DualController.java", "gyroy: " + gyroy);
 //        Log.d("UsbDriverService DualController.java", "gyroz: " + gyroz);
 
-        int accelx = (accelX1 << 8) | accelX0;
-        if (accelx > 0x7FFF) accelx -= 0x10000;
-        int accely = (accelY1 << 8) | accelY0;
-        if (accely > 0x7FFF) accely -= 0x10000;
-        int accelz = (accelZ1 << 8) | accelZ0;
-        if (accelz > 0x7FFF) accelz -= 0x10000;
+        int _accelx = (accelX1 << 8) | accelX0;
+        if (_accelx > 0x7FFF) _accelx -= 0x10000;
+        int _accely = (accelY1 << 8) | accelY0;
+        if (_accely > 0x7FFF) _accely -= 0x10000;
+        int _accelz = (accelZ1 << 8) | accelZ0;
+        if (_accelz > 0x7FFF) _accelz -= 0x10000;
+
+        accelx = _accelx;
+        accely = _accely;
+        accelz = _accelz;
 
 //        Log.d("UsbDriverService DualController.java", "accelx: " + accelx);
 //        Log.d("UsbDriverService DualController.java", "accely: " + accely);

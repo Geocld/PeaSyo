@@ -83,7 +83,7 @@ public class UsbRumbleManager extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    private void sendCommand() {
+    private void setDsController(int led_r, int led_g, int led_b,  int mute) {
         MainActivity mainActivity = (MainActivity) getCurrentActivity();
         if (mainActivity != null) {
             byte[] reportData = new byte[] {
@@ -93,8 +93,8 @@ public class UsbRumbleManager extends ReactContextBaseJavaModule {
                     0x00, // right trigger rumble
                     0x00, // left trigger rumble
                     0x00, 0x00, 0x00, 0x00,
-                    0x00,  // mute_button_led (0: mute LED off  | 1: mute LED on)
-                    0x10, // power_save_control(mute led on  = 0x00, off = 0x10)
+                    (byte)mute,  // mute_button_led (0: mute LED off  | 1: mute LED on)
+                    mute == 1 ? (byte)0x00 : (byte)0x10, // power_save_control(mute led on  = 0x00, off = 0x10)
                     0x06,          // R2 trigger effect mode
                     (byte)0x0a, // R2 trigger effect parameter 1
                     (byte)0xff, // R2 trigger effect parameter 2
@@ -115,7 +115,7 @@ public class UsbRumbleManager extends ReactContextBaseJavaModule {
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x02, 0x00, 0x02, 0x00,
                     0x00,       // player leds
-                    (byte)0x12, (byte)0xff, (byte)0x1c // RGB values
+                    (byte)led_r, (byte)led_g, (byte)led_b // RGB values
             };
             mainActivity.handleSendCommand(reportData);
         }

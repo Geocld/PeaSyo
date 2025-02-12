@@ -2,34 +2,37 @@ import React from 'react';
 import {View} from 'react-native';
 import Svg, {Path, Circle, Rect, G} from 'react-native-svg';
 
+const strokeColor = '#fff';
+const buttonBlurColor = '#fff';
+const buttonFocusColor = '#DF6069';
+const strokeWidth = 4;
+
 const DS5Controller = ({
-  // 按钮颜色控制props
-  crossColor = '#fff',
-  rectColor = '#fff',
-  circleColor = '#fff',
-  triangleColor = '#fff',
-  dpadUpColor = '#fff',
-  dpadDownColor = '#fff',
-  dpadLeftColor = '#fff',
-  dpadRightColor = '#fff',
-  l1Color = '#fff',
-  l2Color = '#fff',
-  r1Color = '#fff',
-  r2Color = '#fff',
-  l3Color = '#fff',
-  r3Color = '#fff',
-  createColor = '#fff',
-  optionsColor = '#fff',
-  psColor = '#fff',
-  touchpadColor = '#fff',
-  muteColor = '#fff',
-  strokeColor = '#fff',
-  strokeWidth = 4,
+  cross = 0,
+  moon = 0,
+  box = 0,
+  pyramid = 0,
+  left = 0,
+  right = 0,
+  up = 0,
+  down = 0,
+  l1 = 0,
+  r1 = 0,
+  l3 = 0,
+  r3 = 0,
+  options = 0,
+  share = 0,
+  touchpad = 0,
+  touch0active = false,
+  touch1active = false,
+  ps = 0,
+  mute = 0,
+  leftTrigger = 0,
+  rightTrigger = 0,
 }) => {
   return (
     <View style={{width: '100%', height: 350}}>
       <Svg width="100%" height="100%" viewBox="0 0 1117 892">
-        {/* 主按键组 */}
         <Path
           d="M917.682,411.683l32.795,32.795m-0,-32.795l-32.795,32.795"
           fill="#fff"
@@ -55,14 +58,14 @@ const DS5Controller = ({
         <Path
           id="r2"
           d="M866.471,116.785l114.214,0c12.312,0 -1.248,-110.916 -78.919,-110.916c-37.32,-0 -51.81,110.916 -35.295,110.916Z"
-          fill={r2Color}
+          fill={rightTrigger ? buttonFocusColor : buttonBlurColor}
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         />
         <Path
           id="l2"
           d="M252.212,116.785l-114.214,0c-12.312,0 1.248,-110.916 78.919,-110.916c37.32,-0 51.81,110.916 35.295,110.916Z"
-          fill={l2Color}
+          fill={leftTrigger ? buttonFocusColor : buttonBlurColor}
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         />
@@ -70,7 +73,7 @@ const DS5Controller = ({
         <G id="dpad-up">
           <Path
             d="M213.487,271.996c0,-11.214 -9.091,-20.305 -20.305,-20.305l-28.888,-0c-11.215,-0 -20.306,9.091 -20.306,20.305l0,24.336c0,6.286 2.397,12.335 6.703,16.915c6.856,7.293 17.331,18.436 23.351,24.838c1.218,1.296 2.917,2.031 4.696,2.031c1.778,-0 3.478,-0.735 4.696,-2.031c6.019,-6.402 16.494,-17.545 23.35,-24.838c4.306,-4.58 6.703,-10.629 6.703,-16.915c0,-6.766 0,-16.013 0,-24.336Z"
-            fill={dpadUpColor}
+            fill={up ? buttonFocusColor : buttonBlurColor}
             stroke={strokeColor}
             strokeWidth={strokeWidth}
           />
@@ -83,7 +86,7 @@ const DS5Controller = ({
         <G id="dpad-down">
           <Path
             d="M213.487,443.093c0,11.215 -9.091,20.306 -20.305,20.306l-28.888,-0c-11.215,-0 -20.306,-9.091 -20.306,-20.306l0,-24.125c0,-6.412 2.494,-12.572 6.953,-17.178c6.884,-7.11 17.23,-17.796 23.166,-23.927c1.214,-1.254 2.885,-1.962 4.631,-1.962c1.745,0 3.416,0.708 4.63,1.962c5.936,6.131 16.282,16.817 23.166,23.927c4.46,4.606 6.953,10.766 6.953,17.178c0,6.746 0,15.888 0,24.125Z"
-            fill={dpadDownColor}
+            fill={down ? buttonFocusColor : buttonBlurColor}
             stroke={strokeColor}
             strokeWidth={strokeWidth}
           />
@@ -93,10 +96,10 @@ const DS5Controller = ({
           />
         </G>
 
-        <G id="dpad-left">
+        <G id="dpad-right">
           <Path
             d="M263.75,322.259c11.215,0 20.306,9.091 20.306,20.306l-0,28.888c-0,11.214 -9.091,20.305 -20.306,20.305l-24.349,0c-6.278,0 -12.32,-2.391 -16.899,-6.687c-7.081,-6.644 -17.749,-16.654 -23.907,-22.433c-1.274,-1.195 -2.008,-2.855 -2.035,-4.601c-0.027,-1.746 0.656,-3.428 1.892,-4.661c6.106,-6.094 16.81,-16.778 23.946,-23.901c4.63,-4.621 10.905,-7.216 17.446,-7.216c6.724,0 15.758,0 23.906,0Z"
-            fill={dpadLeftColor}
+            fill={right ? buttonFocusColor : buttonBlurColor}
             stroke={strokeColor}
             strokeWidth={strokeWidth}
           />
@@ -106,10 +109,10 @@ const DS5Controller = ({
           />
         </G>
 
-        <G id="dpad-right">
+        <G id="dpad-left">
           <Path
             d="M93.725,322.259c-11.214,0 -20.306,9.091 -20.306,20.306l0,28.888c0,11.214 9.092,20.305 20.306,20.305l24.349,0c6.278,0 12.321,-2.391 16.899,-6.687c7.081,-6.644 17.749,-16.654 23.908,-22.433c1.273,-1.195 2.007,-2.855 2.034,-4.601c0.027,-1.746 -0.656,-3.428 -1.891,-4.661c-6.106,-6.094 -16.81,-16.778 -23.947,-23.901c-4.63,-4.621 -10.904,-7.216 -17.446,-7.216c-6.724,0 -15.757,0 -23.906,0Z"
-            fill={dpadRightColor}
+            fill={left ? buttonFocusColor : buttonBlurColor}
             stroke={strokeColor}
             strokeWidth={strokeWidth}
           />
@@ -119,13 +122,12 @@ const DS5Controller = ({
           />
         </G>
 
-        {/* 主按键圆圈 */}
         <Circle
           id="cross"
           cx="934.079"
           cy="428.08"
           r="34.957"
-          fill={crossColor}
+          fill={cross ? buttonFocusColor : buttonBlurColor}
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         />
@@ -134,7 +136,7 @@ const DS5Controller = ({
           cx="864.079"
           cy="358.08"
           r="34.957"
-          fill={rectColor}
+          fill={box ? buttonFocusColor : buttonBlurColor}
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         />
@@ -143,7 +145,7 @@ const DS5Controller = ({
           cx="1004.08"
           cy="358.08"
           r="34.957"
-          fill={circleColor}
+          fill={moon ? buttonFocusColor : buttonBlurColor}
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         />
@@ -152,7 +154,7 @@ const DS5Controller = ({
           cx="934.079"
           cy="288.08"
           r="34.957"
-          fill={triangleColor}
+          fill={pyramid ? buttonFocusColor : buttonBlurColor}
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         />
@@ -175,7 +177,7 @@ const DS5Controller = ({
         <Path
           id="mute"
           d="M590.061,591.266c-0,-3.699 -2.999,-6.698 -6.698,-6.698c-11.914,0 -36.653,0 -48.567,0c-3.7,0 -6.698,2.999 -6.698,6.698c-0,0.001 -0,0.001 -0,0.002c-0,3.699 2.998,6.698 6.698,6.698c11.914,-0 36.653,-0 48.567,-0c3.699,-0 6.698,-2.999 6.698,-6.698c-0,-0.001 -0,-0.001 -0,-0.002Z"
-          fill={muteColor}
+          fill={mute ? buttonFocusColor : buttonBlurColor}
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         />
@@ -208,7 +210,11 @@ const DS5Controller = ({
           <Path
             id="touchpad"
             d="M559.079,143.015c0,0 158.534,-0.805 226.555,15.497c12.437,2.981 21.237,14.507 19.467,24.644c-8.942,51.221 -20.354,109.033 -30.53,160.023c-8.029,40.224 -40.893,53.816 -68.431,53.692c-27.538,-0.124 -147.061,-0.559 -147.061,-0.559c0,0 -119.522,0.435 -147.06,0.559c-27.538,0.124 -60.403,-13.468 -68.431,-53.692c-10.177,-50.99 -21.589,-108.802 -30.531,-160.023c-1.77,-10.137 7.031,-21.663 19.467,-24.644c68.021,-16.302 226.555,-15.497 226.555,-15.497Z"
-            fill="none"
+            fill={
+              touchpad || touch0active || touch1active
+                ? buttonFocusColor
+                : 'none'
+            }
             stroke={strokeColor}
             strokeWidth={strokeWidth}
           />
@@ -226,7 +232,7 @@ const DS5Controller = ({
         <Path
           id="r1"
           d="M995.675,180.421c-0.736,-29.244 -151.654,-71.59 -148.099,-18.465c9.518,-3.397 21.562,-4.367 36.227,-2.82c39.392,4.154 77.223,11.417 111.872,21.285Z"
-          fill="none"
+          fill={r1 ? buttonFocusColor : 'none'}
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         />
@@ -234,7 +240,7 @@ const DS5Controller = ({
         <Path
           id="l1"
           d="M122.514,180.513c0.736,-29.244 151.654,-71.59 148.099,-18.465c-9.518,-3.397 -21.562,-4.367 -36.227,-2.82c-39.392,4.154 -77.223,11.417 -111.872,21.285Z"
-          fill="none"
+          fill={l1 ? buttonFocusColor : 'none'}
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         />
@@ -242,7 +248,7 @@ const DS5Controller = ({
         <Path
           id="options"
           d="M839.082,206.321l-6.369,31.916c-0,-0 -2.557,11.875 11.724,14.725c14.281,2.849 16.478,-9.098 16.478,-9.098l6.4,-32.075c0,-0 2.559,-11.876 -11.74,-14.645c-14.298,-2.77 -16.493,9.177 -16.493,9.177Z"
-          fill="none"
+          fill={options ? buttonFocusColor : 'none'}
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         />
@@ -250,7 +256,7 @@ const DS5Controller = ({
         <Path
           id="create"
           d="M281.064,206.321l6.369,31.916c-0,-0 2.557,11.875 -11.724,14.725c-14.281,2.849 -16.478,-9.098 -16.478,-9.098l-6.4,-32.075c-0,-0 -2.559,-11.876 11.739,-14.645c14.299,-2.77 16.494,9.177 16.494,9.177Z"
-          fill="none"
+          fill={share ? buttonFocusColor : 'none'}
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         />
@@ -312,7 +318,7 @@ const DS5Controller = ({
             cx="763.456"
             cy="528.548"
             r="57.193"
-            fill={r3Color}
+            fill={r3 ? buttonFocusColor : buttonBlurColor}
             stroke={strokeColor}
             strokeWidth={strokeWidth}
           />
@@ -333,7 +339,7 @@ const DS5Controller = ({
             cx="351.764"
             cy="528.548"
             r="57.193"
-            fill={l3Color}
+            fill={l3 ? buttonFocusColor : buttonBlurColor}
             stroke={strokeColor}
             strokeWidth={strokeWidth}
           />
@@ -342,7 +348,7 @@ const DS5Controller = ({
         <Path
           id="ps"
           d="M525.1,538.049c-6.333,-1.817 -7.382,-5.56 -4.509,-7.734c2.071,-1.361 4.45,-2.545 6.969,-3.436l0.232,-0.072l18.72,-6.713l-0,7.71l-13.419,4.906c-2.351,0.905 -2.751,2.108 -0.798,2.754c0.974,0.248 2.089,0.392 3.239,0.392c1.641,-0 3.212,-0.291 4.666,-0.822l-0.094,0.029l6.462,-2.353l-0,6.915c-0.4,0.099 -0.854,0.147 -1.299,0.243c-2.068,0.363 -4.448,0.571 -6.875,0.571c-4.744,0 -9.3,-0.795 -13.547,-2.257l0.293,0.088l-0.04,-0.221Zm39.449,0.789l20.99,-7.584c2.383,-0.859 2.753,-2.084 0.819,-2.727c-0.968,-0.237 -2.078,-0.373 -3.222,-0.373c-1.66,-0 -3.255,0.288 -4.733,0.813l0.099,-0.029l-14.02,5l0,-7.958l0.801,-0.283c2.801,-0.931 6.093,-1.654 9.489,-2.03l0.221,-0.022c1.249,-0.133 2.695,-0.208 4.16,-0.208c5.007,0 9.809,0.883 14.254,2.505l-0.288,-0.093c6.16,2.003 6.8,4.906 5.252,6.907c-1.491,1.486 -3.294,2.662 -5.303,3.42l-0.104,0.035l-28.484,10.359l-0,-7.654l0.069,-0.078Zm-15.521,-54.146l-0,58.498l13.051,4.204l-0,-49.061c-0,-2.3 1.013,-3.836 2.646,-3.303c2.121,0.601 2.534,2.713 2.534,5.018l0,19.587c8.137,3.978 14.543,-0.008 14.543,-10.508c-0,-10.791 -3.754,-15.585 -14.796,-19.427c-4.762,-1.729 -10.778,-3.452 -16.933,-4.815l-1.037,-0.193l-0.008,0Z"
-          fill={psColor}
+          fill={ps ? buttonFocusColor : buttonBlurColor}
           fillRule="nonzero"
         />
       </Svg>

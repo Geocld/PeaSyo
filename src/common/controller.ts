@@ -15,4 +15,5 @@ export const CONTROLLERS = {
   SHARE: 8192,
   TOUCHPAD: 16384,
   PS: 32768,
+  MUTE: 65536,
 };

@@ -25,11 +25,11 @@ public abstract class AbstractDualSenseController extends AbstractController {
         this.device = device;
         this.connection = connection;
         this.buttonFlags =
-                DSControllerPacket.DPAD_UP_FLAG | DSControllerPacket.DPAD_DOWN_FLAG | DSControllerPacket.DPAD_LEFT_FLAG | DSControllerPacket.DPAD_RIGHT_FLAG |
-                        DSControllerPacket.SQUARE_FLAG | DSControllerPacket.CROSS_FLAG | DSControllerPacket.CIRCLE_FLAG | DSControllerPacket.TRIANGLE_FLAG |
+                DSControllerPacket.CROSS_FLAG | DSControllerPacket.MOON_FLAG | DSControllerPacket.BOX_FLAG | DSControllerPacket.PYRAMID_FLAG |
+                        DSControllerPacket.LEFT_FLAG | DSControllerPacket.RIGHT_FLAG | DSControllerPacket.UP_FLAG | DSControllerPacket.DOWN_FLAG |
                         DSControllerPacket.L1_FLAG | DSControllerPacket.R1_FLAG |
                         DSControllerPacket.L3_FLAG | DSControllerPacket.R3_FLAG |
-                        DSControllerPacket.CREATE_FLAG | DSControllerPacket.OPTIONS_FLAG | DSControllerPacket.PS_FLAG | DSControllerPacket.TOUCHPAD_FLAG | DSControllerPacket.MUTE_FLAG;
+                        DSControllerPacket.OPTIONS_FLAG | DSControllerPacket.SHARE_FLAG | DSControllerPacket.TOUCHPAD_FLAG | DSControllerPacket.PS_FLAG | DSControllerPacket.MUTE_FLAG;
     }
 
     private Thread createInputThread() {
