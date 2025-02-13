@@ -158,6 +158,7 @@ public class UsbDriverService extends Service implements UsbDriverListener {
 
         // Open usb gamepad
         boolean bindAllUsb = UsbRumbleManager.getBindUsbDevice();
+        Log.d("UsbDriverService", "bindAllUsb: " + bindAllUsb);
 
         Log.d("UsbDriverService", "shouldClaimDevice: " + shouldClaimDevice(device, bindAllUsb));
         if (shouldClaimDevice(device, bindAllUsb)) {
@@ -314,7 +315,7 @@ public class UsbDriverService extends Service implements UsbDriverListener {
                 ((!isRecognizedInputDevice(device) || claimAllAvailable) && Xbox360Controller.canClaimDevice(device)) ||
                 // We must not call isRecognizedInputDevice() because wireless controllers don't share the same product ID as the dongle
                 ((!kernelSupportsXbox360W() || claimAllAvailable) && Xbox360WirelessDongle.canClaimDevice(device)) ||
-                DualSenseController.canClaimDevice((device));
+                (DualSenseController.canClaimDevice((device)) && claimAllAvailable);
     }
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
