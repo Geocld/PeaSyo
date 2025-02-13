@@ -92,14 +92,23 @@ function DsScreen({navigation}) {
   const [touch1y, setTouch1y] = React.useState(0);
 
   const usbGpEventListener = React.useRef<any>(undefined);
-
   const [microLed, setMicroLed] = React.useState('0');
-  const microLedRef = React.useRef<any>('0');
-
   const [playerLed, setPlayerLed] = React.useState('0');
   const [playerLight, setPlayerLight] = React.useState('0');
   const [currentColor, setCurrentColor] = React.useState('#DF6069');
+  const [rumbleHeavy, setRumbleHeavy] = React.useState(0);
+  const [rumbleSoft, setRumbleSoft] = React.useState(0);
+  const [l2Trigger, setL2Trigger] = React.useState('0');
+  const [r2Trigger, setR2Trigger] = React.useState('0');
+
   const colorPickerRef = React.useRef<any>(null);
+  const microLedRef = React.useRef<string>('0');
+  const playerLedRef = React.useRef<string>('0');
+  const playerLightRef = React.useRef<string>('0');
+  const rumbleHeavyRef = React.useRef<number>(0);
+  const rumbleSoftRef = React.useRef<number>(0);
+  const l2TriggerRef = React.useRef<string>('0');
+  const r2TriggerRef = React.useRef<string>('0');
 
   React.useEffect(() => {
     const handleGamepadReport = throttle(states => {
@@ -148,25 +157,26 @@ function DsScreen({navigation}) {
       setMute(_buttonStates.MUTE);
       setLeftTrigger(states.leftTrigger);
       setRightTrigger(states.rightTrigger);
+
       setLeftStickX(states.leftStickX);
       setLeftStickY(states.leftStickY);
       setRightStickX(states.rightStickX);
       setRightStickY(states.rightStickY);
-      setGyrox(states.gyrox);
-      setGyroy(states.gyroy);
-      setGyroz(states.gyroz);
-      setAccelx(states.accelx);
-      setAccely(states.accely);
-      setAccelz(states.accelz);
-      setTouch0active(states.touch0active);
-      setTouch0id(states.touch0id);
-      setTouch0x(states.touch0x);
-      setTouch0y(states.touch0y);
-      setTouch1active(states.touch1active);
-      setTouch1id(states.touch1id);
-      setTouch1x(states.touch1x);
-      setTouch1y(states.touch1y);
-    }, 32);
+      // setGyrox(states.gyrox);
+      // setGyroy(states.gyroy);
+      // setGyroz(states.gyroz);
+      // setAccelx(states.accelx);
+      // setAccely(states.accely);
+      // setAccelz(states.accelz);
+      // setTouch0active(states.touch0active);
+      // setTouch0id(states.touch0id);
+      // setTouch0x(states.touch0x);
+      // setTouch0y(states.touch0y);
+      // setTouch1active(states.touch1active);
+      // setTouch1id(states.touch1id);
+      // setTouch1x(states.touch1x);
+      // setTouch1y(states.touch1y);
+    }, 16);
     usbGpEventListener.current = eventEmitter.addListener(
       'onDsGamepadReport',
       handleGamepadReport,
@@ -187,6 +197,18 @@ function DsScreen({navigation}) {
     handleSetController();
   };
 
+  const handlePlayerLed = value => {
+    setPlayerLed(value);
+    playerLedRef.current = value;
+    handleSetController();
+  };
+
+  const handlePlayerLight = value => {
+    setPlayerLight(value);
+    playerLightRef.current = value;
+    handleSetController();
+  };
+
   const handleColorChangeComplete = color => {
     setCurrentColor(color);
     setTimeout(() => {
@@ -194,13 +216,88 @@ function DsScreen({navigation}) {
     }, 10);
   };
 
+  const handleTrigger = (type: string, value: string) => {
+    if (type === 'right') {
+      setR2Trigger(value);
+      r2TriggerRef.current = value;
+    } else {
+      setL2Trigger(value);
+      l2TriggerRef.current = value;
+    }
+    handleSetController();
+  };
+
   const handleSetController = () => {
     const [r, g, b] = hexToRgb(currentColor);
+    const mled = microLedRef.current === '1' ? 1 : 0;
+    let pled = 0;
+    let plight = 0;
+    if (playerLedRef.current === '1') {
+      pled = 4;
+    } else if (playerLedRef.current === '2') {
+      pled = 10;
+    } else if (playerLedRef.current === '3') {
+      pled = 21;
+    } else if (playerLedRef.current === '4') {
+      pled = 27;
+    } else if (playerLedRef.current === '5') {
+      pled = 31;
+    }
+
+    if (playerLightRef.current === '1') {
+      plight = 1;
+    } else if (playerLightRef.current === '2') {
+      plight = 2;
+    }
+
+    // Left Trigger
+    let leftTriggerType = 0;
+    let leftTriggerParams = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+    if (l2TriggerRef.current === '1') {
+      // resistance
+      leftTriggerType = 1;
+      leftTriggerParams = [40, 230, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    } else if (l2TriggerRef.current === '2') {
+      // trigger
+      leftTriggerType = 2;
+      leftTriggerParams = [15, 100, 255, 0, 0, 0, 0, 0, 0, 0, 0];
+    } else if (l2TriggerRef.current === '3') {
+      // automatic trigger
+      leftTriggerType = 6;
+      leftTriggerParams = [20, 255, 10, 0, 0, 0, 0, 0, 0, 0, 0];
+    }
+
+    // Right Trigger
+    let rightTriggerType = 0;
+    let rightTriggerParams = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    if (r2TriggerRef.current === '1') {
+      // resistance
+      rightTriggerType = 1;
+      rightTriggerParams = [40, 230, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    } else if (r2TriggerRef.current === '2') {
+      // trigger
+      rightTriggerType = 2;
+      rightTriggerParams = [15, 100, 255, 0, 0, 0, 0, 0, 0, 0, 0];
+    } else if (r2TriggerRef.current === '3') {
+      // automatic trigger
+      rightTriggerType = 6;
+      rightTriggerParams = [20, 255, 10, 0, 0, 0, 0, 0, 0, 0, 0];
+    }
+
     UsbRumbleManager.setDsController(
       r,
       g,
       b,
-      microLedRef.current === '1' ? 1 : 0,
+      mled,
+      pled,
+      plight,
+      rumbleHeavyRef.current,
+      rumbleSoftRef.current,
+      leftTriggerType,
+      leftTriggerParams,
+      rightTriggerType,
+      rightTriggerParams,
     );
   };
 
@@ -762,7 +859,7 @@ function DsScreen({navigation}) {
             <Text>玩家指示灯</Text>
             <View>
               <RadioButton.Group
-                onValueChange={newValue => setPlayerLed(newValue)}
+                onValueChange={newValue => handlePlayerLed(newValue)}
                 value={playerLed}>
                 <View style={styles.playerItem}>
                   <Text>Close</Text>
@@ -796,7 +893,7 @@ function DsScreen({navigation}) {
             <Text>玩家指示灯亮度</Text>
             <View>
               <RadioButton.Group
-                onValueChange={newValue => setPlayerLight(newValue)}
+                onValueChange={newValue => handlePlayerLight(newValue)}
                 value={playerLight}>
                 <View style={styles.playerItem}>
                   <Text>亮</Text>
@@ -819,12 +916,17 @@ function DsScreen({navigation}) {
             <View>
               <Slider
                 style={styles.slider}
-                value={0}
+                value={rumbleHeavy}
                 minimumValue={0}
                 maximumValue={255}
                 step={1}
                 minimumTrackTintColor="#DF6069"
                 maximumTrackTintColor="grey"
+                onValueChange={val => {
+                  setRumbleHeavy(val);
+                  rumbleHeavyRef.current = val;
+                  handleSetController();
+                }}
               />
             </View>
           </View>
@@ -834,12 +936,17 @@ function DsScreen({navigation}) {
             <View>
               <Slider
                 style={styles.slider}
-                value={0}
+                value={rumbleSoft}
                 minimumValue={0}
                 maximumValue={255}
                 step={1}
                 minimumTrackTintColor="#DF6069"
                 maximumTrackTintColor="grey"
+                onValueChange={val => {
+                  setRumbleSoft(val);
+                  rumbleSoftRef.current = val;
+                  handleSetController();
+                }}
               />
             </View>
           </View>
@@ -848,8 +955,8 @@ function DsScreen({navigation}) {
             <Text>左自适应扳机</Text>
             <View>
               <RadioButton.Group
-                onValueChange={newValue => setPlayerLight(newValue)}
-                value={playerLight}>
+                onValueChange={newValue => handleTrigger('left', newValue)}
+                value={l2Trigger}>
                 <View style={styles.playerItem}>
                   <Text>关</Text>
                   <RadioButton value="0" />
@@ -874,8 +981,8 @@ function DsScreen({navigation}) {
             <Text>右自适应扳机</Text>
             <View>
               <RadioButton.Group
-                onValueChange={newValue => setPlayerLight(newValue)}
-                value={playerLight}>
+                onValueChange={newValue => handleTrigger('right', newValue)}
+                value={r2Trigger}>
                 <View style={styles.playerItem}>
                   <Text>关</Text>
                   <RadioButton value="0" />
