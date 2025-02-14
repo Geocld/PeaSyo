@@ -41,7 +41,124 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+class MadgwickFilter {
+    private float beta; // 滤波器增益参数
+    private float q0 = 1.0f, q1 = 0.0f, q2 = 0.0f, q3 = 0.0f; // 四元数
+
+    public MadgwickFilter(float beta) {
+        this.beta = beta;
+    }
+
+    /**
+     * 更新四元数
+     *
+     * @param gx 陀螺仪 X 轴角速度（弧度/秒）
+     * @param gy 陀螺仪 Y 轴角速度（弧度/秒）
+     * @param gz 陀螺仪 Z 轴角速度（弧度/秒）
+     * @param ax 加速度计 X 轴数据（单位：g）
+     * @param ay 加速度计 Y 轴数据（单位：g）
+     * @param az 加速度计 Z 轴数据（单位：g）
+     * @param timeStepSec 时间步长（秒）
+     */
+    public void update(float gx, float gy, float gz, float ax, float ay, float az, float timeStepSec) {
+        float recipNorm;
+        float s0, s1, s2, s3;
+        float qDot1, qDot2, qDot3, qDot4;
+        float _2q0, _2q1, _2q2, _2q3, _4q0, _4q1, _4q2, _8q1, _8q2, q0q0, q1q1, q2q2, q3q3;
+
+        // 计算四元数的导数
+        qDot1 = 0.5f * (-q1 * gx - q2 * gy - q3 * gz);
+        qDot2 = 0.5f * (q0 * gx + q2 * gz - q3 * gy);
+        qDot3 = 0.5f * (q0 * gy - q1 * gz + q3 * gx);
+        qDot4 = 0.5f * (q0 * gz + q1 * gy - q2 * gx);
+
+        // 如果加速度计数据有效，则计算反馈
+        if (!((ax == 0.0f) && (ay == 0.0f) && (az == 0.0f))) {
+            // 归一化加速度计数据
+            recipNorm = invSqrt(ax * ax + ay * ay + az * az);
+            ax *= recipNorm;
+            ay *= recipNorm;
+            az *= recipNorm;
+
+            // 辅助变量
+            _2q0 = 2.0f * q0;
+            _2q1 = 2.0f * q1;
+            _2q2 = 2.0f * q2;
+            _2q3 = 2.0f * q3;
+            _4q0 = 4.0f * q0;
+            _4q1 = 4.0f * q1;
+            _4q2 = 4.0f * q2;
+            _8q1 = 8.0f * q1;
+            _8q2 = 8.0f * q2;
+            q0q0 = q0 * q0;
+            q1q1 = q1 * q1;
+            q2q2 = q2 * q2;
+            q3q3 = q3 * q3;
+
+            // 计算误差
+            s0 = _4q0 * q2q2 + _2q2 * ax + _4q0 * q1q1 - _2q1 * ay;
+            s1 = _4q1 * q3q3 - _2q3 * ax + 4.0f * q0q0 * q1 - _2q0 * ay - _4q1 + _8q1 * q1q1 + _8q1 * q2q2 + _4q1 * az;
+            s2 = 4.0f * q0q0 * q2 + _2q0 * ax + _4q2 * q3q3 - _2q3 * ay - _4q2 + _8q2 * q1q1 + _8q2 * q2q2 + _4q2 * az;
+            s3 = 4.0f * q1q1 * q3 - _2q1 * ax + 4.0f * q2q2 * q3 - _2q2 * ay;
+
+            // 归一化误差
+            recipNorm = invSqrt(s0 * s0 + s1 * s1 + s2 * s2 + s3 * s3);
+            if (recipNorm > 0.000001f) {
+                s0 *= recipNorm;
+                s1 *= recipNorm;
+                s2 *= recipNorm;
+                s3 *= recipNorm;
+
+                // 应用反馈
+                qDot1 -= beta * s0;
+                qDot2 -= beta * s1;
+                qDot3 -= beta * s2;
+                qDot4 -= beta * s3;
+            }
+        }
+
+        // 积分四元数
+        q0 += qDot1 * timeStepSec;
+        q1 += qDot2 * timeStepSec;
+        q2 += qDot3 * timeStepSec;
+        q3 += qDot4 * timeStepSec;
+
+        // 归一化四元数
+        recipNorm = invSqrt(q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3);
+        q0 *= recipNorm;
+        q1 *= recipNorm;
+        q2 *= recipNorm;
+        q3 *= recipNorm;
+    }
+
+    /**
+     * 获取当前四元数
+     *
+     * @return 四元数数组 [w, x, y, z]
+     */
+    public float[] getQuaternion() {
+        return new float[]{q0, q1, q2, q3};
+    }
+
+    /**
+     * 快速计算 1/sqrt(x)
+     *
+     * @param x 输入值
+     * @return 1/sqrt(x)
+     */
+    private float invSqrt(float x) {
+        float halfX = 0.5f * x;
+        int i = Float.floatToIntBits(x);
+        i = 0x5f3759df - (i >> 1);
+        float y = Float.intBitsToFloat(i);
+        y = y * (1.5f - halfX * y * y); // 一次牛顿迭代
+        return y;
+    }
+}
+
 public class StreamView extends FrameLayout {
+
+    MadgwickFilter madgwickFilter;
 
     static final String TAG = "StreamView";
 
@@ -103,6 +220,8 @@ public class StreamView extends FrameLayout {
         this.isShortTrigger = false;
         this.isLeftTriggerCanClick = false;
         this.isRightTriggerCanClick = false;
+
+        madgwickFilter = new MadgwickFilter(20.0f);
     }
 
     @Override
@@ -549,13 +668,32 @@ public class StreamView extends FrameLayout {
         controllerState.setL2State(unsignedAxis(leftTrigger));
         controllerState.setR2State(unsignedAxis(rightTrigger));
 
-//        controllerState.setGyroX(gyrox);
-//        controllerState.setGyroY(gyroy);
-//        controllerState.setGyroZ(gyroz);
-//
-//        controllerState.setAccelX(accelx);
-//        controllerState.setAccelY(accely);
-//        controllerState.setAccelZ(accelz);
+        controllerState.setGyroX(gyroy);
+        controllerState.setGyroY(gyrox);
+        controllerState.setGyroZ(gyroz);
+
+        float accel0 = accelx / 8192f * SensorManager.GRAVITY_EARTH;
+        float accel1 = accely / 8192f * SensorManager.GRAVITY_EARTH;
+        float accel2 = accelz / 8192f * SensorManager.GRAVITY_EARTH;
+
+        controllerState.setAccelX(accel0);
+        controllerState.setAccelY(accel1);
+        controllerState.setAccelZ(accel2);
+
+        madgwickFilter.update(gyroy, gyrox, gyroz, accel0, accel1, accel2, 0.1f);
+
+        float[] quaternion = madgwickFilter.getQuaternion();
+
+        controllerState.setOrientX(0f);
+        controllerState.setOrientY(0f);
+        controllerState.setOrientZ(0f);
+        controllerState.setOrientW(1.0f);
+
+        // TODO：设置旋转矢量
+//        controllerState.setOrientX(quaternion[1]);
+//        controllerState.setOrientY(quaternion[2]);
+//        controllerState.setOrientZ(quaternion[3]);
+//        controllerState.setOrientW(quaternion[0]);
 
         ControllerTouch[] touches = new ControllerTouch[] {
                 new ControllerTouch((short)touch0x, (short)touch0y, (byte)touch0id),
