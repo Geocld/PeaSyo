@@ -418,7 +418,7 @@ class Session(connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean)
 		event(RumbleEvent(left, right))
 	}
 
-	// 扳机振动反馈
+	// Adaptive trigger
 	private fun eventRumbleTigger(typeLeft: Int, left: Int, typeRight: Int, right: Int)
 	{
 		event(TriggerRumbleEvent(typeLeft, left, typeRight, right))

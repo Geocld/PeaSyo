@@ -805,9 +805,9 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
                                       boolean touch0active, boolean touch1active,
                                       int touch0id, int touch0x, int touch0y,
                                       int touch1id, int touch1x, int touch1y) {
-        if (buttonFlags != 0) {
-            Log.d("UsbDriverService reportDsControllerState", "ds buttonFlags:" + buttonFlags);
-        }
+//        if (buttonFlags != 0) {
+//            Log.d("UsbDriverService reportDsControllerState", "ds buttonFlags:" + buttonFlags);
+//        }
 
         WritableMap params = Arguments.createMap();
         params.putInt("flags", buttonFlags);

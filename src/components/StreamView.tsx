@@ -28,6 +28,7 @@ interface StreamViewRef {
   touch: (mask: number, nextId: number, touches: any[]) => void;
   getPerformance: () => void;
   usbController: (controllerStates: any) => void;
+  usbDsController: (controllerStates: any) => void;
   sleep: () => void;
   startSensor: () => void;
   stopSensor: () => void;
@@ -175,6 +176,59 @@ const StreamView: ForwardRefRenderFunction<StreamViewRef, StreamViewProps> = (
             rightStickY,
             leftTrigger,
             rightTrigger,
+          ],
+        );
+      }
+    },
+    usbDsController: (states: any) => {
+      if (streamViewRef.current) {
+        const {
+          flags,
+          leftTrigger,
+          rightTrigger,
+          leftStickX,
+          leftStickY,
+          rightStickX,
+          rightStickY,
+          gyrox,
+          gyroy,
+          gyroz,
+          accelx,
+          accely,
+          accelz,
+          touch0id,
+          touch0x,
+          touch0y,
+          touch1id,
+          touch1x,
+          touch1y,
+        } = states;
+        const viewId = findNodeHandle(streamViewRef.current);
+
+        UIManager.dispatchViewManagerCommand(
+          viewId,
+          // @ts-ignore
+          UIManager.StreamView.Commands.usbDsController.toString(),
+          [
+            flags,
+            leftStickX,
+            leftStickY,
+            rightStickX,
+            rightStickY,
+            leftTrigger,
+            rightTrigger,
+            gyrox,
+            gyroy,
+            gyroz,
+            accelx,
+            accely,
+            accelz,
+            touch0id,
+            touch0x,
+            touch0y,
+            touch1id,
+            touch1x,
+            touch1y,
           ],
         );
       }

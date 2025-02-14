@@ -519,6 +519,58 @@ public class StreamView extends FrameLayout {
         setControllerState(controllerState);
     }
 
+    // DS controller override
+    public void handleUsbDsControllerEvent(
+            int flags,
+            float leftStickX,
+            float leftStickY,
+            float rightStickX,
+            float rightStickY,
+            float leftTrigger,
+            float rightTrigger,
+            float gyrox,
+            float gyroy,
+            float gyroz,
+            float accelx,
+            float accely,
+            float accelz,
+            int touch0id,
+            int touch0x,
+            int touch0y,
+            int touch1id,
+            int touch1x,
+            int touch1y
+    ) {
+        controllerState.setButtons(flags);
+        controllerState.setLeftX(signedAxis(leftStickX));
+        controllerState.setLeftY(signedAxis(-leftStickY));
+        controllerState.setRightX(signedAxis(rightStickX));
+        controllerState.setRightY(signedAxis(-rightStickY));
+        controllerState.setL2State(unsignedAxis(leftTrigger));
+        controllerState.setR2State(unsignedAxis(rightTrigger));
+
+//        controllerState.setGyroX(gyrox);
+//        controllerState.setGyroY(gyroy);
+//        controllerState.setGyroZ(gyroz);
+//
+//        controllerState.setAccelX(accelx);
+//        controllerState.setAccelY(accely);
+//        controllerState.setAccelZ(accelz);
+
+        ControllerTouch[] touches = new ControllerTouch[] {
+                new ControllerTouch((short)touch0x, (short)touch0y, (byte)touch0id),
+                new ControllerTouch((short)touch1x, (short)touch1y, (byte)touch1id)
+        };
+
+        int idNext = Math.max(touch0id, touch1id) + 1;
+        if (idNext > 125) {
+            idNext = 0;
+        }
+        controllerState.setTouchIdNext((byte)idNext);
+        controllerState.setTouches(touches);
+        setControllerState(controllerState);
+    }
+
     public void setControllerState(ControllerState controllerState) {
 //        Log.d(TAG, "setControllerState:" + controllerState);
 

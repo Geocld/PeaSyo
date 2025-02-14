@@ -282,7 +282,7 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 							right = 0
 						}
 
-						Log.d("StreamView", "RumbleEvent: $event")
+//						Log.d("StreamView", "RumbleEvent: $event")
 
 						if (shouldVibrate) {
 							if (usbMode) {
@@ -301,18 +301,18 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 							} else {
 								var gamepadManager = Gamepad(reactContext)
 								if(left == 0 || right == 0) {
-									gamepadManager.vibrate(60, left, right, 0, 0, rumbleIntensity)
+									gamepadManager.vibrate(50, left, right, 0, 0, rumbleIntensity)
 								} else {
 //									val params = Arguments.createMap().apply {
 //										putInt("left", left)
 //										putInt("right", right)
 //									}
 //									sendEvent("rumble", params)
-									gamepadManager.vibrate(60, left, right, 0, 0, rumbleIntensity)
+									gamepadManager.vibrate(50, left, right, 0, 0, rumbleIntensity)
 									vibrateScope.launch {
 										vibrateMutex.withLock {
-											gamepadManager.vibrate(60, left, right, 0, 0, rumbleIntensity)
-											delay(60)
+											gamepadManager.vibrate(50, left, right, 0, 0, rumbleIntensity)
+											delay(50)
 											gamepadManager.vibrate(0, 0, 0, 0, 0, rumbleIntensity)
 										}
 									}
@@ -322,26 +322,22 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 					}
 				}
 			}
-			is TriggerRumbleEvent -> {
+			is TriggerRumbleEvent -> { // Adaptive trigger
 //				Log.d("StreamView", "TriggerRumbleEvent: $event")
-				if (rumble) {
-					if (usbMode) {
-						val INPUT_MAX = 256
-						val OUTPUT_MAX = 32767
-						val VIBRATION_DURATION = 60L
 
-						val left = (event.left * OUTPUT_MAX / INPUT_MAX).coerceAtMost(OUTPUT_MAX)
-						val right = (event.right * OUTPUT_MAX / INPUT_MAX).coerceAtMost(OUTPUT_MAX)
+				if (usbMode) {
+					val left_type = event.typeLeft
+					val left_data = event.left
+					val right_type = event.typeLeft
+					val right_data = event.left
 
-						getMainActivity()?.handleRumbleTrigger(left.toShort(), right.toShort())
-
-						Handler(Looper.getMainLooper()).postDelayed({
-							getMainActivity()?.handleRumbleTrigger(0, 0)
-						}, VIBRATION_DURATION)
-					} else {
-						var gamepadManager = Gamepad(reactContext);
-						gamepadManager.vibrate(60, 0, 0, event.left, event.right, rumbleIntensity);
+					val params = Arguments.createMap().apply {
+						putInt("leftType", left_type)
+						putInt("leftData", left_data)
+						putInt("rightType", right_type)
+						putInt("rightData", right_data)
 					}
+					sendEvent("trigger", params);
 				}
 			}
 			is PerformanceEvent -> {

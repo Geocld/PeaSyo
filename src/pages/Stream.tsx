@@ -26,7 +26,7 @@ import {debugFactory} from '../utils/debug';
 
 const CONNECTED = 'connected';
 
-const {FullScreenManager, GamepadManager} = NativeModules;
+const {FullScreenManager, GamepadManager, UsbRumbleManager} = NativeModules;
 
 const eventEmitter = new NativeEventEmitter();
 
@@ -56,8 +56,10 @@ function StreamScreen({navigation, route}) {
   const stateEventListener = React.useRef<any>(undefined);
   // const rumbleEventListener = React.useRef<any>(undefined);
   const usbGpEventListener = React.useRef<any>(undefined);
+  const usbDsGpEventListener = React.useRef<any>(undefined);
   const appStateSubscription = React.useRef<any>(undefined);
   const performanceEventListener = React.useRef<any>(undefined);
+  const triggerEventListener = React.useRef<any>(undefined);
   const perfTimer = React.useRef<any>(undefined);
   const performances = React.useRef<any[]>([]);
   const isExiting = React.useRef(false);
@@ -344,6 +346,14 @@ function StreamScreen({navigation, route}) {
       },
     );
 
+    usbDsGpEventListener.current = eventEmitter.addListener(
+      'onDsGamepadReport',
+      states => {
+        // console.log('onDsGamepadReport:', states);
+        streamViewRef.current?.usbDsController(states);
+      },
+    );
+
     performanceEventListener.current = eventEmitter.addListener(
       'performance',
       states => {
@@ -386,6 +396,43 @@ function StreamScreen({navigation, route}) {
           setAvgPerformance(_avgPerformance);
           performances.current = [];
         }
+      },
+    );
+
+    function intToByteArray(int32) {
+      const byteArray = new Array(10).fill(0);
+      for (let i = 0; i < 10; i++) {
+        // eslint-disable-next-line no-bitwise
+        byteArray[i] = (int32 >> (i * 8)) & 0xff;
+      }
+      return byteArray;
+    }
+
+    triggerEventListener.current = eventEmitter.addListener(
+      'trigger',
+      states => {
+        if (!route.params?.isUsbMode) {
+          return;
+        }
+        const {leftType, leftData, rightType, rightData} = states;
+
+        const leftArr = intToByteArray(leftData);
+        const rightArr = intToByteArray(rightData);
+
+        UsbRumbleManager.setDsController(
+          0,
+          10,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          leftType,
+          leftArr,
+          rightType,
+          rightArr,
+        );
       },
     );
 
@@ -433,6 +480,8 @@ function StreamScreen({navigation, route}) {
       FullScreenManager.immersiveModeOff();
       stateEventListener.current && stateEventListener.current.remove();
       usbGpEventListener.current && usbGpEventListener.current.remove();
+      usbDsGpEventListener.current && usbDsGpEventListener.current.remove();
+      triggerEventListener.current && triggerEventListener.current.remove();
       perfTimer.current && clearInterval(perfTimer.current);
     };
   }, [
