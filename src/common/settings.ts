@@ -120,7 +120,7 @@ const settings = [
   {
     name: 'bind_usb_device',
     type: 'radio',
-    title: t('Override native Xbox gamepad support'),
+    title: t('Override native gamepad support'),
     description: t('bind_usb_device_description'),
     tips: t('bind_usb_device_tips'),
     data: [

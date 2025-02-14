@@ -125,11 +125,19 @@ function SettingsScreen({navigation}) {
           }}
         />
 
-        <SettingItem
+        {/* <SettingItem
           title={t('DualSense controller')}
           description={t('Config DualSense controller when use OTG mode')}
           onPress={() => {
             navigation.navigate('DualSense');
+          }}
+        /> */}
+
+        <SettingItem
+          title={t('DS_test_title')}
+          description={t('DS_test_desc')}
+          onPress={() => {
+            navigation.navigate('DualSenseWeb');
           }}
         />
 

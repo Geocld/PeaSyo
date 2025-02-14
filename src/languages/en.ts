@@ -195,5 +195,8 @@ export default {
       'You can export PeaSyo configuration locally for future configuration recovery and transfer to another device, without the need to re-login or register hosts.',
     ImportDesc:
       'If you have a PeaSyo configuration, you can import the configuration file directly without re-registering hosts.',
+    DS_test_title: 'DualSense 5 Controller Test',
+    DS_test_desc:
+      'To test the DualSense 5, ensure that the Android overlay driver is enabled(Settings - Override native gamepad support - Enable) and the DualSense 5 controller is connected via a wired connection.',
   },
 };

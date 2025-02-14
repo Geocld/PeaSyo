@@ -79,7 +79,7 @@ export default {
     'Mapping key of gamepad': '映射手柄按鍵',
     Rumble: '振動',
     RumbleDesc: '如果手柄支持振動，可以設置遊戲中是否振動',
-    'Override native Xbox gamepad support': '覆蓋安卓手柄支持',
+    'Override native gamepad support': '覆蓋安卓手柄支持',
     bind_usb_device_description:
       '強制Peasyo的USB驅動接管所有受支持的Xbox手柄(實驗性)',
     bind_usb_device_tips: '該設置只有支持xinput協議的手柄有線連接才生效',
@@ -209,5 +209,8 @@ export default {
     ExportDesc:
       '你可以將PeaSyo配置匯出到本地，用於後續配置恢復及轉移到另一個裝置，無需重新登入及註冊主機。',
     ImportDesc: '如果你有PeaSyo配置，可以直接匯入配置檔案，無需重新註冊主機。',
+    DS_test_title: 'DualSense 5控制器測試',
+    DS_test_desc:
+      '測試 DualSense 5 時，請注意需開啟安卓覆蓋驅動程式(设置-覆盖安卓手柄支持-开启)，同時以有線方式連接 DualSense 5 控制器。',
   },
 };

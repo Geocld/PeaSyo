@@ -81,7 +81,7 @@ export default {
     'Mapping key of gamepad': '映射手柄按键',
     Rumble: '振动',
     RumbleDesc: '如果手柄支持振动，可以设置游戏中是否振动',
-    'Override native Xbox gamepad support': '覆盖安卓手柄支持',
+    'Override native gamepad support': '覆盖安卓手柄支持',
     bind_usb_device_description:
       '强制Peasyo的USB驱动接管所有受支持的Xbox手柄(实验性)',
     bind_usb_device_tips: '该设置只有支持xinput协议的手柄有线连接才生效',
@@ -215,5 +215,8 @@ export default {
     WD: '带宽',
     PL: '丢包率',
     DT: '解码时间',
+    DS_test_title: 'DualSense5控制器测试',
+    DS_test_desc:
+      '测试DualSense5，注意测试需打开安卓覆盖驱动(设置-覆盖安卓手柄支持-开启)的同时有线连接DualSense5控制器。',
   },
 };

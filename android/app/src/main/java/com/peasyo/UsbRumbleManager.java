@@ -89,13 +89,13 @@ public class UsbRumbleManager extends ReactContextBaseJavaModule {
         if (mainActivity != null) {
 
             int left_size = left_trigger_data.size();
-            int[] left_data = new int[left_size];
+            int[] left_data = new int[10];
             for (int i = 0; i < left_size; i++) {
                 left_data[i] = left_trigger_data.getInt(i);
             }
 
             int right_size = right_trigger_data.size();
-            int[] right_data = new int[right_size];
+            int[] right_data = new int[10];
             for (int i = 0; i < right_size; i++) {
                 right_data[i] = right_trigger_data.getInt(i);
             }
@@ -127,9 +127,12 @@ public class UsbRumbleManager extends ReactContextBaseJavaModule {
                     (byte) left_data[5],       // L2 trigger effect parameter 6
                     (byte) left_data[6],       // L2 trigger effect parameter 7
                     0x00, 0x00, 0x00,
-                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x02, 0x00, 0x02,
-                    (byte)player_light,       // player light brightnes
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x03,
+                    0x02,
+                    0x00,
+                    0x02,
+                    (byte)player_light,     // player light brightness
                     (byte)player_led,       // player leds
                     (byte)led_r, (byte)led_g, (byte)led_b // RGB values
             };

@@ -37,6 +37,7 @@ import GameMapDetailScreen from './pages/GameMapDetail';
 import AboutScreen from './pages/About';
 import FeedbackScreen from './pages/Feedback';
 import DualSenseScreen from './pages/DualSense';
+import DualSenseWebScreen from './pages/DualSenseWeb';
 import VirtualGamepadSettingsScreen from './pages/VirtualGamepadSettings';
 import CustomGamepadScreen from './pages/CustomGamepad';
 import updater from './utils/updater';
@@ -169,6 +170,11 @@ function App() {
                 <RootStack.Screen
                   name="DualSense"
                   component={DualSenseScreen}
+                  options={{title: t('DualSense')}}
+                />
+                <RootStack.Screen
+                  name="DualSenseWeb"
+                  component={DualSenseWebScreen}
                   options={{title: t('DualSense')}}
                 />
                 <RootStack.Screen name="Debug" component={DebugScreen} />
