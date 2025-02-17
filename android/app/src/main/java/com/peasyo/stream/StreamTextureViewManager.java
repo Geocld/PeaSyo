@@ -35,6 +35,7 @@ public class StreamTextureViewManager extends SimpleViewManager<StreamTextureVie
     public static final int COMMAND_GOTO_BED = 11;
     public static final int COMMAND_START_SENSOR = 12;
     public static final int COMMAND_STOP_SENSOR = 13;
+    public static final int COMMAND_USB_DS_CONTROLLER = 14;
 
     @Override
     @NonNull
@@ -105,6 +106,7 @@ public class StreamTextureViewManager extends SimpleViewManager<StreamTextureVie
                 .put("touchpadTap", COMMAND_TOUCHPAD_TAP)
                 .put("performance", COMMAND_PERFORMANCE)
                 .put("usbController", COMMAND_USB_CONTROLLER)
+                .put("usbDsController", COMMAND_USB_DS_CONTROLLER)
                 .put("requestFocus", COMMAND_FOCUS)
                 .put("gotoBed", COMMAND_GOTO_BED)
                 .put("startSensor", COMMAND_START_SENSOR)
@@ -207,6 +209,54 @@ public class StreamTextureViewManager extends SimpleViewManager<StreamTextureVie
                     double leftTrigger = args.getDouble(5);
                     double rightTrigger = args.getDouble(6);
                     view.handleUsbControllerEvent(flags, (float) leftStickX, (float) leftStickY, (float) rightStickX, (float) rightStickY, (float) leftTrigger, (float) rightTrigger);
+                }
+
+                break;
+            }
+
+            case COMMAND_USB_DS_CONTROLLER: {
+                if (args != null) {
+                    int flags = args.getInt(0);
+                    double leftStickX = args.getDouble(1);
+                    double leftStickY = args.getDouble(2);
+                    double rightStickX = args.getDouble(3);
+                    double rightStickY = args.getDouble(4);
+                    double leftTrigger = args.getDouble(5);
+                    double rightTrigger = args.getDouble(6);
+                    double gyrox = args.getDouble(7);
+                    double gyroy = args.getDouble(8);
+                    double gyroz = args.getDouble(9);
+                    double accelx = args.getDouble(10);
+                    double accely = args.getDouble(11);
+                    double accelz = args.getDouble(12);
+                    int touch0id = args.getInt(13);
+                    int touch0x = args.getInt(14);
+                    int touch0y = args.getInt(15);
+                    int touch1id = args.getInt(16);
+                    int touch1x = args.getInt(17);
+                    int touch1y = args.getInt(18);
+
+                    view.handleUsbDsControllerEvent(
+                            flags,
+                            (float) leftStickX,
+                            (float) leftStickY,
+                            (float) rightStickX,
+                            (float) rightStickY,
+                            (float) leftTrigger,
+                            (float) rightTrigger,
+                            (float) gyrox,
+                            (float) gyroy,
+                            (float) gyroz,
+                            (float) accelx,
+                            (float) accely,
+                            (float) accelz,
+                            touch0id,
+                            touch0x,
+                            touch0y,
+                            touch1id,
+                            touch1x,
+                            touch1y
+                    );
                 }
 
                 break;

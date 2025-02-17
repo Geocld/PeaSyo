@@ -21,9 +21,6 @@ import android.hardware.SensorManager;
 import android.graphics.SurfaceTexture;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleEventObserver;
-import androidx.lifecycle.LifecycleOwner;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
@@ -32,6 +29,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.peasyo.lib.*;
 import com.peasyo.log.LogManager;
 import com.peasyo.session.*;
+import com.peasyo.utils.OrientationTracker;
 
 import java.util.Objects;
 import java.util.Collections;
@@ -42,6 +40,8 @@ import java.util.Objects;
 public class StreamTextureView extends FrameLayout implements TextureView.SurfaceTextureListener {
 
     static final String TAG = "StreamTextureView";
+
+    OrientationTracker tracker;
 
     ControllerState controllerState;
 
@@ -524,6 +524,76 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         controllerState.setL2State(unsignedAxis(leftTrigger));
         controllerState.setR2State(unsignedAxis(rightTrigger));
 
+        setControllerState(controllerState);
+    }
+
+    // DS controller override
+    public void handleUsbDsControllerEvent(
+            int flags,
+            float leftStickX,
+            float leftStickY,
+            float rightStickX,
+            float rightStickY,
+            float leftTrigger,
+            float rightTrigger,
+            float gyrox,
+            float gyroy,
+            float gyroz,
+            float accelx,
+            float accely,
+            float accelz,
+            int touch0id,
+            int touch0x,
+            int touch0y,
+            int touch1id,
+            int touch1x,
+            int touch1y
+    ) {
+        controllerState.setButtons(flags);
+        controllerState.setLeftX(signedAxis(leftStickX));
+        controllerState.setLeftY(signedAxis(-leftStickY));
+        controllerState.setRightX(signedAxis(rightStickX));
+        controllerState.setRightY(signedAxis(-rightStickY));
+        controllerState.setL2State(unsignedAxis(leftTrigger));
+        controllerState.setR2State(unsignedAxis(rightTrigger));
+
+        controllerState.setGyroX(gyrox);
+        controllerState.setGyroY(gyroy);
+        controllerState.setGyroZ(gyroz);
+
+        float accel0 = accelx / 8192f * SensorManager.GRAVITY_EARTH;
+        float accel1 = accely / 8192f * SensorManager.GRAVITY_EARTH;
+        float accel2 = accelz / 8192f * SensorManager.GRAVITY_EARTH;
+
+        controllerState.setAccelX(accel0);
+        controllerState.setAccelY(accel1);
+        controllerState.setAccelZ(accel2);
+
+        OrientationTracker.AccelNewZero accelZero = new OrientationTracker.AccelNewZero();
+
+        float[] orientation = tracker.update(gyrox, gyroy, gyroz,
+                accel0, accel1, accel2,
+                accelZero, true,
+                System.nanoTime() / 1000);
+
+        // TODO：Make orientation more precies
+        // Refer: https://github.com/streetpea/chiaki-ng/blob/main/lib/src/orientation.c
+        controllerState.setOrientX(orientation[1]);
+        controllerState.setOrientY(orientation[2]);
+        controllerState.setOrientZ(orientation[3]);
+        controllerState.setOrientW(-orientation[0]);
+
+        ControllerTouch[] touches = new ControllerTouch[] {
+                new ControllerTouch((short)touch0x, (short)touch0y, (byte)touch0id),
+                new ControllerTouch((short)touch1x, (short)touch1y, (byte)touch1id)
+        };
+
+        int idNext = Math.max(touch0id, touch1id) + 1;
+        if (idNext > 125) {
+            idNext = 0;
+        }
+        controllerState.setTouchIdNext((byte)idNext);
+        controllerState.setTouches(touches);
         setControllerState(controllerState);
     }
 
