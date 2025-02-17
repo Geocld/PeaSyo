@@ -54,15 +54,20 @@ function StreamScreen({navigation, route}) {
   const [isTouchpadFull, setIsTouchpadFull] = React.useState(false);
 
   const stateEventListener = React.useRef<any>(undefined);
-  // const rumbleEventListener = React.useRef<any>(undefined);
   const usbGpEventListener = React.useRef<any>(undefined);
   const usbDsGpEventListener = React.useRef<any>(undefined);
   const appStateSubscription = React.useRef<any>(undefined);
   const performanceEventListener = React.useRef<any>(undefined);
+  const rumbleEventListener = React.useRef<any>(undefined);
   const triggerEventListener = React.useRef<any>(undefined);
   const perfTimer = React.useRef<any>(undefined);
   const performances = React.useRef<any[]>([]);
   const isExiting = React.useRef(false);
+
+  const leftTriggerType = React.useRef(0);
+  const leftTriggerData = React.useRef<any>([]);
+  const rightTriggerType = React.useRef(0);
+  const rightTriggerData = React.useRef<any>([]);
 
   const background = {
     borderless: false,
@@ -142,6 +147,9 @@ function StreamScreen({navigation, route}) {
 
   React.useEffect(() => {
     const _consoleInfo = route.params?.consoleInfo || null;
+
+    const usbController = UsbRumbleManager.getUsbController();
+    console.log('usbController:', usbController);
 
     if (!_consoleInfo) {
       Alert.alert(t('Warning'), 'Console not found', [
@@ -230,6 +238,7 @@ function StreamScreen({navigation, route}) {
       rumble,
       rumbleIntensity: rumble_intensity,
       usbMode: route.params?.isUsbMode || false,
+      usbController,
       videoFormat: video_format,
       useSensor: sensor,
       sensorInvert: sensor_invert,
@@ -408,6 +417,35 @@ function StreamScreen({navigation, route}) {
       return byteArray;
     }
 
+    rumbleEventListener.current = eventEmitter.addListener(
+      'dsRumble',
+      states => {
+        console.log('dsRumble000:', states);
+        if (!route.params?.isUsbMode) {
+          return;
+        }
+        if (usbController !== 'DualSenseController') {
+          return;
+        }
+        console.log('dsRumble:', states);
+        const {left, right} = states;
+        UsbRumbleManager.setDsController(
+          0, // r
+          10, // g
+          0, // b
+          0,
+          0,
+          0,
+          left,
+          right,
+          leftTriggerType.current,
+          leftTriggerData.current,
+          rightTriggerType.current,
+          rightTriggerData.current,
+        );
+      },
+    );
+
     triggerEventListener.current = eventEmitter.addListener(
       'trigger',
       states => {
@@ -418,6 +456,12 @@ function StreamScreen({navigation, route}) {
 
         const leftArr = intToByteArray(leftData);
         const rightArr = intToByteArray(rightData);
+
+        leftTriggerType.current = leftType;
+        leftTriggerData.current = leftArr;
+
+        rightTriggerType.current = rightType;
+        rightTriggerData.current = rightArr;
 
         UsbRumbleManager.setDsController(
           0,
@@ -481,6 +525,7 @@ function StreamScreen({navigation, route}) {
       stateEventListener.current && stateEventListener.current.remove();
       usbGpEventListener.current && usbGpEventListener.current.remove();
       usbDsGpEventListener.current && usbDsGpEventListener.current.remove();
+      rumbleEventListener.current && rumbleEventListener.current.remove();
       triggerEventListener.current && triggerEventListener.current.remove();
       perfTimer.current && clearInterval(perfTimer.current);
     };

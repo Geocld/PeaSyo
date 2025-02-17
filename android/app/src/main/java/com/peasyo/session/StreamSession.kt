@@ -44,7 +44,7 @@ data class StreamStateCreateError(val error: CreateError): StreamState()
 data class StreamStateQuit(val reason: QuitReason, val reasonString: String?): StreamState()
 data class StreamStateLoginPinRequest(val pinIncorrect: Boolean): StreamState()
 
-class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, val logVerbose: Boolean, private val reactContext: ReactContext?, val rumble: Boolean, val rumbleIntensity: Int, val usbMode: Boolean)
+class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, val logVerbose: Boolean, private val reactContext: ReactContext?, val rumble: Boolean, val rumbleIntensity: Int, val usbMode: Boolean, val usbController: String)
 {
 	var session: Session? = null
 		private set
@@ -62,6 +62,8 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 	private val VALUE_CHANGE_THRESHOLD = 5   // 数值变化阈值(百分比)
 	private val EVENT_COOLDOWN_MS = 50L      // 事件发送冷却时间(毫秒)
 	private val CHANNEL_DIFF_THRESHOLD = 0
+
+	private val DSCONTROLLER_NAME = "DualSenseController"
 
 	private data class AudioHapticsState(
 		var lastLeft: Int = 0,
@@ -286,18 +288,39 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 
 						if (shouldVibrate) {
 							if (usbMode) {
-								val INPUT_MAX = 256
-								val OUTPUT_MAX = 32767
-								val VIBRATION_DURATION = 60L
+								if (usbController == DSCONTROLLER_NAME) {
+									val params = Arguments.createMap().apply {
+										putInt("left", left)
+										putInt("right", right)
+									}
+									val params0 = Arguments.createMap().apply {
+										putInt("left", 0)
+										putInt("right", 0)
+									}
+									vibrateScope.launch {
+										vibrateMutex.withLock {
+											sendEvent("dsRumble", params)
+											delay(30)
+											sendEvent("dsRumble", params0)
+										}
+									}
+								} else {
+									val INPUT_MAX = 256
+									val OUTPUT_MAX = 32767
 
-								val left = (event.left * OUTPUT_MAX / INPUT_MAX).coerceAtMost(OUTPUT_MAX)
-								val right = (event.right * OUTPUT_MAX / INPUT_MAX).coerceAtMost(OUTPUT_MAX)
+									val left = (event.left * OUTPUT_MAX / INPUT_MAX).coerceAtMost(OUTPUT_MAX)
+									val right = (event.right * OUTPUT_MAX / INPUT_MAX).coerceAtMost(OUTPUT_MAX)
 
-								getMainActivity()?.handleRumble(left.toShort(), right.toShort())
+									getMainActivity()?.handleRumble(left.toShort(), right.toShort())
 
-								Handler(Looper.getMainLooper()).postDelayed({
-									getMainActivity()?.handleRumble(0, 0)
-								}, VIBRATION_DURATION)
+									vibrateScope.launch {
+										vibrateMutex.withLock {
+											getMainActivity()?.handleRumble(left.toShort(), right.toShort())
+											delay(50)
+											getMainActivity()?.handleRumble(0, 0)
+										}
+									}
+								}
 							} else {
 								var gamepadManager = Gamepad(reactContext)
 								if(left == 0 || right == 0) {
@@ -308,7 +331,6 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 //										putInt("right", right)
 //									}
 //									sendEvent("rumble", params)
-									gamepadManager.vibrate(50, left, right, 0, 0, rumbleIntensity)
 									vibrateScope.launch {
 										vibrateMutex.withLock {
 											gamepadManager.vibrate(50, left, right, 0, 0, rumbleIntensity)

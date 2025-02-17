@@ -83,6 +83,7 @@ public class StreamView extends FrameLayout {
     private boolean rumble;
     private int rumbleIntensity;
     private boolean usbMode;
+    private String usbController;
     private boolean useSensor;
     private boolean sensorInvert;
     private float deadZone;
@@ -99,6 +100,7 @@ public class StreamView extends FrameLayout {
         this.rumble = true;
         this.rumbleIntensity = 3;
         this.usbMode = false;
+        this.usbController = "Xbox360Controller";
         this.useSensor = false;
         this.sensorInvert = false;
         this.deadZone = 0.2f;
@@ -237,6 +239,7 @@ public class StreamView extends FrameLayout {
         boolean rumble = streamInfo.getBoolean("rumble");
         int rumbleIntensity = streamInfo.getInt("rumbleIntensity");
         boolean usbMode = streamInfo.getBoolean("usbMode");
+        String usbController = streamInfo.getString("usbController");
         String videoFormat = streamInfo.getString("videoFormat");
         boolean useSensor = streamInfo.getBoolean("useSensor");
         boolean sensorInvert = streamInfo.getBoolean("sensorInvert");
@@ -252,6 +255,7 @@ public class StreamView extends FrameLayout {
         this.rumble = rumble;
         this.rumbleIntensity = rumbleIntensity;
         this.usbMode = usbMode;
+        this.usbController = usbController;
         this.useSensor = useSensor;
         this.sensorInvert = sensorInvert;
         this.deadZone = deadZone;
@@ -290,7 +294,7 @@ public class StreamView extends FrameLayout {
         LogManager logManager = new LogManager(application);
 
         // 初始化session
-        session = new StreamSession(connectInfo, logManager, false, this.reactContext, this.rumble, this.rumbleIntensity, this.usbMode);
+        session = new StreamSession(connectInfo, logManager, false, this.reactContext, this.rumble, this.rumbleIntensity, this.usbMode, this.usbController);
 
         // 添加媒体流视图
         session.attachToSurfaceView(surface);

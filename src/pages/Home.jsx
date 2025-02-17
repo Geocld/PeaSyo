@@ -224,10 +224,10 @@ function HomeScreen({navigation, route}) {
               if (item.host !== res.address.address) {
                 item.host = res.address.address;
               }
-              
+
               if (res.status === 'STANDBY') {
                 setLoadingText(t('Waking'));
-  
+
                 const credential = RegistryManager.getCredential(
                   item.rpRegistKey,
                 );
