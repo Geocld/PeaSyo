@@ -31,6 +31,7 @@ export type Settings = {
   gamepad_maping: Record<string, number>;
   check_update: boolean;
   theme: string;
+  rgb: string;
   debug: boolean;
 };
 
@@ -61,6 +62,7 @@ const defaultSettings: Settings = {
   gamepad_maping: {},
   check_update: true,
   theme: 'dark',
+  rgb: '#DF6069',
   debug: false,
 };
 

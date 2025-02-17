@@ -40,6 +40,7 @@ import DualSenseScreen from './pages/DualSense';
 import DualSenseWebScreen from './pages/DualSenseWeb';
 import VirtualGamepadSettingsScreen from './pages/VirtualGamepadSettings';
 import CustomGamepadScreen from './pages/CustomGamepad';
+import RgbScreen from './pages/Rgb';
 import updater from './utils/updater';
 
 import {useTranslation} from 'react-i18next';
@@ -206,6 +207,11 @@ function App() {
                   name="NativeGameMap"
                   component={NativeGameMapScreen}
                   options={{title: t('GameMap')}}
+                />
+                <RootStack.Screen
+                  name="RGB"
+                  component={RgbScreen}
+                  options={{title: t('RGB')}}
                 />
               </RootStack.Group>
 

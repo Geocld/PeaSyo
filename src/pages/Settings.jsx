@@ -142,6 +142,14 @@ function SettingsScreen({navigation}) {
         />
 
         <SettingItem
+          title={t('DS_RGB_title')}
+          description={t('DS_RGB_desc')}
+          onPress={() => {
+            navigation.navigate('RGB');
+          }}
+        />
+
+        <SettingItem
           title={t('Configuration Transfer')}
           description={t('TransferDesc')}
           onPress={() => navigation.navigate('Transfer')}

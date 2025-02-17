@@ -32,6 +32,14 @@ const eventEmitter = new NativeEventEmitter();
 
 const log = debugFactory('StreamScreen');
 
+function hexToRgb(hex: string): [number, number, number] {
+  const hexCode = hex.replace(/^#/, '');
+  const r = Number.parseInt(hexCode.substring(0, 2), 16);
+  const g = Number.parseInt(hexCode.substring(2, 4), 16);
+  const b = Number.parseInt(hexCode.substring(4, 6), 16);
+  return [r, g, b];
+}
+
 function StreamScreen({navigation, route}) {
   const {t} = useTranslation();
 
@@ -68,6 +76,7 @@ function StreamScreen({navigation, route}) {
   const leftTriggerData = React.useRef<any>([]);
   const rightTriggerType = React.useRef(0);
   const rightTriggerData = React.useRef<any>([]);
+  const lightRGB = React.useRef<any>([223, 96, 105]); // #DF6069
 
   const background = {
     borderless: false,
@@ -149,7 +158,6 @@ function StreamScreen({navigation, route}) {
     const _consoleInfo = route.params?.consoleInfo || null;
 
     const usbController = UsbRumbleManager.getUsbController();
-    console.log('usbController:', usbController);
 
     if (!_consoleInfo) {
       Alert.alert(t('Warning'), 'Console not found', [
@@ -171,6 +179,11 @@ function StreamScreen({navigation, route}) {
 
     log.info('consoleInfo:', _consoleInfo);
     log.info('_settings:', _settings);
+
+    if (_settings.rgb) {
+      const [r, g, b] = hexToRgb(_settings.rgb);
+      lightRGB.current = [r, g, b];
+    }
 
     let width = 1280;
     let height = 720;
@@ -430,9 +443,9 @@ function StreamScreen({navigation, route}) {
         console.log('dsRumble:', states);
         const {left, right} = states;
         UsbRumbleManager.setDsController(
-          0, // r
-          10, // g
-          0, // b
+          lightRGB.current[0] || 0, // r
+          lightRGB.current[1] || 0, // g
+          lightRGB.current[2] || 0, // b
           0,
           0,
           0,

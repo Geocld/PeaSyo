@@ -217,6 +217,9 @@ export default {
     DT: '解码时间',
     DS_test_title: 'DualSense5控制器测试',
     DS_test_desc:
-      '测试DualSense5，注意测试需打开安卓覆盖驱动(设置-覆盖安卓手柄支持-开启)的同时有线连接DualSense5控制器。',
+      '测试DualSense5，注意需打开安卓覆盖驱动(设置-覆盖安卓手柄支持-开启)的同时有线连接DualSense5控制器。',
+    DS_RGB_title: '设置DS5手柄灯带颜色',
+    DS_RGB_desc:
+      '当DS5手柄通过USB有线连接PeaSyo时，可以修改灯带颜色(注意需打开安卓覆盖驱动(设置-覆盖安卓手柄支持-开启))。',
   },
 };

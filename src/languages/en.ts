@@ -198,5 +198,8 @@ export default {
     DS_test_title: 'DualSense 5 Controller Test',
     DS_test_desc:
       'To test the DualSense 5, ensure that the Android overlay driver is enabled(Settings - Override native gamepad support - Enable) and the DualSense 5 controller is connected via a wired connection.',
+    DS_RGB_title: 'Set DS5 Controller LED Strip Color',
+    DS_RGB_desc:
+      'When the DS5 controller is connected to PeaSyo via USB, you can modify the LED strip color(ensure that the Android overlay driver is enabled(Settings - Override native gamepad support - Enable)).',
   },
 };

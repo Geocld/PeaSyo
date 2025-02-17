@@ -212,5 +212,8 @@ export default {
     DS_test_title: 'DualSense 5控制器測試',
     DS_test_desc:
       '測試 DualSense 5 時，請注意需開啟安卓覆蓋驅動程式(设置-覆盖安卓手柄支持-开启)，同時以有線方式連接 DualSense 5 控制器。',
+    DS_RGB_title: '設定DS5手柄燈帶顏色',
+    DS_RGB_desc:
+      '當DS5手柄通過USB有線連接PeaSyo()時，可以修改燈帶顏色, 請注意需開啟安卓覆蓋驅動程式(设置-覆盖安卓手柄支持-开启)。',
   },
 };
