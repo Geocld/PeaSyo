@@ -573,19 +573,19 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         controllerState.setAccelY(accel1);
         controllerState.setAccelZ(accel2);
 
-        OrientationTracker.AccelNewZero accelZero = new OrientationTracker.AccelNewZero();
-
-        float[] orientation = tracker.update(gyrox, gyroy, gyroz,
-                accel0, accel1, accel2,
-                accelZero, true,
-                System.nanoTime() / 1000);
-
-        // TODO：Make orientation more precies
-        // Refer: https://github.com/streetpea/chiaki-ng/blob/main/lib/src/orientation.c
-        controllerState.setOrientX(orientation[1]);
-        controllerState.setOrientY(orientation[2]);
-        controllerState.setOrientZ(orientation[3]);
-        controllerState.setOrientW(-orientation[0]);
+//        OrientationTracker.AccelNewZero accelZero = new OrientationTracker.AccelNewZero();
+//
+//        float[] orientation = tracker.update(gyrox, gyroy, gyroz,
+//                accel0, accel1, accel2,
+//                accelZero, true,
+//                System.nanoTime() / 1000);
+//
+//        // TODO：Make orientation more precies
+//        // Refer: https://github.com/streetpea/chiaki-ng/blob/main/lib/src/orientation.c
+//        controllerState.setOrientX(orientation[1]);
+//        controllerState.setOrientY(orientation[2]);
+//        controllerState.setOrientZ(orientation[3]);
+//        controllerState.setOrientW(-orientation[0]);
 
         ControllerTouch[] touches = new ControllerTouch[] {
                 new ControllerTouch((short)touch0x, (short)touch0y, (byte)touch0id),
