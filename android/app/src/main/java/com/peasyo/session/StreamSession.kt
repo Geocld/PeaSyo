@@ -245,11 +245,9 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 
 					if (canSendEvent) {
 						// Situation1：left != right
-						if (abs(left - right) > CHANNEL_DIFF_THRESHOLD) {
-							if (left + right < 200) {
-								shouldVibrate = true
-								Log.d("StreamView", "Vibration triggered by Situation1: L=${left}, R=${right}")
-							}
+						if (abs(left - right) > CHANNEL_DIFF_THRESHOLD && left > 0 && right > 0) {
+							shouldVibrate = true
+//							Log.d("StreamView", "Vibration triggered by Situation1: L=${left}, R=${right}")
 						}
 
 						// Situation2：rumble change
@@ -266,7 +264,7 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 								(rightChange > VALUE_CHANGE_THRESHOLD && rightChange < 30)) {
 								shouldVibrate = true
 								hapticsState.stableCount = 0
-								Log.d("StreamView", "Vibration triggered by sudden change: L=${leftChange}%, R=${rightChange}%")
+//								Log.d("StreamView", "Vibration triggered by sudden change: L=${leftChange}%, R=${rightChange}%")
 							}
 						}
 
@@ -274,7 +272,7 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 						val diff = currentTime - hapticsState.lastActionTime
 						if (!shouldVibrate && (diff < 1500L) && (left > 0 || right > 0)) {
 							shouldVibrate = true
-							Log.d("StreamView", "Vibration triggered by Situation3: L=${left}%, R=${right}%")
+//							Log.d("StreamView", "Vibration triggered by Situation3: L=${left}%, R=${right}%")
 						}
 					}
 
