@@ -61,7 +61,7 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 	private val STABLE_THRESHOLD = 3         // 判定为稳定需要的次数
 	private val VALUE_CHANGE_THRESHOLD = 5   // 数值变化阈值(百分比)
 	private val EVENT_COOLDOWN_MS = 50L      // 事件发送冷却时间(毫秒)
-	private val CHANNEL_DIFF_THRESHOLD = 0
+	private val CHANNEL_DIFF_THRESHOLD = 10
 
 	private val DSCONTROLLER_NAME = "DualSenseController"
 
@@ -88,8 +88,37 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 		session?.setControllerState(controllerState)
 		currentState = controllerState.copy()
 
-		if (controllerState.buttons > 0u || controllerState.l2State > 0u || controllerState.r2State > 0u || controllerState.leftX > 0.2 || controllerState.leftY > 0.2 || controllerState.rightX > 0.2 || controllerState.rightY > 0.2) {
-			hapticsState.lastActionTime = System.currentTimeMillis()
+		if (usbMode) {
+			if (controllerState.leftX > 1 || controllerState.leftY > 1 || controllerState.rightX > 1 || controllerState.rightY > 1) {
+				val leftx = if (controllerState.leftX > 1) {
+					(controllerState.leftX.toInt() and 0xFFFF).toFloat() / 65535f
+				} else {
+					0f
+				}
+				val lefty = if (controllerState.leftY > 1) {
+					(controllerState.leftY.toInt() and 0xFFFF).toFloat() / 65535f
+				} else {
+					0f
+				}
+				val rightx = if (controllerState.rightX > 1) {
+					(controllerState.rightX.toInt() and 0xFFFF).toFloat() / 65535f
+				} else {
+					0f
+				}
+				val righty = if (controllerState.rightY > 1) {
+					(controllerState.rightY.toInt() and 0xFFFF).toFloat() / 65535f
+				} else {
+					0f
+				}
+
+				if (controllerState.buttons > 0u || controllerState.l2State > 25U || controllerState.r2State > 25U || leftx > 0.2 || lefty > 0.2 || rightx > 0.2 || righty > 0.2) {
+					hapticsState.lastActionTime = System.currentTimeMillis()
+				}
+			}
+		} else {
+			if (controllerState.buttons > 0u || controllerState.l2State > 25U || controllerState.r2State > 25U || controllerState.leftX > 0.2 || controllerState.leftY > 0.2 || controllerState.rightX > 0.2 || controllerState.rightY > 0.2) {
+				hapticsState.lastActionTime = System.currentTimeMillis()
+			}
 		}
 	}
 
@@ -217,8 +246,10 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 					if (canSendEvent) {
 						// Situation1：left != right
 						if (abs(left - right) > CHANNEL_DIFF_THRESHOLD) {
-							shouldVibrate = true
-							//Log.d("StreamView", "Vibration triggered by channel difference: L=$left8, R=$right8")
+							if (left + right < 200) {
+								shouldVibrate = true
+								Log.d("StreamView", "Vibration triggered by Situation1: L=${left}, R=${right}")
+							}
 						}
 
 						// Situation2：rumble change
@@ -235,7 +266,7 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 								(rightChange > VALUE_CHANGE_THRESHOLD && rightChange < 30)) {
 								shouldVibrate = true
 								hapticsState.stableCount = 0
-								//Log.d("StreamView", "Vibration triggered by sudden change: L=${leftChange}%, R=${rightChange}%")
+								Log.d("StreamView", "Vibration triggered by sudden change: L=${leftChange}%, R=${rightChange}%")
 							}
 						}
 
@@ -243,6 +274,7 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 						val diff = currentTime - hapticsState.lastActionTime
 						if (!shouldVibrate && (diff < 1500L) && (left > 0 || right > 0)) {
 							shouldVibrate = true
+							Log.d("StreamView", "Vibration triggered by Situation3: L=${left}%, R=${right}%")
 						}
 					}
 

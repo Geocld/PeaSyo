@@ -101,6 +101,7 @@ private class ChiakiNative
 		@JvmStatic external fun sessionJoin(ptr: Long): Int
 		@JvmStatic external fun sessionSetSurface(ptr: Long, surface: Surface?)
 		@JvmStatic external fun sessionSetControllerState(ptr: Long, controllerState: ControllerState)
+		@JvmStatic external fun sessionSetSensorState(ptr: Long)
 		@JvmStatic external fun sessionSetLoginPin(ptr: Long, pin: String)
 		@JvmStatic external fun registStart(result: CreateResult, registInfo: RegistInfo, javaLog: ChiakiLog, javaRegist: Regist)
 		@JvmStatic external fun registStop(ptr: Long)
@@ -443,6 +444,10 @@ class Session(connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean)
 	fun setControllerState(controllerState: ControllerState)
 	{
 		ChiakiNative.sessionSetControllerState(nativePtr, controllerState)
+	}
+
+	fun setSensorState() {
+		ChiakiNative.sessionSetSensorState(nativePtr)
 	}
 
 	fun setLoginPin(pin: String)

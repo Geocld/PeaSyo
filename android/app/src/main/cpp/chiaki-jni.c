@@ -17,6 +17,7 @@
 #include "video-decoder.h"
 #include "audio-decoder.h"
 #include "audio-output.h"
+#include "controller.h"
 #include "log.h"
 #include "chiaki-jni.h"
 
@@ -164,6 +165,7 @@ typedef struct android_chiaki_session_t
 
 	AndroidChiakiVideoDecoder video_decoder;
 	AndroidChiakiAudioDecoder audio_decoder;
+    AndroidChiakiController controller;
 	void *audio_output;
 } AndroidChiakiSession;
 
@@ -377,6 +379,9 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
 
 	session->audio_output = android_chiaki_audio_output_new(log);
 
+    // Initial controller for dualsense controller sensor
+    android_chiaki_controller_init(&session->controller);
+
 	android_chiaki_audio_decoder_set_cb(&session->audio_decoder, android_chiaki_audio_output_settings, android_chiaki_audio_output_frame, session->audio_output);
 
 	err = chiaki_session_init(&session->session, &connect_info, log);
@@ -540,6 +545,11 @@ JNIEXPORT void JNICALL JNI_FCN(sessionSetControllerState)(JNIEnv *env, jobject o
 	controller_state.orient_z = E->GetFloatField(env, controller_state_java, session->java_controller_state_orient_z);
 	controller_state.orient_w = E->GetFloatField(env, controller_state_java, session->java_controller_state_orient_w);
 	chiaki_session_set_controller_state(&session->session, &controller_state);
+}
+
+JNIEXPORT void JNICALL JNI_FCN(sessionSetSensorState)(JNIEnv *env, jobject obj, jlong ptr)
+{
+    AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;
 }
 
 JNIEXPORT void JNICALL JNI_FCN(sessionSetLoginPin)(JNIEnv *env, jobject obj, jlong ptr, jstring pin_java)

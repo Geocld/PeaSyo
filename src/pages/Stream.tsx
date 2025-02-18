@@ -433,7 +433,6 @@ function StreamScreen({navigation, route}) {
     rumbleEventListener.current = eventEmitter.addListener(
       'dsRumble',
       states => {
-        console.log('dsRumble000:', states);
         if (!route.params?.isUsbMode) {
           return;
         }

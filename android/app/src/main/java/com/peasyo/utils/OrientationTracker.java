@@ -1,5 +1,6 @@
 package com.peasyo.utils;
 
+// Refer: https://github.com/streetpea/chiaki-ng/blob/main/lib/src/orientation.c
 public class OrientationTracker {
     private static final float SIN_1_4_PI = 0.7071067811865475f;
     private static final float SIN_NEG_1_4_PI = -0.7071067811865475f;
@@ -58,11 +59,10 @@ public class OrientationTracker {
                 sampleIndex <WARMUP_SAMPLES_COUNT ? BETA_WARMUP : BETA_DEFAULT,
                 (float) deltaUs / 1000000.0f);
 
-        // 计算最终的方向四元数（应用-90度绕X轴旋转）
-        float orientW = COS_1_4_PI * orient.w - SIN_1_4_PI * orient.x;
-        float orientX = COS_1_4_PI * orient.x + SIN_1_4_PI * orient.w;
-        float orientY = COS_1_4_PI * orient.y - SIN_1_4_PI * orient.z;
-        float orientZ = COS_1_4_PI * orient.z + SIN_1_4_PI * orient.y;
+        float orientW = COS_NEG_1_4_PI * orient.w - COS_NEG_1_4_PI * orient.x;
+        float orientX = COS_NEG_1_4_PI * orient.x + COS_NEG_1_4_PI * orient.w;
+        float orientY = COS_NEG_1_4_PI * orient.y - COS_NEG_1_4_PI * orient.z;
+        float orientZ = COS_NEG_1_4_PI * orient.z + COS_NEG_1_4_PI * orient.y;
 
         return new float[]{orientW, orientX, orientY, orientZ};
     }
