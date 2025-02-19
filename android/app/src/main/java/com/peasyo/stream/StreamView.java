@@ -576,7 +576,7 @@ public class StreamView extends FrameLayout {
             hasAccel = true;
         }
 
-        if ((Math.abs(gyrox / 10) > 10 || Math.abs(gyroy / 10) > 10 || Math.abs(gyroz / 10) > 10)) {
+        if ((Math.abs(gyrox / 10) > 20 || Math.abs(gyroy / 20) > 10 || Math.abs(gyroz / 20) > 10)) {
 
 //            Log.d(TAG, "gyrox:" + Math.abs(gyrox / 10));
 //            Log.d(TAG, "gyroy:" + Math.abs(gyroy / 10));
@@ -587,9 +587,9 @@ public class StreamView extends FrameLayout {
 //            Log.d(TAG, "hasAccel:" + hasAccel);
 
             if (hasAccel) {
-                controllerState.setGyroX(gyrox);
-                controllerState.setGyroY(gyroy);
-                controllerState.setGyroZ(gyroz);
+                controllerState.setGyroX(-gyrox);
+                controllerState.setGyroY(-gyroy);
+                controllerState.setGyroZ(-gyroz);
 
                 controllerState.setAccelX(accelX);
                 controllerState.setAccelY(accelY);

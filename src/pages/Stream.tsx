@@ -442,22 +442,20 @@ function StreamScreen({navigation, route}) {
         console.log('dsRumble:', states);
         const {left, right} = states;
 
-        if (left !== right) {
-          UsbRumbleManager.setDsController(
-            lightRGB.current[0] || 0, // r
-            lightRGB.current[1] || 0, // g
-            lightRGB.current[2] || 0, // b
-            0,
-            0,
-            0,
-            left * 0.1,
-            right * 0.1,
-            leftTriggerType.current,
-            leftTriggerData.current,
-            rightTriggerType.current,
-            rightTriggerData.current,
-          );
-        }
+        UsbRumbleManager.setDsController(
+          lightRGB.current[0] || 0, // r
+          lightRGB.current[1] || 0, // g
+          lightRGB.current[2] || 0, // b
+          0,
+          0,
+          0,
+          0,
+          right * 0.5,
+          leftTriggerType.current,
+          leftTriggerData.current,
+          rightTriggerType.current,
+          rightTriggerData.current,
+        );
       },
     );
 
