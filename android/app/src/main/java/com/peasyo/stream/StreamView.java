@@ -578,13 +578,13 @@ public class StreamView extends FrameLayout {
 
         if ((Math.abs(gyrox / 10) > 10 || Math.abs(gyroy / 10) > 10 || Math.abs(gyroz / 10) > 10)) {
 
-            Log.d(TAG, "gyrox:" + Math.abs(gyrox / 10));
-            Log.d(TAG, "gyroy:" + Math.abs(gyroy / 10));
-            Log.d(TAG, "gyroz:" + Math.abs(gyroz / 10));
-            Log.d(TAG, "accelX:" + accelX);
-            Log.d(TAG, "accelY:" + accelY);
-            Log.d(TAG, "accelZ:" + accelZ);
-            Log.d(TAG, "hasAccel:" + hasAccel);
+//            Log.d(TAG, "gyrox:" + Math.abs(gyrox / 10));
+//            Log.d(TAG, "gyroy:" + Math.abs(gyroy / 10));
+//            Log.d(TAG, "gyroz:" + Math.abs(gyroz / 10));
+//            Log.d(TAG, "accelX:" + accelX);
+//            Log.d(TAG, "accelY:" + accelY);
+//            Log.d(TAG, "accelZ:" + accelZ);
+//            Log.d(TAG, "hasAccel:" + hasAccel);
 
             if (hasAccel) {
                 controllerState.setGyroX(gyrox);
@@ -618,6 +618,7 @@ public class StreamView extends FrameLayout {
                         accelZero, true,
                         System.nanoTime() / 1000);
 
+                // FIXME: Pitch direction is incorrect
                 controllerState.setOrientX(orientation[1]);
                 controllerState.setOrientY(orientation[2]);
                 controllerState.setOrientZ(-orientation[3]);
