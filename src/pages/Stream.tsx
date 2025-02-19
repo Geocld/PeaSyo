@@ -439,7 +439,7 @@ function StreamScreen({navigation, route}) {
         if (usbController !== 'DualSenseController') {
           return;
         }
-        console.log('dsRumble:', states);
+        // console.log('dsRumble:', states);
         const {left, right} = states;
 
         UsbRumbleManager.setDsController(
