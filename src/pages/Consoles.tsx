@@ -62,13 +62,7 @@ function ConsolesScreen({navigation}) {
     );
   };
 
-  const handleEdit = item => {
-    let idx = 0;
-    consoles.forEach((_console, i) => {
-      if (_console.id === item.id) {
-        idx = i;
-      }
-    });
+  const handleEdit = (idx: number) => {
     navigation.navigate({
       name: 'ConsoleEdit',
       params: {
@@ -86,7 +80,7 @@ function ConsolesScreen({navigation}) {
             numColumns={numColumns}
             key={numColumns}
             contentContainerStyle={styles.listContainer}
-            renderItem={({item}) => {
+            renderItem={({item, index}) => {
               return (
                 <View
                   style={[
@@ -96,7 +90,7 @@ function ConsolesScreen({navigation}) {
                   <ConsoleItem
                     consoleItem={item}
                     isEdit
-                    onPressEdit={() => handleEdit(item)}
+                    onPressEdit={() => handleEdit(index)}
                   />
                 </View>
               );
