@@ -5,7 +5,7 @@ public class OrientationTracker {
     private static final float SIN_1_4_PI = 0.7071067811865475f;
     private static final float SIN_NEG_1_4_PI = -0.7071067811865475f;
     private static final float COS_1_4_PI = 0.7071067811865476f;
-    private static final float COS_NEG_1_4_PI = 0.7071067811865476f;
+    private static final float COS_NEG_1_4_PI = -0.7071067811865476f;
 
     private static final int WARMUP_SAMPLES_COUNT = 60000;
     private static final float BETA_WARMUP = 90000.0f;
@@ -59,10 +59,10 @@ public class OrientationTracker {
                 sampleIndex <WARMUP_SAMPLES_COUNT ? BETA_WARMUP : BETA_DEFAULT,
                 (float) deltaUs / 1000000.0f);
 
-        float orientW = COS_NEG_1_4_PI * orient.w - COS_NEG_1_4_PI * orient.x;
-        float orientX = COS_NEG_1_4_PI * orient.x + COS_NEG_1_4_PI * orient.w;
-        float orientY = COS_NEG_1_4_PI * orient.y - COS_NEG_1_4_PI * orient.z;
-        float orientZ = COS_NEG_1_4_PI * orient.z + COS_NEG_1_4_PI * orient.y;
+        float orientW = COS_NEG_1_4_PI * orient.w - SIN_NEG_1_4_PI * orient.x;
+        float orientX = COS_NEG_1_4_PI * orient.x + SIN_NEG_1_4_PI * orient.w;
+        float orientY = COS_NEG_1_4_PI * orient.y - SIN_NEG_1_4_PI * orient.z;
+        float orientZ = COS_NEG_1_4_PI * orient.z + SIN_NEG_1_4_PI * orient.y;
 
         return new float[]{orientW, orientX, orientY, orientZ};
     }
