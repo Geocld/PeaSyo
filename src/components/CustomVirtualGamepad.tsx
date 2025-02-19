@@ -33,6 +33,7 @@ const CustomVirtualGamepad: React.FC<Props> = ({
     const _buttons = [
       {
         name: 'LeftTrigger',
+        psName: 'LeftTrigger',
         x: 20,
         y: 10,
         width: 100,
@@ -42,6 +43,7 @@ const CustomVirtualGamepad: React.FC<Props> = ({
       },
       {
         name: 'RightTrigger',
+        psName: 'RightTrigger',
         x: width - 45,
         y: 10,
         width: 100,
@@ -51,6 +53,7 @@ const CustomVirtualGamepad: React.FC<Props> = ({
       },
       {
         name: 'LeftShoulder',
+        psName: 'L1',
         x: 20,
         y: 80,
         width: 100,
@@ -60,6 +63,7 @@ const CustomVirtualGamepad: React.FC<Props> = ({
       },
       {
         name: 'RightShoulder',
+        psName: 'R1',
         x: width - 45,
         y: 80,
         width: 100,
@@ -69,6 +73,7 @@ const CustomVirtualGamepad: React.FC<Props> = ({
       },
       {
         name: 'A',
+        psName: 'CROSS',
         x: width - 70,
         y: height - 50,
         scale: 1,
@@ -76,6 +81,7 @@ const CustomVirtualGamepad: React.FC<Props> = ({
       },
       {
         name: 'B',
+        psName: 'MOON',
         x: width - 30,
         y: height - 90,
         scale: 1,
@@ -83,6 +89,7 @@ const CustomVirtualGamepad: React.FC<Props> = ({
       },
       {
         name: 'X',
+        psName: 'BOX',
         x: width - 110,
         y: height - 90,
         scale: 1,
@@ -90,6 +97,7 @@ const CustomVirtualGamepad: React.FC<Props> = ({
       },
       {
         name: 'Y',
+        psName: 'PYRAMID',
         x: width - 70,
         y: height - 130,
         scale: 1,
@@ -97,6 +105,7 @@ const CustomVirtualGamepad: React.FC<Props> = ({
       },
       {
         name: 'LeftThumb',
+        psName: 'L3',
         x: 150,
         y: height - 60,
         width: 50,
@@ -106,6 +115,7 @@ const CustomVirtualGamepad: React.FC<Props> = ({
       },
       {
         name: 'RightThumb',
+        psName: 'R3',
         x: width - 210,
         y: height - 40,
         width: 50,
@@ -115,6 +125,7 @@ const CustomVirtualGamepad: React.FC<Props> = ({
       },
       {
         name: 'View',
+        psName: 'SHARE',
         x: viewLeft,
         y: height - 60,
         width: 100,
@@ -124,6 +135,7 @@ const CustomVirtualGamepad: React.FC<Props> = ({
       },
       {
         name: 'Nexus',
+        psName: 'PS',
         x: nexusLeft,
         y: height - 40,
         width: 50,
@@ -133,6 +145,7 @@ const CustomVirtualGamepad: React.FC<Props> = ({
       },
       {
         name: 'Menu',
+        psName: 'OPTIONS',
         x: menuLeft,
         y: height - 60,
         width: 100,
@@ -244,6 +257,7 @@ const CustomVirtualGamepad: React.FC<Props> = ({
             <GamepadButton
               key={button.name}
               name={button.name}
+              psName={button.psName}
               scale={button.scale}
               width={button.width}
               height={button.height}

@@ -66,6 +66,7 @@ function CustomGamepadScreen({navigation, route}) {
       const _buttons = [
         {
           name: 'LeftTrigger',
+          psName: 'LeftTrigger',
           x: 20,
           y: 10,
           width: 100,
@@ -75,6 +76,7 @@ function CustomGamepadScreen({navigation, route}) {
         },
         {
           name: 'RightTrigger',
+          psName: 'RightTrigger',
           x: width - 45,
           y: 10,
           width: 100,
@@ -84,6 +86,7 @@ function CustomGamepadScreen({navigation, route}) {
         },
         {
           name: 'LeftShoulder',
+          psName: 'L1',
           x: 20,
           y: 80,
           width: 100,
@@ -93,6 +96,7 @@ function CustomGamepadScreen({navigation, route}) {
         },
         {
           name: 'RightShoulder',
+          psName: 'R1',
           x: width - 45,
           y: 80,
           width: 100,
@@ -102,6 +106,7 @@ function CustomGamepadScreen({navigation, route}) {
         },
         {
           name: 'A',
+          psName: 'CROSS',
           x: width - 70,
           y: height - 50,
           scale: 1,
@@ -109,6 +114,7 @@ function CustomGamepadScreen({navigation, route}) {
         },
         {
           name: 'B',
+          psName: 'MOON',
           x: width - 30,
           y: height - 90,
           scale: 1,
@@ -116,6 +122,7 @@ function CustomGamepadScreen({navigation, route}) {
         },
         {
           name: 'X',
+          psName: 'BOX',
           x: width - 110,
           y: height - 90,
           scale: 1,
@@ -123,6 +130,7 @@ function CustomGamepadScreen({navigation, route}) {
         },
         {
           name: 'Y',
+          psName: 'PYRAMID',
           x: width - 70,
           y: height - 130,
           scale: 1,
@@ -130,6 +138,7 @@ function CustomGamepadScreen({navigation, route}) {
         },
         {
           name: 'LeftThumb',
+          psName: 'L3',
           x: 150,
           y: height - 60,
           width: 50,
@@ -139,6 +148,7 @@ function CustomGamepadScreen({navigation, route}) {
         },
         {
           name: 'RightThumb',
+          psName: 'R3',
           x: width - 210,
           y: height - 40,
           width: 50,
@@ -148,6 +158,7 @@ function CustomGamepadScreen({navigation, route}) {
         },
         {
           name: 'View',
+          psName: 'SHARE',
           x: viewLeft,
           y: height - 60,
           width: 100,
@@ -157,6 +168,7 @@ function CustomGamepadScreen({navigation, route}) {
         },
         {
           name: 'Nexus',
+          psName: 'PS',
           x: nexusLeft,
           y: height - 40,
           width: 50,
@@ -166,6 +178,7 @@ function CustomGamepadScreen({navigation, route}) {
         },
         {
           name: 'Menu',
+          psName: 'OPTIONS',
           x: menuLeft,
           y: height - 60,
           width: 100,

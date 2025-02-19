@@ -1,11 +1,13 @@
 import React from 'react';
 import {TouchableOpacity} from 'react-native';
 import {GestureDetector, Gesture} from 'react-native-gesture-handler';
+import {runOnJS} from 'react-native-reanimated';
 import {SvgXml} from 'react-native-svg';
 import icons from '../../common/virtualgp';
 
 type Props = {
   name: string;
+  psName?: string;
   width?: number;
   height?: number;
   scale?: number;
@@ -16,6 +18,7 @@ type Props = {
 
 const GamepadButton: React.FC<Props> = ({
   name,
+  psName = '',
   width = 60,
   height = 60,
   scale = 1,
@@ -25,10 +28,12 @@ const GamepadButton: React.FC<Props> = ({
 }) => {
   const longPressGesture = Gesture.LongPress()
     .onStart(() => {
-      onPressIn && onPressIn(name);
+      'worklet';
+      onPressIn && runOnJS(onPressIn)(psName);
     })
     .onEnd(() => {
-      onPressOut && onPressOut(name);
+      'worklet';
+      onPressOut && runOnJS(onPressOut)(psName);
     })
     .minDuration(16);
 

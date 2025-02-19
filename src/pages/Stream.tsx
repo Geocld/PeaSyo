@@ -25,6 +25,7 @@ import {getSettings} from '../store/settingStore';
 import {debugFactory} from '../utils/debug';
 
 const CONNECTED = 'connected';
+const DSCONTROLLER_NAME = 'DualSenseController';
 
 const {FullScreenManager, GamepadManager, UsbRumbleManager} = NativeModules;
 
@@ -60,6 +61,7 @@ function StreamScreen({navigation, route}) {
   const [streamInfo, setStreamInfo] = React.useState<any>(null);
   const [resolution, setResolution] = React.useState('');
   const [isTouchpadFull, setIsTouchpadFull] = React.useState(false);
+  const [isUsbDs5, setIsUsbDs5] = React.useState(false);
 
   const stateEventListener = React.useRef<any>(undefined);
   const usbGpEventListener = React.useRef<any>(undefined);
@@ -158,6 +160,10 @@ function StreamScreen({navigation, route}) {
     const _consoleInfo = route.params?.consoleInfo || null;
 
     const usbController = UsbRumbleManager.getUsbController();
+
+    if (usbController === DSCONTROLLER_NAME && route.params?.isUsbMode) {
+      setIsUsbDs5(true);
+    }
 
     if (!_consoleInfo) {
       Alert.alert(t('Warning'), 'Console not found', [
@@ -686,17 +692,19 @@ function StreamScreen({navigation, route}) {
                       }}
                     />
                   )}
-                  {connectState === CONNECTED && !isTouchpadFull && (
-                    <List.Item
-                      title={t('Toggle Virtual Gamepad')}
-                      background={background}
-                      onPress={() => {
-                        setShowVirtualGamepad(!showVirtualGamepad);
-                        handleCloseModal();
-                      }}
-                    />
-                  )}
-                  {connectState === CONNECTED && (
+                  {connectState === CONNECTED &&
+                    !isTouchpadFull &&
+                    !isUsbDs5 && (
+                      <List.Item
+                        title={t('Toggle Virtual Gamepad')}
+                        background={background}
+                        onPress={() => {
+                          setShowVirtualGamepad(!showVirtualGamepad);
+                          handleCloseModal();
+                        }}
+                      />
+                    )}
+                  {connectState === CONNECTED && !isUsbDs5 && (
                     <List.Item
                       title={t('Toggle Touchpad')}
                       background={background}
@@ -706,13 +714,24 @@ function StreamScreen({navigation, route}) {
                       }}
                     />
                   )}
-                  {connectState === CONNECTED && (
+                  {connectState === CONNECTED && !isUsbDs5 && (
+                    <List.Item
+                      title={t('Long Press PS')}
+                      background={background}
+                      onPress={() => {
+                        handlePressIn('PS');
+                        setTimeout(() => handlePressOut('PS'), 200);
+                        handleCloseModal();
+                      }}
+                    />
+                  )}
+                  {connectState === CONNECTED && !isUsbDs5 && (
                     <List.Item
                       title={t('Press PS')}
                       background={background}
                       onPress={() => {
                         handlePressIn('PS');
-                        setTimeout(() => handlePressOut('PS'), 200);
+                        setTimeout(() => handlePressOut('PS'), 1500);
                         handleCloseModal();
                       }}
                     />

@@ -1,5 +1,6 @@
 import React from 'react';
 import {View, TouchableOpacity, StyleSheet} from 'react-native';
+import {runOnJS} from 'react-native-reanimated';
 
 type Props = {
   style: any;
@@ -14,50 +15,50 @@ const GamepadButton: React.FC<Props> = ({
   onPressIn,
   onPressOut,
 }) => {
-  const handlePressIn = (name: string) => {
-    onPressIn && onPressIn(name);
-  };
-
-  const handlePressOut = (name: string) => {
-    onPressOut && onPressOut(name);
-  };
-
   return (
     <View style={[styles.dpad, {transform: [{scale}]}, style]}>
       <TouchableOpacity
         style={[styles.button, styles.dpadLeft]}
         onPressIn={() => {
-          handlePressIn('DPadLeft');
+          'worklet';
+          onPressIn && runOnJS(onPressIn)('DPAD_LEFT');
         }}
         onPressOut={() => {
-          handlePressOut('DPadLeft');
+          'worklet';
+          onPressOut && runOnJS(onPressOut)('DPAD_LEFT');
         }}
       />
       <TouchableOpacity
         style={[styles.button, styles.dpadTop]}
         onPressIn={() => {
-          handlePressIn('DPadUp');
+          'worklet';
+          onPressIn && runOnJS(onPressIn)('DPAD_UP');
         }}
         onPressOut={() => {
-          handlePressOut('DPadUp');
+          'worklet';
+          onPressOut && runOnJS(onPressOut)('DPAD_UP');
         }}
       />
       <TouchableOpacity
         style={[styles.button, styles.dpadRight]}
         onPressIn={() => {
-          handlePressIn('DPadRight');
+          'worklet';
+          onPressIn && runOnJS(onPressIn)('DPAD_RIGHT');
         }}
         onPressOut={() => {
-          handlePressOut('DPadRight');
+          'worklet';
+          onPressOut && runOnJS(onPressOut)('DPAD_RIGHT');
         }}
       />
       <TouchableOpacity
         style={[styles.button, styles.dpadBottom]}
         onPressIn={() => {
-          handlePressIn('DPadDown');
+          'worklet';
+          onPressIn && runOnJS(onPressIn)('DPAD_DOWN');
         }}
         onPressOut={() => {
-          handlePressOut('DPadDown');
+          'worklet';
+          onPressOut && runOnJS(onPressOut)('DPAD_DOWN');
         }}
       />
     </View>

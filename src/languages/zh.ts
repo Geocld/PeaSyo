@@ -180,6 +180,7 @@ export default {
     'Toggle Virtual Gamepad': '展示/隐藏虚拟手柄',
     'Toggle Touchpad': '展示/隐藏触摸板',
     'Press PS': '按下PS键',
+    'Long Press PS': '长按PS键',
     'Disconnect and sleep': '断开连接并休眠',
     Disconnect: '断开连接',
     Stopped: '已停止',
