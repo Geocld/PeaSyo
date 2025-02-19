@@ -127,6 +127,9 @@ export default {
     ConsoleDeleteWarn: '确定要删除该终端吗，删除后需要重新注册终端',
     // Home
     NoLogin: '尚未登录，请登录',
+    Login_PSN_Username:
+      '如果你无法打开PSN登录页面，可以选择使用PSN用户名直接登录',
+    Login_with_username: '使用用户名登录',
     NoRegistry: '尚未注册主机，请注册',
     EmptyRegistry: '清空注册主机',
     'Login Successful': '登录成功',

@@ -149,6 +149,15 @@ function HomeScreen({navigation, route}) {
         <Button mode="outlined" onPress={() => navigation.navigate('Login')}>
           &nbsp;{t('Login')}&nbsp;
         </Button>
+
+        <View style={{marginTop: 20}}>
+          <Text variant="bodyMedium" style={{textAlign: 'center'}}>
+            {t('Login_PSN_Username')}
+          </Text>
+          <Button mode="text" onPress={() => navigation.navigate('Login')}>
+            {t('Login_with_username')}
+          </Button>
+        </View>
       </View>
     );
   };
@@ -512,6 +521,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     marginBottom: 10,
+    textAlign: 'center',
   },
   modalContent: {
     textAlign: 'center',
