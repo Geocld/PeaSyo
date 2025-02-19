@@ -558,32 +558,72 @@ public class StreamView extends FrameLayout {
         controllerState.setL2State(unsignedAxis(leftTrigger));
         controllerState.setR2State(unsignedAxis(rightTrigger));
 
-        controllerState.setGyroX(gyrox);
-        controllerState.setGyroY(gyroy);
-        controllerState.setGyroZ(gyroz);
+        float accelX = accelx / 8192f;
+        float accelY = accely / 8192f;
+        float accelZ = accelz / 8192f;
 
-//        float accel0 = accelx / 8192f * SensorManager.GRAVITY_EARTH;
-//        float accel1 = accely / 8192f * SensorManager.GRAVITY_EARTH;
-//        float accel2 = accelz / 8192f * SensorManager.GRAVITY_EARTH;
-        float accel0 = accelx / 8192f;
-        float accel1 = accely / 8192f;
-        float accel2 = accelz / 8192f;
+        float[] accelArray = {accelX, accelY, accelZ};
+        boolean hasAccel = false;
+        int count = 0;
 
-        controllerState.setAccelX(accel0);
-        controllerState.setAccelY(accel1);
-        controllerState.setAccelZ(accel2);
+        for (float value : accelArray) {
+            if (Math.abs(value) > 0.3) {
+                count++;
+            }
+        }
 
-        OrientationTracker.AccelNewZero accelZero = new OrientationTracker.AccelNewZero();
+        if (count == 3) {
+            hasAccel = true;
+        }
 
-        float[] orientation = tracker.update(gyrox, gyroy, gyroz,
-                accel0, accel1, accel2,
-                accelZero, true,
-                System.nanoTime() / 1000);
+        if ((Math.abs(gyrox / 10) > 10 || Math.abs(gyroy / 10) > 10 || Math.abs(gyroz / 10) > 10)) {
 
-        controllerState.setOrientX(-orientation[1]);
-        controllerState.setOrientY(-orientation[2]);
-        controllerState.setOrientZ(-orientation[3]);
-        controllerState.setOrientW(orientation[0]);
+            Log.d(TAG, "gyrox:" + Math.abs(gyrox / 10));
+            Log.d(TAG, "gyroy:" + Math.abs(gyroy / 10));
+            Log.d(TAG, "gyroz:" + Math.abs(gyroz / 10));
+            Log.d(TAG, "accelX:" + accelX);
+            Log.d(TAG, "accelY:" + accelY);
+            Log.d(TAG, "accelZ:" + accelZ);
+            Log.d(TAG, "hasAccel:" + hasAccel);
+
+            if (hasAccel) {
+                controllerState.setGyroX(gyrox);
+                controllerState.setGyroY(gyroy);
+                controllerState.setGyroZ(gyroz);
+
+                controllerState.setAccelX(accelX);
+                controllerState.setAccelY(accelY);
+                controllerState.setAccelZ(accelZ);
+
+                OrientationTracker.AccelNewZero accelZero = new OrientationTracker.AccelNewZero();
+
+                float[] orientation = tracker.update(gyrox, gyroy, gyroz,
+                        accelX, accelY, accelZ,
+                        accelZero, true,
+                        System.nanoTime() / 1000);
+
+                controllerState.setOrientX(orientation[1]);
+                controllerState.setOrientY(orientation[2]);
+                controllerState.setOrientZ(-orientation[3]);
+                controllerState.setOrientW(-orientation[0]);
+            } else {
+                controllerState.setGyroX(gyrox);
+                controllerState.setGyroY(gyroy);
+                controllerState.setGyroZ(gyroz);
+
+                OrientationTracker.AccelNewZero accelZero = new OrientationTracker.AccelNewZero();
+
+                float[] orientation = tracker.update(gyrox, gyroy, gyroz,
+                        accelX, accelY, accelZ,
+                        accelZero, true,
+                        System.nanoTime() / 1000);
+
+                controllerState.setOrientX(orientation[1]);
+                controllerState.setOrientY(orientation[2]);
+                controllerState.setOrientZ(-orientation[3]);
+                controllerState.setOrientW(-orientation[0]);
+            }
+        }
 
         ControllerTouch[] touches = new ControllerTouch[] {
                 new ControllerTouch((short)touch0x, (short)touch0y, (byte)touch0id),

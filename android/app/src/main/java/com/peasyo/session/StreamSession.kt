@@ -262,8 +262,10 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 
 							if ((leftChange > VALUE_CHANGE_THRESHOLD && leftChange < 30) ||
 								(rightChange > VALUE_CHANGE_THRESHOLD && rightChange < 30)) {
-								shouldVibrate = true
-								hapticsState.stableCount = 0
+								if(left + right  < 255) {
+									shouldVibrate = true
+									hapticsState.stableCount = 0
+								}
 //								Log.d("StreamView", "Vibration triggered by sudden change: L=${leftChange}%, R=${rightChange}%")
 							}
 						}
@@ -330,7 +332,7 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 									vibrateScope.launch {
 										vibrateMutex.withLock {
 											sendEvent("dsRumble", params)
-											delay(30)
+											delay(20)
 											sendEvent("dsRumble", params0)
 										}
 									}
@@ -346,7 +348,7 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 									vibrateScope.launch {
 										vibrateMutex.withLock {
 											getMainActivity()?.handleRumble(left.toShort(), right.toShort())
-											delay(50)
+											delay(30)
 											getMainActivity()?.handleRumble(0, 0)
 										}
 									}
