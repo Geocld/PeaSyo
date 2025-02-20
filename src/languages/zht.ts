@@ -46,7 +46,7 @@ export default {
     GameMap: '映射',
     // settings
     'App language': '應用語言',
-    'Set language of Peasyo': '設置Peasyo應用語言',
+    'Set language of Peasyo': '設置PeaSyo應用語言',
     Theme: '主題',
     'Set the app theme to take effect on the next launch':
       '設置APP主題，下次啟動生效',
@@ -237,5 +237,9 @@ export default {
     User_manager_desc1: '請選擇當前登錄用戶。',
     User_manager_desc2: '選擇的用戶只影響未註冊的主機，已註冊主機不受影響。',
     Delete_user_text: '确认删除此用户',
+    BasesSettings: '基礎',
+    DisplaySettings: '顯示',
+    GamepadSettings: '手把及震動',
+    SensorSettings: '感應器',
   },
 };

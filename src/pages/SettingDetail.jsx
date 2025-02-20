@@ -11,7 +11,11 @@ import {useTranslation} from 'react-i18next';
 import RNRestart from 'react-native-restart';
 import Slider from '@react-native-community/slider';
 import {getSettings, saveSettings} from '../store/settingStore';
-import settingsMeta from '../common/settings';
+import bases from '../common/settings/bases';
+import display from '../common/settings/display';
+import gamepad from '../common/settings/gamepad';
+import sensor from '../common/settings/sensor';
+import others from '../common/settings/others';
 
 const {UsbRumbleManager} = NativeModules;
 
@@ -31,6 +35,13 @@ function SettingDetailScreen({navigation, route}) {
     if (route.params?.id) {
       const name = route.params.id;
       let currentVal = _settings[name];
+      const settingsMeta = [
+        ...bases,
+        ...display,
+        ...gamepad,
+        ...sensor,
+        ...others,
+      ];
       let metas = {};
       settingsMeta.forEach(item => {
         if (item.name === name) {

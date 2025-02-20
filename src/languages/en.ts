@@ -37,7 +37,7 @@ export default {
     'Name can not be empty': 'Name cannot be empty',
     // settings
     'App language': 'App language',
-    'Set language of Peasyo': 'Set the language of Peasyo',
+    'Set language of Peasyo': 'Set the language of PeaSyo',
     Theme: 'Theme',
     'Set the app theme to take effect on the next launch':
       'Set the app theme to take effect on the next launch',
@@ -221,5 +221,9 @@ export default {
     User_manager_desc2:
       'The selected user only affects unregistered consoles; registered consoles are not affected.',
     Delete_user_text: 'Delete user',
+    BasesSettings: 'Basic',
+    DisplaySettings: 'Display',
+    GamepadSettings: 'Gamepad and Vibration',
+    SensorSettings: 'Sensor',
   },
 };

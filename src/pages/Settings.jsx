@@ -16,7 +16,11 @@ import RNRestart from 'react-native-restart';
 import CookieManager from '@react-native-cookies/cookies';
 import {useTranslation} from 'react-i18next';
 import {debugFactory} from '../utils/debug';
-import settingsMeta from '../common/settings';
+import bases from '../common/settings/bases';
+import display from '../common/settings/display';
+import gamepad from '../common/settings/gamepad';
+import sensor from '../common/settings/sensor';
+import others from '../common/settings/others';
 import {TokenStore} from '../store/tokenStore';
 import pkg from '../../package.json';
 
@@ -132,95 +136,165 @@ function SettingsScreen({navigation}) {
       />
 
       <ScrollView>
-        {settingsMeta.map((meta, idx) => {
-          return (
-            <SettingItem
-              key={meta.name || idx}
-              title={meta.title}
-              description={meta.description}
-              onPress={() => handleItemPress(meta.name)}
-            />
-          );
-        })}
+        <View>
+          <View style={styles.contentTitle}>
+            <Text variant="titleLarge" style={styles.titleText}>
+              {t('BasesSettings')}
+            </Text>
+          </View>
 
-        <SettingItem
-          title={t('Customize virtual buttons')}
-          description={t('Customize buttons of virtual gamepad')}
-          onPress={() => {
-            navigation.navigate('VirtualGamepadSettings');
-          }}
-        />
-
-        {/* <SettingItem
-          title={t('DualSense controller')}
-          description={t('Config DualSense controller when use OTG mode')}
-          onPress={() => {
-            navigation.navigate('DualSense');
-          }}
-        /> */}
-
-        <SettingItem
-          title={t('DS_test_title')}
-          description={t('DS_test_desc')}
-          onPress={() => {
-            navigation.navigate('DualSenseWeb');
-          }}
-        />
-
-        <SettingItem
-          title={t('DS_RGB_title')}
-          description={t('DS_RGB_desc')}
-          onPress={() => {
-            navigation.navigate('RGB');
-          }}
-        />
-
-        <SettingItem
-          title={t('Configuration Transfer')}
-          description={t('TransferDesc')}
-          onPress={() => navigation.navigate('Transfer')}
-        />
-
-        <SettingItem
-          title={t('Reset')}
-          description={t('Reset all settings to default')}
-          onPress={() => handleItemPress('reset')}
-        />
-
-        <View style={styles.contentTitle}>
-          <Text variant="titleLarge" style={styles.titleText}>
-            {t('Others')}
-          </Text>
+          {bases.map((meta, idx) => {
+            return (
+              <SettingItem
+                key={meta.name || idx}
+                title={meta.title}
+                description={meta.description}
+                onPress={() => handleItemPress(meta.name)}
+              />
+            );
+          })}
         </View>
-        <SettingItem
-          title={t('Version')}
-          description={`v${pkg.version}`}
-          onPress={() => navigation.navigate('About')}
-        />
 
-        {(currentLanguage === 'zh' || currentLanguage === 'zht') && (
+        <View>
+          <View style={styles.contentTitle}>
+            <Text variant="titleLarge" style={styles.titleText}>
+              {t('DisplaySettings')}
+            </Text>
+          </View>
+          {display.map((meta, idx) => {
+            return (
+              <SettingItem
+                key={meta.name || idx}
+                title={meta.title}
+                description={meta.description}
+                onPress={() => handleItemPress(meta.name)}
+              />
+            );
+          })}
+        </View>
+
+        <View>
+          <View style={styles.contentTitle}>
+            <Text variant="titleLarge" style={styles.titleText}>
+              {t('GamepadSettings')}
+            </Text>
+          </View>
+
+          {gamepad.map((meta, idx) => {
+            return (
+              <SettingItem
+                key={meta.name || idx}
+                title={meta.title}
+                description={meta.description}
+                onPress={() => handleItemPress(meta.name)}
+              />
+            );
+          })}
+
           <SettingItem
-            title={'支持及交流'}
-            description={'支持开发或交流更多串流技术'}
-            onPress={() => navigation.navigate('Feedback')}
+            title={t('Customize virtual buttons')}
+            description={t('Customize buttons of virtual gamepad')}
+            onPress={() => {
+              navigation.navigate('VirtualGamepadSettings');
+            }}
           />
-        )}
 
-        <SettingItem
-          title={'DEBUG'}
-          description={'Enter debug.'}
-          onPress={() => handleItemPress('debug')}
-        />
-
-        {token && token.account_id && (
           <SettingItem
-            title={t('Switch_user')}
-            description={`${t('PSN_username')}: ${token.online_id}
+            title={t('DS_test_title')}
+            description={t('DS_test_desc')}
+            onPress={() => {
+              navigation.navigate('DualSenseWeb');
+            }}
+          />
+
+          <SettingItem
+            title={t('DS_RGB_title')}
+            description={t('DS_RGB_desc')}
+            onPress={() => {
+              navigation.navigate('RGB');
+            }}
+          />
+        </View>
+
+        <View>
+          <View style={styles.contentTitle}>
+            <Text variant="titleLarge" style={styles.titleText}>
+              {t('SensorSettings')}
+            </Text>
+          </View>
+
+          {sensor.map((meta, idx) => {
+            return (
+              <SettingItem
+                key={meta.name || idx}
+                title={meta.title}
+                description={meta.description}
+                onPress={() => handleItemPress(meta.name)}
+              />
+            );
+          })}
+        </View>
+
+        <View>
+          <View style={styles.contentTitle}>
+            <Text variant="titleLarge" style={styles.titleText}>
+              {t('Others')}
+            </Text>
+          </View>
+
+          {others.map((meta, idx) => {
+            return (
+              <SettingItem
+                key={meta.name || idx}
+                title={meta.title}
+                description={meta.description}
+                onPress={() => handleItemPress(meta.name)}
+              />
+            );
+          })}
+
+          <SettingItem
+            title={t('Configuration Transfer')}
+            description={t('TransferDesc')}
+            onPress={() => navigation.navigate('Transfer')}
+          />
+
+          <SettingItem
+            title={t('Reset')}
+            description={t('Reset all settings to default')}
+            onPress={() => handleItemPress('reset')}
+          />
+
+          <SettingItem
+            title={t('Version')}
+            description={`v${pkg.version}`}
+            onPress={() => navigation.navigate('About')}
+          />
+
+          {(currentLanguage === 'zh' || currentLanguage === 'zht') && (
+            <SettingItem
+              title={'支持及交流'}
+              description={'支持开发或交流更多串流技术'}
+              onPress={() => navigation.navigate('Feedback')}
+            />
+          )}
+
+          <SettingItem
+            title={'DEBUG'}
+            description={'Enter debug.'}
+            onPress={() => handleItemPress('debug')}
+          />
+
+          {token && token.account_id && (
+            <SettingItem
+              title={t('Switch_user')}
+              description={`${t('PSN_username')}: ${token.online_id}
 PSN ID: ${token.user_id}
             `}
-            onPress={() => navigation.navigate('Users')}
-          />
-        )}
+              onPress={() => navigation.navigate('Users')}
+            />
+          )}
+        </View>
       </ScrollView>
     </View>
   );
@@ -239,6 +313,9 @@ const styles = StyleSheet.create({
   contentTitle: {
     padding: 15,
     paddingBottom: 0,
+  },
+  titleText: {
+    color: '#DF6069',
   },
 });
 

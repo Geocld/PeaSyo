@@ -1,30 +1,8 @@
-import i18next from '../i18n';
+import i18next from '../../i18n';
 
 const {t} = i18next;
 
-const settings = [
-  {
-    name: 'locale',
-    type: 'radio',
-    title: t('App language'),
-    description: t('Set language of Peasyo'),
-    data: [
-      {value: 'en', text: 'English'},
-      {value: 'zh', text: '简体中文'},
-      {value: 'zht', text: '繁體中文'},
-    ],
-  },
-  {
-    name: 'theme',
-    type: 'radio',
-    title: t('Theme'),
-    description: t('Set the app theme to take effect on the next launch'),
-    data: [
-      {value: 'auto', text: t('Auto')},
-      {value: 'light', text: t('Light')},
-      {value: 'dark', text: t('Dark')},
-    ],
-  },
+const display = [
   {
     name: 'resolution',
     type: 'radio',
@@ -95,40 +73,6 @@ const settings = [
     ],
   },
   {
-    name: 'rumble',
-    type: 'radio',
-    title: t('Rumble'),
-    description: t('RumbleDesc'),
-    data: [
-      {value: true, text: t('Enable')},
-      {value: false, text: t('Disable')},
-    ],
-  },
-  {
-    name: 'rumble_intensity',
-    type: 'radio',
-    title: t('Rumble intensity'),
-    description: t('RumbleIntensityDesc'),
-    data: [
-      {value: 1, text: t('VeryWeak')},
-      {value: 2, text: t('Weak')},
-      {value: 3, text: t('Normal')},
-      {value: 4, text: t('Strong')},
-      {value: 5, text: t('VeryStrong')},
-    ],
-  },
-  {
-    name: 'bind_usb_device',
-    type: 'radio',
-    title: t('Override native gamepad support'),
-    description: t('bind_usb_device_description'),
-    tips: t('bind_usb_device_tips'),
-    data: [
-      {value: true, text: t('Enable')},
-      {value: false, text: t('Disable')},
-    ],
-  },
-  {
     name: 'touchpad_type',
     type: 'radio',
     title: t('Touchpad type'),
@@ -137,26 +81,6 @@ const settings = [
     data: [
       {value: 0, text: t('Default')},
       {value: 1, text: t('Fullscreen')},
-    ],
-  },
-  {
-    name: 'sensor',
-    type: 'radio',
-    title: t('Sensor'),
-    description: t('SensorDesc'),
-    data: [
-      {value: true, text: t('Enable')},
-      {value: false, text: t('Disable')},
-    ],
-  },
-  {
-    name: 'sensor_invert',
-    type: 'radio',
-    title: t('Invert Sensor'),
-    description: t('InvertSensorDesc'),
-    data: [
-      {value: true, text: t('Enable')},
-      {value: false, text: t('Disable')},
     ],
   },
   {
@@ -177,43 +101,6 @@ const settings = [
     data: [
       {value: true, text: t('Horizon')},
       {value: false, text: t('Vertical')},
-    ],
-  },
-  {
-    name: 'maping',
-    type: '',
-    title: t('Key mapping'),
-    description: t('Mapping key of gamepad'),
-    data: [],
-  },
-  {
-    name: 'dead_zone',
-    type: 'slider',
-    min: 0.1,
-    max: 0.9,
-    step: 0.01,
-    title: t('Joystick dead zone'),
-    description: t('DeadZoneDesc'),
-    data: [],
-  },
-  {
-    name: 'edge_compensation',
-    type: 'slider',
-    min: 0,
-    max: 20,
-    step: 1,
-    title: t('Joystick edge compensation'),
-    description: t('EdgeDesc'),
-    data: [],
-  },
-  {
-    name: 'short_trigger',
-    type: 'radio',
-    title: t('Short Trigger'),
-    description: t('Modify the linear trigger action to a short trigger'),
-    data: [
-      {value: true, text: t('Enable')},
-      {value: false, text: t('Disable')},
     ],
   },
   {
@@ -246,16 +133,6 @@ const settings = [
     description: t('Config opacity of virtual gamepad'),
     data: [],
   },
-  {
-    name: 'check_update',
-    type: 'radio',
-    title: t('Auto check update'),
-    description: t('AutoUpdateDesc'),
-    data: [
-      {value: true, text: t('Enable')},
-      {value: false, text: t('Disable')},
-    ],
-  },
 ];
 
-export default settings;
+export default display;
