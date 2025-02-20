@@ -9,13 +9,15 @@ export default {
     Confirm: '确定',
     Save: '保存',
     Reset: '重置',
-    Saved: '已保存',
+    Saved: '保存成功',
+    Deleted: '删除成功',
     Delete: '删除',
     Others: '其他',
     Back: '返回',
     Select: '选择',
     Edit: '编辑',
     Default: '默认',
+    Version: '版本号',
     About: '关于',
     Enable: '开',
     Disable: '关',
@@ -24,6 +26,7 @@ export default {
     'Update Warning': '新版本提示',
     Download: '下载',
     Feedback: '反馈及支持',
+    Users: '用户',
     Logout: '退出登录',
     Current: '当前',
     LogoutText: '需要退出登录吗?',
@@ -201,7 +204,7 @@ export default {
       '远程设备已断开流媒体连接，因为服务器已关闭',
     Unknown: '未知错误',
     // transfer
-    ExporEtSuccess: '配置导出成功',
+    ExportSuccess: '配置导出成功',
     ExportFail: '配置导出失败',
     ImportSuccess: '配置导入成功',
     ImportFail: '配置导入失败',
@@ -214,6 +217,8 @@ export default {
     ImportSettings: '导入配置',
     ExportDesc:
       '你可以将PeaSyo配置导出到本地，用于后续配置恢复及转移到另一个设备，无需重新登录及注册主机。',
+    ExportTips:
+      '由于Android权限限制，你只能导出到Download(下载)文件夹下，如Download/peasyo。',
     ImportDesc: '如果你有PeaSyo配置，可以直接导入配置文件，无需重新注册主机。',
     // Performance panel
     WD: '带宽',
@@ -225,5 +230,18 @@ export default {
     DS_RGB_title: '设置DS5手柄灯带颜色',
     DS_RGB_desc:
       '当DS5手柄通过USB有线连接PeaSyo时，可以修改灯带颜色(注意需打开安卓覆盖驱动(设置-覆盖安卓手柄支持-开启))。',
+    'PSN username': 'PSN用户名',
+    Login_username_title:
+      '你可以直接使用PSN用户名(在线ID)进行登录，注意不是PSN账号。',
+    Login_username_tips:
+      '您的隐私设置需要允许“任何人”在搜索中找到您。否则将登录失败。',
+    User_not_found: '没有找到该用户，请确认您的PSN用户名输入正确',
+    PSN_username: 'PSN用户名',
+    Switch_user: '切换用户',
+    'PSN login': 'PSN登录',
+    'PSN username login': 'PSN用户名登录',
+    User_manager_desc1: '请选择当前登录用户',
+    User_manager_desc2: '选择的用户只影响未注册的主机，已注册主机不受影响。',
+    Delete_user_text: '确认删除此用户',
   },
 };

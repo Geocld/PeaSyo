@@ -128,6 +128,9 @@ export default {
     Login: 'Login',
     Registry: 'Register',
     NoLogin: 'Not logged in, please login',
+    Login_PSN_Username:
+      'If you cannot open the PSN login page, you can choose to log in directly with your PSN username.',
+    Login_with_username: 'Login with username',
     NoRegistry: 'Host not registered, please register',
     EmptyRegistry: 'Clear registered hosts',
     'Login Successful': 'Login successful',
@@ -193,6 +196,8 @@ export default {
     ImportSettings: 'Import Settings',
     ExportDesc:
       'You can export PeaSyo configuration locally for future configuration recovery and transfer to another device, without the need to re-login or register hosts.',
+    ExportTips:
+      'Due to Android permission restrictions, you can only export to the Download folder, such as Download/peasyo.',
     ImportDesc:
       'If you have a PeaSyo configuration, you can import the configuration file directly without re-registering hosts.',
     DS_test_title: 'DualSense 5 Controller Test',
@@ -201,5 +206,20 @@ export default {
     DS_RGB_title: 'Set DS5 Controller LED Strip Color',
     DS_RGB_desc:
       'When the DS5 controller is connected to PeaSyo via USB, you can modify the LED strip color(ensure that the Android overlay driver is enabled(Settings - Override native gamepad support - Enable)).',
+    'PSN username': 'PSN Username',
+    Login_username_title:
+      'You can log in directly using your PSN username (online ID), note that it is not your PSN account.',
+    Login_username_tips:
+      "Your privacy settings need to allow 'Anyone' to find you in search. Otherwise, login will fail.",
+    User_not_found:
+      'User not found, please confirm that your PSN username is entered correctly.',
+    PSN_username: 'PSN Username',
+    Switch_user: 'Switch User',
+    'PSN login': 'PSN Login',
+    'PSN username login': 'PSN Username Login',
+    User_manager_desc1: 'Please select the currently logged-in user.',
+    User_manager_desc2:
+      'The selected user only affects unregistered consoles; registered consoles are not affected.',
+    Delete_user_text: 'Delete user',
   },
 };

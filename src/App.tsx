@@ -24,6 +24,7 @@ import customDarkTheme from './theme/index.dark';
 
 import HomeScreen from './pages/Home';
 import LoginScreen from './pages/Login';
+import LoginUsernameScreen from './pages/LoginUsername';
 import RegistryScreen from './pages/Registry';
 import ConsolesScreen from './pages/Consoles';
 import ConsoleEditScreen from './pages/ConsoleEdit';
@@ -40,6 +41,7 @@ import DualSenseScreen from './pages/DualSense';
 import DualSenseWebScreen from './pages/DualSenseWeb';
 import VirtualGamepadSettingsScreen from './pages/VirtualGamepadSettings';
 import CustomGamepadScreen from './pages/CustomGamepad';
+import UsersScreen from './pages/Users';
 import RgbScreen from './pages/Rgb';
 import updater from './utils/updater';
 
@@ -139,6 +141,11 @@ function App() {
                   options={{title: t('Login')}}
                 />
                 <RootStack.Screen
+                  name="LoginUsername"
+                  component={LoginUsernameScreen}
+                  options={{title: t('Login')}}
+                />
+                <RootStack.Screen
                   name="Stream"
                   component={StreamScreen}
                   options={{headerShown: false}}
@@ -212,6 +219,11 @@ function App() {
                   name="RGB"
                   component={RgbScreen}
                   options={{title: t('RGB')}}
+                />
+                <RootStack.Screen
+                  name="Users"
+                  component={UsersScreen}
+                  options={{title: t('Users')}}
                 />
               </RootStack.Group>
 

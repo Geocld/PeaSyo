@@ -1,6 +1,6 @@
 import React from 'react';
 import {StyleSheet, View, Alert, ScrollView} from 'react-native';
-import {Button, Text, Divider} from 'react-native-paper';
+import {Button, Text, HelperText, Divider} from 'react-native-paper';
 import {useTranslation} from 'react-i18next';
 import RNFS from 'react-native-fs';
 import DocumentPicker from 'react-native-document-picker';
@@ -24,7 +24,7 @@ function TransferScreen({navigation}) {
       const ciphertext = CryptoJS.AES.encrypt(text, SECRET_KEY).toString();
       return ciphertext;
     } catch (e) {
-      console.error('encrypt error:', e);
+      // console.error('encrypt error:', e);
       return '';
     }
   };
@@ -35,7 +35,7 @@ function TransferScreen({navigation}) {
       let originalText = bytes.toString(CryptoJS.enc.Utf8);
       return originalText;
     } catch (e) {
-      console.error('decrypt error:', e);
+      // console.error('decrypt error:', e);
       return '';
     }
   };
@@ -84,10 +84,8 @@ function TransferScreen({navigation}) {
       });
 
       const fileContent = await RNFS.readFile(result[0].uri, 'utf8');
-      console.log('fileContent:', fileContent);
 
       const configStr = decrypt(fileContent);
-      console.log('configStr:', configStr);
       if (!configStr) {
         return {
           success: false,
@@ -119,11 +117,11 @@ function TransferScreen({navigation}) {
   const handleExport = async () => {
     const ts = new TokenStore();
     ts.load();
-    const token = ts.getToken();
+    const tokens = ts.getToken();
     const consoles = getConsoles();
 
     const configs = {
-      token,
+      tokens,
       consoles,
     };
 
@@ -147,13 +145,12 @@ function TransferScreen({navigation}) {
 
     const result = await importConfig();
     if (result.success) {
-      console.log('import settings:', result.data);
       const configs = result.data;
-      const {token, consoles} = configs;
+      const {tokens, consoles} = configs;
 
       // Save token
       const ts = new TokenStore();
-      ts.setToken(token);
+      ts.setToken(tokens);
       ts.save();
 
       // Save consoles
@@ -173,6 +170,9 @@ function TransferScreen({navigation}) {
         <Text style={styles.title} variant="titleMedium">
           {t('ExportDesc')}
         </Text>
+        <HelperText type="error" visible={true}>
+          {t('ExportTips')}
+        </HelperText>
         <Button mode="contained" onPress={handleExport}>
           {t('ExportSettings')}
         </Button>

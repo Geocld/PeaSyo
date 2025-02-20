@@ -1,6 +1,7 @@
 import {DiscoveryVersions, DeviceStatus, DeviceType} from '../common';
 
 export type UserInfo = {
+  is_default: boolean;
   scopes: string; // eg: "psn:clientapp",
   expiration: string; // eg: "2021-03-21T15:19:42.198Z",
   client_id: string; // as passed in,
@@ -14,6 +15,13 @@ export type UserInfo = {
   community_domain: string; // eg: "a6",
   is_sub_account: boolean;
   account_id?: string; // Final encode user id
+};
+
+export type PsnUsrtInfo = {
+  is_default: boolean;
+  account_id: string; // Final encode user id
+  online_id: string;
+  user_id: string;
 };
 
 export type RegistedInfo = {

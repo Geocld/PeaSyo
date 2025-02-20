@@ -29,6 +29,7 @@ function VirtualGamepadSettingsScreen({navigation, route}) {
 
   React.useEffect(() => {
     navigation.setOptions({
+      // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () => (
         <IconButton
           icon="plus"

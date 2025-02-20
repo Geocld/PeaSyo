@@ -10,7 +10,6 @@ import {Button, RadioButton, Text, Divider} from 'react-native-paper';
 import {useTranslation} from 'react-i18next';
 import RNRestart from 'react-native-restart';
 import Slider from '@react-native-community/slider';
-import {useSelector} from 'react-redux';
 import {getSettings, saveSettings} from '../store/settingStore';
 import settingsMeta from '../common/settings';
 
@@ -24,19 +23,9 @@ function SettingDetailScreen({navigation, route}) {
   const [value2, setValue2] = React.useState('');
   const [currentMetas, setCurrentMetas] = React.useState(null);
   const [settings, setSettings] = React.useState({});
-  const regions = React.useRef([]);
-  const xgpuRegions = React.useRef([]);
-
-  const streamingTokens = useSelector(state => state.streamingTokens);
-  regions.current = streamingTokens.xHomeToken?.getRegions() || [];
-
-  if (streamingTokens.xCloudToken) {
-    xgpuRegions.current = streamingTokens.xCloudToken?.getRegions() || [];
-  }
 
   React.useEffect(() => {
     const _settings = getSettings();
-    console.log('Get localSettings:', _settings);
     setSettings(_settings);
 
     if (route.params?.id) {

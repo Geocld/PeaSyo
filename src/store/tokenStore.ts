@@ -1,41 +1,41 @@
 import {storage} from '../store/mmkv';
-import type {UserInfo} from '../types';
+import type {UserInfo, PsnUsrtInfo} from '../types';
 
-const STORE_KEY = 'user.tokenstore';
+const STORE_KEY = 'user.tokenstore_v2';
 
 export class TokenStore {
-  userToken: UserInfo | null;
+  userTokens: Array<UserInfo | PsnUsrtInfo> | [];
 
   constructor() {
-    this.userToken = null;
+    this.userTokens = [];
   }
 
   load() {
-    let tokens = '{}';
+    let tokens = '[]';
     try {
       tokens = storage.getString(STORE_KEY) || '';
       if (!tokens) {
-        tokens = '{}';
+        tokens = '[]';
       }
 
-      this.userToken = JSON.parse(tokens);
+      this.userTokens = JSON.parse(tokens);
     } catch {}
 
     return true;
   }
 
-  getToken(): UserInfo | null {
-    return this.userToken;
+  getToken(): Array<UserInfo | PsnUsrtInfo> {
+    return this.userTokens;
   }
 
-  setToken(data: UserInfo) {
-    this.userToken = data;
+  setToken(data: Array<UserInfo | PsnUsrtInfo>) {
+    this.userTokens = data;
   }
 
   save() {
-    const data = JSON.stringify(this.userToken);
+    const data = JSON.stringify(this.userTokens);
 
-    console.log('[TokenStore] save data:', data);
+    // console.log('[TokenStore] save data:', data);
     storage.set(STORE_KEY, data);
   }
 
@@ -46,6 +46,6 @@ export class TokenStore {
       console.log('clear error: ', e);
     }
 
-    this.userToken = null;
+    this.userTokens = [];
   }
 }

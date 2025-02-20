@@ -53,6 +53,12 @@ function HomeScreen({navigation, route}) {
   useFocusEffect(
     React.useCallback(() => {
       log.info('Refreshing HomeScreen');
+      const ts = new TokenStore();
+      ts.load();
+      const tokens = ts.getToken();
+      if (tokens.length > 0) {
+        setIsLogined(true);
+      }
       const _consoles = getConsoles();
       log.info('consoles:', _consoles);
       setConsoles(_consoles);
@@ -71,9 +77,9 @@ function HomeScreen({navigation, route}) {
       // Check login
       if (!route.params?.xalUrl) {
         ts.load();
-        const token = ts.getToken();
-        log.info('token:', token);
-        if (token.account_id) {
+        const tokens = ts.getToken();
+        log.info('tokens:', tokens);
+        if (tokens.length > 0) {
           setIsLogined(true);
 
           // Get consoles
@@ -98,7 +104,18 @@ function HomeScreen({navigation, route}) {
               getUserInfoFromToken(accessToken)
                 .then(userInfo => {
                   // Save token(userInfo) to local storege
-                  ts.setToken(userInfo);
+                  ts.load();
+                  const tokens = ts.getToken();
+                  tokens.forEach(item => {
+                    item.is_default = false;
+                  });
+
+                  tokens.push({
+                    is_default: true,
+                    ...userInfo,
+                  });
+
+                  ts.setToken(tokens);
                   ts.save();
 
                   ToastAndroid.show(t('Login Successful'), ToastAndroid.SHORT);
@@ -154,7 +171,16 @@ function HomeScreen({navigation, route}) {
           <Text variant="bodyMedium" style={{textAlign: 'center'}}>
             {t('Login_PSN_Username')}
           </Text>
-          <Button mode="text" onPress={() => navigation.navigate('Login')}>
+          <Button
+            mode="text"
+            onPress={() => {
+              navigation.navigate({
+                name: 'LoginUsername',
+                params: {
+                  from: 'home',
+                },
+              });
+            }}>
             {t('Login_with_username')}
           </Button>
         </View>
@@ -431,7 +457,7 @@ function HomeScreen({navigation, route}) {
 
     const ts = new TokenStore();
     ts.load();
-    const token = ts.getToken();
+    const tokens = ts.getToken();
 
     let actions = [
       {
@@ -441,7 +467,7 @@ function HomeScreen({navigation, route}) {
       },
     ];
 
-    if (token && token.account_id) {
+    if (tokens.length > 0) {
       actions = actions.concat(fabActionsLogin);
     }
 

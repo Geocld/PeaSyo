@@ -9,19 +9,22 @@ export default {
     Confirm: '確定',
     Save: '保存',
     Reset: '重置',
-    Saved: '已保存',
+    Saved: '保存成功',
+    Deleted: '删除成功',
     Delete: '删除',
     Others: '其他',
     Back: '返回',
     Select: '選擇',
     Edit: '編輯',
     Default: '默認',
+    Version: '版本号',
     About: '關於',
     Enable: '開',
     Disable: '關',
     Light: '明亮',
     Dark: '暗黑',
     Feedback: '反饋及支持',
+    Users: '用户',
     Logout: '退出登錄',
     Current: '當前',
     LogoutText: '需要退出登錄嗎?',
@@ -125,6 +128,9 @@ export default {
     ConsoleDeleteWarn: '确定要删除该终端吗，删除后需要重新注册终端',
     // home
     NoLogin: '尚未登錄，請登錄',
+    Login_PSN_Username:
+      '如果你無法打開PSN登錄頁面，可以選擇使用PSN用戶名直接登錄。',
+    Login_with_username: '使用用戶名登錄',
     NoRegistry: '尚未註冊主機，請註冊',
     EmptyRegistry: '清空註冊主機',
     'Login Successful': '登錄成功',
@@ -209,6 +215,8 @@ export default {
     ImportSettings: '匯入配置',
     ExportDesc:
       '你可以將PeaSyo配置匯出到本地，用於後續配置恢復及轉移到另一個裝置，無需重新登入及註冊主機。',
+    ExportTips:
+      '由於Android權限限制，您只能導出到Download文件夾下，例如Download/peasyo。',
     ImportDesc: '如果你有PeaSyo配置，可以直接匯入配置檔案，無需重新註冊主機。',
     DS_test_title: 'DualSense 5控制器測試',
     DS_test_desc:
@@ -216,5 +224,18 @@ export default {
     DS_RGB_title: '設定DS5手柄燈帶顏色',
     DS_RGB_desc:
       '當DS5手柄通過USB有線連接PeaSyo()時，可以修改燈帶顏色, 請注意需開啟安卓覆蓋驅動程式(设置-覆盖安卓手柄支持-开启)。',
+    'PSN username': 'PSN用戶名',
+    Login_username_title:
+      '您可以直接使用PSN用戶名（在線ID）進行登錄，注意不是PSN賬號。',
+    Login_username_tips:
+      '您的隱私設置需要允許「任何人」在搜索中找到您。否則將登錄失敗。',
+    User_not_found: '沒有找到該用戶，請確認您的PSN用戶名輸入正確。',
+    PSN_username: 'PSN用戶名',
+    Switch_user: '切換用戶',
+    'PSN login': 'PSN登錄',
+    'PSN username login': 'PSN用戶名登錄',
+    User_manager_desc1: '請選擇當前登錄用戶。',
+    User_manager_desc2: '選擇的用戶只影響未註冊的主機，已註冊主機不受影響。',
+    Delete_user_text: '确认删除此用户',
   },
 };

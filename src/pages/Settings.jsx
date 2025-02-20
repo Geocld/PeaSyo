@@ -7,6 +7,7 @@ import {
   NativeModules,
   ToastAndroid,
 } from 'react-native';
+import {useFocusEffect} from '@react-navigation/native';
 import {Text} from 'react-native-paper';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {getSettings, resetSettings} from '../store/settingStore';
@@ -28,17 +29,42 @@ function SettingsScreen({navigation}) {
   const [token, setToken] = useState(null);
 
   const currentLanguage = i18n.language;
-  console.log('currentLanguage:', currentLanguage);
 
   const [loading, setLoading] = React.useState(false);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const ts = new TokenStore();
+      ts.load();
+      const _tokens = ts.getToken();
+      log.info('_tokens:', _tokens);
+      if (_tokens.length === 1) {
+        setToken(_tokens[0]);
+      } else {
+        _tokens.forEach(item => {
+          if (item.is_default) {
+            setToken(item);
+          }
+        });
+      }
+    }, []),
+  );
 
   React.useEffect(() => {
     log.info('settings page show');
     const ts = new TokenStore();
     ts.load();
-    const _token = ts.getToken();
-    log.info('token:', _token);
-    setToken(_token);
+    const _tokens = ts.getToken();
+    log.info('_tokens:', _tokens);
+    if (_tokens.length === 1) {
+      setToken(_tokens[0]);
+    } else {
+      _tokens.forEach(item => {
+        if (item.is_default) {
+          setToken(item);
+        }
+      });
+    }
   }, [navigation]);
 
   const handleItemPress = async id => {
@@ -167,8 +193,8 @@ function SettingsScreen({navigation}) {
           </Text>
         </View>
         <SettingItem
-          title={t('About')}
-          description={`${t('About Peasyo')}\nv${pkg.version}`}
+          title={t('Version')}
+          description={`v${pkg.version}`}
           onPress={() => navigation.navigate('About')}
         />
 
@@ -188,12 +214,11 @@ function SettingsScreen({navigation}) {
 
         {token && token.account_id && (
           <SettingItem
-            title={t('Logout')}
-            description={`
-${t('Current')}: ${token.online_id}
+            title={t('Switch_user')}
+            description={`${t('PSN_username')}: ${token.online_id}
 PSN ID: ${token.user_id}
             `}
-            onPress={() => handleItemPress('logout')}
+            onPress={() => navigation.navigate('Users')}
           />
         )}
       </ScrollView>

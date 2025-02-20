@@ -25,9 +25,9 @@ export const deleteConsole = (consoleId: string) => {
   }
 
   let newConsoles: any[] = [];
-  consoles.forEach((console: any) => {
-    if (console.consoleId !== consoleId) {
-      newConsoles.push(console);
+  consoles.forEach((_console: any) => {
+    if (_console.consoleId !== consoleId) {
+      newConsoles.push(_console);
     }
   });
 

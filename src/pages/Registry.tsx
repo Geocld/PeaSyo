@@ -22,7 +22,7 @@ import {TokenStore} from '../store/tokenStore';
 import {getConsoles, saveConsoles} from '../store/consolesStore';
 import {DiscoveryVersions} from '../common';
 import {debugFactory} from '../utils/debug';
-import type {RegistedInfo} from '../types';
+import type {RegistedInfo, UserInfo, PsnUsrtInfo} from '../types';
 
 const log = debugFactory('xCloud/index.js');
 
@@ -95,8 +95,20 @@ function RegistryScreen({navigation}) {
     }
     const ts = new TokenStore();
     ts.load();
-    const token = ts.getToken();
-    if (!token || !token.account_id) {
+    const tokens = ts.getToken();
+    if (tokens.length === 0) {
+      ToastAndroid.show(t('TokenisEmpty'), ToastAndroid.SHORT);
+      return;
+    }
+
+    let currentUser: UserInfo | PsnUsrtInfo | undefined;
+    tokens.forEach(item => {
+      if (item.is_default) {
+        currentUser = item;
+      }
+    });
+
+    if (!currentUser) {
       ToastAndroid.show(t('TokenisEmpty'), ToastAndroid.SHORT);
       return;
     }
@@ -105,7 +117,7 @@ function RegistryScreen({navigation}) {
       dicoverVersion === DiscoveryVersions.PS5 ? 1000100 : 1000, // (PS5-1000100, PS4(10)-1000)
       host, // host,eg. 192.168.1.1
       false, // broadcast - false
-      token.account_id, // psnId -> token.account_id
+      currentUser.account_id, // psnId -> token.account_id
       parseInt(pin, 10), // PIN
     ).then((result: RegistedInfo) => {
       log.info('registry result:', result);
