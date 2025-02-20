@@ -18,6 +18,8 @@ export type Settings = {
   rumble_intensity: number;
   sensor: boolean;
   sensor_invert: boolean;
+  gyroscope: number;
+  gyroscope_sensitivity: number;
   bind_usb_device: boolean;
   dead_zone: number;
   edge_compensation: number;
@@ -49,6 +51,8 @@ const defaultSettings: Settings = {
   rumble_intensity: 3,
   sensor: false,
   sensor_invert: false,
+  gyroscope: 0,
+  gyroscope_sensitivity: 15000,
   bind_usb_device: false,
   dead_zone: 0.2,
   edge_compensation: 0,

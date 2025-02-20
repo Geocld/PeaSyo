@@ -24,6 +24,7 @@ interface StreamViewRef {
   pressButton: (buttonMask: number, isPressed: boolean) => void;
   pressTrigger: (name: string, value: number) => void;
   moveStick: (name: string, x: number, y: number) => void;
+  sensorStick: (x: number, y: number) => void;
   tap: (isPressed: boolean, nextId: number, touches: any[]) => void;
   touch: (mask: number, nextId: number, touches: any[]) => void;
   getPerformance: () => void;
@@ -113,6 +114,18 @@ const StreamTextureView: ForwardRefRenderFunction<
           // @ts-ignore
           UIManager.StreamTextureView.Commands.moveStick.toString(),
           [name, x, y],
+        );
+      }
+    },
+    sensorStick: (x: number, y: number) => {
+      if (streamViewRef.current) {
+        const viewId = findNodeHandle(streamViewRef.current);
+
+        UIManager.dispatchViewManagerCommand(
+          viewId,
+          // @ts-ignore
+          UIManager.StreamTextureView.Commands.sensorStick.toString(),
+          [x, y],
         );
       }
     },

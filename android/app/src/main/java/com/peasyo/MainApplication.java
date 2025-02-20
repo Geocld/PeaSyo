@@ -42,6 +42,8 @@ public class MainApplication extends Application implements ReactApplication {
             packages.add(new StreamViewPackage());
             packages.add(new BatteryPackage());
             packages.add(new StreamTextureViewPackage());
+            packages.add(new SensorPackage());
+            packages.add(new GamepadSensorPackage());
           return packages;
         }
 

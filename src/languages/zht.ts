@@ -241,5 +241,13 @@ export default {
     DisplaySettings: '顯示',
     GamepadSettings: '手把及震動',
     SensorSettings: '感應器',
+    gyroTitle: '啟用陀螺儀',
+    gyroDesc:
+      '是否強制使用設備陀螺儀，當按下LT鍵時陀螺儀模擬右搖杆，常用於FPS遊戲',
+    gyroTips: '當前只支持設備陀螺儀，手把陀螺儀暫不支持',
+    gyroSenTitle: '陀螺儀靈敏度',
+    gyroSenDesc: '調節陀螺儀靈敏度',
+    Device: '设备',
+    'Controller(DS5)': '控制器(DS5)',
   },
 };

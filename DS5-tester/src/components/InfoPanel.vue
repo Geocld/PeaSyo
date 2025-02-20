@@ -11,8 +11,12 @@ import SelectBox from './common/SelectBox.vue';
 const dualsenseStore = useDualSenseStore();
 const { state } = storeToRefs(dualsenseStore)
 const { t } = useI18n()
+const ACCEL_RES_PER_G = 8192;
+const STANDARD_GRAVITY = 9.80665;
 
-const test = (num: number) => num
+const formatAccel = (num: number) => {
+    return ((num / ACCEL_RES_PER_G) * STANDARD_GRAVITY).toFixed(5) + 'm/s²'
+}
 const showValue = ref(0)
 const showValueSets = computed(() => {
     return [
@@ -42,15 +46,15 @@ const showValueSets = computed(() => {
 
         <div class="flex justify-between w-full text-primary font-sans">
             <p class="font-bold">X</p>
-            <p class="w-1/2 text-right">{{ test(state.axes.accelX) }}</p>
+            <p class="w-1/2 text-right">{{ formatAccel(state.axes.accelX) }}</p>
         </div>
         <div class="flex justify-between w-full text-primary font-sans">
             <p class="font-bold">Y</p>
-            <p class="w-1/2 text-right">{{ test(state.axes.accelY) }}</p>
+            <p class="w-1/2 text-right">{{ formatAccel(state.axes.accelY) }}</p>
         </div>
         <div class="flex justify-between w-full text-primary font-sans">
             <p class="font-bold">Z</p>
-            <p class="w-1/2 text-right">{{ test(state.axes.accelZ) }}</p>
+            <p class="w-1/2 text-right">{{ formatAccel(state.axes.accelZ) }}</p>
         </div>
     </div>
 </template>

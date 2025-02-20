@@ -176,6 +176,7 @@ data class ControllerState constructor(
 	@set:JvmName("setButtons")
 	var buttons: UInt = 0U,
 
+	@get:JvmName("getL2State")
 	@set:JvmName("setL2State")
 	var l2State: UByte = 0U,
 

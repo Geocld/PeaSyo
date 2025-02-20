@@ -36,6 +36,7 @@ public class StreamTextureViewManager extends SimpleViewManager<StreamTextureVie
     public static final int COMMAND_START_SENSOR = 12;
     public static final int COMMAND_STOP_SENSOR = 13;
     public static final int COMMAND_USB_DS_CONTROLLER = 14;
+    public static final int COMMAND_SENSOR_STICK = 15;
 
     @Override
     @NonNull
@@ -102,6 +103,7 @@ public class StreamTextureViewManager extends SimpleViewManager<StreamTextureVie
                 .put("pressButton", COMMAND_PRESS_BUTTON)
                 .put("pressTrigger", COMMAND_PRESS_TRIGGER)
                 .put("moveStick", COMMAND_MOVE_STICK)
+                .put("sensorStick", COMMAND_SENSOR_STICK)
                 .put("touchpad", COMMAND_TOUCHPAD)
                 .put("touchpadTap", COMMAND_TOUCHPAD_TAP)
                 .put("performance", COMMAND_PERFORMANCE)
@@ -151,6 +153,14 @@ public class StreamTextureViewManager extends SimpleViewManager<StreamTextureVie
                     double x = args.getDouble(1);
                     double y = args.getDouble(2);
                     view.handleVirtualStick(name, (float) x, (float) y);
+                }
+                break;
+            }
+            case COMMAND_SENSOR_STICK: {
+                if (args != null) {
+                    double x = args.getDouble(0);
+                    double y = args.getDouble(1);
+                    view.handleSensorStick((float) x, (float) y);
                 }
                 break;
             }

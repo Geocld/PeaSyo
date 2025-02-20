@@ -247,5 +247,13 @@ export default {
     DisplaySettings: '显示',
     GamepadSettings: '手柄及振动',
     SensorSettings: '传感器',
+    gyroTitle: '启用陀螺仪',
+    gyroDesc:
+      '是否强制使用设备/控制器陀螺仪，当按下LT键时陀螺仪模拟右摇杆，常用于FPS游戏',
+    gyroTips: '控制器陀螺仪只支持Android12+',
+    gyroSenTitle: '陀螺仪灵敏度',
+    gyroSenDesc: '调节陀螺仪灵敏度',
+    Device: '设备',
+    'Controller(DS5)': '控制器(DS5)',
   },
 };

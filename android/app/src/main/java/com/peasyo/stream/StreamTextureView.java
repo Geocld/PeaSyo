@@ -88,6 +88,8 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
     private boolean isLeftTriggerCanClick;
     private boolean isRightTriggerCanClick;
 
+    private boolean isRightstickMoving = false;
+
     private final ReactContext reactContext;
 
     public StreamTextureView(Context context) {
@@ -490,6 +492,19 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
             controllerState.setRightY(signedAxis(y));
             setControllerState(controllerState);
         }
+    }
+
+    // 陀螺仪模拟摇杆
+    public void handleSensorStick(float x, float y) {
+        // gyroscope only work when Rightstick not moving and L2 button press
+        if (!isRightstickMoving && controllerState.getL2State() >= this.deadZone) {
+            controllerState.setRightX(signedAxis(x));
+            controllerState.setRightY(signedAxis(y));
+        } else {
+            controllerState.setRightX(signedAxis(0));
+            controllerState.setRightY(signedAxis(0));
+        }
+        setControllerState(controllerState);
     }
 
     // 触摸板事件

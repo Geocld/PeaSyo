@@ -27,7 +27,13 @@ import {debugFactory} from '../utils/debug';
 const CONNECTED = 'connected';
 const DSCONTROLLER_NAME = 'DualSenseController';
 
-const {FullScreenManager, GamepadManager, UsbRumbleManager} = NativeModules;
+const {
+  FullScreenManager,
+  GamepadManager,
+  UsbRumbleManager,
+  SensorModule,
+  GamepadSensorModule,
+} = NativeModules;
 
 const eventEmitter = new NativeEventEmitter();
 
@@ -74,6 +80,10 @@ function StreamScreen({navigation, route}) {
   const performances = React.useRef<any[]>([]);
   const isExiting = React.useRef(false);
 
+  const sensorEventListener = React.useRef<any>(undefined);
+  const isRightstickMoving = React.useRef(false);
+  const isL2Pressing = React.useRef(false);
+
   const leftTriggerType = React.useRef(0);
   const leftTriggerData = React.useRef<any>([]);
   const rightTriggerType = React.useRef(0);
@@ -94,6 +104,7 @@ function StreamScreen({navigation, route}) {
     } else {
       if (name === 'LeftTrigger') {
         handleTrigger('left', 1);
+        isL2Pressing.current = true;
       } else if (name === 'RightTrigger') {
         handleTrigger('right', 1);
       }
@@ -108,6 +119,7 @@ function StreamScreen({navigation, route}) {
     } else {
       if (name === 'LeftTrigger') {
         handleTrigger('left', 0);
+        isL2Pressing.current = false;
       } else if (name === 'RightTrigger') {
         handleTrigger('right', 0);
       }
@@ -121,6 +133,15 @@ function StreamScreen({navigation, route}) {
 
     const x = Number(leveledX);
     const y = Number(-leveledY);
+
+    if (name === 'right') {
+      if (Math.abs(leveledX) > 0.1 || Math.abs(leveledY) > 0.1) {
+        isRightstickMoving.current = true;
+      } else {
+        isRightstickMoving.current = false;
+      }
+    }
+
     handleMoveStick(name, x, y);
   };
 
@@ -446,7 +467,7 @@ function StreamScreen({navigation, route}) {
           return;
         }
         // console.log('dsRumble:', states);
-        const {left, right} = states;
+        const {right} = states;
 
         UsbRumbleManager.setDsController(
           lightRGB.current[0] || 0, // r
@@ -499,6 +520,32 @@ function StreamScreen({navigation, route}) {
       },
     );
 
+    if (_settings.gyroscope) {
+      const sensorManager =
+        _settings.gyroscope === 2 ? GamepadSensorModule : SensorModule;
+      sensorManager.startSensor(_settings.gyroscope_sensitivity);
+
+      sensorEventListener.current = eventEmitter.addListener(
+        'SensorData',
+        params => {
+          const {x, y} = params;
+          let stickX = x / 32767;
+          let stickY = y / 32767;
+
+          // gyroscope only work when Rightstick not moving
+          if (!isRightstickMoving.current && !isL2Pressing.current) {
+            const scale =
+              _settings.gyroscope_sensitivity > 10000
+                ? _settings.gyroscope_sensitivity / 10000
+                : 1;
+            stickX = stickX * scale;
+            stickY = stickY * scale;
+            streamViewRef.current?.sensorStick(stickX, stickY);
+          }
+        },
+      );
+    }
+
     setTimeout(() => {
       Orientation.lockToLandscape();
 
@@ -546,7 +593,10 @@ function StreamScreen({navigation, route}) {
       usbDsGpEventListener.current && usbDsGpEventListener.current.remove();
       rumbleEventListener.current && rumbleEventListener.current.remove();
       triggerEventListener.current && triggerEventListener.current.remove();
+      sensorEventListener.current && sensorEventListener.current.remove();
       perfTimer.current && clearInterval(perfTimer.current);
+      SensorModule.stopSensor();
+      GamepadSensorModule.stopSensor();
     };
   }, [
     navigation,
@@ -570,6 +620,11 @@ function StreamScreen({navigation, route}) {
       setShowVirtualGamepad(false);
       setShowTouchpad(false);
       setShowTouchpad(false);
+
+      if (settings.gyroscope) {
+        SensorModule.stopSensor();
+        GamepadSensorModule.stopSensor();
+      }
     } catch (e) {}
     setTimeout(() => {
       GamepadManager.vibrate(0, 0, 0, 0, 0, 3);
