@@ -33,11 +33,21 @@ PeaSyo, also known as Pixiu, is a PS4/5 streaming application for Android that s
 - Streaming performance monitoring
 - Remote wakeup and standby
 - DualSense 5 adaptive triggers (requires custom Android driver + OTG wired connection)
-- Complete DualSense 5 controller testing
+- Complete DualSense 5 controller testing(Great inspired by [daidr/dualsense-tester](https://github.com/daidr/dualsense-tester))
 
 <img src="https://raw.githubusercontent.com/Geocld/PeaSyo/main/images/game.jpg" width="400" />
 <img src="https://github.com/Geocld/PeaSyo/blob/main/images/home.jpg" width="400" /><img src="https://raw.githubusercontent.com/Geocld/PeaSyo/main/images/settings.jpg" width="400" />
 <img src="https://raw.githubusercontent.com/Geocld/PeaSyo/main/images/ds5-test.jpg" width="400" />
+
+## Wired Controller Usage
+Due to limitations in the Android kernel drivers, not all Android devices support controller vibration. Additionally, if you are using the DualSense 5 controller and wish to utilize the adaptive triggers, PeaSyo has built-in support for Xbox 360, Xbox Series X/S, and DualSense 5 controllers. When the controller is connected to the Android device via a wired connection, it fully supports vibration and adaptive trigger functions. The specific usage is as follows:
+
+1. PeaSyo - Settings - Controller and Vibration - Override Android Controller Support - Enable
+2. Connect the Xbox/DualSense 5 controller to the Android device via a wired connection.
+3. A pop-up will appear asking for USB access to the device; click "OK," and PeaSyo will enter the built-in controller driver mode.
+
+> Notice: You must connect controller before streaming, or PeaSyo can not recognize controller.
+
 
 ## Next plans
 PeaSyo is undergoing a major refactoring based on [Chiaki](https://git.sr.ht/~thestr4ng3r/chiaki)'s connection protocol, with the next phase planning to rewrite [Chiaki](https://git.sr.ht/~thestr4ng3r/chiaki)'s original C implementation in Rust.

@@ -32,10 +32,20 @@ PeaSyo，也称貔貅（pixiu），使用中国古代神兽命名，是一款PS4
 - 支持快捷菜单
 - 远程唤醒及休眠
 - DualSense5自适应扳机(需要覆盖安卓驱动+OTG有线连接)
-- 完整的DualSense 5手柄测试
+- 完整的DualSense 5手柄测试((感谢 [daidr/dualsense-tester](https://github.com/daidr/dualsense-tester)))
 
 <img src="https://raw.githubusercontent.com/Geocld/PeaSyo/main/images/game.jpg" width="400" />
 <img src="https://github.com/Geocld/PeaSyo/blob/main/images/home.jpg" width="400" /><img src="https://raw.githubusercontent.com/Geocld/PeaSyo/main/images/settings.jpg" width="400" />
+<img src="https://raw.githubusercontent.com/Geocld/PeaSyo/main/images/ds5-test.jpg" width="400" />
+
+## 有线手柄使用
+因为安卓内核驱动限制，并非所有的安卓设备都支持手柄振动，以及如果你使用DualSense5手柄希望得到自适应扳机的支持，PeaSyo内置了Xbox 360、Xbox series x/s手柄及DualSense 5手柄内核，可以在手柄连线连接安卓设备的情况下完全支持振动和自适应扳机功能，具体使用如下：
+
+1. PeaSyo - 设置 - 手柄及振动 - 覆盖安卓手柄支持 - 开启
+2. 将Xbox/Dualsense5 手柄有线连接安卓设备
+3. 此时会有一个USB访问设备的弹窗出现，点击确定，PeaSyo即进入内置手柄驱动模式。
+
+> 注意需要在进入游戏前连接手柄，否则PeaSyo将无法识别手柄。
 
 ## 接下来的计划
 PeaSyo基于[Chiaki](https://git.sr.ht/~thestr4ng3r/chiaki)连接协议，其他功能均重新实现，接下来的计划是使用Rust将原chiaki的协议部分进行全部重构。
