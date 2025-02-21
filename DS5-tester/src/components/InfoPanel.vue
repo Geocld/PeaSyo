@@ -15,7 +15,12 @@ const ACCEL_RES_PER_G = 8192;
 const STANDARD_GRAVITY = 9.80665;
 
 const formatAccel = (num: number) => {
-    return ((num / ACCEL_RES_PER_G) * STANDARD_GRAVITY).toFixed(5) + 'm/s²'
+    const accel = (num / ACCEL_RES_PER_G) * STANDARD_GRAVITY
+    if (accel === 0) {
+        return accel + ' m/s²'
+    } else {
+        return accel.toFixed(5) + ' m/s²'
+    }
 }
 const showValue = ref(0)
 const showValueSets = computed(() => {
