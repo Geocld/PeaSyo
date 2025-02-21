@@ -1,4 +1,7 @@
 {
+  "warnings": {
+    "connect": "提示：如需测试DualSense5 手柄，请务必在PeaSyo设置中打开覆盖安卓手柄支持（设置 - 覆盖安卓手柄支持 - 开启），并将DualSense5手柄进行有线连接。"
+  },
   "application": {
     "name": "DualSense 在线测试"
   },

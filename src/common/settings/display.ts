@@ -133,6 +133,16 @@ const display = [
     description: t('Config opacity of virtual gamepad'),
     data: [],
   },
+  {
+    name: 'show_menu',
+    type: 'radio',
+    title: t('show_menu_title'),
+    description: t('show_menu_desc'),
+    data: [
+      {value: false, text: t('Disable')},
+      {value: true, text: t('Enable')},
+    ],
+  },
 ];
 
 export default display;

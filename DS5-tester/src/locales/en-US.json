@@ -1,4 +1,7 @@
 {
+  "warnings": {
+    "connect": "To test the DualSense 5 controller, please make sure to enable 'Override Android Controller Support' in the PeaSyo settings (Settings - Override Android Controller Support - Enable), and connect the DualSense 5 controller via a wired connection."
+  },
   "application": {
     "name": "DualSense Tester"
   },

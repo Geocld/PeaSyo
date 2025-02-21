@@ -10,7 +10,7 @@ import {
   NativeModules,
   NativeEventEmitter,
 } from 'react-native';
-import {Card, List, Text} from 'react-native-paper';
+import {Card, List, Text, IconButton} from 'react-native-paper';
 import {useTranslation} from 'react-i18next';
 import Spinner from '../components/Spinner';
 import Orientation from 'react-native-orientation-locker';
@@ -756,6 +756,18 @@ function StreamScreen({navigation, route}) {
 
       {renderTouchpad()}
 
+      {settings.show_menu && (
+        <View style={styles.quickMenu}>
+          <IconButton
+            icon="menu"
+            size={28}
+            onPress={() => {
+              setShowModal(true);
+            }}
+          />
+        </View>
+      )}
+
       {showModal && (
         <View style={styles.modal}>
           <Card>
@@ -908,6 +920,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 9999,
     backgroundColor: 'black',
+  },
+  quickMenu: {
+    position: 'absolute',
+    right: 5,
+    bottom: 5,
+    zIndex: 10,
+    opacity: 0.6,
   },
 });
 

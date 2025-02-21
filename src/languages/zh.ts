@@ -86,8 +86,9 @@ export default {
     RumbleDesc: '如果手柄支持振动，可以设置游戏中是否振动',
     'Override native gamepad support': '覆盖安卓手柄支持',
     bind_usb_device_description:
-      '强制Peasyo的USB驱动接管所有受支持的Xbox手柄(实验性)',
-    bind_usb_device_tips: '该设置只有支持xinput协议的手柄有线连接才生效',
+      '强制PeaSyo的USB驱动接管所有受支持的Xbox/DualSense手柄(实验性)',
+    bind_usb_device_tips:
+      '该设置只有支持xinput或dualsense协议的手柄有线连接(OTG)才生效',
     'Rumble intensity': '振动强度',
     RumbleIntensityDesc: '设置控制器振动强度',
     VeryWeak: '最弱',
@@ -260,5 +261,7 @@ export default {
     x_axies: 'X轴',
     y_axies: 'Y轴',
     all_axies: '全部',
+    show_menu_title: '显示快捷菜单',
+    show_menu_desc: '串流界面右下角始终显示快捷菜单。',
   },
 };

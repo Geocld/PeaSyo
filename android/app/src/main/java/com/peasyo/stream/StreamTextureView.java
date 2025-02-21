@@ -500,14 +500,17 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
     // 陀螺仪模拟摇杆
     public void handleSensorStick(float x, float y) {
         // gyroscope only work when Rightstick not moving and L2 button press
-        if (!isRightstickMoving && controllerState.getL2State() >= this.deadZone) {
-            controllerState.setRightX(signedAxis(x));
-            controllerState.setRightY(signedAxis(y));
-        } else {
-            controllerState.setRightX(signedAxis(0));
-            controllerState.setRightY(signedAxis(0));
+        if(!isRightstickMoving) {
+            // gyroscope only work when LT button press
+            if (Math.abs(controllerState.getL2State()) >= this.deadZone) {
+                controllerState.setRightX(signedAxis(x));
+                controllerState.setRightY(signedAxis(y));
+            } else {
+                controllerState.setRightX(signedAxis(0));
+                controllerState.setRightY(signedAxis(0));
+            }
+            setControllerState(controllerState);
         }
-        setControllerState(controllerState);
     }
 
     // 触摸板事件
@@ -753,13 +756,13 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         rx = normaliseAxis(rx);
         ry = normaliseAxis(ry);
 
-        Log.d(TAG, "left axisX:" + x);
-        Log.d(TAG, "left axisY:" + y);
+//        Log.d(TAG, "left axisX:" + x);
+//        Log.d(TAG, "left axisY:" + y);
+//
+//        Log.d(TAG, "right axisX:" + rx);
+//        Log.d(TAG, "right axisY:" + ry);
 
-        Log.d(TAG, "right axisX:" + rx);
-        Log.d(TAG, "right axisY:" + ry);
-
-        if (Math.abs(rx) > 0.1 || Math.abs(ry) > 0.1) {
+        if (Math.abs(rx) > this.deadZone || Math.abs(ry) > this.deadZone) {
             isRightstickMoving = true;
         } else {
             isRightstickMoving = false;

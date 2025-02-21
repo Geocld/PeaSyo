@@ -32,6 +32,7 @@ export type Settings = {
   virtual_gamepad_opacity: number;
   custom_virtual_gamepad: string;
   gamepad_maping: Record<string, number>;
+  show_menu: boolean;
   check_update: boolean;
   theme: string;
   rgb: string;
@@ -66,6 +67,7 @@ const defaultSettings: Settings = {
   virtual_gamepad_opacity: 0.6,
   custom_virtual_gamepad: '',
   gamepad_maping: {},
+  show_menu: false,
   check_update: true,
   theme: 'dark',
   rgb: '#DF6069',

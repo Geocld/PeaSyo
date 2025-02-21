@@ -768,7 +768,7 @@ public class StreamView extends FrameLayout {
 //        Log.d(TAG, "right axisX:" + rx);
 //        Log.d(TAG, "right axisY:" + ry);
 
-        if (Math.abs(rx) > 0.1 || Math.abs(ry) > 0.1) {
+        if (Math.abs(rx) > this.deadZone || Math.abs(ry) > this.deadZone) {
             isRightstickMoving = true;
         } else {
             isRightstickMoving = false;

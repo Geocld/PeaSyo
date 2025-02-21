@@ -84,9 +84,9 @@ export default {
     'Override native Xbox gamepad support':
       'Override native Xbox gamepad support',
     bind_usb_device_description:
-      'Force Peasyo’s USB driver to take over all supported Xbox gamepads (experimental)',
+      'Force Peasyo’s USB driver to take over all supported /DualSense controllers (experimental)',
     bind_usb_device_tips:
-      'This setting only works for gamepads with xinput protocol in wired mode',
+      'This setting only takes effect for controllers that support XInput or DualSense protocol when connected via wired (OTG).',
     'Rumble intensity': 'Rumble intensity',
     RumbleIntensityDesc: 'Set the controller rumble intensity',
     'Joystick dead zone': 'Joystick dead zone',
@@ -240,5 +240,8 @@ export default {
     x_axies: 'X Axis',
     y_axies: 'Y Axis',
     all_axies: 'All Axes',
+    show_menu_title: 'Display Quick Menu',
+    show_menu_desc:
+      'The quick menu is always displayed in the lower right corner of the streaming page.',
   },
 };
