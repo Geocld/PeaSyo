@@ -225,12 +225,20 @@ export default {
     DisplaySettings: 'Display',
     GamepadSettings: 'Gamepad and Vibration',
     SensorSettings: 'Sensor',
-    gyroTitle: 'Enable Gyroscope',
+    gyroTitle: 'Enable Gyroscope Simulated Joystick',
     gyroDesc:
-      'Whether to force the use of the device’s gyroscope. When the LT button is pressed, the gyroscope simulates the right stick, commonly used in FPS games.',
+      'Force use of device/controller gyroscope to simulate joystick. when the LT button is pressed, the gyroscope simulates the right joystick, commonly used in FPS games.',
     gyroTips:
-      "Currently, only the device's gyroscope is supported; gamepad gyroscope is not supported",
+      'Controller gyroscope only supports Android 12+. recommended to use DualSense 5 controller.',
     gyroSenTitle: 'Gyroscope Sensitivity',
     gyroSenDesc: 'Adjust gyroscope sensitivity',
+    Device: 'Device',
+    'Controller(DS5)': 'Controller (Recommended DS5)',
+    gyroSenInvertTitle: 'Invert Gyroscope Simulated Joystick',
+    gyroSenInvertDesc:
+      'The gyroscope direction on some devices may be opposite to the actual direction. you can invert the direction here.',
+    x_axies: 'X Axis',
+    y_axies: 'Y Axis',
+    all_axies: 'All Axes',
   },
 };

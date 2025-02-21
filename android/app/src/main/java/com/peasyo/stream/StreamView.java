@@ -91,7 +91,7 @@ public class StreamView extends FrameLayout {
     private boolean isShortTrigger;
     private boolean isLeftTriggerCanClick;
     private boolean isRightTriggerCanClick;
-    private boolean isRightstickMoving = false;
+    private boolean isRightstickMoving;
 
     private final ReactContext reactContext;
 
@@ -109,6 +109,7 @@ public class StreamView extends FrameLayout {
         this.isShortTrigger = false;
         this.isLeftTriggerCanClick = false;
         this.isRightTriggerCanClick = false;
+        this.isRightstickMoving = false;
 
         tracker = new OrientationTracker();
     }
@@ -493,14 +494,17 @@ public class StreamView extends FrameLayout {
     // 陀螺仪模拟摇杆
     public void handleSensorStick(float x, float y) {
         // gyroscope only work when Rightstick not moving and L2 button press
-        if (!isRightstickMoving && controllerState.getL2State() >= this.deadZone) {
-            controllerState.setRightX(signedAxis(x));
-            controllerState.setRightY(signedAxis(y));
-        } else {
-            controllerState.setRightX(signedAxis(0));
-            controllerState.setRightY(signedAxis(0));
+        if(!isRightstickMoving) {
+            // gyroscope only work when LT button press
+            if (Math.abs(controllerState.getL2State()) >= this.deadZone) {
+                controllerState.setRightX(signedAxis(x));
+                controllerState.setRightY(signedAxis(y));
+            } else {
+                controllerState.setRightX(signedAxis(0));
+                controllerState.setRightY(signedAxis(0));
+            }
+            setControllerState(controllerState);
         }
-        setControllerState(controllerState);
     }
 
     // 触摸板移动
@@ -760,9 +764,15 @@ public class StreamView extends FrameLayout {
 
 //        Log.d(TAG, "left axisX:" + x);
 //        Log.d(TAG, "left axisY:" + y);
-//
+
 //        Log.d(TAG, "right axisX:" + rx);
 //        Log.d(TAG, "right axisY:" + ry);
+
+        if (Math.abs(rx) > 0.1 || Math.abs(ry) > 0.1) {
+            isRightstickMoving = true;
+        } else {
+            isRightstickMoving = false;
+        }
 
         controllerState.setLeftX(signedAxis(x));
         controllerState.setLeftY(signedAxis(y));

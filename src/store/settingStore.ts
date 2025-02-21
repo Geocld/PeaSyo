@@ -20,6 +20,7 @@ export type Settings = {
   sensor_invert: boolean;
   gyroscope: number;
   gyroscope_sensitivity: number;
+  gyroscope_invert: number;
   bind_usb_device: boolean;
   dead_zone: number;
   edge_compensation: number;
@@ -53,6 +54,7 @@ const defaultSettings: Settings = {
   sensor_invert: false,
   gyroscope: 0,
   gyroscope_sensitivity: 15000,
+  gyroscope_invert: 0,
   bind_usb_device: false,
   dead_zone: 0.2,
   edge_compensation: 0,

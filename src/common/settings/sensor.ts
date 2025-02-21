@@ -45,6 +45,18 @@ const sensor = [
     description: t('gyroSenDesc'),
     data: [],
   },
+  {
+    name: 'gyroscope_invert',
+    type: 'radio',
+    title: t('gyroSenInvertTitle'),
+    description: t('gyroSenInvertDesc'),
+    data: [
+      {value: 0, text: t('Disable')},
+      {value: 1, text: t('x_axies')},
+      {value: 2, text: t('y_axies')},
+      {value: 3, text: t('all_axies')},
+    ],
+  },
 ];
 
 export default sensor;

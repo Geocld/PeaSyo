@@ -88,7 +88,7 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
     private boolean isLeftTriggerCanClick;
     private boolean isRightTriggerCanClick;
 
-    private boolean isRightstickMoving = false;
+    private boolean isRightstickMoving;
 
     private final ReactContext reactContext;
 
@@ -106,6 +106,9 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         this.isShortTrigger = false;
         this.isLeftTriggerCanClick = false;
         this.isRightTriggerCanClick = false;
+        this.isRightstickMoving = false;
+
+        tracker = new OrientationTracker();
     }
 
     @Override
@@ -755,6 +758,12 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
 
         Log.d(TAG, "right axisX:" + rx);
         Log.d(TAG, "right axisY:" + ry);
+
+        if (Math.abs(rx) > 0.1 || Math.abs(ry) > 0.1) {
+            isRightstickMoving = true;
+        } else {
+            isRightstickMoving = false;
+        }
 
         controllerState.setLeftX(signedAxis(x));
         controllerState.setLeftY(signedAxis(y));

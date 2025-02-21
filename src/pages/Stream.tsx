@@ -82,7 +82,6 @@ function StreamScreen({navigation, route}) {
 
   const sensorEventListener = React.useRef<any>(undefined);
   const isRightstickMoving = React.useRef(false);
-  const isL2Pressing = React.useRef(false);
 
   const leftTriggerType = React.useRef(0);
   const leftTriggerData = React.useRef<any>([]);
@@ -104,7 +103,6 @@ function StreamScreen({navigation, route}) {
     } else {
       if (name === 'LeftTrigger') {
         handleTrigger('left', 1);
-        isL2Pressing.current = true;
       } else if (name === 'RightTrigger') {
         handleTrigger('right', 1);
       }
@@ -119,7 +117,6 @@ function StreamScreen({navigation, route}) {
     } else {
       if (name === 'LeftTrigger') {
         handleTrigger('left', 0);
-        isL2Pressing.current = false;
       } else if (name === 'RightTrigger') {
         handleTrigger('right', 0);
       }
@@ -528,18 +525,46 @@ function StreamScreen({navigation, route}) {
       sensorEventListener.current = eventEmitter.addListener(
         'SensorData',
         params => {
-          const {x, y} = params;
-          let stickX = x / 32767;
-          let stickY = y / 32767;
-
           // gyroscope only work when Rightstick not moving
-          if (!isRightstickMoving.current && !isL2Pressing.current) {
+          if (!isRightstickMoving.current) {
+            const {x, y} = params;
+            let stickX = x / 32767;
+            let stickY = y / 32767;
             const scale =
               _settings.gyroscope_sensitivity > 10000
                 ? _settings.gyroscope_sensitivity / 10000
                 : 1;
             stickX = stickX * scale;
             stickY = stickY * scale;
+            if (stickX > 1) {
+              stickX = 1;
+            }
+            if (stickX < -1) {
+              stickX = -1;
+            }
+            if (stickY > 1) {
+              stickY = 1;
+            }
+            if (stickY < -1) {
+              stickY = -1;
+            }
+
+            // Invert direction
+            if (_settings.gyroscope_invert) {
+              if (_settings.gyroscope_invert === 1) {
+                // X axis
+                stickX = -stickX;
+              }
+              if (_settings.gyroscope_invert === 2) {
+                // Y axis
+                stickY = -stickY;
+              }
+              if (_settings.gyroscope_invert === 3) {
+                // All axis
+                stickX = -stickX;
+                stickY = -stickY;
+              }
+            }
             streamViewRef.current?.sensorStick(stickX, stickY);
           }
         },
@@ -775,7 +800,7 @@ function StreamScreen({navigation, route}) {
                       background={background}
                       onPress={() => {
                         handlePressIn('PS');
-                        setTimeout(() => handlePressOut('PS'), 200);
+                        setTimeout(() => handlePressOut('PS'), 1500);
                         handleCloseModal();
                       }}
                     />
@@ -786,7 +811,7 @@ function StreamScreen({navigation, route}) {
                       background={background}
                       onPress={() => {
                         handlePressIn('PS');
-                        setTimeout(() => handlePressOut('PS'), 1500);
+                        setTimeout(() => handlePressOut('PS'), 200);
                         handleCloseModal();
                       }}
                     />
