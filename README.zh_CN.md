@@ -31,6 +31,8 @@ PeaSyo，也称貔貅（pixiu），使用中国古代神兽命名，是一款PS4
 - 支持串流性能查看
 - 支持快捷菜单
 - 远程唤醒及休眠
+- DualSense5自适应扳机(需要覆盖安卓驱动+OTG有线连接)
+- 完整的DualSense 5手柄测试
 
 <img src="https://raw.githubusercontent.com/Geocld/PeaSyo/main/images/game.jpg" width="400" />
 <img src="https://github.com/Geocld/PeaSyo/blob/main/images/home.jpg" width="400" /><img src="https://raw.githubusercontent.com/Geocld/PeaSyo/main/images/settings.jpg" width="400" />

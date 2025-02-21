@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.app.Service;
 import android.content.ServiceConnection;
+import android.view.WindowManager;
 
 import com.peasyo.input.UsbDriverService;
 import com.peasyo.input.ControllerHandler;
@@ -88,6 +89,8 @@ public class MainActivity extends ReactActivity implements UsbDriverService.UsbD
     // Start the USB driver
     bindService(new Intent(this, UsbDriverService.class),
             usbDriverServiceConnection, Service.BIND_AUTO_CREATE);
+
+    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
   }
 
   public void handleRumble(short lowFreMotor, short highFreMotor) {
