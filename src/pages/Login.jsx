@@ -27,6 +27,7 @@ function LoginScreen({navigation, route}) {
       source={{uri: LOGIN_URL}}
       originWhitelist={['*']}
       setSupportMultipleWindows={false}
+      cacheEnabled={false}
       onShouldStartLoadWithRequest={request => {
         // log.info('onShouldStartLoadWithRequest:', request);
         if (request.url.startsWith(REDIRECT_URI)) {
