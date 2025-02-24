@@ -417,7 +417,10 @@ public class StreamView extends FrameLayout {
     // 处理实体按键事件
     public boolean handleKeyEvent(KeyEvent event) {
 //        Log.d(TAG, "handleKeyEvent:" +  event);
-        if(event.getKeyCode() == KeyEvent.KEYCODE_BACK || event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN || event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP || (event.getAction() != KeyEvent.ACTION_DOWN && event.getAction() != KeyEvent.ACTION_UP))
+        if(event.getKeyCode() == KeyEvent.KEYCODE_BACK && event.getDeviceId() == -1) {
+            return false;
+        }
+        if(event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN || event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP || (event.getAction() != KeyEvent.ACTION_DOWN && event.getAction() != KeyEvent.ACTION_UP))
             return false;
         int buttonMask = getButtonMask(event.getKeyCode());
 
