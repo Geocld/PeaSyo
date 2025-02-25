@@ -27,6 +27,12 @@ typedef uint16_t chiaki_unaligned_uint16_t;
 
 #define CHIAKI_EXPORT
 
+#ifdef _WIN32
+#define CHIAKI_SSIZET_TYPE int
+#else
+#define CHIAKI_SSIZET_TYPE ssize_t
+#endif
+
 #define CHIAKI_SSIZET_TYPE ssize_t
 
 #define CHIAKI_NEW(t) ((t*)malloc(sizeof(t)))
