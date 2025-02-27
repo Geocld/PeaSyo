@@ -149,14 +149,11 @@ public class StreamView extends FrameLayout {
         surface.setFocusable(true);
         surface.setFocusableInTouchMode(true);
 
-        surface.setZOrderOnTop(false);
         surface.setZOrderMediaOverlay(true);
-//        surface.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        surface.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
-//        SurfaceHolder holder = surface.getHolder();
-//        holder.setFormat(PixelFormat.RGBA_8888);
-//        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-//        surface.setWillNotDraw(false);
+        SurfaceHolder holder = surface.getHolder();
+        holder.setFormat(PixelFormat.TRANSLUCENT);
 
         addView(surface);
 
@@ -325,6 +322,12 @@ public class StreamView extends FrameLayout {
         Log.d(TAG, "native sleep called");
         if (session != null) {
             session.sleep();
+        }
+    }
+
+    public void sendText(String text) {
+        if (session != null) {
+            session.sendText(text);
         }
     }
 

@@ -491,6 +491,13 @@ JNIEXPORT jint JNICALL JNI_FCN(sessionGotoBed)(JNIEnv *env, jobject obj, jlong p
     return chiaki_session_goto_bed(&session->session);
 }
 
+JNIEXPORT jint JNICALL JNI_FCN(sessionSetText)(JNIEnv *env, jobject obj, jlong ptr, jstring text)
+{
+    AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;
+    const char *text_str = E->GetStringUTFChars(env, text, NULL);
+    return chiaki_session_keyboard_set_text(&session->session, text_str);
+}
+
 JNIEXPORT jint JNICALL JNI_FCN(sessionJoin)(JNIEnv *env, jobject obj, jlong ptr)
 {
 	AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;

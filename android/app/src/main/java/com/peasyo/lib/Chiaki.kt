@@ -98,6 +98,7 @@ private class ChiakiNative
 		@JvmStatic external fun sessionStart(ptr: Long): Int
 		@JvmStatic external fun sessionStop(ptr: Long): Int
 		@JvmStatic external fun sessionGotoBed(ptr: Long): Int
+		@JvmStatic external fun sessionSetText(ptr: Long, text: String): Int
 		@JvmStatic external fun sessionJoin(ptr: Long): Int
 		@JvmStatic external fun sessionSetSurface(ptr: Long, surface: Surface?)
 		@JvmStatic external fun sessionSetControllerState(ptr: Long, controllerState: ControllerState)
@@ -383,6 +384,8 @@ class Session(connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean)
 	fun start() = ErrorCode(ChiakiNative.sessionStart(nativePtr))
 	fun stop() = ErrorCode(ChiakiNative.sessionStop(nativePtr))
 	fun gotoBed() = ErrorCode(ChiakiNative.sessionGotoBed(nativePtr))
+
+	fun setText(text: String) = ErrorCode(ChiakiNative.sessionSetText(nativePtr, text))
 
 	fun dispose()
 	{

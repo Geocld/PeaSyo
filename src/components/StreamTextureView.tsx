@@ -33,6 +33,7 @@ interface StreamViewRef {
   sleep: () => void;
   startSensor: () => void;
   stopSensor: () => void;
+  sendText: (text: string) => void;
 }
 
 const StreamTextureViewNative =
@@ -280,6 +281,18 @@ const StreamTextureView: ForwardRefRenderFunction<
           // @ts-ignore
           UIManager.StreamTextureView.Commands.stopSensor.toString(),
           [viewId],
+        );
+      }
+    },
+    sendText: (text: string) => {
+      if (streamViewRef.current) {
+        const viewId = findNodeHandle(streamViewRef.current);
+
+        UIManager.dispatchViewManagerCommand(
+          viewId,
+          // @ts-ignore
+          UIManager.StreamTextureView.Commands.sendText.toString(),
+          [text],
         );
       }
     },

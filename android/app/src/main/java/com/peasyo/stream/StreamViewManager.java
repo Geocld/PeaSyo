@@ -38,6 +38,7 @@ public class StreamViewManager extends SimpleViewManager<StreamView> {
     public static final int COMMAND_USB_DS_CONTROLLER = 14;
 
     public static final int COMMAND_SENSOR_STICK = 15;
+    public static final int COMMAND_SEND_TEXT = 16;
 
     @Override
     @NonNull
@@ -113,6 +114,7 @@ public class StreamViewManager extends SimpleViewManager<StreamView> {
                 .put("gotoBed", COMMAND_GOTO_BED)
                 .put("startSensor", COMMAND_START_SENSOR)
                 .put("stopSensor", COMMAND_STOP_SENSOR)
+                .put("sendText", COMMAND_SEND_TEXT)
                 .build();
     }
 
@@ -289,6 +291,14 @@ public class StreamViewManager extends SimpleViewManager<StreamView> {
 
             case COMMAND_STOP_SENSOR: {
                 view.stopSensorListener();
+                break;
+            }
+
+            case COMMAND_SEND_TEXT: {
+                if (args != null) {
+                    String text = args.getString(0);
+                    view.sendText(text);
+                }
                 break;
             }
 

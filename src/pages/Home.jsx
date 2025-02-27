@@ -106,17 +106,23 @@ function HomeScreen({navigation, route}) {
                   // Save token(userInfo) to local storege
                   ts.load();
                   const tokens = ts.getToken();
+                  let isExist = false;
                   tokens.forEach(item => {
                     item.is_default = false;
+                    if (item.user_id === userInfo.user_id) {
+                      isExist = true;
+                    }
                   });
 
-                  tokens.push({
-                    is_default: true,
-                    ...userInfo,
-                  });
+                  if (!isExist) {
+                    tokens.push({
+                      is_default: true,
+                      ...userInfo,
+                    });
 
-                  ts.setToken(tokens);
-                  ts.save();
+                    ts.setToken(tokens);
+                    ts.save();
+                  }
 
                   ToastAndroid.show(t('Login Successful'), ToastAndroid.SHORT);
                   setLoading(false);

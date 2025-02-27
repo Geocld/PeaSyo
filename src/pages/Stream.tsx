@@ -828,6 +828,16 @@ function StreamScreen({navigation, route}) {
                       }}
                     />
                   )}
+                  {/* {connectState === CONNECTED && (
+                    <List.Item
+                      title={t('Send text')}
+                      background={background}
+                      onPress={() => {
+                        streamViewRef.current?.sendText('hello world');
+                        handleCloseModal();
+                      }}
+                    />
+                  )} */}
                   {connectState === CONNECTED && (
                     <List.Item
                       title={t('Disconnect and sleep')}

@@ -334,6 +334,12 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         }
     }
 
+    public void sendText(String text) {
+        if (session != null) {
+            session.sendText(text);
+        }
+    }
+
     // 默认掩码映射
     private static Map<Integer, Integer> DEFAULT_MAPPING = Map.ofEntries(
             Map.entry(KeyEvent.KEYCODE_BUTTON_A, BUTTON_CROSS),

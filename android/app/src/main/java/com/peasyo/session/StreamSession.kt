@@ -145,6 +145,10 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 		session?.gotoBed()
 	}
 
+	fun sendText(text: String) {
+		session?.setText(text);
+	}
+
 	fun pause()
 	{
 		shutdown()
