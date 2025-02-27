@@ -31,6 +31,7 @@ import androidx.lifecycle.LifecycleOwner;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableMap;
 import com.peasyo.lib.*;
 import com.peasyo.log.LogManager;
@@ -149,7 +150,9 @@ public class StreamView extends FrameLayout {
         surface.setFocusable(true);
         surface.setFocusableInTouchMode(true);
 
-        surface.setZOrderMediaOverlay(true);
+        UiThreadUtil.runOnUiThread(() -> {
+            surface.setZOrderMediaOverlay(true);
+        });
         surface.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
         SurfaceHolder holder = surface.getHolder();
@@ -740,6 +743,7 @@ public class StreamView extends FrameLayout {
         return (byte)((int)(value * 255.0f));
     }
 
+    private long lastTriggerTime = 0;
     private void processJoystickInput(MotionEvent event,
                                       int historyPos) {
 
@@ -774,10 +778,14 @@ public class StreamView extends FrameLayout {
 //        Log.d(TAG, "right axisX:" + rx);
 //        Log.d(TAG, "right axisY:" + ry);
 
-        if (Math.abs(rx) > this.deadZone || Math.abs(ry) > this.deadZone) {
+        long currentTime = System.currentTimeMillis();
+        if (Math.abs(rx) > 0.1 || Math.abs(ry) > 0.1) {
             isRightstickMoving = true;
+            lastTriggerTime = currentTime;
         } else {
-            isRightstickMoving = false;
+            if (isRightstickMoving && (currentTime - lastTriggerTime >= 500)) {
+                isRightstickMoving = false;
+            }
         }
 
         controllerState.setLeftX(signedAxis(x));

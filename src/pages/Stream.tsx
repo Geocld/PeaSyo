@@ -520,7 +520,10 @@ function StreamScreen({navigation, route}) {
     if (_settings.gyroscope) {
       const sensorManager =
         _settings.gyroscope === 2 ? GamepadSensorModule : SensorModule;
-      sensorManager.startSensor(_settings.gyroscope_sensitivity);
+      sensorManager.startSensor(
+        _settings.gyroscope_sensitivity_x,
+        _settings.gyroscope_sensitivity_y,
+      );
 
       sensorEventListener.current = eventEmitter.addListener(
         'SensorData',
@@ -530,12 +533,17 @@ function StreamScreen({navigation, route}) {
             const {x, y} = params;
             let stickX = x / 32767;
             let stickY = y / 32767;
-            const scale =
-              _settings.gyroscope_sensitivity > 10000
-                ? _settings.gyroscope_sensitivity / 10000
+            const scaleX =
+              _settings.gyroscope_sensitivity_x > 10000
+                ? _settings.gyroscope_sensitivity_x / 10000
                 : 1;
-            stickX = stickX * scale;
-            stickY = stickY * scale;
+
+            const scaleY =
+              _settings.gyroscope_sensitivity_y > 10000
+                ? _settings.gyroscope_sensitivity_y / 10000
+                : 1;
+            stickX = stickX * scaleX;
+            stickY = stickY * scaleY;
             if (stickX > 1) {
               stickX = 1;
             }

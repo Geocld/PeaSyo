@@ -252,8 +252,10 @@ export default {
     gyroDesc:
       '是否强制使用设备/控制器陀螺仪模拟摇杆，当按下LT键时陀螺仪模拟右摇杆，常用于FPS游戏。',
     gyroTips: '控制器陀螺仪只支持Android12+，推荐使用DualSense5控制器',
-    gyroSenTitle: '陀螺仪灵敏度',
-    gyroSenDesc: '调节陀螺仪灵敏度',
+    gyroSenTitleX: '陀螺仪X轴灵敏度',
+    gyroSenDescX: '调节陀螺仪X轴灵敏度',
+    gyroSenTitleY: '陀螺仪Y轴灵敏度',
+    gyroSenDescY: '调节陀螺仪Y轴灵敏度',
     Device: '设备',
     'Controller(DS5)': '控制器(推荐DS5)',
     gyroSenInvertTitle: '反转陀螺仪模拟摇杆',

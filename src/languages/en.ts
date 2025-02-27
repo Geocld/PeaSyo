@@ -230,8 +230,10 @@ export default {
       'Force use of device/controller gyroscope to simulate joystick. when the LT button is pressed, the gyroscope simulates the right joystick, commonly used in FPS games.',
     gyroTips:
       'Controller gyroscope only supports Android 12+. recommended to use DualSense 5 controller.',
-    gyroSenTitle: 'Gyroscope Sensitivity',
-    gyroSenDesc: 'Adjust gyroscope sensitivity',
+    gyroSenTitleX: 'Gyroscope X-axis Sensitivity',
+    gyroSenDescX: 'Adjust gyroscope X-axis sensitivity',
+    gyroSenTitleY: 'Gyroscope Y-axis Sensitivity',
+    gyroSenDescY: 'Adjust gyroscope Y-axis sensitivity',
     Device: 'Device',
     'Controller(DS5)': 'Controller (Recommended DS5)',
     gyroSenInvertTitle: 'Invert Gyroscope Simulated Joystick',
