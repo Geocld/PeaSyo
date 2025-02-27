@@ -71,7 +71,8 @@ data class ConnectInfo(
 	val host: String,
 	val registKey: ByteArray,
 	val morning: ByteArray,
-	val videoProfile: ConnectVideoProfile
+	val videoProfile: ConnectVideoProfile,
+	val enableKeyboard: Boolean
 ): Parcelable
 
 private class ChiakiNative
@@ -98,7 +99,9 @@ private class ChiakiNative
 		@JvmStatic external fun sessionStart(ptr: Long): Int
 		@JvmStatic external fun sessionStop(ptr: Long): Int
 		@JvmStatic external fun sessionGotoBed(ptr: Long): Int
+		@JvmStatic external fun sessionKeyboardAccept(ptr: Long): Int
 		@JvmStatic external fun sessionSetText(ptr: Long, text: String): Int
+		@JvmStatic external fun sessionKeyboardReject(ptr: Long): Int
 		@JvmStatic external fun sessionJoin(ptr: Long): Int
 		@JvmStatic external fun sessionSetSurface(ptr: Long, surface: Surface?)
 		@JvmStatic external fun sessionSetControllerState(ptr: Long, controllerState: ControllerState)
@@ -385,7 +388,10 @@ class Session(connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean)
 	fun stop() = ErrorCode(ChiakiNative.sessionStop(nativePtr))
 	fun gotoBed() = ErrorCode(ChiakiNative.sessionGotoBed(nativePtr))
 
+	fun sessionKeyboardAccept() = ErrorCode(ChiakiNative.sessionKeyboardAccept(nativePtr))
 	fun setText(text: String) = ErrorCode(ChiakiNative.sessionSetText(nativePtr, text))
+
+	fun sessionKeyboardReject() = ErrorCode(ChiakiNative.sessionKeyboardReject(nativePtr))
 
 	fun dispose()
 	{

@@ -295,10 +295,12 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
 	jbyteArray morning_array = E->GetObjectField(env, connect_info_obj, E->GetFieldID(env, connect_info_class, "morning", "[B"));
 	jobject connect_video_profile_obj = E->GetObjectField(env, connect_info_obj, E->GetFieldID(env, connect_info_class, "videoProfile", "L"BASE_PACKAGE"/ConnectVideoProfile;"));
 	jclass connect_video_profile_class = E->GetObjectClass(env, connect_video_profile_obj);
+    jboolean enable_keyboard = E->GetBooleanField(env, connect_info_obj, E->GetFieldID(env, connect_info_class, "enableKeyboard", "Z"));
 
 	ChiakiConnectInfo connect_info = { 0 };
 	connect_info.ps5 = ps5;
-	connect_info.enable_dualsense=ps5;
+	connect_info.enable_dualsense = ps5; // Make haptic rumble
+    connect_info.enable_keyboard = enable_keyboard; // Using device keyboard send text
 
     jboolean is_remote = JNI_TRUE;
 
@@ -491,11 +493,23 @@ JNIEXPORT jint JNICALL JNI_FCN(sessionGotoBed)(JNIEnv *env, jobject obj, jlong p
     return chiaki_session_goto_bed(&session->session);
 }
 
+JNIEXPORT jint JNICALL JNI_FCN(sessionKeyboardAccept)(JNIEnv *env, jobject obj, jlong ptr)
+{
+    AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;
+    return chiaki_session_keyboard_accept(&session->session);
+}
+
 JNIEXPORT jint JNICALL JNI_FCN(sessionSetText)(JNIEnv *env, jobject obj, jlong ptr, jstring text)
 {
     AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;
     const char *text_str = E->GetStringUTFChars(env, text, NULL);
     return chiaki_session_keyboard_set_text(&session->session, text_str);
+}
+
+JNIEXPORT jint JNICALL JNI_FCN(sessionKeyboardReject)(JNIEnv *env, jobject obj, jlong ptr)
+{
+    AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;
+    return chiaki_session_keyboard_reject(&session->session);
 }
 
 JNIEXPORT jint JNICALL JNI_FCN(sessionJoin)(JNIEnv *env, jobject obj, jlong ptr)

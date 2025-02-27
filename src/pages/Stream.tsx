@@ -10,7 +10,14 @@ import {
   NativeModules,
   NativeEventEmitter,
 } from 'react-native';
-import {Card, List, Text, IconButton} from 'react-native-paper';
+import {
+  Card,
+  List,
+  Text,
+  IconButton,
+  Button,
+  TextInput,
+} from 'react-native-paper';
 import {useTranslation} from 'react-i18next';
 import Spinner from '../components/Spinner';
 import Orientation from 'react-native-orientation-locker';
@@ -68,6 +75,8 @@ function StreamScreen({navigation, route}) {
   const [resolution, setResolution] = React.useState('');
   const [isTouchpadFull, setIsTouchpadFull] = React.useState(false);
   const [isUsbDs5, setIsUsbDs5] = React.useState(false);
+  const [message, setMessage] = React.useState('');
+  const [showMessageModal, setShowMessageModal] = React.useState(false);
 
   const stateEventListener = React.useRef<any>(undefined);
   const usbGpEventListener = React.useRef<any>(undefined);
@@ -229,6 +238,7 @@ function StreamScreen({navigation, route}) {
       gamepad_maping,
       useSurface,
       touchpad_type,
+      keyboard = false,
     } = _settings;
     if (_resolution === 360) {
       width = 640;
@@ -267,6 +277,7 @@ function StreamScreen({navigation, route}) {
         : _consoleInfo.host,
       registKey: _consoleInfo.rpRegistKey,
       morning: _consoleInfo.rpKey,
+      enableKeyboard: keyboard,
       width,
       height,
       fps,
@@ -595,6 +606,7 @@ function StreamScreen({navigation, route}) {
           setShowModal(true);
           setShowPerformance(true);
           setShowTouchpad(true);
+          setShowMessageModal(true);
           setShowVirtualGamepad(true);
         }
 
@@ -607,6 +619,7 @@ function StreamScreen({navigation, route}) {
             setShowModal(false);
             setShowPerformance(false);
             setShowTouchpad(false);
+            setShowMessageModal(false);
             setShowVirtualGamepad(false);
             setShowInitOverlay(false);
           }
@@ -615,7 +628,7 @@ function StreamScreen({navigation, route}) {
             streamViewRef.current?.startSession();
           }, 100);
         }, 300);
-      }, 100);
+      }, 300);
     }, 500);
 
     return () => {
@@ -744,6 +757,49 @@ function StreamScreen({navigation, route}) {
     );
   };
 
+  const handleSendMessage = () => {
+    streamViewRef.current?.sendText(message);
+    setShowMessageModal(false);
+  };
+
+  const handleSwitchKeyboard = (isReject: boolean) => {
+    streamViewRef.current?.switchKb(isReject);
+    setShowMessageModal(false);
+  };
+
+  const renderMessageModal = () => {
+    if (!showMessageModal || !consoleInfo) {
+      return null;
+    }
+
+    return (
+      <View style={styles.messageModal}>
+        <Card>
+          <Card.Content>
+            <TextInput
+              label={t('Text')}
+              value={message}
+              onChangeText={text => setMessage(text)}
+            />
+            <Button
+              mode="contained"
+              style={{marginTop: 10}}
+              onPress={handleSendMessage}>
+              {t('Send')}
+            </Button>
+
+            <Button
+              mode="outlined"
+              style={{marginTop: 10}}
+              onPress={() => handleSwitchKeyboard(true)}>
+              {t('ExitRemoteKb')}
+            </Button>
+          </Card.Content>
+        </Card>
+      </View>
+    );
+  };
+
   return (
     <View>
       {showInitOverlay && (
@@ -763,6 +819,8 @@ function StreamScreen({navigation, route}) {
       {renderVirtualGamepad()}
 
       {renderTouchpad()}
+
+      {renderMessageModal()}
 
       {settings.show_menu && (
         <View style={styles.quickMenu}>
@@ -836,16 +894,16 @@ function StreamScreen({navigation, route}) {
                       }}
                     />
                   )}
-                  {/* {connectState === CONNECTED && (
+                  {connectState === CONNECTED && settings.keyboard && (
                     <List.Item
                       title={t('Send text')}
                       background={background}
                       onPress={() => {
-                        streamViewRef.current?.sendText('hello world');
                         handleCloseModal();
+                        setShowMessageModal(true);
                       }}
                     />
-                  )} */}
+                  )}
                   {connectState === CONNECTED && (
                     <List.Item
                       title={t('Disconnect and sleep')}
@@ -910,6 +968,14 @@ const styles = StyleSheet.create({
     marginLeft: '32%',
     marginRight: '32%',
     zIndex: 999,
+  },
+  messageModal: {
+    position: 'absolute',
+    top: '2%',
+    left: 0,
+    marginLeft: '25%',
+    marginRight: '25%',
+    zIndex: 998,
   },
   touchpad: {
     position: 'absolute',

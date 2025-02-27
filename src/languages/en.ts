@@ -245,5 +245,6 @@ export default {
     show_menu_title: 'Display Quick Menu',
     show_menu_desc:
       'The quick menu is always displayed in the lower right corner of the streaming page.',
+    ExitRemoteKb: 'Exit Remote keyboard',
   },
 };

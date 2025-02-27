@@ -265,5 +265,12 @@ export default {
     all_axies: '全部',
     show_menu_title: '显示快捷菜单',
     show_menu_desc: '串流界面右下角始终显示快捷菜单。',
+    ExitRemoteKb: '退出远程键盘',
+    Send: '发送',
+    Sended: '已发送',
+    Text: '文字',
+    'Send text': '发送文字',
+    'Remote keyboard input': '远程键盘输入',
+    'Enable remote keyboard input': '开启远程键盘输入',
   },
 };

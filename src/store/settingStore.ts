@@ -37,6 +37,7 @@ export type Settings = {
   check_update: boolean;
   theme: string;
   rgb: string;
+  keyboard: boolean;
   debug: boolean;
 };
 
@@ -73,6 +74,7 @@ const defaultSettings: Settings = {
   check_update: true,
   theme: 'dark',
   rgb: '#DF6069',
+  keyboard: false,
   debug: false,
 };
 

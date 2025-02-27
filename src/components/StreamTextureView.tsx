@@ -34,6 +34,7 @@ interface StreamViewRef {
   startSensor: () => void;
   stopSensor: () => void;
   sendText: (text: string) => void;
+  switchKb: (isReject: boolean) => void;
 }
 
 const StreamTextureViewNative =
@@ -293,6 +294,18 @@ const StreamTextureView: ForwardRefRenderFunction<
           // @ts-ignore
           UIManager.StreamTextureView.Commands.sendText.toString(),
           [text],
+        );
+      }
+    },
+    switchKb: (isReject: boolean) => {
+      if (streamViewRef.current) {
+        const viewId = findNodeHandle(streamViewRef.current);
+
+        UIManager.dispatchViewManagerCommand(
+          viewId,
+          // @ts-ignore
+          UIManager.StreamTextureView.Commands.keyboardSwitch.toString(),
+          [isReject],
         );
       }
     },

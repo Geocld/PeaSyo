@@ -39,6 +39,7 @@ public class StreamViewManager extends SimpleViewManager<StreamView> {
 
     public static final int COMMAND_SENSOR_STICK = 15;
     public static final int COMMAND_SEND_TEXT = 16;
+    public static final int COMMAND_KEYBOARD_SWITCH = 17;
 
     @Override
     @NonNull
@@ -58,6 +59,7 @@ public class StreamViewManager extends SimpleViewManager<StreamView> {
         String host = streamInfo.getString("host");
         String registKeyBase64 = streamInfo.getString("registKey"); // base64
         String morningBase64 = streamInfo.getString("morning"); // base64
+        boolean enableKeyboard = streamInfo.getBoolean("enableKeyboard");
 
         byte[] registKey = java.util.Base64.getDecoder().decode(registKeyBase64);
         byte[] morning = java.util.Base64.getDecoder().decode(morningBase64);
@@ -89,7 +91,7 @@ public class StreamViewManager extends SimpleViewManager<StreamView> {
                 codec  // codec
         );
 
-        ConnectInfo connectInfo = new ConnectInfo(ps5, host, registKey, morning, videoProfile);
+        ConnectInfo connectInfo = new ConnectInfo(ps5, host, registKey, morning, videoProfile, enableKeyboard);
         view.setConnectInfo(connectInfo, streamInfo);
     }
 
@@ -115,6 +117,7 @@ public class StreamViewManager extends SimpleViewManager<StreamView> {
                 .put("startSensor", COMMAND_START_SENSOR)
                 .put("stopSensor", COMMAND_STOP_SENSOR)
                 .put("sendText", COMMAND_SEND_TEXT)
+                .put("keyboardSwitch", COMMAND_KEYBOARD_SWITCH)
                 .build();
     }
 
@@ -300,6 +303,17 @@ public class StreamViewManager extends SimpleViewManager<StreamView> {
                     view.sendText(text);
                 }
                 break;
+            }
+
+            case COMMAND_KEYBOARD_SWITCH: {
+                if (args != null) {
+                    boolean isReject = args.getBoolean(0);
+                    if (isReject) {
+                        view.keyboardReject();
+                    } else {
+                        view.keyboardAccept();
+                    }
+                }
             }
 
             default:

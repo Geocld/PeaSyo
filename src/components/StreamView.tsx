@@ -34,6 +34,7 @@ interface StreamViewRef {
   startSensor: () => void;
   stopSensor: () => void;
   sendText: (text: string) => void;
+  switchKb: (isReject: boolean) => void;
 }
 
 const StreamViewNative = requireNativeComponent<StreamViewProps>('StreamView');
@@ -292,6 +293,18 @@ const StreamView: ForwardRefRenderFunction<StreamViewRef, StreamViewProps> = (
           // @ts-ignore
           UIManager.StreamView.Commands.sendText.toString(),
           [text],
+        );
+      }
+    },
+    switchKb: (isReject: boolean) => {
+      if (streamViewRef.current) {
+        const viewId = findNodeHandle(streamViewRef.current);
+
+        UIManager.dispatchViewManagerCommand(
+          viewId,
+          // @ts-ignore
+          UIManager.StreamView.Commands.keyboardSwitch.toString(),
+          [isReject],
         );
       }
     },

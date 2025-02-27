@@ -149,6 +149,14 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 		session?.setText(text);
 	}
 
+	fun keyboardAccept() {
+		session?.sessionKeyboardAccept()
+	}
+
+	fun keyboardReject() {
+		session?.sessionKeyboardReject()
+	}
+
 	fun pause()
 	{
 		shutdown()

@@ -259,5 +259,12 @@ export default {
     all_axies: '全部軸',
     show_menu_title: '顯示快捷菜單',
     show_menu_desc: '串流介面右下角始終顯示快捷菜單。',
+    ExitRemoteKb: '退出遠程鍵盤',
+    Send: '發送',
+    Sended: '已發送',
+    Text: '文字',
+    'Send text': '發送文字',
+    'Remote keyboard input': '遠程鍵盤輸入',
+    'Enable remote keyboard input': '開啟遠程鍵盤輸入',
   },
 };

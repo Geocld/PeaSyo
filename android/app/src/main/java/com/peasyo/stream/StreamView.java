@@ -334,6 +334,18 @@ public class StreamView extends FrameLayout {
         }
     }
 
+    public void keyboardAccept() {
+        if (session != null) {
+            session.keyboardAccept();
+        }
+    }
+
+    public void keyboardReject() {
+        if (session != null) {
+            session.keyboardReject();
+        }
+    }
+
     // 默认掩码映射
     private static Map<Integer, Integer> DEFAULT_MAPPING = Map.ofEntries(
             Map.entry(KeyEvent.KEYCODE_BUTTON_A, BUTTON_CROSS),
