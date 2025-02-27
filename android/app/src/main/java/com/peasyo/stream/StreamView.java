@@ -153,7 +153,7 @@ public class StreamView extends FrameLayout {
         UiThreadUtil.runOnUiThread(() -> {
             surface.setZOrderMediaOverlay(true);
         });
-        surface.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+//        surface.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
         SurfaceHolder holder = surface.getHolder();
         holder.setFormat(PixelFormat.TRANSLUCENT);
