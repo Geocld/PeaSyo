@@ -277,7 +277,7 @@ function StreamScreen({navigation, route}) {
         : _consoleInfo.host,
       registKey: _consoleInfo.rpRegistKey,
       morning: _consoleInfo.rpKey,
-      enableKeyboard: keyboard,
+      enableKeyboard: false,
       width,
       height,
       fps,
@@ -894,7 +894,7 @@ function StreamScreen({navigation, route}) {
                       }}
                     />
                   )}
-                  {connectState === CONNECTED && settings.keyboard && (
+                  {/* {connectState === CONNECTED && settings.keyboard && (
                     <List.Item
                       title={t('Send text')}
                       background={background}
@@ -903,7 +903,7 @@ function StreamScreen({navigation, route}) {
                         setShowMessageModal(true);
                       }}
                     />
-                  )}
+                  )} */}
                   {connectState === CONNECTED && (
                     <List.Item
                       title={t('Disconnect and sleep')}
