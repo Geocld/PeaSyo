@@ -29,6 +29,7 @@ const MapItem: React.FC<Props> = ({mapItem, onPress}) => {
   return (
     <Card
       onPress={handlePress}
+      // eslint-disable-next-line react-native/no-inline-styles
       style={{margin: 10, backgroundColor: theme === 'dark' ? 'white' : ''}}>
       <Card.Content style={styles.mapItem}>
         <View style={styles.flex}>

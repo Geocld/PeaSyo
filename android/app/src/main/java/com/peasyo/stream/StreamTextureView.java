@@ -357,7 +357,8 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
             Map.entry(KeyEvent.KEYCODE_BUTTON_SELECT, BUTTON_SHARE),
             Map.entry(KeyEvent.KEYCODE_BUTTON_START, BUTTON_OPTIONS),
             Map.entry(KeyEvent.KEYCODE_BUTTON_C, BUTTON_PS),
-            Map.entry(KeyEvent.KEYCODE_BUTTON_MODE, BUTTON_PS)
+            Map.entry(KeyEvent.KEYCODE_BUTTON_MODE, BUTTON_PS),
+            Map.entry(0, BUTTON_TOUCHPAD)
     );
     private static Map<Integer, Integer> BUTTON_MAPPING = new HashMap<>(DEFAULT_MAPPING);
 
@@ -415,6 +416,9 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         }
         if (mapping.hasKey("Nexus")) {
             newMapping.put(mapping.getInt("Nexus"), BUTTON_PS);
+        }
+        if (mapping.hasKey("Touchpad")) {
+            newMapping.put(mapping.getInt("Touchpad"), BUTTON_TOUCHPAD);
         }
 
         // 更新全局映射

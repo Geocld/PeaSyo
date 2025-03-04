@@ -16,6 +16,7 @@ export const GAMEPAD_MAPING = {
   Menu: 108,
   View: 109,
   Nexus: 110,
+  Touchpad: 0,
 };
 
 export const DiscoveryVersions = {

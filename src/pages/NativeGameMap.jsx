@@ -29,6 +29,7 @@ const buttonLabels = [
   'View',
   'Menu',
   'Nexus',
+  'Touchpad',
 ];
 
 function NativeGameMap({navigation, route}) {
@@ -61,6 +62,12 @@ function NativeGameMap({navigation, route}) {
       const keyCode = route.params.keyCode;
       // console.log('setMaping:', button, keyCode);
       // console.log('mapingRef.current:', mapingRef.current);
+      // If keyCode is conflicted, set other's keycode to 0
+      for (const k in mapingRef.current) {
+        if (mapingRef.current[k] === keyCode) {
+          mapingRef.current[k] = 0;
+        }
+      }
       setMaping({
         ...mapingRef.current,
         [button]: keyCode,
@@ -82,6 +89,7 @@ function NativeGameMap({navigation, route}) {
       'LeftThumb',
       'RightThumb',
       'Nexus',
+      'Touchpad',
     ];
     const largeButtons = ['View', 'Menu'];
     if (defaultButtons.indexOf(button) > -1) {

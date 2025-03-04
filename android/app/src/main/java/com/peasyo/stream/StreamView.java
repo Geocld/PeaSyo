@@ -150,13 +150,14 @@ public class StreamView extends FrameLayout {
         surface.setFocusable(true);
         surface.setFocusableInTouchMode(true);
 
-        UiThreadUtil.runOnUiThread(() -> {
-            surface.setZOrderMediaOverlay(true);
-        });
+        surface.setZOrderOnTop(false);
+        surface.setZOrderMediaOverlay(true);
 //        surface.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
-        SurfaceHolder holder = surface.getHolder();
-        holder.setFormat(PixelFormat.TRANSLUCENT);
+//        SurfaceHolder holder = surface.getHolder();
+//        holder.setFormat(PixelFormat.RGBA_8888);
+//        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+//        surface.setWillNotDraw(false);
 
         addView(surface);
 
@@ -363,7 +364,8 @@ public class StreamView extends FrameLayout {
             Map.entry(KeyEvent.KEYCODE_BUTTON_SELECT, BUTTON_SHARE),
             Map.entry(KeyEvent.KEYCODE_BUTTON_START, BUTTON_OPTIONS),
             Map.entry(KeyEvent.KEYCODE_BUTTON_C, BUTTON_PS),
-            Map.entry(KeyEvent.KEYCODE_BUTTON_MODE, BUTTON_PS)
+            Map.entry(KeyEvent.KEYCODE_BUTTON_MODE, BUTTON_PS),
+            Map.entry(0, BUTTON_TOUCHPAD)
     );
     private static Map<Integer, Integer> BUTTON_MAPPING = new HashMap<>(DEFAULT_MAPPING);
 
@@ -376,7 +378,6 @@ public class StreamView extends FrameLayout {
 
         Map<Integer, Integer> newMapping = new HashMap<>(DEFAULT_MAPPING);
 
-        // 处理各个按键的映射
         if (mapping.hasKey("A")) {
             newMapping.put(mapping.getInt("A"), BUTTON_CROSS);
         }
@@ -421,6 +422,9 @@ public class StreamView extends FrameLayout {
         }
         if (mapping.hasKey("Nexus")) {
             newMapping.put(mapping.getInt("Nexus"), BUTTON_PS);
+        }
+        if (mapping.hasKey("Touchpad")) {
+            newMapping.put(mapping.getInt("Touchpad"), BUTTON_TOUCHPAD);
         }
 
         // 更新全局映射
