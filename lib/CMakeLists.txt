@@ -34,7 +34,8 @@ set(HEADER_FILES
 		include/chiaki/fec.h
 		include/chiaki/regist.h
 		include/chiaki/opusdecoder.h
-		include/chiaki/orientation.h)
+		include/chiaki/orientation.h
+		include/chiaki/bitstream.h)
 
 set(SOURCE_FILES
 		src/common.c
@@ -71,7 +72,8 @@ set(SOURCE_FILES
 		src/fec.c
 		src/regist.c
 		src/opusdecoder.c
-		src/orientation.c)
+		src/orientation.c
+		src/bitstream.c)
 
 set(CHIAKI_LIB_ENABLE_PI_DECODER "${CHIAKI_ENABLE_PI_DECODER}")
 

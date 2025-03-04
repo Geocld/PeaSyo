@@ -11,7 +11,7 @@
 #include <string.h>
 
 #define INPUT_BUFFER_TIMEOUT_MS 10
-#define REMOTE_INPUT_BUFFER_TIMEOUT_MS 500
+#define REMOTE_INPUT_BUFFER_TIMEOUT_MS 50
 
 static void *android_chiaki_video_decoder_output_thread_func(void *user);
 
@@ -29,6 +29,8 @@ ChiakiErrorCode android_chiaki_video_decoder_init(AndroidChiakiVideoDecoder *dec
     decoder->stats.decoded_frames = 0;
 
     decoder->is_remote = remote;
+
+    decoder->frames_lost = 0;
 
     return chiaki_mutex_init(&decoder->codec_mutex, false);
 }
@@ -169,11 +171,13 @@ void android_chiaki_video_decoder_set_surface(AndroidChiakiVideoDecoder *decoder
 }
 
 // receive video buffer
-bool android_chiaki_video_decoder_video_sample(uint8_t *buf, size_t buf_size, void *user)
+bool android_chiaki_video_decoder_video_sample(uint8_t *buf, size_t buf_size, int32_t frames_lost, bool frame_recovered, void *user)
 {
     bool r = true;
     AndroidChiakiVideoDecoder *decoder = user;
     chiaki_mutex_lock(&decoder->codec_mutex);
+
+    decoder->frames_lost = frames_lost;
 
     if(!decoder->codec)
     {

@@ -224,7 +224,8 @@ export default {
     // Performance panel
     WD: '带宽',
     PL: '丢包率',
-    DT: '解码时间',
+    DT: '解码',
+    FL: '丢帧',
     DS_test_title: 'DualSense5控制器测试',
     DS_test_desc:
       '测试DualSense5，注意需打开安卓覆盖驱动(设置-覆盖安卓手柄支持-开启)的同时有线连接DualSense5控制器。',

@@ -79,6 +79,13 @@ const PerfPanel: React.FC<Props> = ({resolution = '', performance = {}}) => {
     return value.toFixed(2) + 'ms';
   };
 
+  const computedFl = (value: number | undefined): number | string => {
+    if (value === undefined) {
+      return '-1';
+    }
+    return value;
+  };
+
   const renderBattery = (level: number) => {
     if (level < 20) {
       return `🪫: ${level}%`;
@@ -120,6 +127,12 @@ const PerfPanel: React.FC<Props> = ({resolution = '', performance = {}}) => {
         <View>
           <Text style={styles.text}>
             {t('DT')}: {computedDt(performance.decodeTime)} ({codec})
+            {isHorizon ? ' | ' : ''}
+          </Text>
+        </View>
+        <View>
+          <Text style={styles.text}>
+            {t('FL')}: {computedFl(performance.frameLost)}
             {isHorizon ? ' | ' : ''}
           </Text>
         </View>

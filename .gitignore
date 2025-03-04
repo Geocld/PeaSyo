@@ -66,3 +66,6 @@ yarn-error.log
 
 # testing
 /coverage
+
+# vcpkg
+/vcpkg_installed

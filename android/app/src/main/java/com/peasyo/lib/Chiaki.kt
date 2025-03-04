@@ -94,6 +94,7 @@ private class ChiakiNative
 		@JvmStatic external fun getPacketLoss(ptr: Long): Double
 		@JvmStatic external fun getDecodeTime(ptr: Long): Double
 		@JvmStatic external fun getFps(ptr: Long): Double
+		@JvmStatic external fun getFrameLost(ptr: Long): Double
 		@JvmStatic external fun sessionCreate(result: CreateResult, connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean, javaSession: Session)
 		@JvmStatic external fun sessionFree(ptr: Long)
 		@JvmStatic external fun sessionStart(ptr: Long): Int
@@ -361,7 +362,7 @@ data class LoginPinRequestEvent(val pinIncorrect: Boolean): Event()
 data class QuitEvent(val reason: QuitReason, val reasonString: String?): Event()
 data class RumbleEvent(val left: Int, val right: Int): Event()
 data class TriggerRumbleEvent(val typeLeft: Int, val left: Int, val typeRight: Int, val right: Int): Event()
-data class PerformanceEvent(val rtt: Double, val bitrate: Double, val packetLoss: Double, val decodeTime: Double, val fps: Double): Event()
+data class PerformanceEvent(val rtt: Double, val bitrate: Double, val packetLoss: Double, val decodeTime: Double, val fps: Double, val frameLost: Double): Event()
 class CreateError(val errorCode: ErrorCode): Exception("Failed to create a native object: $errorCode")
 
 class Session(connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean)
@@ -442,8 +443,9 @@ class Session(connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean)
 		val packetLoss = ChiakiNative.getPacketLoss(nativePtr)
 		val decodeTime = ChiakiNative.getDecodeTime(nativePtr)
 		val fps = ChiakiNative.getFps(nativePtr)
+		val frameLost = ChiakiNative.getFrameLost(nativePtr)
 
-		event(PerformanceEvent(rtt, bitrate, packetLoss, decodeTime, fps))
+		event(PerformanceEvent(rtt, bitrate, packetLoss, decodeTime, fps, frameLost))
 	}
 
 	fun setSurface(surface: Surface?)

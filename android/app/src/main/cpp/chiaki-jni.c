@@ -274,6 +274,16 @@ JNIEXPORT jdouble JNICALL JNI_FCN(getFps)(JNIEnv *env, jobject obj, jlong ptr)
     return fps;
 }
 
+// Frame lost
+JNIEXPORT jdouble JNICALL JNI_FCN(getFrameLost)(JNIEnv *env, jobject obj, jlong ptr)
+{
+    AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;
+    if(!session)
+        return 0;
+    double lost = session->video_decoder.frames_lost;
+    return lost;
+}
+
 JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject result, jobject connect_info_obj, jstring log_file_str, jboolean log_verbose, jobject java_session)
 {
 	AndroidChiakiSession *session = NULL;

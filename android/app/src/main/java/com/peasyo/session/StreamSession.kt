@@ -414,6 +414,7 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 					putDouble("packetLoss", event.packetLoss)
 					putDouble("decodeTime", event.decodeTime)
 					putDouble("fps", event.fps)
+					putDouble("frameLost", event.frameLost)
 				}
 				sendEvent("performance", params)
 			}

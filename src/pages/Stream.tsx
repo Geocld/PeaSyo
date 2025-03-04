@@ -238,7 +238,6 @@ function StreamScreen({navigation, route}) {
       gamepad_maping,
       useSurface,
       touchpad_type,
-      keyboard = false,
     } = _settings;
     if (_resolution === 360) {
       width = 640;
@@ -424,6 +423,7 @@ function StreamScreen({navigation, route}) {
             packetLoss: 0,
             decodeTime: 0,
             fps: 0,
+            frameLost: 0,
           };
 
           const rtts = performances.current.map(p => p.rtt);
@@ -440,6 +440,10 @@ function StreamScreen({navigation, route}) {
             performances.current.reduce((sum, p) => sum + p.decodeTime, 0) /
             performances.current.length;
 
+          const avgFrameLost =
+            performances.current.reduce((sum, p) => sum + p.frameLost, 0) /
+            performances.current.length;
+
           const avgFps =
             performances.current.reduce((sum, p) => sum + p.fps, 0) /
             performances.current.length;
@@ -449,6 +453,7 @@ function StreamScreen({navigation, route}) {
           _avgPerformance.packetLoss = avgPackLoss;
           _avgPerformance.decodeTime = avgDecodeTime;
           _avgPerformance.fps = avgFps;
+          _avgPerformance.frameLost = avgFrameLost;
 
           setAvgPerformance(_avgPerformance);
           performances.current = [];
