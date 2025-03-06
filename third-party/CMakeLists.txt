@@ -79,7 +79,7 @@ if(NOT CHIAKI_USE_SYSTEM_CURL)
 		add_library(Libidn2::Libidn2 ALIAS PkgConfig::PkgLibIdn2)
 		set(Libidn2_FOUND ON)
 	endif()
-	# add_subdirectory(curl)
+	add_subdirectory(curl)
 	# Exported library is CURL::libcurl_static
 	
 endif()

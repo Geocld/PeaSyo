@@ -25,20 +25,26 @@ set(EXE_NAME curl)
 add_definitions("-DBUILDING_CURL")
 
 if(ENABLE_CURL_MANUAL AND HAVE_MANUAL_TOOLS)
-  add_definitions("-DUSE_MANUAL")
+  # add_definitions("-DUSE_MANUAL")
+  # add_custom_command(
+  #   OUTPUT "tool_hugehelp.c"
+  #   COMMAND ${CMAKE_COMMAND} -E echo "#include \"tool_setup.h\"" > "tool_hugehelp.c"
+  #   COMMAND ${CMAKE_COMMAND} -E echo "#ifndef HAVE_LIBZ" >> "tool_hugehelp.c"
+  #   COMMAND "${PERL_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/mkhelp.pl"    < "${CURL_ASCIIPAGE}" >> "tool_hugehelp.c"
+  #   COMMAND ${CMAKE_COMMAND} -E echo "#else" >> "tool_hugehelp.c"
+  #   COMMAND "${PERL_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/mkhelp.pl" -c < "${CURL_ASCIIPAGE}" >> "tool_hugehelp.c"
+  #   COMMAND ${CMAKE_COMMAND} -E echo "#endif /* HAVE_LIBZ */" >> "tool_hugehelp.c"
+  #   DEPENDS
+  #     generate-curl.1
+  #     "${CMAKE_CURRENT_SOURCE_DIR}/mkhelp.pl"
+  #     "${CMAKE_CURRENT_SOURCE_DIR}/tool_hugehelp.h"
+  #     "${CURL_ASCIIPAGE}"
+  #   VERBATIM)
   add_custom_command(
     OUTPUT "tool_hugehelp.c"
-    COMMAND ${CMAKE_COMMAND} -E echo "#include \"tool_setup.h\"" > "tool_hugehelp.c"
-    COMMAND ${CMAKE_COMMAND} -E echo "#ifndef HAVE_LIBZ" >> "tool_hugehelp.c"
-    COMMAND "${PERL_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/mkhelp.pl"    < "${CURL_ASCIIPAGE}" >> "tool_hugehelp.c"
-    COMMAND ${CMAKE_COMMAND} -E echo "#else" >> "tool_hugehelp.c"
-    COMMAND "${PERL_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/mkhelp.pl" -c < "${CURL_ASCIIPAGE}" >> "tool_hugehelp.c"
-    COMMAND ${CMAKE_COMMAND} -E echo "#endif /* HAVE_LIBZ */" >> "tool_hugehelp.c"
+    COMMAND ${CMAKE_COMMAND} -E echo "#include \"tool_hugehelp.h\"" > "tool_hugehelp.c"
     DEPENDS
-      generate-curl.1
-      "${CMAKE_CURRENT_SOURCE_DIR}/mkhelp.pl"
       "${CMAKE_CURRENT_SOURCE_DIR}/tool_hugehelp.h"
-      "${CURL_ASCIIPAGE}"
     VERBATIM)
 else()
   add_custom_command(
