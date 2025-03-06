@@ -102,6 +102,8 @@ target_include_directories(chiaki-lib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/includ
 find_package(Threads REQUIRED)
 target_link_libraries(chiaki-lib Threads::Threads)
 
+target_link_libraries(chiaki-lib CURL::libcurl_static)
+
 target_link_libraries(chiaki-lib OpenSSL_Crypto)
 
 target_link_libraries(chiaki-lib Nanopb::nanopb)
