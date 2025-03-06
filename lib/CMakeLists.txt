@@ -104,6 +104,9 @@ target_link_libraries(chiaki-lib Threads::Threads)
 
 target_link_libraries(chiaki-lib CURL::libcurl_static)
 
+# TODO: JSON-C
+# target_link_libraries(chiaki-lib json-c)
+
 target_link_libraries(chiaki-lib OpenSSL_Crypto)
 
 target_link_libraries(chiaki-lib Nanopb::nanopb)

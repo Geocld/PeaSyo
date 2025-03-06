@@ -25,7 +25,6 @@
 
 #include "utils.h"
 
-
 #define SESSION_PORT					9295
 
 #define SESSION_EXPECT_TIMEOUT_MS		5000

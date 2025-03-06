@@ -83,3 +83,6 @@ if(NOT CHIAKI_USE_SYSTEM_CURL)
 	# Exported library is CURL::libcurl_static
 	
 endif()
+
+# TODO: JSON-C
+add_subdirectory(json-c)
