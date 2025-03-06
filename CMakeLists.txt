@@ -61,6 +61,18 @@ if(CHIAKI_USE_SYSTEM_JERASURE)
 	endif()
 endif()
 
+include(OpenSSLExternalProject)
+
+if(CHIAKI_USE_SYSTEM_CURL)
+	if (CHIAKI_USE_SYSTEM_CURL STREQUAL AUTO)
+		find_package(CURL COMPONENTS HTTP HTTPS WS WSS QUIET)
+		set(CHIAKI_USE_SYSTEM_CURL ${CURL_FOUND})
+	else()
+		find_package(CURL REQUIRED COMPONENTS HTTP HTTPS WS WSS)
+		set(CHIAKI_USE_SYSTEM_CURL ON)
+	endif()
+endif()
+
 find_package(PythonInterp 3 REQUIRED) # Make sure nanopb doesn't find Python 2.7 because Python 2 should just die.
 
 if(CHIAKI_USE_SYSTEM_NANOPB)
@@ -76,8 +88,6 @@ endif()
 add_subdirectory(third-party)
 
 add_definitions(-DCHIAKI_VERSION_MAJOR=${CHIAKI_VERSION_MAJOR} -DCHIAKI_VERSION_MINOR=${CHIAKI_VERSION_MINOR} -DCHIAKI_VERSION_PATCH=${CHIAKI_VERSION_PATCH} -DCHIAKI_VERSION=\"${CHIAKI_VERSION}\")
-
-include(OpenSSLExternalProject)
 
 
 # 这里声明入口文件lib
