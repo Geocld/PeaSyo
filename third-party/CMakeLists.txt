@@ -65,6 +65,7 @@ if(NOT CHIAKI_USE_SYSTEM_CURL)
 	set(CURL_DISABLE_INSTALL ON)
 	set(HTTP_ONLY ON)
 	set(ENABLE_WEBSOCKETS ON)
+	set(CURL_USE_OPENSSL OFF)
 
 	find_package(PkgConfig QUIET)
 	if (PKG_CONFIG_FOUND)
@@ -78,7 +79,7 @@ if(NOT CHIAKI_USE_SYSTEM_CURL)
 		add_library(Libidn2::Libidn2 ALIAS PkgConfig::PkgLibIdn2)
 		set(Libidn2_FOUND ON)
 	endif()
-	add_subdirectory(curl)
+	# add_subdirectory(curl)
 	# Exported library is CURL::libcurl_static
 	
 endif()

@@ -1869,26 +1869,12 @@ else()
   set(CURL_BUILD_TESTING OFF)
 endif()
 
-if(HAVE_MANUAL_TOOLS)
-  set(CURL_MANPAGE "${PROJECT_BINARY_DIR}/docs/cmdline-opts/curl.1")
-  set(CURL_ASCIIPAGE "${PROJECT_BINARY_DIR}/docs/cmdline-opts/curl.txt")
-  add_subdirectory(docs)
-endif()
-
 add_subdirectory(lib)
 
 if(BUILD_CURL_EXE)
   add_subdirectory(src)
 endif()
 
-option(BUILD_EXAMPLES "Build libcurl examples" ON)
-if(BUILD_EXAMPLES)
-  add_subdirectory(docs/examples)
-endif()
-
-if(CURL_BUILD_TESTING)
-  add_subdirectory(tests)
-endif()
 
 # Helper to populate a list (_items) with a label when conditions
 # (the remaining args) are satisfied
