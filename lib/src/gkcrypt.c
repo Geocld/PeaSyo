@@ -188,7 +188,10 @@ CHIAKI_EXPORT void chiaki_gkcrypt_gen_gmac_key(uint64_t index, const uint8_t *ke
 	// last param
 	// is224 Determines which function to use.
 	// This must be either 0 for SHA-256, or 1 for SHA-224.
-	mbedtls_sha256_ret(data, sizeof(data), md, 0);
+	
+	//https://github.com/Mbed-TLS/mbedtls/blob/0cc68601e6f602ae909fd701217a885396cdcee9/docs/3.0-migration-guide.md?plain=1#L346
+	// mbedtls_sha256_ret -> mbedtls_sha256
+	mbedtls_sha256(data, sizeof(data), md, 0);
 #else
 	SHA256(data, 0x20, md);
 #endif
@@ -244,7 +247,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_gkcrypt_gen_key_stream(ChiakiGKCrypt *gkcry
 		return CHIAKI_ERR_UNKNOWN;
 	}
 #endif
-	int counter_offset = (int)(key_pos / CHIAKI_GKCRYPT_BLOCK_SIZE);
+	uint64_t counter_offset = (key_pos / CHIAKI_GKCRYPT_BLOCK_SIZE);
 
 	for(uint8_t *cur = buf, *end = buf + buf_size; cur < end; cur += CHIAKI_GKCRYPT_BLOCK_SIZE)
 		counter_add(cur, gkcrypt->iv, counter_offset++);
@@ -384,7 +387,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_gkcrypt_gmac(ChiakiGKCrypt *gkcrypt, uint64
 	}
 
 	// encrypt without additional data
-	if(mbedtls_gcm_starts(&actx, MBEDTLS_GCM_ENCRYPT, iv, CHIAKI_GKCRYPT_BLOCK_SIZE, NULL, 0) != 0)
+	if(mbedtls_gcm_starts(&actx, MBEDTLS_GCM_ENCRYPT, iv, CHIAKI_GKCRYPT_BLOCK_SIZE) != 0)
 	{
 		mbedtls_gcm_free(&actx);
 		return CHIAKI_ERR_UNKNOWN;
@@ -509,6 +512,7 @@ static void *gkcrypt_thread_func(void *user)
 		if(gkcrypt->key_buf_thread_stop || err != CHIAKI_ERR_SUCCESS)
 			break;
 
+		/*
 		CHIAKI_LOGV(gkcrypt->log, "GKCrypt %d key buf size %#llx, start offset: %#llx, populated: %#llx, min key pos: %#llx, last key pos: %#llx, generating next chunk",
 					(int)gkcrypt->index,
 					(unsigned long long)gkcrypt->key_buf_size,
@@ -516,6 +520,7 @@ static void *gkcrypt_thread_func(void *user)
 					(unsigned long long)gkcrypt->key_buf_populated,
 					(unsigned long long)gkcrypt->key_buf_key_pos_min,
 					(unsigned long long)gkcrypt->last_key_pos);
+		*/
 
 		if(gkcrypt->last_key_pos > gkcrypt->key_buf_key_pos_min + gkcrypt->key_buf_populated)
 		{

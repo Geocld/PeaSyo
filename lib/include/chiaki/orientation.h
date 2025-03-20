@@ -17,36 +17,36 @@ extern "C" {
  */
 typedef struct chiaki_orientation_t
 {
-    float x, y, z, w;
+	float x, y, z, w;
 } ChiakiOrientation;
 
 typedef struct chiaki_accel_new_zero
 {
-    float accel_x, accel_y, accel_z;
+	float accel_x, accel_y, accel_z;
 } ChiakiAccelNewZero;
 
 CHIAKI_EXPORT void chiaki_orientation_init(ChiakiOrientation *orient);
 CHIAKI_EXPORT void chiaki_orientation_update(ChiakiOrientation *orient,
-                                             float gx, float gy, float gz, float ax, float ay, float az, float beta, float time_step_sec);
+		float gx, float gy, float gz, float ax, float ay, float az, float beta, float time_step_sec);
 
 /**
  * Extension of ChiakiOrientation, also tracking an absolute timestamp and the current gyro/accel state
  */
 typedef struct chiaki_orientation_tracker_t
 {
-    float gyro_x, gyro_y, gyro_z;
-    float accel_x, accel_y, accel_z;
-    ChiakiOrientation orient;
-    uint32_t timestamp;
-    uint64_t sample_index;
+	float gyro_x, gyro_y, gyro_z;
+	float accel_x, accel_y, accel_z;
+	ChiakiOrientation orient;
+	uint32_t timestamp;
+	uint64_t sample_index;
 } ChiakiOrientationTracker;
 
 CHIAKI_EXPORT void chiaki_orientation_tracker_init(ChiakiOrientationTracker *tracker);
 CHIAKI_EXPORT void chiaki_orientation_tracker_update(ChiakiOrientationTracker *tracker,
-                                                     float gx, float gy, float gz, float ax, float ay, float az,
-                                                     ChiakiAccelNewZero *accel_zero, bool accel_zero_applied, uint32_t timestamp_us);
+		float gx, float gy, float gz, float ax, float ay, float az,
+		ChiakiAccelNewZero *accel_zero, bool accel_zero_applied, uint32_t timestamp_us);
 CHIAKI_EXPORT void chiaki_orientation_tracker_apply_to_controller_state(ChiakiOrientationTracker *tracker,
-                                                                        ChiakiControllerState *state);
+		ChiakiControllerState *state);
 CHIAKI_EXPORT void chiaki_accel_new_zero_set_inactive(ChiakiAccelNewZero *accel_zero, bool real_accel);
 CHIAKI_EXPORT void chiaki_accel_new_zero_set_active(ChiakiAccelNewZero *accel_zero, float accel_x, float accel_y, float accel_z, bool real_accel);
 

@@ -27,7 +27,7 @@ extern "C" {
 typedef enum chiaki_takion_message_data_type_t {
 	CHIAKI_TAKION_MESSAGE_DATA_TYPE_PROTOBUF = 0,
 	CHIAKI_TAKION_MESSAGE_DATA_TYPE_RUMBLE = 7,
-	CHIAKI_TAKION_MESSAGE_DATA_TYPE_9 = 9,
+	CHIAKI_TAKION_MESSAGE_DATA_TYPE_PAD_INFO = 9,
 	CHIAKI_TAKION_MESSAGE_DATA_TYPE_TRIGGER_EFFECTS = 11,
 } ChiakiTakionMessageDataType;
 
@@ -108,6 +108,7 @@ typedef struct chiaki_takion_connect_info_t
 	bool enable_crypt;
 	bool enable_dualsense;
 	uint8_t protocol_version;
+	bool close_socket; // close socket when finishing takion
 } ChiakiTakionConnectInfo;
 
 
@@ -151,6 +152,7 @@ typedef struct chiaki_takion_t
 	ChiakiStopPipe stop_pipe;
 	uint32_t tag_local;
 	uint32_t tag_remote;
+	bool close_socket;
 
 	ChiakiSeqNum32 seq_num_local;
 	ChiakiMutex seq_num_local_mutex;
@@ -168,7 +170,7 @@ typedef struct chiaki_takion_t
 } ChiakiTakion;
 
 
-CHIAKI_EXPORT ChiakiErrorCode chiaki_takion_connect(ChiakiTakion *takion, ChiakiTakionConnectInfo *info);
+CHIAKI_EXPORT ChiakiErrorCode chiaki_takion_connect(ChiakiTakion *takion, ChiakiTakionConnectInfo *info, chiaki_socket_t *sock);
 CHIAKI_EXPORT void chiaki_takion_close(ChiakiTakion *takion);
 
 /**
@@ -214,6 +216,13 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_takion_send_message_data(ChiakiTakion *taki
 
 /**
  * Thread-safe while Takion is running.
+ *
+ * @param optional pointer to write the sequence number of the sent packet to
+ */
+CHIAKI_EXPORT ChiakiErrorCode chiaki_takion_send_message_data_cont(ChiakiTakion *takion, uint8_t chunk_flags, uint16_t channel, uint8_t *buf, size_t buf_size, ChiakiSeqNum32 *seq_num);
+
+/**
+ * Thread-safe while Takion is running.
  */
 CHIAKI_EXPORT ChiakiErrorCode chiaki_takion_send_congestion(ChiakiTakion *takion, ChiakiTakionCongestionPacket *packet);
 
@@ -222,6 +231,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_takion_send_congestion(ChiakiTakion *takion
  */
 CHIAKI_EXPORT ChiakiErrorCode chiaki_takion_send_feedback_state(ChiakiTakion *takion, ChiakiSeqNum16 seq_num, ChiakiFeedbackState *feedback_state);
 
+CHIAKI_EXPORT ChiakiErrorCode chiaki_takion_send_mic_packet(ChiakiTakion *takion, uint8_t *audio_packet, size_t packet_size, bool ps5);
 /**
  * Thread-safe while Takion is running.
  */

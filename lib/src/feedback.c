@@ -81,10 +81,6 @@ CHIAKI_EXPORT void chiaki_feedback_state_format_v12(uint8_t *buf, ChiakiFeedback
 	chiaki_feedback_state_format_v9(buf, state);
 	buf[0x19] = 0x0;
 	buf[0x1a] = 0x0;
-
-	// 1 is classic DualShock, 0 is DualSense, but using 0 requires setting [0x19] and [0x1a] to
-	// values taken from raw HID, which is generally not available. But setting 1 for both seems
-	// to always work fine.
 	buf[0x1b] = 0x1;
 }
 

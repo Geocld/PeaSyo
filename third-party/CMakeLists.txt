@@ -86,3 +86,11 @@ endif()
 
 # JSON-C
 add_subdirectory(json-c)
+
+if(NOT CHIAKI_USE_SYSTEM_MINIUPNPC)
+    set(UPNPC_BUILD_STATIC ON CACHE BOOL "Build static library" FORCE)
+    set(UPNPC_BUILD_SHARED OFF CACHE BOOL "Build shared library" FORCE)
+    set(UPNPC_BUILD_TESTS OFF CACHE BOOL "Build test executables" FORCE)
+    add_subdirectory(miniupnpc)
+    add_library(Miniupnpc::miniupnpc ALIAS libminiupnpc-static)
+endif()

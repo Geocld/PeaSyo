@@ -114,7 +114,7 @@ target_link_libraries(chiaki-lib CURL::libcurl_static)
 target_link_libraries(chiaki-lib json-c)
 
 # miniupnpc
-# target_link_libraries(chiaki-lib Miniupnpc::miniupnpc)
+target_link_libraries(chiaki-lib Miniupnpc::miniupnpc)
 target_include_directories(chiaki-lib PRIVATE ${CMAKE_SOURCE_DIR}/third-party/miniupnpc)
 
 target_link_libraries(chiaki-lib OpenSSL_Crypto)

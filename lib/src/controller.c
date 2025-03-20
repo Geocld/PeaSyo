@@ -121,19 +121,6 @@ CHIAKI_EXPORT void chiaki_controller_state_or(ChiakiControllerState *out, Chiaki
 	out->right_x = MAX_ABS(a->right_x, b->right_x);
 	out->right_y = MAX_ABS(a->right_y, b->right_y);
 
-	#define ORF(n, idle_val) if(a->n == idle_val) out->n = b->n; else out->n = a->n
-	ORF(accel_x, 0.0f);
-	ORF(accel_y, 1.0f);
-	ORF(accel_z, 0.0f);
-	ORF(gyro_x, 0.0f);
-	ORF(gyro_y, 0.0f);
-	ORF(gyro_z, 0.0f);
-	ORF(orient_x, 0.0f);
-	ORF(orient_y, 0.0f);
-	ORF(orient_z, 0.0f);
-	ORF(orient_w, 1.0f);
-	#undef ORF
-
 	out->touch_id_next = 0;
 	for(size_t i = 0; i < CHIAKI_CONTROLLER_TOUCHES_MAX; i++)
 	{
@@ -147,4 +134,32 @@ CHIAKI_EXPORT void chiaki_controller_state_or(ChiakiControllerState *out, Chiaki
 		if(touch != &out->touches[i])
 			out->touches[i] = *touch;
 	}
+	// If first value has gyro set take it, otherwise give 2nd value
+	// prioritizes DualSense over Steam Deck for instance if it's attached 
+	// since setsu and controller_state are before steamdeck
+	// don't mix gryo / accel values from different controllers with simple or
+	// doing so will cause problems w/ orientation values among other things
+	// since orient is calculated from accel and gyro, just check those.
+	bool chooser = false;
+#define SETCHOOSER(n, default) if(a->n < (default - 0.0000001f) ||  a->n > (default + 0.0000001f)) chooser = true;
+	SETCHOOSER(gyro_x, 0.0f);
+	SETCHOOSER(gyro_y, 0.0f);
+	SETCHOOSER(gyro_z, 0.0f);
+	SETCHOOSER(accel_x, 0.0f);
+	SETCHOOSER(accel_y, 1.0f);
+	SETCHOOSER(accel_z, 0.0f);
+#undef SETCHOOSER
+	 
+#define CHOOSEF(n, chooser) if(chooser == true) out->n = a->n; else out->n = b->n;
+	CHOOSEF(gyro_x, chooser);
+	CHOOSEF(gyro_y, chooser);
+	CHOOSEF(gyro_z, chooser);
+	CHOOSEF(accel_x, chooser);
+	CHOOSEF(accel_y, chooser);
+	CHOOSEF(accel_z, chooser);
+	CHOOSEF(orient_x, chooser);
+	CHOOSEF(orient_y, chooser);
+	CHOOSEF(orient_z, chooser);
+	CHOOSEF(orient_w, chooser);
+#undef CHOOSEF
 }

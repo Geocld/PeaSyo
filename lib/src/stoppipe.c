@@ -151,7 +151,11 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_stop_pipe_select_single(ChiakiStopPipe *sto
 	do
 	{
 		r = select(nfds, &rfds, write ? &wfds : NULL, NULL, timeout);
+#ifdef _WIN32
+	} while(r < 0 && WSAGetLastError() == WSAEINTR)
+#else
 	} while(r < 0 && errno == EINTR);
+#endif
 
 	if(r < 0)
 		return CHIAKI_ERR_UNKNOWN;
@@ -203,13 +207,16 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_stop_pipe_connect(ChiakiStopPipe *stop_pipe
 		return CHIAKI_ERR_UNKNOWN;
 
 #ifdef _WIN32
-	DWORD sockerr;
+	int sockerr;
+	socklen_t sockerr_sz = sizeof(sockerr);
+	if(getsockopt(fd, SOL_SOCKET, SO_ERROR, (char*)(&sockerr), &sockerr_sz) < 0)
+		return CHIAKI_ERR_UNKNOWN;
 #else
 	int sockerr;
-#endif
 	socklen_t sockerr_sz = sizeof(sockerr);
 	if(getsockopt(fd, SOL_SOCKET, SO_ERROR, &sockerr, &sockerr_sz) < 0)
 		return CHIAKI_ERR_UNKNOWN;
+#endif
 
 #ifdef _WIN32
 	switch(sockerr)

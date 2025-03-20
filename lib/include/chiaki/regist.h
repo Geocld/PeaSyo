@@ -8,13 +8,15 @@
 #include "thread.h"
 #include "stoppipe.h"
 #include "rpcrypt.h"
-#include "session.h"
+#include "remote/holepunch.h"
+#include "remote/rudp.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define CHIAKI_PSN_ACCOUNT_ID_SIZE 8
+#define CHIAKI_SESSION_AUTH_SIZE 0x10
 
 typedef struct chiaki_regist_info_t
 {
@@ -33,6 +35,15 @@ typedef struct chiaki_regist_info_t
 	uint8_t psn_account_id[CHIAKI_PSN_ACCOUNT_ID_SIZE];
 
 	uint32_t pin;
+	uint32_t console_pin;
+	/**
+	 * may be null, in which regular regist (instead of PSN Regist will be used)
+	 */
+	ChiakiHolepunchRegistInfo* holepunch_info;
+	/**
+	 * NULL unless using PSN Regist
+	 */
+	ChiakiRudp rudp;
 } ChiakiRegistInfo;
 
 typedef struct chiaki_registered_host_t
@@ -47,6 +58,7 @@ typedef struct chiaki_registered_host_t
 	char rp_regist_key[CHIAKI_SESSION_AUTH_SIZE]; // must be completely filled (pad with \0)
 	uint32_t rp_key_type;
 	uint8_t rp_key[0x10];
+	uint32_t console_pin;
 } ChiakiRegisteredHost;
 
 typedef enum chiaki_regist_event_type_t {
@@ -81,7 +93,7 @@ CHIAKI_EXPORT void chiaki_regist_stop(ChiakiRegist *regist);
 /**
  * @param psn_account_id must be exactly of size CHIAKI_PSN_ACCOUNT_ID_SIZE
  */
-CHIAKI_EXPORT ChiakiErrorCode chiaki_regist_request_payload_format(ChiakiTarget target, const uint8_t *ambassador, uint8_t *buf, size_t *buf_size, ChiakiRPCrypt *crypt, const char *psn_online_id, const uint8_t *psn_account_id, uint32_t pin);
+CHIAKI_EXPORT ChiakiErrorCode chiaki_regist_request_payload_format(ChiakiTarget target, const uint8_t *ambassador, uint8_t *buf, size_t *buf_size, ChiakiRPCrypt *crypt, const char *psn_online_id, const uint8_t *psn_account_id, uint32_t pin, ChiakiHolepunchRegistInfo *holepunch_info);
 
 #ifdef __cplusplus
 }
