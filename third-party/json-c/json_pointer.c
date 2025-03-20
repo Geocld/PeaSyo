@@ -158,7 +158,7 @@ static int json_pointer_result_get_recursive(struct json_object *obj, char *path
                                              struct json_pointer_get_result *res)
 {
 	struct json_object *parent_obj = obj;
-	size_t idx = 0;
+	size_t idx;
 	char *endp;
 	int rc;
 
@@ -231,7 +231,7 @@ int json_pointer_get_internal(struct json_object *obj, const char *path,
 		res->parent = NULL;
 		res->obj = obj;
 		res->key_in_parent = NULL;
-		res->index_in_parent = UINT32_MAX;
+		res->index_in_parent = -1;
 		return 0;
 	}
 

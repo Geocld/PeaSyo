@@ -297,7 +297,6 @@ struct incremental_step
     {"d", -1, -1, json_tokener_continue, 0, 0},
     {"1", -1, -1, json_tokener_continue, 0, 0},
     {"e\"", -1, -1, json_tokener_success, 1, 0},
-
     /* parse two char at every time */
     {"\"\\u", -1, -1, json_tokener_continue, 0, 0},
     {"d8", -1, -1, json_tokener_continue, 0, 0},
@@ -322,11 +321,6 @@ struct incremental_step
 	 */
     {"\"fff \\ud83d\\ude", -1, -1, json_tokener_continue, 0, 0},
     {"00 bar\"", -1, -1, json_tokener_success, 1, 0},
-
-    /* Check a utf-8 char (a+umlaut) that has bytes that look negative when
-       char are signed (see also control char check below) */
-    {"\"\xc3\xa4\"", -1, -1, json_tokener_success, 1, 0},
-    {"\"\xc3\xa4\"", -1, -1, json_tokener_success, 1, JSON_TOKENER_STRICT},
 
     /* Check that json_tokener_reset actually resets */
     {"{ \"foo", -1, -1, json_tokener_continue, 1, 0},
@@ -400,8 +394,8 @@ struct incremental_step
 
     {"Infinity", 9, 8, json_tokener_success, 1, 0},
     {"infinity", 9, 8, json_tokener_success, 1, 0},
-    {"infinity", 9, 0, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
     {"-infinity", 10, 9, json_tokener_success, 1, 0},
+    {"infinity", 9, 0, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
     {"-infinity", 10, 1, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
 
     {"inf", 3, 3, json_tokener_continue, 0, 0},
@@ -468,15 +462,12 @@ struct incremental_step
 	{"[18446744073709551616]", 23, 21, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT}, 
 
 	/* XXX this seems like a bug, should fail with _error_parse_number instead */
-	{"18446744073709551616", 21, 20, json_tokener_success, 1, 0},
 	{"18446744073709551616", 21, 20, json_tokener_error_parse_eof, 1, JSON_TOKENER_STRICT}, 
 
 	/* Exceeding integer limits as double parse OK */
 	{"[9223372036854775808.0]", 24, 23, json_tokener_success, 1, 0},
-	{"[-9223372036854775809.0]", 25, 24, json_tokener_success, 1, 0},
 	{"[-9223372036854775809.0]", 25, 24, json_tokener_success, 1, JSON_TOKENER_STRICT},
 	{"[18446744073709551615.0]", 25, 24, json_tokener_success, 1, 0}, 
-	{"[18446744073709551616.0]", 25, 24, json_tokener_success, 1, 0},
 	{"[18446744073709551616.0]", 25, 24, json_tokener_success, 1, JSON_TOKENER_STRICT}, 
 
     /* offset=1 because "n" is the start of "null".  hmm... */
@@ -533,7 +524,6 @@ struct incremental_step
     {"\"\\a\"", -1, 2, json_tokener_error_parse_string, 1, 0},
 
     /* Check '\'' in strict model */
-    {"\'foo\'", -1, 5, json_tokener_success, 1, 0},
     {"\'foo\'", -1, 0, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
 
     /* Parse array/object */
@@ -545,7 +535,7 @@ struct incremental_step
     {"{\"a\":}", -1, 5, json_tokener_error_parse_unexpected, 1, 0},
     {"{\"a\":1,\"a\":2}", -1, -1, json_tokener_success, 1, 0},
     {"\"a\":1}", -1, 3, json_tokener_success, 1, 0},
-    {"{\"a\":1", -1, -1, json_tokener_continue, 1, 0}, //}
+    {"{\"a\":1", -1, -1, json_tokener_continue, 1, 0},
     {"[,]", -1, 1, json_tokener_error_parse_unexpected, 1, 0},
     {"[,1]", -1, 1, json_tokener_error_parse_unexpected, 1, 0},
 
@@ -554,10 +544,9 @@ struct incremental_step
 	 * in what we accept (up to a point).
 	 */
     {"[1,2,3,]", -1, -1, json_tokener_success, 0, 0},
-    {"[1,2,3,]", -1, 7, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
     {"[1,2,,3,]", -1, 5, json_tokener_error_parse_unexpected, 0, 0},
-    {"[1,2,,3,]", -1, 5, json_tokener_error_parse_unexpected, 0, JSON_TOKENER_STRICT},
 
+    {"[1,2,3,]", -1, 7, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
     {"{\"a\":1,}", -1, 7, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
 
     // utf-8 test
@@ -606,44 +595,6 @@ struct incremental_step
     {"\x7b\x22\x31\x81\x22\x3a\x31\x7d", -1, 3, json_tokener_error_parse_utf8_string, 1,
      JSON_TOKENER_VALIDATE_UTF8},
 
-    // Note, current asciiz APIs can't parse \x00, skip it
-    { "\"0\x01\x02\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f" \
-      "\x10\x11\x12\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\"",
-      -1, -1, json_tokener_success, 1, 0 },
-
-    // Test control chars again, this time in strict mode, which should fail
-    { "\"\x01\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x02\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x03\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x04\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x05\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x06\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x07\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x08\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x09\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x0a\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x0b\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x0c\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x0d\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x0e\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x0f\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x10\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x11\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x12\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x13\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x14\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x15\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x16\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x17\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x18\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x19\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x1a\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x1b\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x1c\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x1d\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x1e\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-    { "\"\x1f\"", -1, 1, json_tokener_error_parse_string, 1, JSON_TOKENER_STRICT },
-
     {NULL, -1, -1, json_tokener_success, 0, 0},
 };
 
@@ -667,7 +618,7 @@ static void test_incremental_parse(void)
 	printf("json_tokener_parse(%s) ... ", string_to_parse);
 	new_obj = json_tokener_parse(string_to_parse);
 	if (new_obj == NULL)
-		printf("%s", "got error as expected\n");
+		puts("got error as expected");
 
 	/* test incremental parsing in various forms */
 	tok = json_tokener_new();

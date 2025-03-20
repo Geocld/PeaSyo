@@ -154,9 +154,6 @@ struct json_tokener *json_tokener_new_ex(int depth)
 {
 	struct json_tokener *tok;
 
-	if (depth < 1)
-		return NULL;
-
 	tok = (struct json_tokener *)calloc(1, sizeof(struct json_tokener));
 	if (!tok)
 		return NULL;
@@ -185,8 +182,6 @@ struct json_tokener *json_tokener_new(void)
 
 void json_tokener_free(struct json_tokener *tok)
 {
-	if (!tok)
-		return;
 	json_tokener_reset(tok);
 	if (tok->pb)
 		printbuf_free(tok->pb);
@@ -231,10 +226,7 @@ struct json_object *json_tokener_parse_verbose(const char *str, enum json_tokene
 
 	tok = json_tokener_new();
 	if (!tok)
-	{
-		*error = json_tokener_error_memory;
 		return NULL;
-	}
 	obj = json_tokener_parse_ex(tok, str, -1);
 	*error = tok->err;
 	if (tok->err != json_tokener_success
@@ -345,31 +337,17 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 
 #ifdef HAVE_USELOCALE
 	{
-#ifdef HAVE_DUPLOCALE
 		locale_t duploc = duplocale(oldlocale);
-		if (duploc == NULL && errno == ENOMEM)
-		{
-			tok->err = json_tokener_error_memory;
-			return NULL;
-		}
 		newloc = newlocale(LC_NUMERIC_MASK, "C", duploc);
-#else
-		newloc = newlocale(LC_NUMERIC_MASK, "C", oldlocale);
-#endif
 		if (newloc == NULL)
 		{
-			tok->err = json_tokener_error_memory;
-#ifdef HAVE_DUPLOCALE
 			freelocale(duploc);
-#endif
 			return NULL;
 		}
 #ifdef NEWLOCALE_NEEDS_FREELOCALE
-#ifdef HAVE_DUPLOCALE
 		// Older versions of FreeBSD (<12.4) don't free the locale
 		// passed to newlocale(), so do it here
 		freelocale(duploc);
-#endif
 #endif
 		uselocale(newloc);
 	}
@@ -381,10 +359,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 		{
 			oldlocale = strdup(tmplocale);
 			if (oldlocale == NULL)
-			{
-				tok->err = json_tokener_error_memory;
 				return NULL;
-			}
 		}
 		setlocale(LC_NUMERIC, "C");
 	}
@@ -690,12 +665,6 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 					saved_state = json_tokener_state_string;
 					state = json_tokener_state_string_escape;
 					break;
-				}
-				else if ((tok->flags & JSON_TOKENER_STRICT) && (unsigned char)c <= 0x1f)
-				{
-					// Disallow control characters in strict mode
-					tok->err = json_tokener_error_parse_string;
-					goto out;
 				}
 				if (!ADVANCE_CHAR(str, tok) || !PEEK_CHAR(c, tok))
 				{
@@ -1285,11 +1254,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 			goto redo_char;
 
 		case json_tokener_state_object_value_add:
-			if (json_object_object_add(current, obj_field_name, obj) != 0)
-			{
-				tok->err = json_tokener_error_memory;
-				goto out;
-			}
+			json_object_object_add(current, obj_field_name, obj);
 			free(obj_field_name);
 			obj_field_name = NULL;
 			saved_state = json_tokener_state_object_sep;

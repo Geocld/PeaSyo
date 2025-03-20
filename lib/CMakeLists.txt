@@ -35,7 +35,10 @@ set(HEADER_FILES
 		include/chiaki/regist.h
 		include/chiaki/opusdecoder.h
 		include/chiaki/orientation.h
-		include/chiaki/bitstream.h)
+		include/chiaki/bitstream.h
+		include/chiaki/remote/holepunch.h
+		include/chiaki/remote/rudp.h
+		include/chiaki/remote/rudpsendbuffer.h)
 
 set(SOURCE_FILES
 		src/common.c
@@ -73,7 +76,10 @@ set(SOURCE_FILES
 		src/regist.c
 		src/opusdecoder.c
 		src/orientation.c
-		src/bitstream.c)
+		src/bitstream.c
+		src/remote/holepunch.c
+		src/remote/rudp.c
+		src/remote/rudpsendbuffer.c)
 
 set(CHIAKI_LIB_ENABLE_PI_DECODER "${CHIAKI_ENABLE_PI_DECODER}")
 
@@ -104,8 +110,12 @@ target_link_libraries(chiaki-lib Threads::Threads)
 
 target_link_libraries(chiaki-lib CURL::libcurl_static)
 
-# TODO: JSON-C
-# target_link_libraries(chiaki-lib json-c)
+# JSON-C
+target_link_libraries(chiaki-lib json-c)
+
+# miniupnpc
+# target_link_libraries(chiaki-lib Miniupnpc::miniupnpc)
+target_include_directories(chiaki-lib PRIVATE ${CMAKE_SOURCE_DIR}/third-party/miniupnpc)
 
 target_link_libraries(chiaki-lib OpenSSL_Crypto)
 

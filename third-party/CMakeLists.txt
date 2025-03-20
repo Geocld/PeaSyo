@@ -84,5 +84,5 @@ if(NOT CHIAKI_USE_SYSTEM_CURL)
 	
 endif()
 
-# TODO: JSON-C
+# JSON-C
 add_subdirectory(json-c)

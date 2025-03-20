@@ -1,6 +1,6 @@
 \mainpage
 
-json-c
+`json-c`
 ========
 
 1. [Overview and Build Status](#overview)
@@ -12,12 +12,10 @@ json-c
 5. [Testing](#testing)
 6. [Building with `vcpkg`](#buildvcpkg)
 7. [Building for Android](#android)
-8. [Building for Commodore Amiga or MorphOS](#amiga)
-9. [Linking to libjson-c](#linking)
-10. [Using json-c](#using)
+7. [Linking to libjson-c](#linking)
+8. [Using json-c](#using)
 
-<a name="overview"></a>
-JSON-C - A JSON implementation in C
+JSON-C - A JSON implementation in C <a name="overview"></a>
 -----------------------------------
 
 JSON-C implements a reference counting object model that allows you to easily
@@ -31,8 +29,7 @@ if you already have json-c installed and ready to use.
 
 Home page for json-c: https://github.com/json-c/json-c/wiki
 
-<a name="gettinghelp"></a>
-Getting Help
+Getting Help <a name="gettinghelp"></a>
 ------------
 
 If you have questions about using json-c, please start a thread on
@@ -50,8 +47,7 @@ features or large changes of any kind, please first start a discussion
 on the [forums](https://groups.google.com/forum/#!forum/json-c).
 
 
-<a name="buildunix"></a>
-Building on Unix with `git`, `gcc` and `cmake`
+Building on Unix with `git`, `gcc` and `cmake` <a name="buildunix"></a>
 --------------------------------------------------
 
 If you already have json-c installed, see [Linking to `libjson-c`](#linking)
@@ -64,8 +60,7 @@ Build Status
 Test Status
 * [Coveralls](https://coveralls.io/github/json-c/json-c?branch=master) [![Coverage Status](https://coveralls.io/repos/github/json-c/json-c/badge.svg?branch=master)](https://coveralls.io/github/json-c/json-c?branch=master)
 
-<a name="installprereq"></a>
-### Prerequisites:
+### Prerequisites: <a name="installprereq"></a>
 
  - `gcc`, `clang`, or another C compiler
 
@@ -85,8 +80,7 @@ sudo apt install doxygen  # optional
 sudo apt install valgrind # optional
 ```
 
-<a name="buildcmds"></a>
-### Build instructions:
+### Build instructions:  <a name="buildcmds"></a>
 
 `json-c` GitHub repo: https://github.com/json-c/json-c
 
@@ -122,8 +116,7 @@ google-chrome doc/html/index.html
 ```
 
 
-<a name="CMake"></a>
-CMake Options
+CMake Options <a name="CMake"></a>
 --------------------
 
 The json-c library is built with [CMake](https://cmake.org/cmake-tutorial/),
@@ -195,8 +188,7 @@ cmake-configure can take a few options.
 | disable-werror |  Avoid treating compiler warnings as fatal errors |
 
 
-<a name="testing"></a>
-Testing:
+Testing:  <a name="testing"></a>
 ----------
 
 By default, if valgrind is available running tests uses it.
@@ -232,8 +224,7 @@ JSONC_TEST_TRACE=1 make test
 and check the log files again.
 
 
-<a name="buildvcpkg"></a>
-Building on Unix and Windows with `vcpkg`
+Building on Unix and Windows with `vcpkg` <a name="buildvcpkg"></a>
 --------------------------------------------------
 
 You can download and install JSON-C using the [vcpkg](https://github.com/Microsoft/vcpkg/) dependency manager:
@@ -246,8 +237,7 @@ You can download and install JSON-C using the [vcpkg](https://github.com/Microso
 
 The JSON-C port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
 
-<a name="android"></a>
-Building for Android
+Building for Android <a name="android">
 ----------------------
 
 Building on Android is now particularly well supported, but there
@@ -271,65 +261,7 @@ cmake \
 make install
 ```
 
-<a name="amiga"></a>
-Building for Commodore Amiga or MorphOS
-----------------------
-
-Building for Commodore Amiga is supported for both Motorola 68k (AmigaOS 3) and PowerPC (AmigaOS 4) architectures. MorphOS on compatible PowerPC hardware is also supported. You can set up a cross compiler locally, however it is much easier to use the already preconfigured Amiga development environment wtthin a Docker container.
-
-Install Docker on your machine if you don't already have it. You can download Docker Desktop for Windows/macOS/Linux [here](https://www.docker.com/products/docker-desktop/).
-
-### To build for Motorola 68k Amiga:
-
-```
-mkdir build
-docker run --rm \
-    -v ${PWD}:/work \
-    -e USER=$( id -u ) -e GROUP=$( id -g ) \
-    -it  sacredbanana/amiga-compiler:m68k-amigaos bash
-cd build
-cmake -DM68K_CRT=newlib ..
-make
-```
-
-libjson-c.a will get created in the build directory.
-
-You can change newlib to nix20, nix13, ixemul or clib2 if you would like to build the library suited for libnix or clib2 instead. Newlib is default.
-
-### To build for PowerPC Amiga:
-
-```
-mkdir build
-docker run --rm \
-    -v ${PWD}:/work \
-    -e USER=$( id -u ) -e GROUP=$( id -g ) \
-    -it  sacredbanana/amiga-compiler:ppc-amigaos bash
-cd build
-cmake ..
-make
-```
-
-libjson-c.a will get created in the build directory.
-
-### To build for PowerPC MorphOS:
-
-```
-mkdir build
-docker run --rm \
-    -v ${PWD}:/work \
-    -e USER=$( id -u ) -e GROUP=$( id -g ) \
-    -it  sacredbanana/amiga-compiler:ppc-morphos bash
-cd build
-cmake -DNOIXEMUL=1 ..
-make
-```
-
-If you are making an application that absolutely requires ixemul, then remove the `-DNOIXEMUL=1`.
-
-libjson-c.a will get created in the build directory.
-
-<a name="linking"></a>
-Linking to `libjson-c`
+Linking to `libjson-c` <a name="linking">
 ----------------------
 
 If your system has `pkgconfig`,
@@ -366,8 +298,7 @@ cd build
 cmake -DCMAKE_PREFIX_PATH=/path/to/json_c/install/lib64/cmake ..
 ```
 
-<a name="using"></a>
-Using json-c
+Using json-c <a name="using">
 ------------
 
 To use json-c you can either include json.h, or preferably, one of the

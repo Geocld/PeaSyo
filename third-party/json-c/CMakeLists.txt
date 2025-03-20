@@ -3,11 +3,24 @@
 #   and many OpenWRT packages require, much newer CMake packages.
 #  We're stopping before 3.10 because that version starts requiring
 #   c++11, which isn't available on e.g HPUX.
-cmake_minimum_required(VERSION 3.9...3.12)
+cmake_minimum_required(VERSION 3.9)
+
+# The project() command manages VERSION variables.
+cmake_policy(SET CMP0048 NEW)
 
 # JSON-C library is C only project.
 # PROJECT_VERSION{,_MAJOR,_MINOR,_PATCH} set by project():
-project(json-c LANGUAGES C VERSION 0.18.99)
+project(json-c LANGUAGES C VERSION 0.17)
+
+# Targets may not link directly to themselves.
+cmake_policy(SET CMP0038 NEW)
+
+# MACOSX_RPATH is enabled by default.
+# We set it explicitly to avoid the warning
+cmake_policy(SET CMP0042 NEW)
+
+# Only interpret if() arguments as variables or keywords when unquoted.
+cmake_policy(SET CMP0054 NEW)
 
 # set default build type if not specified by user
 if(NOT CMAKE_BUILD_TYPE)
@@ -15,6 +28,13 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE} -O2")
+
+# Include file check macros honor CMAKE_REQUIRED_LIBRARIES
+# i.e. the check_include_file() calls will include -lm when checking.
+# New in version 3.12.
+if(POLICY CMP0075)
+	cmake_policy(SET CMP0075 NEW)
+endif()
 
 include(CTest)
 
@@ -45,6 +65,10 @@ include(CMakePackageConfigHelpers)
 option(BUILD_SHARED_LIBS  "Default to building shared libraries" ON)
 option(BUILD_STATIC_LIBS  "Default to building static libraries" ON)
 
+if (BUILD_SHARED_LIBS)
+    add_definitions(-D JSON_C_DLL)
+endif()
+
 # Generate a release merge and test it to verify the correctness of republishing the package.
 ADD_CUSTOM_TARGET(distcheck
 COMMAND make package_source
@@ -69,57 +93,12 @@ option(DISABLE_JSON_PATCH             "Disable JSON patch (RFC6902) support."   
 option(NEWLOCALE_NEEDS_FREELOCALE     "Work around newlocale bugs in old FreeBSD by calling freelocale"  OFF)
 option(BUILD_APPS                     "Default to building apps" ON)
 
-if (AMIGA)
-    set(DISABLE_THREAD_LOCAL_STORAGE ON)
-    set(ENABLE_THREADING OFF)
-    set(BUILD_SHARED_LIBS OFF)
-    set(BUILD_APPS OFF)
-    set(DISABLE_STATIC_FPIC ON)
-    if ($ENV{CROSS_PFX} STREQUAL "m68k-amigaos")
-        set(AMIGA_M68K ON)
-        set(BUILD_TESTING OFF)
-        if (${M68K_CRT} STREQUAL "newlib")
-            set(NEWLIB ON)
-        elseif(${M68K_CRT} STREQUAL "clib2")
-            set(CLIB2 ON)
-        elseif(${M68K_CRT} STREQUAL "ixemul")
-            set(IXEMUL ON)
-        elseif(${M68K_CRT} STREQUAL "nix20")
-            set(NIX20 ON)
-        elseif(${M68K_CRT} STREQUAL "nix13")
-            set(NIX13 ON)
-        else()
-            set(NEWLIB ON)
-        endif()
-        message(STATUS "Building for Motorola 68k AmigaOS using CRT: ${M68K_CRT}")
-    elseif ($ENV{CROSS_PFX} STREQUAL "ppc-amigaos")
-        set(AMIGA_PPC ON)
-        message(STATUS "Building for PowerPC AmigaOS")
-    elseif($ENV{CROSS_PFX} STREQUAL "ppc-morphos")
-        set(MORPHOS ON)
-        if (NOIXEMUL)
-            message(STATUS "Building for PowerPC MorphOS without ixemul")
-            set(DISABLE_WERROR ON)
-            set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -noixemul")
-        else()
-            message(STATUS "Building for PowerPC MorphOS with ixemul")
-        endif()
-    else()
-        message(FATAL_ERROR "Unsupported AmigaOS target")
-    endif()
-else()
-    message(STATUS "Building for ${CMAKE_SYSTEM_NAME}")
-endif()
 
-if (UNIX OR MINGW OR CYGWIN OR AMIGA)
+if (UNIX OR MINGW OR CYGWIN)
     list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
 endif()
 
-if (BUILD_SHARED_LIBS)
-    add_definitions(-D JSON_C_DLL)
-endif()
-
-if (UNIX OR AMIGA)
+if (UNIX)
     list(APPEND CMAKE_REQUIRED_LIBRARIES   m)
 endif()
 
@@ -177,7 +156,7 @@ endif()
 check_symbol_exists(_isnan          "float.h" HAVE_DECL__ISNAN)
 check_symbol_exists(_finite         "float.h" HAVE_DECL__FINITE)
 
-if ((MSVC AND NOT (MSVC_VERSION LESS 1800)) OR MINGW OR CYGWIN OR UNIX OR AMIGA)
+if ((MSVC AND NOT (MSVC_VERSION LESS 1800)) OR MINGW OR CYGWIN OR UNIX)
     check_symbol_exists(INFINITY    "math.h" HAVE_DECL_INFINITY)
     check_symbol_exists(isinf       "math.h" HAVE_DECL_ISINF)
     check_symbol_exists(isnan       "math.h" HAVE_DECL_ISNAN)
@@ -185,23 +164,22 @@ if ((MSVC AND NOT (MSVC_VERSION LESS 1800)) OR MINGW OR CYGWIN OR UNIX OR AMIGA)
 endif()
 
 check_symbol_exists(_doprnt         "stdio.h" HAVE_DOPRNT)
-if (UNIX OR MINGW OR CYGWIN OR AMIGA)
+if (UNIX OR MINGW OR CYGWIN)
     check_symbol_exists(snprintf    "stdio.h" HAVE_SNPRINTF)
 endif()
 check_symbol_exists(vasprintf       "stdio.h" HAVE_VASPRINTF)
 check_symbol_exists(vsnprintf       "stdio.h" HAVE_VSNPRINTF)
 check_symbol_exists(vprintf         "stdio.h" HAVE_VPRINTF)
-if (NOT AMIGA_M68K)
-    check_symbol_exists(arc4random      "stdlib.h" HAVE_ARC4RANDOM)
-endif()
+
+check_symbol_exists(arc4random      "stdlib.h" HAVE_ARC4RANDOM)
 if (NOT HAVE_ARC4RANDOM AND DISABLE_EXTRA_LIBS STREQUAL "OFF")
     check_include_file(bsd/stdlib.h HAVE_BSD_STDLIB_H)
     if (HAVE_BSD_STDLIB_H)
-        list(APPEND CMAKE_REQUIRED_LIBRARIES "bsd")
-        unset(HAVE_ARC4RANDOM CACHE)
+		list(APPEND CMAKE_REQUIRED_LIBRARIES "bsd")
+		unset(HAVE_ARC4RANDOM CACHE)
         check_symbol_exists(arc4random   "bsd/stdlib.h" HAVE_ARC4RANDOM)
         if (NOT HAVE_ARC4RANDOM)
-            list(REMOVE_ITEM CMAKE_REQUIRED_LIBRARIES "bsd")
+			list(REMOVE_ITEM CMAKE_REQUIRED_LIBRARIES "bsd")
         endif()
     endif()
 endif()
@@ -215,18 +193,13 @@ endif()
 if (HAVE_LOCALE_H)
     check_symbol_exists(setlocale   "locale.h" HAVE_SETLOCALE)
     check_symbol_exists(uselocale   "locale.h" HAVE_USELOCALE)
-    if (NOT NIX20 AND NOT NIX13)
-        # libnix does not fully support this yet
-        check_symbol_exists(duplocale   "locale.h" HAVE_DUPLOCALE)
-    endif()
 endif()
 
 # uClibc *intentionally* crashes in duplocale(), at least as of:
 # https://github.com/ffainelli/uClibc/blob/266bdc1/libc/misc/locale/locale.c#L1322
-# So, if it looks like we're compiling for a system like that just disable
+# So, if it looks like we're compiling for a system like that just disable 
 # locale handling entirely.
-execute_process (COMMAND ${CMAKE_C_COMPILER} -dumpmachine ERROR_QUIET OUTPUT_VARIABLE CMAKE_GNU_C_MACHINE)
-
+exec_program(${CMAKE_C_COMPILER} ARGS -dumpmachine OUTPUT_VARIABLE CMAKE_GNU_C_MACHINE)
 if (CMAKE_GNU_C_MACHINE MATCHES "uclibc")
 	message(STATUS "Detected uClibc compiler, disabling locale handling")
 	set(HAVE_SETLOCALE 0)
@@ -322,31 +295,11 @@ message(STATUS "Wrote ${PROJECT_BINARY_DIR}/config.h")
 configure_file(${PROJECT_SOURCE_DIR}/cmake/json_config.h.in   ${PROJECT_BINARY_DIR}/json_config.h)
 message(STATUS "Wrote ${PROJECT_BINARY_DIR}/json_config.h")
 
-if (NOT DEFINED CMAKE_C_COMPILER_FRONTEND_VARIANT OR "${CMAKE_C_COMPILER_FRONTEND_VARIANT}" STREQUAL "")  # only available in cmake 3.14+
-	if ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
-		set(CMAKE_C_COMPILER_FRONTEND_VARIANT "MSVC")
-	elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
-		set(CMAKE_C_COMPILER_FRONTEND_VARIANT "GNU")
-	elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
-		# Detect clang-cl.exe, it is Clang but with MSVC compatible command line arguments
-		execute_process (COMMAND ${CMAKE_C_COMPILER} -? ERROR_QUIET OUTPUT_QUIET RESULT_VARIABLE _clang_result)
-		if (_clang_result EQUAL 0)
-			set(CMAKE_C_COMPILER_FRONTEND_VARIANT "MSVC")
-		else()
-			set(CMAKE_C_COMPILER_FRONTEND_VARIANT "GNU")
-			message(STATUS, "clang result is NOT 0")
-		endif()
-	endif()
-endif()
-
-if ("${CMAKE_C_COMPILER_FRONTEND_VARIANT}" STREQUAL "GNU" OR "${CMAKE_C_COMPILER_FRONTEND_VARIANT}" STREQUAL "Clang")
+if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections")
 	if ("${DISABLE_WERROR}" STREQUAL "OFF")
 	    set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -Werror")
 	endif()
-    if (AMIGA_M68K)
-        set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -fbaserel")
-    endif()
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -Wall")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -Wcast-qual")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -Wno-error=deprecated-declarations")
@@ -359,11 +312,11 @@ if ("${CMAKE_C_COMPILER_FRONTEND_VARIANT}" STREQUAL "GNU" OR "${CMAKE_C_COMPILER
 
     add_definitions(-D_GNU_SOURCE)
 
-    if ("${CMAKE_C_COMPILER_FRONTEND_VARIANT}" STREQUAL "Clang")
+    if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
         # Remove this for 1.0 when we can bump the ABI and actually fix these warnings.
         set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -Wno-shorten-64-to-32")
     endif()
-elseif ("${CMAKE_C_COMPILER_FRONTEND_VARIANT}" STREQUAL "MSVC")
+elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /DEBUG")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /wd4100")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /wd4996")
@@ -374,7 +327,7 @@ elseif ("${CMAKE_C_COMPILER_FRONTEND_VARIANT}" STREQUAL "MSVC")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /wd4701")
 endif()
 
-if (NOT ("${CMAKE_C_COMPILER_FRONTEND_VARIANT}" STREQUAL "MSVC"))
+if (NOT ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC"))
 	check_c_source_compiles(
 	"
 	/* uClibc toolchains without threading barf when _REENTRANT is defined */
@@ -519,7 +472,7 @@ add_library(${PROJECT_NAME}
     ${JSON_C_HEADERS}
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    VERSION 5.4.0
+    VERSION 5.3.0
     SOVERSION 5)
 list(APPEND CMAKE_TARGETS ${PROJECT_NAME})
 # If json-c is used as subroject it set to target correct interface -I flags and allow
@@ -592,6 +545,7 @@ install(
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
+if (UNIX OR MINGW OR CYGWIN)
     SET(prefix ${CMAKE_INSTALL_PREFIX})
     # exec_prefix is prefix by default and CMake does not have the
     # concept.
@@ -619,6 +573,7 @@ install(
     configure_file(json-c.pc.in json-c.pc @ONLY)
     set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_LIBDIR}/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
     install(FILES ${PROJECT_BINARY_DIR}/json-c.pc DESTINATION "${INSTALL_PKGCONFIG_DIR}")
+endif ()
 
 install(FILES ${JSON_C_PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/json-c)
 
@@ -634,3 +589,4 @@ if (NOT MSVC)  # cmd line apps don't built on Windows currently.
 add_subdirectory(apps)
 endif()
 endif()
+

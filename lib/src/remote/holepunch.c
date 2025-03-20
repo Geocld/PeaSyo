@@ -50,12 +50,12 @@
 #endif
 
 #include <curl/curl.h>
-#include <json-c/json_object.h>
-#include <json-c/json_tokener.h>
-#include <json-c/json_pointer.h>
-#include <miniupnpc/miniupnpc.h>
-#include <miniupnpc/upnpcommands.h>
-#include <miniupnpc/upnperrors.h>
+#include <json_object.h>
+#include <json_tokener.h>
+#include <json_pointer.h>
+#include <miniupnpc.h>
+#include <upnpcommands.h>
+#include <upnperrors.h>
 
 #include <chiaki/remote/holepunch.h>
 #include <chiaki/stoppipe.h>

@@ -8,9 +8,9 @@
 
 #include "snprintf_compat.h"
 
-#ifndef _WIN32
+#ifndef WIN32
 #include <stdarg.h>
-#endif /* !defined(_WIN32) */
+#endif /* !defined(WIN32) */
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -18,10 +18,10 @@
 /* CAW: compliant version of vasprintf */
 static int vasprintf(char **buf, const char *fmt, va_list ap)
 {
-#ifndef _WIN32
+#ifndef WIN32
 	static char _T_emptybuffer = '\0';
 	va_list ap2;
-#endif /* !defined(_WIN32) */
+#endif /* !defined(WIN32) */
 	int chars;
 	char *b;
 
@@ -30,16 +30,16 @@ static int vasprintf(char **buf, const char *fmt, va_list ap)
 		return -1;
 	}
 
-#ifdef _WIN32
+#ifdef WIN32
 	chars = _vscprintf(fmt, ap);
-#else  /* !defined(_WIN32) */
+#else  /* !defined(WIN32) */
 	/* CAW: RAWR! We have to hope to god here that vsnprintf doesn't overwrite
 	 * our buffer like on some 64bit sun systems... but hey, it's time to move on
 	 */
 	va_copy(ap2, ap);
 	chars = vsnprintf(&_T_emptybuffer, 0, fmt, ap2);
 	va_end(ap2);
-#endif /* defined(_WIN32) */
+#endif /* defined(WIN32) */
 	if (chars < 0 || (size_t)chars + 1 > SIZE_MAX / sizeof(char))
 	{
 		return -1;
