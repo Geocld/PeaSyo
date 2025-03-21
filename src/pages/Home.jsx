@@ -365,13 +365,33 @@ function HomeScreen({navigation, route}) {
 
   const handleOnlyConnect = () => {
     setShowWakeModal(false);
+    setLoading(true);
     const settings = getSettings();
     const hasValidUsbDevice = UsbRumbleManager.getHasValidUsbDevice();
     const isUsbMode = settings.bind_usb_device && hasValidUsbDevice;
+    currentConsole.parsedHost = '';
+    // Parse domain
+    if (DOMAIN_REGEX.test(currentConsole.remoteHost)) {
+      getIpAddressesForHostname(currentConsole.remoteHost)
+        .then(ipAddresses => {
+          if (ipAddresses.length) {
+            currentConsole.parsedHost = ipAddresses[0] || '';
+          }
+          setLoading(false);
+          handleToStream(currentConsole, isUsbMode);
+        })
+        .catch(e => {
+          setLoading(false);
+          handleToStream(currentConsole, isUsbMode);
+        });
+    }
+  };
+
+  const handleToStream = (consoleInfo, isUsbMode) => {
     navigation.navigate({
       name: 'Stream',
       params: {
-        consoleInfo: currentConsole,
+        consoleInfo,
         isRemote: true,
         isUsbMode,
       },
@@ -431,6 +451,7 @@ function HomeScreen({navigation, route}) {
     const isUsbMode = settings.bind_usb_device && hasValidUsbDevice;
 
     wakeup(host, credential, isPS5);
+    currentConsole.parsedHost = host;
 
     setLoadingText(t('Waking'));
     // Wait for one min

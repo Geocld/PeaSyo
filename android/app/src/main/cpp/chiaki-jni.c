@@ -294,12 +294,14 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
 
 	ChiakiErrorCode err = CHIAKI_ERR_SUCCESS;
 	char *host_str = NULL;
+    char *parsed_host_str = NULL;
 
 	jclass result_class = E->GetObjectClass(env, result);
 
 	jclass connect_info_class = E->GetObjectClass(env, connect_info_obj);
 	jboolean ps5 = E->GetBooleanField(env, connect_info_obj, E->GetFieldID(env, connect_info_class, "ps5", "Z"));
 	jstring host_string = E->GetObjectField(env, connect_info_obj, E->GetFieldID(env, connect_info_class, "host", "Ljava/lang/String;"));
+    jstring parsed_host_string = E->GetObjectField(env, connect_info_obj, E->GetFieldID(env, connect_info_class, "parsedHost", "Ljava/lang/String;"));
 	jbyteArray regist_key_array = E->GetObjectField(env, connect_info_obj, E->GetFieldID(env, connect_info_class, "registKey", "[B"));
 	jbyteArray morning_array = E->GetObjectField(env, connect_info_obj, E->GetFieldID(env, connect_info_class, "morning", "[B"));
 	jobject connect_video_profile_obj = E->GetObjectField(env, connect_info_obj, E->GetFieldID(env, connect_info_class, "videoProfile", "L"BASE_PACKAGE"/ConnectVideoProfile;"));
@@ -395,7 +397,18 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
 
 	android_chiaki_audio_decoder_set_cb(&session->audio_decoder, android_chiaki_audio_output_settings, android_chiaki_audio_output_frame, session->audio_output);
 
-	err = chiaki_session_init(&session->session, &connect_info, log);
+    const char *parsed_str_borrow = E->GetStringUTFChars(env, parsed_host_string, NULL);
+    const char *parsed_host = strdup(parsed_str_borrow);
+    E->ReleaseStringUTFChars(env, parsed_host_string, parsed_str_borrow);
+
+    char *ipv6 = strchr(parsed_host, ':');
+    if (ipv6) {
+        CHIAKI_LOGE(log, "chiaki_session_init_v6 parsed_host : %s", parsed_host);
+        err = chiaki_session_init_v6(&session->session, &connect_info, log);
+    } else {
+        err = chiaki_session_init(&session->session, &connect_info, log);
+    }
+
 	if(err != CHIAKI_ERR_SUCCESS)
 	{
 		CHIAKI_LOGE(log, "JNI ChiakiSession failed to init");

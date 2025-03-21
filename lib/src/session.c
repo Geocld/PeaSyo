@@ -175,6 +175,84 @@ CHIAKI_EXPORT const char *chiaki_quit_reason_string(ChiakiQuitReason reason)
 	}
 }
 
+CHIAKI_EXPORT ChiakiErrorCode chiaki_session_init_v6(ChiakiSession *session, ChiakiConnectInfo *connect_info, ChiakiLog *log)
+{
+    memset(session, 0, sizeof(ChiakiSession));
+
+    session->log = log;
+    session->quit_reason = CHIAKI_QUIT_REASON_NONE;
+    session->target = connect_info->ps5 ? CHIAKI_TARGET_PS5_1 : CHIAKI_TARGET_PS4_10;
+
+    ChiakiErrorCode err = chiaki_cond_init(&session->state_cond);
+    if(err != CHIAKI_ERR_SUCCESS)
+        goto error;
+
+    err = chiaki_mutex_init(&session->state_mutex, false);
+    if(err != CHIAKI_ERR_SUCCESS)
+        goto error_state_cond;
+
+    err = chiaki_stop_pipe_init(&session->stop_pipe);
+    if(err != CHIAKI_ERR_SUCCESS)
+        goto error_state_mutex;
+
+    session->should_stop = false;
+    session->ctrl_session_id_received = false;
+    session->ctrl_login_pin_requested = false;
+    session->login_pin_entered = false;
+    session->login_pin = NULL;
+    session->login_pin_size = 0;
+
+    err = chiaki_ctrl_init(&session->ctrl, session);
+    if(err != CHIAKI_ERR_SUCCESS)
+    {
+        CHIAKI_LOGE(session->log, "Ctrl init failed");
+        goto error_stop_pipe;
+    }
+
+    err = chiaki_stream_connection_init(&session->stream_connection, session, connect_info->packet_loss_max);
+    if(err != CHIAKI_ERR_SUCCESS)
+    {
+        CHIAKI_LOGE(session->log, "StreamConnection init failed");
+        goto error_ctrl;
+    }
+
+    int r = getaddrinfo(connect_info->host, NULL, NULL, &session->connect_info.host_addrinfos);
+    if(r != 0)
+    {
+        chiaki_session_fini(session);
+        return CHIAKI_ERR_PARSE_ADDR;
+    }
+
+    chiaki_controller_state_set_idle(&session->controller_state);
+
+    session->connect_info.ps5 = connect_info->ps5;
+    memcpy(session->connect_info.regist_key, connect_info->regist_key, sizeof(session->connect_info.regist_key));
+    memcpy(session->connect_info.morning, connect_info->morning, sizeof(session->connect_info.morning));
+
+    const uint8_t did_prefix[] = { 0x00, 0x18, 0x00, 0x00, 0x00, 0x07, 0x00, 0x40, 0x00, 0x80 };
+    const uint8_t did_suffix[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    memcpy(session->connect_info.did, did_prefix, sizeof(did_prefix));
+    chiaki_random_bytes_crypt(session->connect_info.did + sizeof(did_prefix), sizeof(session->connect_info.did) - sizeof(did_prefix) - sizeof(did_suffix));
+    memcpy(session->connect_info.did + sizeof(session->connect_info.did) - sizeof(did_suffix), did_suffix, sizeof(did_suffix));
+
+    session->connect_info.video_profile = connect_info->video_profile;
+    session->connect_info.video_profile_auto_downgrade = connect_info->video_profile_auto_downgrade;
+    session->connect_info.enable_keyboard = connect_info->enable_keyboard;
+    session->connect_info.enable_dualsense = connect_info->enable_dualsense;
+
+    return CHIAKI_ERR_SUCCESS;
+    error_stop_pipe:
+    chiaki_stop_pipe_fini(&session->stop_pipe);
+    error_ctrl:
+    chiaki_ctrl_fini(&session->ctrl);
+    error_state_mutex:
+    chiaki_mutex_fini(&session->state_mutex);
+    error_state_cond:
+    chiaki_cond_fini(&session->state_cond);
+    error:
+    return err;
+}
+
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_init(ChiakiSession *session, ChiakiConnectInfo *connect_info,
 	ChiakiLog *log)
 {
@@ -189,7 +267,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_session_init(ChiakiSession *session, Chiaki
 	ChiakiErrorCode err = chiaki_cond_init(&session->state_cond);
 	if(err != CHIAKI_ERR_SUCCESS)
 		goto error;
-		
+
 	err = chiaki_mutex_init(&session->state_mutex, false);
 	if(err != CHIAKI_ERR_SUCCESS)
 		goto error_state_cond;

@@ -274,6 +274,7 @@ function StreamScreen({navigation, route}) {
       host: route.params?.isRemote
         ? _consoleInfo.remoteHost
         : _consoleInfo.host,
+      parsedHost: _consoleInfo.parsedHost || '',
       registKey: _consoleInfo.rpRegistKey,
       morning: _consoleInfo.rpKey,
       enableKeyboard: false,

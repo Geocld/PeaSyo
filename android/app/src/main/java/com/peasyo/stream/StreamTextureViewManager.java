@@ -55,6 +55,7 @@ public class StreamTextureViewManager extends SimpleViewManager<StreamTextureVie
     public void setStreamInfo(StreamTextureView view, ReadableMap streamInfo) {
         boolean ps5 = streamInfo.getBoolean("ps5");
         String host = streamInfo.getString("host");
+        String parsedHost = streamInfo.getString("parsedHost");
         String registKeyBase64 = streamInfo.getString("registKey"); // base64
         String morningBase64 = streamInfo.getString("morning"); // base64
         boolean enableKeyboard = streamInfo.getBoolean("enableKeyboard");
@@ -90,7 +91,7 @@ public class StreamTextureViewManager extends SimpleViewManager<StreamTextureVie
                 codec  // codec
         );
 
-        ConnectInfo connectInfo = new ConnectInfo(ps5, host, registKey, morning, videoProfile, enableKeyboard);
+        ConnectInfo connectInfo = new ConnectInfo(ps5, host, parsedHost, registKey, morning, videoProfile, enableKeyboard);
         view.setConnectInfo(connectInfo, streamInfo);
     }
 

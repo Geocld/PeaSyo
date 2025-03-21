@@ -69,6 +69,7 @@ data class ConnectVideoProfile(
 data class ConnectInfo(
 	val ps5: Boolean,
 	val host: String,
+	val parsedHost: String,
 	val registKey: ByteArray,
 	val morning: ByteArray,
 	val videoProfile: ConnectVideoProfile,
