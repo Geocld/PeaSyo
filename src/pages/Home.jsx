@@ -18,7 +18,11 @@ import ConsoleItem from '../components/ConsoleItem';
 import SplashScreen from 'react-native-splash-screen';
 import {useTranslation} from 'react-i18next';
 import {debugFactory} from '../utils/debug';
-import {getTokenFromRedirectUri, getUserInfoFromToken} from '../auth';
+import {
+  getTokenFromRedirectUri,
+  getUserInfoFromToken,
+  refreshAccessToken,
+} from '../auth';
 import {TokenStore} from '../store/tokenStore';
 import {getSettings} from '../store/settingStore';
 import {getConsoles, saveConsoles} from '../store/consolesStore';
@@ -98,7 +102,8 @@ function HomeScreen({navigation, route}) {
         setLoadingText(t('Loading'));
         // Get token from auth code
         getTokenFromRedirectUri(xalUrl)
-          .then(accessToken => {
+          .then(tokenRes => {
+            const {accessToken, refreshToken, tokenExpiry} = tokenRes;
             // console.log('Get access token:', accessToken);
             if (accessToken.length) {
               getUserInfoFromToken(accessToken)
@@ -118,6 +123,9 @@ function HomeScreen({navigation, route}) {
                     tokens.push({
                       is_default: true,
                       ...userInfo,
+                      accessToken,
+                      refreshToken,
+                      tokenExpiry,
                     });
 
                     ts.setToken(tokens);
@@ -509,6 +517,17 @@ function HomeScreen({navigation, route}) {
     );
   };
 
+  const handleRefreshToken = () => {
+    const ts = new TokenStore();
+    ts.load();
+    const tokens = ts.getToken();
+    console.log('tokens:', tokens);
+    const token = tokens[0];
+    refreshAccessToken(token.refreshToken);
+    // TODO
+    // refreshToken();
+  };
+
   return (
     <>
       <Portal>
@@ -556,6 +575,8 @@ function HomeScreen({navigation, route}) {
         textContent={loadingText}
         textStyle={styles.spinnerTextStyle}
       />
+
+      <Button onPress={handleRefreshToken}>{t('refresh')}</Button>
 
       {renderContent()}
 

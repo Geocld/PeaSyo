@@ -17,12 +17,13 @@ const CLIENT_SECRET = 'mvaiZkRsAsI1IBkY';
 const REDIRECT_URI =
   'https://remoteplay.dl.playstation.net/remoteplay/redirect';
 
-export const getTokenFromRedirectUri = (
-  redirectUri: string,
-): Promise<string> => {
+export const getTokenFromRedirectUri = (redirectUri: string): Promise<any> => {
   console.log('getTokenFromRedirectUri redirectUri:', redirectUri);
   return new Promise((resolve, reject) => {
-    let token = '';
+    let accessToken = '';
+    let remoteAccessToken = '';
+    let refreshToken = '';
+    let tokenExpiry = 0;
 
     const url = new URL(redirectUri);
     const code = url.searchParams.get('code');
@@ -52,12 +53,44 @@ export const getTokenFromRedirectUri = (
           },
         )
         .then(res => {
-          console.log('[getTokenFromRedirectUri] res:', res.data);
-          // {"access_token": "1babdde3-48b7-420a-b797-45a63dd47fb8", "expires_in": 3599, "refresh_token": "1e164882-530e-4506-9453-d43577f6bf89", "scope": "psn:clientapp", "token_type": "bearer"}
+          // console.log('[getTokenFromRedirectUri] res:', res.data);
+          // {"access_token": "1babdde3-48b7-420a-af97-45afb8", "expires_in": 3599, "refresh_token": "1e82-530e-4506-9453-d4357f89", "scope": "psn:clientapp", "token_type": "bearer"}
           if (res.data && res.data.access_token) {
-            token = res.data.access_token;
+            accessToken = res.data.access_token;
+            // Get PSN remote token
+            const body2 = new URLSearchParams({
+              code,
+              grant_type: 'authorization_code',
+              scope:
+                'psn:clientapp referenceDataService:countryConfig.read pushNotification:webSocket.desktop.connect sessionManager:remotePlaySession.system.update',
+              redirect_uri:
+                'https://remoteplay.dl.playstation.net/remoteplay/redirect&',
+            }).toString();
+
+            axios
+              .post(
+                'https://auth.api.sonyentertainmentnetwork.com/2.0/oauth/token',
+                body2,
+                {
+                  auth,
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                  },
+                },
+              )
+              .then(res2 => {
+                remoteAccessToken = res2.data.refresh_token;
+                refreshToken = res2.data.refresh_token;
+                tokenExpiry =
+                  new Date().getTime() + res2.data.expires_in * 1000;
+              });
           }
-          resolve(token);
+          resolve({
+            accessToken,
+            remoteAccessToken,
+            refreshToken,
+            tokenExpiry,
+          });
         })
         .catch(e => {
           console.log('[getTokenFromRedirectUri] error:', e);
@@ -121,6 +154,44 @@ export const getUserInfoFromToken = (
       })
       .catch(e => {
         console.log('[getUserInfoFromToken] error:', e);
+        reject(e);
+      });
+  });
+};
+
+// TODO
+export const refreshAccessToken = (token: string): Promise<any> => {
+  console.log('refreshAccessToken:', token);
+  return new Promise((resolve, reject) => {
+    const auth = {
+      username: CLIENT_ID,
+      password: CLIENT_SECRET,
+    };
+    const payload = {
+      refresh_token: token,
+      grant_type: 'refresh_token',
+      scope: 'psn:clientapp',
+      redirect_uri: REDIRECT_URI,
+    };
+    const body = new URLSearchParams(payload).toString();
+
+    axios
+      .post(
+        'https://auth.api.sonyentertainmentnetwork.com/2.0/oauth/token',
+        body,
+        {
+          auth,
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        },
+      )
+      .then(res => {
+        console.log('[refreshToken] res:', res.data);
+        resolve('');
+      })
+      .catch(e => {
+        console.log('[refreshToken] error:', e);
         reject(e);
       });
   });
