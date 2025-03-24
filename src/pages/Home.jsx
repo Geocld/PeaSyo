@@ -18,11 +18,7 @@ import ConsoleItem from '../components/ConsoleItem';
 import SplashScreen from 'react-native-splash-screen';
 import {useTranslation} from 'react-i18next';
 import {debugFactory} from '../utils/debug';
-import {
-  getTokenFromRedirectUri,
-  getUserInfoFromToken,
-  refreshAccessToken,
-} from '../auth';
+import {getTokenFromRedirectUri, getUserInfoFromToken} from '../auth';
 import {TokenStore} from '../store/tokenStore';
 import {getSettings} from '../store/settingStore';
 import {getConsoles, saveConsoles} from '../store/consolesStore';
@@ -517,17 +513,6 @@ function HomeScreen({navigation, route}) {
     );
   };
 
-  const handleRefreshToken = () => {
-    const ts = new TokenStore();
-    ts.load();
-    const tokens = ts.getToken();
-    console.log('tokens:', tokens);
-    const token = tokens[0];
-    refreshAccessToken(token.refreshToken);
-    // TODO
-    // refreshToken();
-  };
-
   return (
     <>
       <Portal>
@@ -575,8 +560,6 @@ function HomeScreen({navigation, route}) {
         textContent={loadingText}
         textStyle={styles.spinnerTextStyle}
       />
-
-      <Button onPress={handleRefreshToken}>{t('refresh')}</Button>
 
       {renderContent()}
 
