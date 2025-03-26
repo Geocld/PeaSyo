@@ -8,6 +8,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
+import com.peasyo.session.HolepunchPackage;
 import com.peasyo.stream.StreamTextureViewPackage;
 import com.peasyo.stream.StreamViewPackage;
 import com.umeng.commonsdk.UMConfigure;
@@ -44,6 +45,7 @@ public class MainApplication extends Application implements ReactApplication {
             packages.add(new StreamTextureViewPackage());
             packages.add(new SensorPackage());
             packages.add(new GamepadSensorPackage());
+            packages.add(new HolepunchPackage());
           return packages;
         }
 

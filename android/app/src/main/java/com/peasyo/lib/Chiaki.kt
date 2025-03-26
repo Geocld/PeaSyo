@@ -96,6 +96,7 @@ private class ChiakiNative
 		@JvmStatic external fun getDecodeTime(ptr: Long): Double
 		@JvmStatic external fun getFps(ptr: Long): Double
 		@JvmStatic external fun getFrameLost(ptr: Long): Double
+		@JvmStatic external fun getDeviceUid(): String
 		@JvmStatic external fun sessionCreate(result: CreateResult, connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean, javaSession: Session)
 		@JvmStatic external fun sessionFree(ptr: Long)
 		@JvmStatic external fun sessionStart(ptr: Long): Int
@@ -568,5 +569,18 @@ class Regist(
 	private fun event(event: RegistEvent)
 	{
 		callback(event)
+	}
+}
+
+// remote psn
+class RemotePsn {
+	private var deviceUid: String = ""
+
+	init {
+		deviceUid = ChiakiNative.getDeviceUid()
+	}
+
+	fun getDeviceUid(): String {
+		return deviceUid
 	}
 }

@@ -283,6 +283,15 @@ JNIEXPORT jdouble JNICALL JNI_FCN(getFrameLost)(JNIEnv *env, jobject obj, jlong 
     return lost;
 }
 
+JNIEXPORT jstring JNICALL JNI_FCN(getDeviceUid)(JNIEnv *env, jobject obj)
+{
+    size_t duid_size = CHIAKI_DUID_STR_SIZE;
+    char duid[duid_size];
+    chiaki_holepunch_generate_client_device_uid(duid, &duid_size);
+    jstring result = (*env)->NewStringUTF(env, duid);
+    return result;
+}
+
 JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject result, jobject connect_info_obj, jstring log_file_str, jboolean log_verbose, jobject java_session)
 {
 	AndroidChiakiSession *session = NULL;

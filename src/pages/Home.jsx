@@ -237,6 +237,7 @@ function HomeScreen({navigation, route}) {
                     consoleItem={item}
                     onPress={() => handleLocalStream(item)}
                     onPressRemote={() => handleRemoteStream(item)}
+                    onPressPsn={() => {handlePSNStream(item)}}
                   />
                 </View>
               );
@@ -339,6 +340,10 @@ function HomeScreen({navigation, route}) {
     setCurrentConsole(item);
     setShowRemoteModal(true);
     setRemoteHost(item.remoteHost || '');
+  };
+
+  const handlePSNStream = item => {
+    console.log('handlePSNStream:', item);
   };
 
   const handleCloseRemoteModal = () => {
