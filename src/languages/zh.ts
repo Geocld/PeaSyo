@@ -273,5 +273,7 @@ export default {
     'Send text': '发送文字',
     'Remote keyboard input': '远程键盘输入',
     'Enable remote keyboard input': '开启远程键盘输入',
+    'Currently no network connection, please connect and try again':
+      '当前无网络连接，请连接后再使用',
   },
 };

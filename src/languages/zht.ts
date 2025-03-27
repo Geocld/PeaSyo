@@ -266,5 +266,7 @@ export default {
     'Send text': '發送文字',
     'Remote keyboard input': '遠程鍵盤輸入',
     'Enable remote keyboard input': '開啟遠程鍵盤輸入',
+    'Currently no network connection, please connect and try again':
+      '當前無網絡連接，請連接後再使用',
   },
 };

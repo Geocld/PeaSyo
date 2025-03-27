@@ -78,18 +78,6 @@ const ConsoleItem = (props: any) => {
               onPress={props.onPressRemote}>
               {t('RemoteStream')}
             </Button>
-
-            <Button
-              mode="outlined"
-              background={{
-                borderless: false,
-                color: 'rgba(255, 255, 255, 0.2)',
-                foreground: true,
-              }}
-              labelStyle={{marginHorizontal: 0}}
-              onPress={props.onPressPsn}>
-              PSN connect
-            </Button>
           </View>
         )}
       </Card.Content>

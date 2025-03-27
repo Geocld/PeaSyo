@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {Button, Text, Portal, Dialog, TextInput, FAB} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
+import NetInfo from '@react-native-community/netinfo';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {getIpAddressesForHostname} from 'react-native-dns-lookup';
 import {useIsFocused} from '@react-navigation/native';
@@ -38,6 +39,7 @@ function HomeScreen({navigation, route}) {
   const [remoteHost, setRemoteHost] = useState('');
   const [showRemoteModal, setShowRemoteModal] = useState(false);
   const [showWakeModal, setShowWakeModal] = useState(false);
+  const [isConnected, setIsConnected] = React.useState(true);
 
   const [isLogined, setIsLogined] = useState(false);
   const [consoles, setConsoles] = useState([]);
@@ -68,6 +70,10 @@ function HomeScreen({navigation, route}) {
   React.useEffect(() => {
     log.info('Page loaded.');
     SplashScreen.hide();
+
+    const unsubscribe = NetInfo.addEventListener(_state => {
+      setIsConnected(_state.isConnected);
+    });
 
     const ts = new TokenStore();
 
@@ -166,6 +172,7 @@ function HomeScreen({navigation, route}) {
 
     return () => {
       subscription?.remove();
+      unsubscribe();
     };
   }, [t, route.params?.xalUrl, navigation]);
 
@@ -237,7 +244,6 @@ function HomeScreen({navigation, route}) {
                     consoleItem={item}
                     onPress={() => handleLocalStream(item)}
                     onPressRemote={() => handleRemoteStream(item)}
-                    onPressPsn={() => {handlePSNStream(item)}}
                   />
                 </View>
               );
@@ -251,6 +257,11 @@ function HomeScreen({navigation, route}) {
   };
 
   const handleLocalStream = item => {
+    if (!isConnected) {
+      noNetWarning();
+      return;
+    }
+
     const isPS5 = item.apName.indexOf('PS5') > -1;
 
     setLoading(true);
@@ -337,13 +348,13 @@ function HomeScreen({navigation, route}) {
   };
 
   const handleRemoteStream = item => {
+    if (!isConnected) {
+      noNetWarning();
+      return;
+    }
     setCurrentConsole(item);
     setShowRemoteModal(true);
     setRemoteHost(item.remoteHost || '');
-  };
-
-  const handlePSNStream = item => {
-    console.log('handlePSNStream:', item);
   };
 
   const handleCloseRemoteModal = () => {
@@ -487,7 +498,13 @@ function HomeScreen({navigation, route}) {
       {
         icon: 'plus',
         label: t('Registry'),
-        onPress: () => navigation.navigate('Registry'),
+        onPress: () => {
+          if (!isConnected) {
+            noNetWarning();
+            return;
+          }
+          navigation.navigate('Registry');
+        },
       },
     ];
 
@@ -515,6 +532,20 @@ function HomeScreen({navigation, route}) {
         actions={actions}
         onStateChange={onStateChange}
       />
+    );
+  };
+
+  const noNetWarning = () => {
+    Alert.alert(
+      t('Warning'),
+      t('Currently no network connection, please connect and try again'),
+      [
+        {
+          text: t('Confirm'),
+          style: 'default',
+          onPress: () => {},
+        },
+      ],
     );
   };
 

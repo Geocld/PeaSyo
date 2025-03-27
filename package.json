@@ -13,7 +13,7 @@
   "dependencies": {
     "@craftzdog/react-native-buffer": "^6.0.5",
     "@eva-design/eva": "^2.2.0",
-    "@react-native-community/netinfo": "^11.3.2",
+    "@react-native-community/netinfo": "^11.4.1",
     "@react-native-community/slider": "^4.5.2",
     "@react-native-cookies/cookies": "^6.2.1",
     "@react-navigation/bottom-tabs": "^6.5.20",

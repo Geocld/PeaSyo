@@ -2333,7 +2333,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-community/netinfo@npm:^11.3.2":
+"@react-native-community/netinfo@npm:^11.4.1":
   version: 11.4.1
   resolution: "@react-native-community/netinfo@npm:11.4.1"
   peerDependencies:
@@ -8482,7 +8482,7 @@ __metadata:
     "@babel/runtime": "npm:^7.20.0"
     "@craftzdog/react-native-buffer": "npm:^6.0.5"
     "@eva-design/eva": "npm:^2.2.0"
-    "@react-native-community/netinfo": "npm:^11.3.2"
+    "@react-native-community/netinfo": "npm:^11.4.1"
     "@react-native-community/slider": "npm:^4.5.2"
     "@react-native-cookies/cookies": "npm:^6.2.1"
     "@react-native/eslint-config": "npm:^0.72.2"
