@@ -129,6 +129,8 @@ export default {
     Host: '地址',
     NicknameError: '终端名称不能为空',
     ConsoleDeleteWarn: '确定要删除该终端吗，删除后需要重新注册终端',
+    SwapDpadTitle: '十字键模拟左摇杆',
+    SwapDpadDesc: '将十字键行为模拟为左摇杆(该模式下左摇杆将失效)',
     // Home
     NoLogin: '尚未登录，请登录',
     Login_PSN_Username:

@@ -74,6 +74,16 @@ const gamepad = [
       {value: false, text: t('Disable')},
     ],
   },
+  {
+    name: 'swap_dpad',
+    type: 'radio',
+    title: t('SwapDpadTitle'),
+    description: t('SwapDpadDesc'),
+    data: [
+      {value: false, text: t('Disable')},
+      {value: true, text: t('Enable')},
+    ],
+  },
 ];
 
 export default gamepad;

@@ -35,6 +35,7 @@ export type Settings = {
   gamepad_maping: Record<string, number>;
   show_menu: boolean;
   check_update: boolean;
+  swap_dpad: boolean;
   theme: string;
   rgb: string;
   keyboard: boolean;
@@ -72,6 +73,7 @@ const defaultSettings: Settings = {
   gamepad_maping: {},
   show_menu: false,
   check_update: true,
+  swap_dpad: false,
   theme: 'dark',
   rgb: '#DF6069',
   keyboard: false,

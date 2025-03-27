@@ -172,6 +172,8 @@ export default {
     NoConsole: 'No console found, please enter the host IP manually',
     RegistFailed:
       'Registration failed. Please check if the PIN code is correct and verify that the host login account matches the current account',
+    SwapDpadTitle: 'D-pad Simulate Left Joystick',
+    SwapDpadDesc: 'Simulate the D-pad behavior as the left joystick(left joystick will not working in this mode).',
     // Map
     MapDesc: 'Press the gamepad button to map it to:',
     MapDesc2: 'This window will close automatically after successful mapping',

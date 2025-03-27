@@ -85,6 +85,7 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
     private float deadZone;
     private int edgeCompensation;
     private boolean isShortTrigger;
+    private boolean swapDpad;
     private boolean isLeftTriggerCanClick;
     private boolean isRightTriggerCanClick;
 
@@ -104,6 +105,7 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         this.deadZone = 0.2f;
         this.edgeCompensation = 0;
         this.isShortTrigger = false;
+        this.swapDpad = false;
         this.isLeftTriggerCanClick = false;
         this.isRightTriggerCanClick = false;
         this.isRightstickMoving = false;
@@ -781,12 +783,13 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
             isRightstickMoving = false;
         }
 
-        controllerState.setLeftX(signedAxis(x));
-        controllerState.setLeftY(signedAxis(y));
-        controllerState.setRightX(signedAxis(rx));
-        controllerState.setRightY(signedAxis(ry));
-
-        setControllerState(controllerState);
+        if (!this.swapDpad) {
+            controllerState.setLeftX(signedAxis(x));
+            controllerState.setLeftY(signedAxis(y));
+            controllerState.setRightX(signedAxis(rx));
+            controllerState.setRightY(signedAxis(ry));
+            setControllerState(controllerState);
+        }
     }
 
     float normaliseAxis(float value) {
@@ -960,21 +963,46 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         if (Dpad.isDpadDevice(event)) {
             int dpadIdx = dpad.getDirectionPressed(event);
             if (dpadIdx != -1) { // Dpad down
-                Log.d("StreamView", "DPAD press:" + dpadIdx);
-                int buttonMask = getButtonMask(dpadIdx);
+                if (this.swapDpad) {
+                    int buttonMask = getButtonMask(dpadIdx);
+                    if (buttonMask == BUTTON_DPAD_UP) {
+                        controllerState.setLeftY(signedAxis(-1));
+                    }
+                    if (buttonMask == BUTTON_DPAD_DOWN) {
+                        controllerState.setLeftY(signedAxis(1));
+                    }
 
-                int buttons = controllerState.getButtons();
-                buttons |= buttonMask;
+                    if (buttonMask == BUTTON_DPAD_LEFT) {
+                        controllerState.setLeftX(signedAxis(-1));
+                    }
+                    if (buttonMask == BUTTON_DPAD_RIGHT) {
+                        controllerState.setLeftX(signedAxis(1));
+                    }
+                    setControllerState(controllerState);
+                } else {
+                    Log.d(TAG, "DPAD press:" + dpadIdx);
+                    int buttonMask = getButtonMask(dpadIdx);
 
-                controllerState.setButtons(buttons);
+                    int buttons = controllerState.getButtons();
+                    buttons |= buttonMask;
+
+                    controllerState.setButtons(buttons);
+                }
+
             } else { // Dpad up
-                int buttons = controllerState.getButtons();
-                buttons &= ~BUTTON_DPAD_LEFT;
-                buttons &= ~BUTTON_DPAD_RIGHT;
-                buttons &= ~BUTTON_DPAD_UP;
-                buttons &= ~BUTTON_DPAD_DOWN;
+                if (this.swapDpad) {
+                    controllerState.setLeftX(signedAxis(0));
+                    controllerState.setLeftY(signedAxis(0));
+                    setControllerState(controllerState);
+                } else {
+                    int buttons = controllerState.getButtons();
+                    buttons &= ~BUTTON_DPAD_LEFT;
+                    buttons &= ~BUTTON_DPAD_RIGHT;
+                    buttons &= ~BUTTON_DPAD_UP;
+                    buttons &= ~BUTTON_DPAD_DOWN;
 
-                controllerState.setButtons(buttons);
+                    controllerState.setButtons(buttons);
+                }
             }
         }
 
