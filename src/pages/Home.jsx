@@ -300,7 +300,7 @@ function HomeScreen({navigation, route}) {
 
                   setTimeout(() => {
                     handleToLocalStream(item);
-                  }, 30 * 1000);
+                  }, 20 * 1000);
                 }, 5000);
               } else if (res.status === 'AWAKE') {
                 // To Stream page
@@ -385,33 +385,13 @@ function HomeScreen({navigation, route}) {
 
   const handleOnlyConnect = () => {
     setShowWakeModal(false);
-    setLoading(true);
     const settings = getSettings();
     const hasValidUsbDevice = UsbRumbleManager.getHasValidUsbDevice();
     const isUsbMode = settings.bind_usb_device && hasValidUsbDevice;
-    currentConsole.parsedHost = '';
-    // Parse domain
-    if (DOMAIN_REGEX.test(currentConsole.remoteHost)) {
-      getIpAddressesForHostname(currentConsole.remoteHost)
-        .then(ipAddresses => {
-          if (ipAddresses.length) {
-            currentConsole.parsedHost = ipAddresses[0] || '';
-          }
-          setLoading(false);
-          handleToStream(currentConsole, isUsbMode);
-        })
-        .catch(e => {
-          setLoading(false);
-          handleToStream(currentConsole, isUsbMode);
-        });
-    }
-  };
-
-  const handleToStream = (consoleInfo, isUsbMode) => {
     navigation.navigate({
       name: 'Stream',
       params: {
-        consoleInfo,
+        consoleInfo: currentConsole,
         isRemote: true,
         isUsbMode,
       },
@@ -592,6 +572,7 @@ function HomeScreen({navigation, route}) {
 
       <Spinner
         visible={loading}
+        cancelable={true}
         color={'#DF6069'}
         textContent={loadingText}
         textStyle={styles.spinnerTextStyle}

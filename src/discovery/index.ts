@@ -89,11 +89,11 @@ export const discoverDevices = (
           err => {
             if (err) {
               // console.log('Send message error:', err);
-              if (!isSocketClosed) {
-                isSocketClosed = true;
-                socket.close();
-              }
-              reject(err);
+              // if (!isSocketClosed) {
+              //   isSocketClosed = true;
+              //   socket.close();
+              // }
+              // reject('Error when send broadcast');
             } else {
               console.log('Discovery message sent successfully');
             }
