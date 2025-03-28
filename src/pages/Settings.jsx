@@ -268,10 +268,10 @@ function SettingsScreen({navigation}) {
           <SettingItem
             title={t('Version')}
             description={`v${pkg.version}`}
-            onPress={() => navigation.navigate('About')}
+            // onPress={() => navigation.navigate('About')}
           />
 
-          {(currentLanguage === 'zh' || currentLanguage === 'zht') && (
+          {/* {(currentLanguage === 'zh' || currentLanguage === 'zht') && (
             <SettingItem
               title={'支持及交流'}
               description={'支持开发或交流更多串流技术'}
@@ -283,7 +283,7 @@ function SettingsScreen({navigation}) {
             title={'DEBUG'}
             description={'Enter debug.'}
             onPress={() => handleItemPress('debug')}
-          />
+          /> */}
 
           {token && token.account_id && (
             <SettingItem
