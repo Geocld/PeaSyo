@@ -411,12 +411,13 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
     E->ReleaseStringUTFChars(env, parsed_host_string, parsed_str_borrow);
 
     char *ipv6 = strchr(parsed_host, ':');
-    if (ipv6) {
-        CHIAKI_LOGE(log, "chiaki_session_init_v6 parsed_host : %s", parsed_host);
-        err = chiaki_session_init_v6(&session->session, &connect_info, log);
-    } else {
-        err = chiaki_session_init(&session->session, &connect_info, log);
-    }
+    err = chiaki_session_init_v6(&session->session, &connect_info, log);
+//    if (ipv6) {
+//        CHIAKI_LOGE(log, "chiaki_session_init_v6 parsed_host : %s", parsed_host);
+//        err = chiaki_session_init_v6(&session->session, &connect_info, log);
+//    } else {
+//        err = chiaki_session_init(&session->session, &connect_info, log);
+//    }
 
 	if(err != CHIAKI_ERR_SUCCESS)
 	{
