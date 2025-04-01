@@ -490,16 +490,24 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_list_devices(
     if(res != CURLE_OK)
         CHIAKI_LOGW(log, "chiaki_holepunch_list_devices: CURL setopt CURLOPT_WRITEDATA failed with CURL error %s", curl_easy_strerror(res));
 
+    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    if(res != CURLE_OK)
+        CHIAKI_LOGW(log, "chiaki_holepunch_list_devices: CURL setopt CURLOPT_SSL_VERIFYPEER failed with CURL error %s", curl_easy_strerror(res));
+    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+    if(res != CURLE_OK)
+        CHIAKI_LOGW(log, "chiaki_holepunch_list_devices: CURL setopt CURLOPT_SSL_VERIFYHOST failed with CURL error %s", curl_easy_strerror(res));
+
     res = curl_easy_perform(curl);
     curl_slist_free_all(headers);
     if (res != CURLE_OK)
     {
+        CHIAKI_LOGE(log, "chiaki_holepunch_list_devices: error11111: %d", res);
         if (res == CURLE_HTTP_RETURNED_ERROR)
         {
             long http_code = 0;
             curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
             CHIAKI_LOGE(log, "chiaki_holepunch_list_devices: Fetching device list from %s failed with HTTP code %ld", url, http_code);
-            CHIAKI_LOGV(log, "Response Body: %.*s.", (int)response_data.size, response_data.data);
+            CHIAKI_LOGV(log, "chiaki_holepunch_list_devices Response Body: %.*s.", (int)response_data.size, response_data.data);
             err = CHIAKI_ERR_HTTP_NONOK;
         } else {
             CHIAKI_LOGE(log, "chiaki_holepunch_list_devices: Fetching device list from %s failed with CURL error %s", url, curl_easy_strerror(res));
