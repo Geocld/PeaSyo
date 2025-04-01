@@ -1,0 +1,13 @@
+prefix=/Users/lijiahao/Desktop/lijiahao/open-source/libcurl-android/jni/build/openssl/armeabi-v7a
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include 
+enginesdir=${libdir}/engines-3
+modulesdir=${libdir}/ossl-modules
+
+Name: OpenSSL-libcrypto
+Description: OpenSSL cryptography library
+Version: 3.4.0
+Libs: -L${libdir} -lcrypto
+Libs.private: -ldl -pthread
+Cflags: -I${includedir}
