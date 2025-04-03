@@ -1,9 +1,0 @@
-prefix=/Users/lijiahao/Desktop/lijiahao/open-source/libcurl-android/jni/build/openssl/x86-64
-exec_prefix=${prefix}
-libdir=${exec_prefix}/lib
-includedir=${prefix}/include 
-
-Name: OpenSSL
-Description: Secure Sockets Layer and cryptography libraries and tools
-Version: 3.4.0
-Requires: libssl libcrypto

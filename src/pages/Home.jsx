@@ -531,14 +531,6 @@ function HomeScreen({navigation, route}) {
 
   return (
     <>
-      <Button
-        mode="text"
-        style={{marginTop: 10}}
-        onPress={() => {
-          NativeModules.HolepunchManager.getDeviceUid();
-        }}>
-        test
-      </Button>
       <Portal>
         <Dialog visible={showRemoteModal} onDismiss={handleCloseRemoteModal}>
           <Dialog.Content>

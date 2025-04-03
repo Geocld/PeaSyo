@@ -13,7 +13,7 @@
  *
  * The hole punching process itself i
  */
-
+ 
 // TODO: Make portable for Switch
 
 #include <string.h>
@@ -107,70 +107,70 @@ static const char delete_messsage_url_fmt[] = "https://web.np.playstation.com/ap
 // Implemented as string templates due to the broken JSON used by the official app, which we're
 // trying to emulate.
 static const char session_create_json_fmt[] =
-        "{\"remotePlaySessions\":["
+    "{\"remotePlaySessions\":["
         "{\"members\":["
-        "{\"accountId\":\"me\","
-        "\"deviceUniqueId\":\"me\","
-        "\"platform\":\"me\","
-        "\"pushContexts\":["
-        "{\"pushContextId\":\"%s\"}]}]}]}";  // 0: push context ID
+            "{\"accountId\":\"me\","
+             "\"deviceUniqueId\":\"me\","
+             "\"platform\":\"me\","
+             "\"pushContexts\":["
+                "{\"pushContextId\":\"%s\"}]}]}]}";  // 0: push context ID
 static const char session_start_envelope_fmt[] =
-        "{\"commandDetail\":"
+    "{\"commandDetail\":"
         "{\"commandType\":\"remotePlay\","
-        "\"duid\":\"%s\","                            // 0: device identifier, lowercase hex string
-        "\"messageDestination\":\"SQS\","
-        "\"parameters\":{\"initialParams\":\"%s\"},"  // 1: string containing escaped JSON data
-        "\"platform\":\"%s\"}}";                      // 2: PS4/PS5
+         "\"duid\":\"%s\","                            // 0: device identifier, lowercase hex string
+         "\"messageDestination\":\"SQS\","
+         "\"parameters\":{\"initialParams\":\"%s\"},"  // 1: string containing escaped JSON data
+         "\"platform\":\"%s\"}}";                      // 2: PS4/PS5
 static const char session_wakeup_envelope_fmt[] =
-        "{\"data\":"
+    "{\"data\":"
         "{\"clientType\":\"Windows\","
-        "\"data1\":\"%s\","                            // 0: 16 byte data1, base64 encoded
-        "\"data2\":\"%s\","                            // 1: 16 byte data2, base64 encoded
-        "\"roomId\": 0,"
-        "\"protocolVer\":\"10.0\","
-        "\"sessionId\":\"%s\"},"                        // 2: session identifier (lowercase UUIDv4)
-        "\"dataTypeSuffix\":\"remotePlay\"}";
+         "\"data1\":\"%s\","                            // 0: 16 byte data1, base64 encoded
+         "\"data2\":\"%s\","                            // 1: 16 byte data2, base64 encoded
+         "\"roomId\": 0,"
+         "\"protocolVer\":\"10.0\","
+         "\"sessionId\":\"%s\"},"                        // 2: session identifier (lowercase UUIDv4)
+         "\"dataTypeSuffix\":\"remotePlay\"}";
 static const char session_message_envelope_fmt[] =
-        "{\"channel\":\"remote_play:1\","
-        "\"payload\":\"ver=1.0, type=text, body=%s\","  // 0: message body as JSON string
-        "\"to\":["
-        "{\"accountId\":\"%" PRId64"\","                     // 1: PSN account ID
+    "{\"channel\":\"remote_play:1\","
+     "\"payload\":\"ver=1.0, type=text, body=%s\","  // 0: message body as JSON string
+     "\"to\":["
+       "{\"accountId\":\"%" PRId64"\","                     // 1: PSN account ID
         "\"deviceUniqueId\":\"%s\","                 // 2: device UID, lowercase hex string
         "\"platform\":\"%s\"}]}";                    // 3: PS4/PS5
 
 // NOTE: These payloads are JSON-escaped, since they're going to be embedded in a JSON string
 static const char session_start_payload_fmt[] =
-        "{\\\"accountId\\\":%" PRId64","             // 0: PSN account ID, integer
-        "\\\"roomId\\\":0,"
-        "\\\"sessionId\\\":\\\"%s\\\","      // 1: session identifier (lowercase UUIDv4)
-        "\\\"clientType\\\":\\\"Windows\\\","
-        "\\\"data1\\\":\\\"%s\\\","          // 2: 16 byte data1, base64 encoded
-        "\\\"data2\\\":\\\"%s\\\"}";         // 3: 16 byte data2, base64 encoded
+    "{\\\"accountId\\\":%" PRId64","             // 0: PSN account ID, integer
+     "\\\"roomId\\\":0,"
+     "\\\"sessionId\\\":\\\"%s\\\","      // 1: session identifier (lowercase UUIDv4)
+     "\\\"clientType\\\":\\\"Windows\\\","
+     "\\\"data1\\\":\\\"%s\\\","          // 2: 16 byte data1, base64 encoded
+     "\\\"data2\\\":\\\"%s\\\"}";         // 3: 16 byte data2, base64 encoded
 static const char session_message_fmt[] =
-        "{\\\"action\\\":\\\"%s\\\"," // 0: OFFER/RESULT/ACCEPT
-        "\\\"reqId\\\":%d,"          // 1: request ID, integer
-        "\\\"error\\\":%d,"          // 2: error id, integer
-        "\\\"connRequest\\\":%s}";   // 3: connRequest JSON object
+    "{\\\"action\\\":\\\"%s\\\"," // 0: OFFER/RESULT/ACCEPT
+     "\\\"reqId\\\":%d,"          // 1: request ID, integer
+     "\\\"error\\\":%d,"          // 2: error id, integer
+     "\\\"connRequest\\\":%s}";   // 3: connRequest JSON object
 static const char session_connrequest_fmt[] =
-        "{\\\"sid\\\":%d,"                         // 0: sid
-        "\\\"peerSid\\\":%d,"                     // 1: peer sid
-        "\\\"skey\\\":\\\"%s\\\","                // 2: skey, 16 byte buffer, base64 encoded
-        "\\\"natType\\\":%d,"                     // 3: NAT type
-        "\\\"candidate\\\":%s,"                   // 4: Candidates, JSON array of objects
-        "\\\"defaultRouteMacAddr\\\":\\\"%s\\\"," // 5: colon-separated lowercase values
-        // NOTE: Needs to be an empty string if local peer address is not submitted
-        //       This leads to broken JSON, but the official app does it this way as well ¯\_(ツ)_/¯
-        "\\\"localPeerAddr\\\":%s,"               // 6: JSON object or **empty string**
-        "\\\"localHashedId\\\":\\\"%s\\\"}";      // 7: 16 byte buffer, base64 encoded
+    "{\\\"sid\\\":%d,"                         // 0: sid
+     "\\\"peerSid\\\":%d,"                     // 1: peer sid
+     "\\\"skey\\\":\\\"%s\\\","                // 2: skey, 16 byte buffer, base64 encoded
+     "\\\"natType\\\":%d,"                     // 3: NAT type
+     "\\\"candidate\\\":%s,"                   // 4: Candidates, JSON array of objects
+     "\\\"defaultRouteMacAddr\\\":\\\"%s\\\"," // 5: colon-separated lowercase values
+     // NOTE: Needs to be an empty string if local peer address is not submitted
+     //       This leads to broken JSON, but the official app does it this way as well ¯\_(ツ)_/¯
+     "\\\"localPeerAddr\\\":%s,"               // 6: JSON object or **empty string**
+     "\\\"localHashedId\\\":\\\"%s\\\"}";      // 7: 16 byte buffer, base64 encoded
 static const char session_connrequest_candidate_fmt[] =
-        "{\\\"type\\\":\\\"%s\\\","        // 0: STATIC/LOCAL
-        "\\\"addr\\\":\\\"%s\\\","        // 1: IP address
-        "\\\"mappedAddr\\\":\\\"%s\\\","  // 2: IP address
-        "\\\"port\\\":%d,"                // 3: Port
-        "\\\"mappedPort\\\":%d}";         // 4: Mapped Port
+    "{\\\"type\\\":\\\"%s\\\","        // 0: STATIC/LOCAL
+     "\\\"addr\\\":\\\"%s\\\","        // 1: IP address
+     "\\\"mappedAddr\\\":\\\"%s\\\","  // 2: IP address
+     "\\\"port\\\":%d,"                // 3: Port
+     "\\\"mappedPort\\\":%d}";         // 4: Mapped Port
 static const char session_localpeeraddr_fmt[] =
-        "{\\\"accountId\\\":\\\"%" PRId64"\\\","   // 0: PSN account ID
-        "\\\"platform\\\":\\\"%s\\\"}";    // 1: "PROSPERO" for PS5, "ORBIS" for PS4, "REMOTE_PLAY" for client
+    "{\\\"accountId\\\":\\\"%" PRId64"\\\","   // 0: PSN account ID
+     "\\\"platform\\\":\\\"%s\\\"}";    // 1: "PROSPERO" for PS5, "ORBIS" for PS4, "REMOTE_PLAY" for client
 
 typedef enum notification_type_t
 {
@@ -368,9 +368,9 @@ typedef struct session_t
 static ChiakiErrorCode make_oauth2_header(char** out, const char* token);
 static ChiakiErrorCode make_session_id_header(char ** out, const char* session_id);
 static ChiakiErrorCode get_websocket_fqdn(
-        Session *session, char **fqdn);
+    Session *session, char **fqdn);
 static inline size_t curl_write_cb(
-        void* ptr, size_t size, size_t nmemb, void* userdata);
+    void* ptr, size_t size, size_t nmemb, void* userdata);
 static ChiakiErrorCode hex_to_bytes(const char* hex_str, uint8_t* bytes, size_t max_len);
 static void bytes_to_hex(const uint8_t* bytes, size_t len, char* hex_str, size_t max_len);
 static void random_uuidv4(char* out);
@@ -394,16 +394,16 @@ static ChiakiErrorCode get_stun_servers(Session *session);
 static void log_session_state(Session *session);
 static ChiakiErrorCode decode_customdata1(const char *customdata1, uint8_t *out, size_t out_len);
 static ChiakiErrorCode check_candidates(
-        Session *session, Candidate *local_candidates, Candidate *candidates_received, size_t num_candidates, chiaki_socket_t *out,
-        Candidate *out_candidate);
+    Session *session, Candidate *local_candidates, Candidate *candidates_received, size_t num_candidates, chiaki_socket_t *out,
+    Candidate *out_candidate);
 
 static json_object* session_message_get_payload(ChiakiLog *log, json_object *session_message);
 // static SessionMessageAction get_session_message_action(json_object *payload);
 static ChiakiErrorCode wait_for_notification(
-        Session *session, Notification** out,
-        uint16_t types, uint64_t timeout_ms);
+    Session *session, Notification** out,
+    uint16_t types, uint64_t timeout_ms);
 static ChiakiErrorCode clear_notification(
-        Session *session, Notification *notification);
+    Session *session, Notification *notification);
 static void notification_queue_free(NotificationQueue* queue);
 static NotificationQueue *createNq();
 static void dequeueNq(NotificationQueue *nq);
@@ -412,31 +412,31 @@ static Notification* newNotification(NotificationType type, json_object *json, c
 static void remove_substring(char *str, char *substring);
 
 static ChiakiErrorCode wait_for_session_message(
-        Session *session, SessionMessage** out,
-        uint16_t types, uint64_t timeout_ms);
+    Session *session, SessionMessage** out,
+    uint16_t types, uint64_t timeout_ms);
 static ChiakiErrorCode wait_for_session_message_ack(
-        Session *session, int req_id, uint64_t timeout_ms);
+    Session *session, int req_id, uint64_t timeout_ms);
 static ChiakiErrorCode session_message_parse(
-        ChiakiLog *log, json_object *message_json, SessionMessage **out);
+    ChiakiLog *log, json_object *message_json, SessionMessage **out);
 static ChiakiErrorCode session_message_serialize(
-        Session *session, SessionMessage *message, char **out, size_t *out_len);
+    Session *session, SessionMessage *message, char **out, size_t *out_len);
 static ChiakiErrorCode short_message_serialize(
-        Session *session, SessionMessage *message, char **out, size_t *out_len);
+    Session *session, SessionMessage *message, char **out, size_t *out_len);
 static ChiakiErrorCode session_message_free(SessionMessage *message);
 static ChiakiErrorCode deleteSession(Session *session);
 static void print_session_request(ChiakiLog *log, ConnectionRequest *req);
 static void print_candidate(ChiakiLog *log, Candidate *candidate);
 static ChiakiErrorCode receive_request_send_response_ps(Session *session, chiaki_socket_t *sock,
-                                                        Candidate *candidate, size_t timeout);
+    Candidate *candidate, size_t timeout);
 static ChiakiErrorCode send_response_ps(Session *session, uint8_t *req, chiaki_socket_t *sock,
-                                        Candidate *candidate);
+    Candidate *candidate);
 static ChiakiErrorCode send_responseto_ps(Session *session, uint8_t *req, chiaki_socket_t *sock,
-                                          Candidate *candidate, struct sockaddr *addr, socklen_t len);
+    Candidate *candidate, struct sockaddr *addr, socklen_t len);
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_list_devices(
-        const char* psn_oauth2_token, ChiakiHolepunchConsoleType console_type,
-        ChiakiHolepunchDeviceInfo **devices, size_t *device_count,
-        ChiakiLog *log)
+    const char* psn_oauth2_token, ChiakiHolepunchConsoleType console_type,
+    ChiakiHolepunchDeviceInfo **devices, size_t *device_count,
+    ChiakiLog *log)
 {
     CURL *curl = curl_easy_init();
     if(!curl)
@@ -463,8 +463,8 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_list_devices(
     }
 
     HttpResponseData response_data = {
-            .data = malloc(0),
-            .size = 0,
+        .data = malloc(0),
+        .size = 0,
     };
 
     struct curl_slist *headers = NULL;
@@ -490,13 +490,6 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_list_devices(
     if(res != CURLE_OK)
         CHIAKI_LOGW(log, "chiaki_holepunch_list_devices: CURL setopt CURLOPT_WRITEDATA failed with CURL error %s", curl_easy_strerror(res));
 
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(log, "chiaki_holepunch_list_devices: CURL setopt CURLOPT_SSL_VERIFYPEER failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(log, "chiaki_holepunch_list_devices: CURL setopt CURLOPT_SSL_VERIFYHOST failed with CURL error %s", curl_easy_strerror(res));
-
     res = curl_easy_perform(curl);
     curl_slist_free_all(headers);
     if (res != CURLE_OK)
@@ -506,7 +499,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_list_devices(
             long http_code = 0;
             curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
             CHIAKI_LOGE(log, "chiaki_holepunch_list_devices: Fetching device list from %s failed with HTTP code %ld", url, http_code);
-            CHIAKI_LOGV(log, "chiaki_holepunch_list_devices Response Body: %.*s.", (int)response_data.size, response_data.data);
+            CHIAKI_LOGV(log, "Response Body: %.*s.", (int)response_data.size, response_data.data);
             err = CHIAKI_ERR_HTTP_NONOK;
         } else {
             CHIAKI_LOGE(log, "chiaki_holepunch_list_devices: Fetching device list from %s failed with CURL error %s", url, curl_easy_strerror(res));
@@ -639,14 +632,14 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_list_devices(
         (*devices)[i] = device;
     }
 
-    cleanup_devices:
-    if (err != CHIAKI_ERR_SUCCESS)
-        chiaki_holepunch_free_device_list(devices);
-    cleanup_json:
+cleanup_devices:
+if (err != CHIAKI_ERR_SUCCESS)
+    chiaki_holepunch_free_device_list(devices);
+cleanup_json:
     json_object_put(json);
-    cleanup_json_tokener:
+cleanup_json_tokener:
     json_tokener_free(tok);
-    cleanup:
+cleanup:
     free(oauth_header);
     free(response_data.data);
     curl_easy_cleanup(curl);
@@ -695,7 +688,7 @@ CHIAKI_EXPORT chiaki_socket_t *chiaki_get_holepunch_sock(ChiakiHolepunchSession 
 }
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_generate_client_device_uid(
-        char *out, size_t *out_size)
+    char *out, size_t *out_size)
 {
     if (*out_size < CHIAKI_DUID_STR_SIZE)
     {
@@ -716,7 +709,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_generate_client_device_uid(
 }
 
 CHIAKI_EXPORT Session* chiaki_holepunch_session_init(
-        const char* psn_oauth2_token, ChiakiLog *log)
+    const char* psn_oauth2_token, ChiakiLog *log)
 {
     Session *session = malloc(sizeof(Session));
     if(!session)
@@ -882,7 +875,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_session_create(Session* session)
     bool finished = false;
     Notification *notif = NULL;
     int notif_query = NOTIFICATION_TYPE_SESSION_CREATED
-                      | NOTIFICATION_TYPE_MEMBER_CREATED;
+                    | NOTIFICATION_TYPE_MEMBER_CREATED;
     while (!finished)
     {
         err = wait_for_notification(session, &notif, notif_query, SESSION_CREATION_TIMEOUT_SEC * 1000);
@@ -957,7 +950,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_session_create(Session* session)
         http_check_session(session, true);
         log_session_state(session);
         finished = (session->state & SESSION_STATE_CREATED) &&
-                   (session->state & SESSION_STATE_CLIENT_JOINED);
+                        (session->state & SESSION_STATE_CLIENT_JOINED);
         chiaki_mutex_unlock(&session->state_mutex);
         clear_notification(session, notif);
     }
@@ -965,8 +958,8 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_session_create(Session* session)
 }
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_session_start(
-        Session* session, const uint8_t* device_uid,
-        ChiakiHolepunchConsoleType console_type)
+    Session* session, const uint8_t* device_uid,
+    ChiakiHolepunchConsoleType console_type)
 {
     chiaki_mutex_lock(&session->state_mutex);
     if (!(session->state & SESSION_STATE_CREATED))
@@ -1024,7 +1017,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_session_start(
     bool finished = false;
     Notification *notif = NULL;
     int notif_query = NOTIFICATION_TYPE_MEMBER_CREATED
-                      | NOTIFICATION_TYPE_CUSTOM_DATA1_UPDATED;
+                    | NOTIFICATION_TYPE_CUSTOM_DATA1_UPDATED;
     while (!finished)
     {
         err = wait_for_notification(session, &notif, notif_query, SESSION_START_TIMEOUT_SEC * 1000);
@@ -1154,8 +1147,8 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_session_start(
 static ChiakiErrorCode http_ps4_session_wakeup(Session *session)
 {
     HttpResponseData response_data = {
-            .data = malloc(0),
-            .size = 0,
+        .data = malloc(0),
+        .size = 0,
     };
 
     CURL *curl = curl_easy_init();
@@ -1193,12 +1186,6 @@ static ChiakiErrorCode http_ps4_session_wakeup(Session *session)
     res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&response_data);
     if(res != CURLE_OK)
         CHIAKI_LOGW(session->log, "http_ps4_session_wakeup: CURL setopt CURLOPT_WRITEDATA failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "http_ps4_session_wakeup: CURL setopt CURLOPT_SSL_VERIFYPEER failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "http_ps4_session_wakeup: CURL setopt CURLOPT_SSL_VERIFYHOST failed with CURL error %s", curl_easy_strerror(res));
 
     ChiakiErrorCode err = CHIAKI_ERR_SUCCESS;
     res = curl_easy_perform(curl);
@@ -1238,8 +1225,8 @@ static ChiakiErrorCode http_ps4_session_wakeup(Session *session)
     json_pointer_get(json, "/url", &user_profile_url_json);
 
     bool schema_bad =
-            (user_profile_url_json == NULL
-             || !json_object_is_type(user_profile_url_json, json_type_string));
+        (user_profile_url_json == NULL
+        || !json_object_is_type(user_profile_url_json, json_type_string));
     if (schema_bad)
     {
         CHIAKI_LOGE(session->log, "http_ps4_session_wakeup: Unexpected JSON schema, could not parse user profile url");
@@ -1303,9 +1290,9 @@ static ChiakiErrorCode http_ps4_session_wakeup(Session *session)
         goto cleanup_json;
     }
     snprintf(envelope_buf, sizeof(envelope_buf), session_wakeup_envelope_fmt,
-             data1_base64,
-             data2_base64,
-             session->session_id);
+        data1_base64,
+        data2_base64,
+        session->session_id);
 
     curl = curl_easy_init();
     if(!curl)
@@ -1348,12 +1335,6 @@ static ChiakiErrorCode http_ps4_session_wakeup(Session *session)
     res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&response_data);
     if(res != CURLE_OK)
         CHIAKI_LOGW(session->log, "http_ps4_session_wakeup: CURL setopt CURLOPT_WRITEDATA failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "http_ps4_session_wakeup: CURL setopt CURLOPT_SSL_VERIFYPEER failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "http_ps4_session_wakeup: CURL setopt CURLOPT_SSL_VERIFYHOST failed with CURL error %s", curl_easy_strerror(res));
 
     CHIAKI_LOGV(session->log, "http_ps4_session_wakeup: Sending JSON:\n%s", envelope_buf);
 
@@ -1384,11 +1365,11 @@ static ChiakiErrorCode http_ps4_session_wakeup(Session *session)
     log_session_state(session);
     chiaki_mutex_unlock(&session->state_mutex);
 
-    cleanup_json:
+cleanup_json:
     json_object_put(json);
-    cleanup_json_tokener:
+cleanup_json_tokener:
     json_tokener_free(tok);
-    cleanup:
+cleanup:
     curl_easy_cleanup(curl);
     free(response_data.data);
 
@@ -1408,7 +1389,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_session_punch_hole(Session* sessi
         goto offer_cleanup;
     }
     else if (port_type == CHIAKI_HOLEPUNCH_PORT_TYPE_DATA
-             && !(session->state & SESSION_STATE_CTRL_ESTABLISHED))
+        && !(session->state & SESSION_STATE_CTRL_ESTABLISHED))
     {
         chiaki_mutex_unlock(&session->state_mutex);
         CHIAKI_LOGE(session->log, "chiaki_holepunch_session_punch_holes: Control port not open yet.");
@@ -1448,11 +1429,11 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_session_punch_hole(Session* sessi
 
     // ACK the message
     SessionMessage ack_msg = {
-            .action = SESSION_MESSAGE_ACTION_RESULT,
-            .req_id = console_offer_msg->req_id,
-            .error = 0,
-            .conn_request = NULL,
-            .notification = NULL,
+        .action = SESSION_MESSAGE_ACTION_RESULT,
+        .req_id = console_offer_msg->req_id,
+        .error = 0,
+        .conn_request = NULL,
+        .notification = NULL,
     };
     err = http_send_session_message(session, &ack_msg, true);
     if(err != CHIAKI_ERR_SUCCESS)
@@ -1479,7 +1460,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_session_punch_hole(Session* sessi
 
     // Wait for ACK of OFFER, ignore other OFFERs, simply ACK them
     err = wait_for_session_message_ack(
-            session, our_offer_req_id, SESSION_START_TIMEOUT_SEC * 1000);
+        session, our_offer_req_id, SESSION_START_TIMEOUT_SEC * 1000);
     if (err == CHIAKI_ERR_TIMEOUT)
     {
         CHIAKI_LOGE(session->log, "chiaki_holepunch_session_punch_holes: Timed out waiting for ACK of our connection offer.");
@@ -1508,8 +1489,8 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_session_punch_hole(Session* sessi
     if (err != CHIAKI_ERR_SUCCESS)
     {
         CHIAKI_LOGE(
-                session->log, "chiaki_holepunch_session_punch_holes: Failed to find reachable candidate for %s connection.",
-                port_type == CHIAKI_HOLEPUNCH_PORT_TYPE_CTRL ? "control" : "data");
+            session->log, "chiaki_holepunch_session_punch_holes: Failed to find reachable candidate for %s connection.",
+            port_type == CHIAKI_HOLEPUNCH_PORT_TYPE_CTRL ? "control" : "data");
         goto cleanup;
     }
     chiaki_mutex_lock(&session->stop_mutex);
@@ -1561,11 +1542,11 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_session_punch_hole(Session* sessi
 
     // ACK the accept message response
     SessionMessage accept_ack_msg = {
-            .action = SESSION_MESSAGE_ACTION_RESULT,
-            .req_id = msg->req_id,
-            .error = 0,
-            .conn_request = NULL,
-            .notification = NULL,
+        .action = SESSION_MESSAGE_ACTION_RESULT,
+        .req_id = msg->req_id,
+        .error = 0,
+        .conn_request = NULL,
+        .notification = NULL,
     };
     err = http_send_session_message(session, &accept_ack_msg, true);
     if(err != CHIAKI_ERR_SUCCESS)
@@ -1619,11 +1600,11 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_session_punch_hole(Session* sessi
     }
     log_session_state(session);
 
-    cleanup_msg:
+cleanup_msg:
     chiaki_mutex_lock(&session->notif_mutex);
     session_message_free(msg);
     chiaki_mutex_unlock(&session->notif_mutex);
-    cleanup:
+cleanup:
     if(err != CHIAKI_ERR_SUCCESS)
     {
         if(!CHIAKI_SOCKET_IS_INVALID(session->ipv4_sock))
@@ -1640,7 +1621,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_session_punch_hole(Session* sessi
     chiaki_mutex_lock(&session->notif_mutex);
     session_message_free(console_offer_msg);
     chiaki_mutex_unlock(&session->notif_mutex);
-    offer_cleanup:
+offer_cleanup:
     if(session->our_offer_msg)
     {
         session_message_free(session->our_offer_msg);
@@ -1715,7 +1696,7 @@ CHIAKI_EXPORT void chiaki_holepunch_session_fini(Session* session)
             if(upnp_delete_udp_port_mapping(session->log, &session->gw, session->local_port_data))
                 CHIAKI_LOGI(session->log, "Deleted UPNP local port data mapping");
             else
-                CHIAKI_LOGE(session->log, "Couldn't delete UPNP local port data mapping");
+                CHIAKI_LOGE(session->log, "Couldn't delete UPNP local port data mapping"); 
         }
         free(session->gw.data);
         free(session->gw.urls);
@@ -1808,8 +1789,8 @@ static ChiakiErrorCode make_session_id_header(char **out, const char* session_id
 static ChiakiErrorCode get_websocket_fqdn(Session *session, char **fqdn)
 {
     HttpResponseData response_data = {
-            .data = malloc(0),
-            .size = 0,
+        .data = malloc(0),
+        .size = 0,
     };
 
     CURL *curl = curl_easy_init();
@@ -1842,12 +1823,6 @@ static ChiakiErrorCode get_websocket_fqdn(Session *session, char **fqdn)
     res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&response_data);
     if(res != CURLE_OK)
         CHIAKI_LOGW(session->log, "get_websocket_fqdn: CURL setopt CURLOPT_WRITEDATA failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "get_websocket_fqdn: CURL setopt CURLOPT_SSL_VERIFYPEER failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "get_websocket_fqdn: CURL setopt CURLOPT_SSL_VERIFYHOST failed with CURL error %s", curl_easy_strerror(res));
 
     res = curl_easy_perform(curl);
     curl_slist_free_all(headers);
@@ -1894,11 +1869,11 @@ static ChiakiErrorCode get_websocket_fqdn(Session *session, char **fqdn)
     }
     *fqdn = strdup(json_object_get_string(fqdn_json));
 
-    cleanup_json:
+cleanup_json:
     json_object_put(json);
-    cleanup_json_tokener:
+cleanup_json_tokener:
     json_tokener_free(tok);
-    cleanup:
+cleanup:
     curl_easy_cleanup(curl);
     free(response_data.data);
     return err;
@@ -1914,7 +1889,7 @@ static ChiakiErrorCode get_websocket_fqdn(Session *session, char **fqdn)
  * @return Number of bytes written
 */
 static inline size_t curl_write_cb(
-        void* ptr, size_t size, size_t nmemb, void* userdata)
+    void* ptr, size_t size, size_t nmemb, void* userdata)
 {
     size_t realsize = size * nmemb;
     HttpResponseData* response_data = (HttpResponseData*) userdata;
@@ -2026,12 +2001,6 @@ static void* websocket_thread_func(void *user) {
     res = curl_easy_setopt(curl, CURLOPT_CONNECT_ONLY, 2L);
     if(res != CURLE_OK)
         CHIAKI_LOGW(session->log, "websocket_thread_func: CURL setopt CURLOPT_CONNECT_ONLY failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "websocket_thread_func: CURL setopt CURLOPT_SSL_VERIFYPEER failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "websocket_thread_func: CURL setopt CURLOPT_SSL_VERIFYHOST failed with CURL error %s", curl_easy_strerror(res));
 
     res = curl_easy_perform(curl);
     curl_slist_free_all(headers);
@@ -2190,12 +2159,12 @@ static void* websocket_thread_func(void *user) {
             // waiting on offers
             chiaki_mutex_lock(&session->state_mutex);
             bool should_ack_offers =
-                    // We're not expecting any offers after receiving one for the control port and before it's established, afterwards we expect
-                    // one for the data port, so we don't auto-ACK in between
-                    (session->state & SESSION_STATE_CTRL_OFFER_RECEIVED
-                     && !(session->state & SESSION_STATE_CTRL_ESTABLISHED))
-                    // At this point all offers were received and we don't care for new ones anymore
-                    || session->state & SESSION_STATE_DATA_OFFER_RECEIVED;
+                // We're not expecting any offers after receiving one for the control port and before it's established, afterwards we expect
+                // one for the data port, so we don't auto-ACK in between
+                (session->state & SESSION_STATE_CTRL_OFFER_RECEIVED
+                 && !(session->state & SESSION_STATE_CTRL_ESTABLISHED))
+                 // At this point all offers were received and we don't care for new ones anymore
+                || session->state & SESSION_STATE_DATA_OFFER_RECEIVED;
             chiaki_mutex_unlock(&session->state_mutex);
             if (should_ack_offers && notif->type == NOTIFICATION_TYPE_SESSION_MESSAGE_CREATED)
             {
@@ -2211,11 +2180,11 @@ static void* websocket_thread_func(void *user) {
                 if (msg->action == SESSION_MESSAGE_ACTION_OFFER)
                 {
                     SessionMessage ack_msg = {
-                            .action = SESSION_MESSAGE_ACTION_RESULT,
-                            .req_id = msg->req_id,
-                            .error = 0,
-                            .conn_request = NULL,
-                            .notification = NULL,
+                        .action = SESSION_MESSAGE_ACTION_RESULT,
+                        .req_id = msg->req_id,
+                        .error = 0,
+                        .conn_request = NULL,
+                        .notification = NULL,
                     };
                     http_send_session_message(session, &ack_msg, true);
                 }
@@ -2235,11 +2204,11 @@ static void* websocket_thread_func(void *user) {
         chiaki_mutex_lock(&session->stop_mutex);
     }
 
-    cleanup_json:
+cleanup_json:
     chiaki_mutex_unlock(&session->stop_mutex);
     json_tokener_free(tok);
     free(buf);
-    cleanup:
+cleanup:
     curl_easy_cleanup(curl);
     session->ws_open = false;
 
@@ -2247,7 +2216,7 @@ static void* websocket_thread_func(void *user) {
 }
 
 static NotificationType parse_notification_type(
-        ChiakiLog *log, json_object* json
+    ChiakiLog *log, json_object* json
 ) {
     json_object* datatype;
     if (!json_object_object_get_ex(json, "dataType", &datatype))
@@ -2318,13 +2287,13 @@ CHIAKI_EXPORT ChiakiErrorCode holepunch_session_create_offer(Session *session)
     const int enable = 1;
     ChiakiErrorCode err = CHIAKI_ERR_SUCCESS;
 #if defined(SO_REUSEPORT)
-    if (setsockopt(session->ipv4_sock, SOL_SOCKET, SO_REUSEPORT, (const void *)&enable, sizeof(int)) < 0)
-    {
-        CHIAKI_LOGE(session->log, "holepunch_session_create_offer: setsockopt(SO_REUSEPORT) for ipv4 socket failed with error " CHIAKI_SOCKET_ERROR_FMT, CHIAKI_SOCKET_ERROR_VALUE);
-        return CHIAKI_ERR_UNKNOWN;
-    }
+        if (setsockopt(session->ipv4_sock, SOL_SOCKET, SO_REUSEPORT, (const void *)&enable, sizeof(int)) < 0)
+        {
+            CHIAKI_LOGE(session->log, "holepunch_session_create_offer: setsockopt(SO_REUSEPORT) for ipv4 socket failed with error " CHIAKI_SOCKET_ERROR_FMT, CHIAKI_SOCKET_ERROR_VALUE);
+            return CHIAKI_ERR_UNKNOWN;
+        }
 #else
-    if (setsockopt(session->ipv4_sock, SOL_SOCKET, SO_REUSEADDR, (const void *)&enable, sizeof(int)) < 0)
+        if (setsockopt(session->ipv4_sock, SOL_SOCKET, SO_REUSEADDR, (const void *)&enable, sizeof(int)) < 0)
         {
             CHIAKI_LOGE(session->log, "holepunch_session_create_offer: setsockopt(SO_REUSEADDR) for ipv4 socket failed with error" CHIAKI_SOCKET_ERROR_FMT, CHIAKI_SOCKET_ERROR_VALUE);
             err = CHIAKI_ERR_UNKNOWN;
@@ -2398,11 +2367,11 @@ CHIAKI_EXPORT ChiakiErrorCode holepunch_session_create_offer(Session *session)
     size_t our_offer_msg_req_id = session->local_req_id;
     session->local_req_id++;
     SessionMessage msg = {
-            .action = SESSION_MESSAGE_ACTION_OFFER,
-            .req_id = our_offer_msg_req_id,
-            .error = 0,
-            .conn_request = malloc(sizeof(ConnectionRequest)),
-            .notification = NULL,
+        .action = SESSION_MESSAGE_ACTION_OFFER,
+        .req_id = our_offer_msg_req_id,
+        .error = 0,
+        .conn_request = malloc(sizeof(ConnectionRequest)),
+        .notification = NULL,
     };
     if(!msg.conn_request)
     {
@@ -2680,7 +2649,7 @@ CHIAKI_EXPORT ChiakiErrorCode holepunch_session_create_offer(Session *session)
     // either STUN candidate if it exists, else STATIC candidate
     memcpy(&session->local_candidates[1], &msg.conn_request->candidates[0], sizeof(Candidate));
 
-    cleanup:
+cleanup:
     if(err == CHIAKI_ERR_SUCCESS)
     {
         session->our_offer_msg = malloc(sizeof(SessionMessage));
@@ -2694,7 +2663,7 @@ CHIAKI_EXPORT ChiakiErrorCode holepunch_session_create_offer(Session *session)
         free(msg.conn_request->candidates);
         free(msg.conn_request);
     }
-    cleanup_socket:
+cleanup_socket:
     if(err != CHIAKI_ERR_SUCCESS)
     {
         if(!CHIAKI_SOCKET_IS_INVALID(session->ipv4_sock))
@@ -2725,11 +2694,11 @@ static ChiakiErrorCode send_offer(Session *session)
 static ChiakiErrorCode send_accept(Session *session, int req_id, Candidate *selected_candidate)
 {
     SessionMessage msg = {
-            .action = SESSION_MESSAGE_ACTION_ACCEPT,
-            .req_id = req_id,
-            .error = 0,
-            .conn_request = calloc(1, sizeof(ConnectionRequest)),
-            .notification = NULL,
+        .action = SESSION_MESSAGE_ACTION_ACCEPT,
+        .req_id = req_id,
+        .error = 0,
+        .conn_request = calloc(1, sizeof(ConnectionRequest)),
+        .notification = NULL,
     };
     if(!msg.conn_request)
         return CHIAKI_ERR_MEMORY;
@@ -2770,8 +2739,8 @@ static ChiakiErrorCode http_create_session(Session *session)
     CHIAKI_LOGV(session->log, "http_create_session: Sending JSON:\n%s", session_create_json);
 
     HttpResponseData response_data = {
-            .data = malloc(0),
-            .size = 0,
+        .data = malloc(0),
+        .size = 0,
     };
 
     CURL* curl = curl_easy_init();
@@ -2810,12 +2779,6 @@ static ChiakiErrorCode http_create_session(Session *session)
     res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&response_data);
     if(res != CURLE_OK)
         CHIAKI_LOGW(session->log, "http_create_session: CURL setopt CURLOPT_WRITEDATA failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "http_create_session: CURL setopt CURLOPT_SSL_VERIFYPEER failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "http_create_session: CURL setopt CURLOPT_SSL_VERIFYHOST failed with CURL error %s", curl_easy_strerror(res));
 
     ChiakiErrorCode err = CHIAKI_ERR_SUCCESS;
     res = curl_easy_perform(curl);
@@ -2856,11 +2819,11 @@ static ChiakiErrorCode http_create_session(Session *session)
     json_pointer_get(json, "/remotePlaySessions/0/members/0/accountId", &account_id_json);
 
     bool schema_bad =
-            session_id_json == NULL
-            || !json_object_is_type(session_id_json, json_type_string)
-            || account_id_json == NULL
-            || (!json_object_is_type(account_id_json, json_type_string)
-                && !json_object_is_type(account_id_json, json_type_int));
+        session_id_json == NULL
+        || !json_object_is_type(session_id_json, json_type_string)
+        || account_id_json == NULL
+        || (!json_object_is_type(account_id_json, json_type_string)
+            && !json_object_is_type(account_id_json, json_type_int));
     if (schema_bad)
     {
         CHIAKI_LOGE(session->log, "http_create_session: Unexpected JSON schema, could not parse sessionId and accountId.");
@@ -2881,11 +2844,11 @@ static ChiakiErrorCode http_create_session(Session *session)
 
     session->account_id = json_object_get_int64(account_id_json);
 
-    cleanup_json:
+cleanup_json:
     json_object_put(json);
-    cleanup_json_tokener:
+cleanup_json_tokener:
     json_tokener_free(tok);
-    cleanup:
+cleanup:
     free(session_create_json);
     free(response_data.data);
     curl_easy_cleanup(curl);
@@ -2902,8 +2865,8 @@ static ChiakiErrorCode http_create_session(Session *session)
 static ChiakiErrorCode http_check_session(Session *session, bool viewurl)
 {
     HttpResponseData response_data = {
-            .data = malloc(0),
-            .size = 0,
+        .data = malloc(0),
+        .size = 0,
     };
 
     CURL* curl = curl_easy_init();
@@ -2938,12 +2901,6 @@ static ChiakiErrorCode http_check_session(Session *session, bool viewurl)
     res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&response_data);
     if(res != CURLE_OK)
         CHIAKI_LOGW(session->log, "http_check_session: CURL setopt CURLOPT_WRITEDATA failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "http_check_session: CURL setopt CURLOPT_SSL_VERIFYPEER failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "http_check_session: CURL setopt CURLOPT_SSL_VERIFYHOST failed with CURL error %s", curl_easy_strerror(res));
 
     ChiakiErrorCode err = CHIAKI_ERR_SUCCESS;
     res = curl_easy_perform(curl);
@@ -2980,11 +2937,11 @@ static ChiakiErrorCode http_check_session(Session *session, bool viewurl)
 
     json_object_put(json);
     cleanup_json_tokener:
-    json_tokener_free(tok);
+        json_tokener_free(tok);
     cleanup:
-    free(response_data.data);
-    curl_easy_cleanup(curl);
-    return err;
+        free(response_data.data);
+        curl_easy_cleanup(curl);
+        return err;
 }
 /**
  * Starts a session on the PSN server. Session must have been created before.
@@ -3012,23 +2969,23 @@ static ChiakiErrorCode http_start_session(Session *session)
         goto offer_cleanup;
     }
     snprintf(payload_buf, sizeof(payload_buf), session_start_payload_fmt,
-             session->account_id,
-             session->session_id,
-             data1_base64,
-             data2_base64);
+        session->account_id,
+        session->session_id,
+        data1_base64,
+        data2_base64);
 
     char device_uid_str[sizeof(session->console_uid) * 2 + 1];
     bytes_to_hex(session->console_uid, sizeof(session->console_uid), device_uid_str, sizeof(device_uid_str));
 
     snprintf(
-            envelope_buf, sizeof(envelope_buf), session_start_envelope_fmt,
-            device_uid_str,
-            payload_buf,
-            session->console_type == CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS4 ? "PS4" : "PS5");
+        envelope_buf, sizeof(envelope_buf), session_start_envelope_fmt,
+        device_uid_str,
+        payload_buf,
+        session->console_type == CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS4 ? "PS4" : "PS5");
 
     HttpResponseData response_data = {
-            .data = malloc(0),
-            .size = 0,
+        .data = malloc(0),
+        .size = 0,
     };
 
     CURL *curl = curl_easy_init();
@@ -3069,12 +3026,6 @@ static ChiakiErrorCode http_start_session(Session *session)
     res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&response_data);
     if(res != CURLE_OK)
         CHIAKI_LOGW(session->log, "http_start_session: CURL setopt CURLOPT_WRITEDATA failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "http_start_session: CURL setopt CURLOPT_SSL_VERIFYPEER failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "http_start_session: CURL setopt CURLOPT_SSL_VERIFYHOST failed with CURL error %s", curl_easy_strerror(res));
 
     CHIAKI_LOGV(session->log, "http_start_session: Sending JSON:\n%s", envelope_buf);
 
@@ -3103,10 +3054,10 @@ static ChiakiErrorCode http_start_session(Session *session)
     log_session_state(session);
     chiaki_mutex_unlock(&session->state_mutex);
 
-    cleanup:
+cleanup:
     curl_easy_cleanup(curl);
     free(response_data.data);
-    offer_cleanup:
+offer_cleanup:
     if(err != CHIAKI_ERR_SUCCESS)
     {
         if(session->our_offer_msg)
@@ -3135,8 +3086,8 @@ static ChiakiErrorCode http_send_session_message(Session *session, SessionMessag
     ChiakiErrorCode err = CHIAKI_ERR_SUCCESS;
 
     HttpResponseData response_data = {
-            .data = malloc(0),
-            .size = 0,
+        .data = malloc(0),
+        .size = 0,
     };
 
     char url[128] = {0};
@@ -3153,9 +3104,9 @@ static ChiakiErrorCode http_send_session_message(Session *session, SessionMessag
         session_message_serialize(session, message, &payload_str, &payload_len);
     char msg_buf[sizeof(session_message_envelope_fmt) * 2 + payload_len];
     snprintf(
-            msg_buf, sizeof(msg_buf), session_message_envelope_fmt,
-            payload_str, session->account_id, console_uid_str,
-            session->console_type == CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS4 ? "PS4" : "PS5"
+        msg_buf, sizeof(msg_buf), session_message_envelope_fmt,
+        payload_str, session->account_id, console_uid_str,
+        session->console_type == CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS4 ? "PS4" : "PS5"
     );
     CHIAKI_LOGV(session->log, "Message to send: %s", msg_buf);
     CURL *curl = curl_easy_init();
@@ -3195,12 +3146,6 @@ static ChiakiErrorCode http_send_session_message(Session *session, SessionMessag
     res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&response_data);
     if(res != CURLE_OK)
         CHIAKI_LOGW(session->log, "http_send_session_message: CURL setopt CURLOPT_WRITEDATA failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "http_send_session_message: CURL setopt CURLOPT_SSL_VERIFYPEER failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "http_send_session_message: CURL setopt CURLOPT_SSL_VERIFYHOST failed with CURL error %s", curl_easy_strerror(res));
 
     res = curl_easy_perform(curl);
     curl_slist_free_all(headers);
@@ -3220,7 +3165,7 @@ static ChiakiErrorCode http_send_session_message(Session *session, SessionMessag
         goto cleanup;
     }
 
-    cleanup:
+cleanup:
     curl_easy_cleanup(curl);
     free(payload_str);
     free(response_data.data);
@@ -3238,8 +3183,8 @@ static ChiakiErrorCode deleteSession(Session *session)
     ChiakiErrorCode err = CHIAKI_ERR_SUCCESS;
 
     HttpResponseData response_data = {
-            .data = malloc(0),
-            .size = 0,
+        .data = malloc(0),
+        .size = 0,
     };
 
     char url[128] = {0};
@@ -3281,12 +3226,6 @@ static ChiakiErrorCode deleteSession(Session *session)
     res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&response_data);
     if(res != CURLE_OK)
         CHIAKI_LOGW(session->log, "delete_session: CURL setopt CURLOPT_WRITEDATA failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "delete_session: CURL setopt CURLOPT_SSL_VERIFYPEER failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "delete_session: CURL setopt CURLOPT_SSL_VERIFYHOST failed with CURL error %s", curl_easy_strerror(res));
 
     res = curl_easy_perform(curl);
     curl_slist_free_all(headers);
@@ -3305,7 +3244,7 @@ static ChiakiErrorCode deleteSession(Session *session)
         goto cleanup;
     }
 
-    cleanup:
+cleanup:
     curl_easy_cleanup(curl);
     free(response_data.data);
     return err;
@@ -3461,7 +3400,7 @@ static ChiakiErrorCode upnp_get_gateway_info(ChiakiLog *log, UPNPGatewayInfo *in
     ChiakiErrorCode err = CHIAKI_ERR_SUCCESS;
     int success = 0;
     struct UPNPDev *devlist = upnpDiscover(
-            2000 /** ms, delay*/, NULL, NULL, 0, 0, 2, &success);
+        2000 /** ms, delay*/, NULL, NULL, 0, 0, 2, &success);
     if (devlist == NULL || err != UPNPDISCOVER_SUCCESS) {
         CHIAKI_LOGI(log, "Failed to find UPnP-capable devices on network: err=%d", err);
         return CHIAKI_ERR_NETWORK;
@@ -3478,7 +3417,7 @@ static ChiakiErrorCode upnp_get_gateway_info(ChiakiLog *log, UPNPGatewayInfo *in
         goto cleanup;
     }
 
-    cleanup:
+cleanup:
     freeUPNPDevlist(devlist);
     return err;
 }
@@ -3492,7 +3431,7 @@ static ChiakiErrorCode upnp_get_gateway_info(ChiakiLog *log, UPNPGatewayInfo *in
 static bool get_client_addr_remote_upnp(ChiakiLog *log, UPNPGatewayInfo *gw_info, char* out)
 {
     int res = UPNP_GetExternalIPAddress(
-            gw_info->urls->controlURL, gw_info->data->first.servicetype, out);
+        gw_info->urls->controlURL, gw_info->data->first.servicetype, out);
     bool success = (res == UPNPCOMMAND_SUCCESS);
     if(!success)
         CHIAKI_LOGE(log, "UPNP error getting external IP Address: %s", strupnperror(res));
@@ -3516,8 +3455,8 @@ static bool upnp_add_udp_port_mapping(ChiakiLog* log, UPNPGatewayInfo *gw_info, 
     snprintf(port_external_str, sizeof(port_external_str), "%d", port_external);
 
     int res = UPNP_AddPortMapping(
-            gw_info->urls->controlURL, gw_info->data->first.servicetype,
-            port_external_str, port_internal_str, gw_info->lan_ip, "Chiaki Streaming", "UDP", NULL, "0");
+        gw_info->urls->controlURL, gw_info->data->first.servicetype,
+        port_external_str, port_internal_str, gw_info->lan_ip, "Chiaki Streaming", "UDP", NULL, "0");
 
     bool success = (res == UPNPCOMMAND_SUCCESS);
     if(!success)
@@ -3538,8 +3477,8 @@ static bool upnp_delete_udp_port_mapping(ChiakiLog *log, UPNPGatewayInfo *gw_inf
     snprintf(port_external_str, sizeof(port_external_str), "%d", port_external);
 
     int res = UPNP_DeletePortMapping(
-            gw_info->urls->controlURL, gw_info->data->first.servicetype,
-            port_external_str, "UDP", NULL);
+        gw_info->urls->controlURL, gw_info->data->first.servicetype,
+        port_external_str, "UDP", NULL);
     bool success = (res == UPNPCOMMAND_SUCCESS);
     if(!success)
         CHIAKI_LOGE(log, "UPNP error deleting port mapping: %s", strupnperror(res));
@@ -3648,8 +3587,8 @@ static bool get_client_addr_remote_stun(Session *session, char *address, uint16_
 */
 
 static ChiakiErrorCode check_candidates(
-        Session *session, Candidate* local_candidates, Candidate *candidates_received, size_t num_candidates, chiaki_socket_t *out,
-        Candidate *out_candidate)
+    Session *session, Candidate* local_candidates, Candidate *candidates_received, size_t num_candidates, chiaki_socket_t *out,
+    Candidate *out_candidate)
 {
     ChiakiErrorCode err = CHIAKI_ERR_SUCCESS;
 
@@ -3734,7 +3673,7 @@ static ChiakiErrorCode check_candidates(
                 continue;
             }
 #endif
-            // set low ttl so packets just punch hole in NAT
+                // set low ttl so packets just punch hole in NAT
 #ifdef _WIN32
             DWORD ttl = 2;
 #else
@@ -3880,9 +3819,9 @@ static ChiakiErrorCode check_candidates(
     {
         int ret = select(maxfd, &fds, NULL, NULL, &tv);
 #ifdef _WIN32
-        if (ret < 0 && WSAGetLastError() != WSAEINTR)
+	    if (ret < 0 && WSAGetLastError() != WSAEINTR)
 #else
-        if (ret < 0 && errno != EINTR)
+	    if (ret < 0 && errno != EINTR)
 #endif
         {
             CHIAKI_LOGE(session->log, "check_candidates: Select failed with error: " CHIAKI_SOCKET_ERROR_FMT, CHIAKI_SOCKET_ERROR_VALUE);
@@ -3933,7 +3872,7 @@ static ChiakiErrorCode check_candidates(
                             }
                         }
                     }
-                    continue;
+                    continue;                    
                 }
                 else if(received_response && !connecting)
                 {
@@ -4161,7 +4100,7 @@ static ChiakiErrorCode check_candidates(
             {
                 CHIAKI_LOGE(session->log, "check_candidates: Sending request failed for %s:%d with error: " CHIAKI_SOCKET_ERROR_FMT, candidate->addr, candidate->port, CHIAKI_SOCKET_ERROR_VALUE);
                 err = CHIAKI_ERR_NETWORK;
-                continue;
+                    continue;
             }
         }
     }
@@ -4251,7 +4190,7 @@ static ChiakiErrorCode check_candidates(
     session->ipv6_sock = CHIAKI_INVALID_SOCKET;
     return CHIAKI_ERR_SUCCESS;
 
-    cleanup_sockets:
+cleanup_sockets:
     if(!CHIAKI_SOCKET_IS_INVALID(session->ipv4_sock))
     {
         CHIAKI_SOCKET_CLOSE(session->ipv4_sock);
@@ -4287,46 +4226,46 @@ static ChiakiErrorCode check_candidates(
  */
 static ChiakiErrorCode send_response_ps(Session *session, uint8_t *req, chiaki_socket_t *sock, Candidate *candidate)
 {
-    uint8_t confirm_buf[88] = {0};
-    *(uint32_t*)&confirm_buf[0] = htonl(MSG_TYPE_RESP);
-    memcpy(&confirm_buf[0x4], session->hashed_id_local, sizeof(session->hashed_id_local));
-    memcpy(&confirm_buf[0x24], session->hashed_id_console, sizeof(session->hashed_id_console));
-    *(uint16_t*)&confirm_buf[0x44] = htons(session->sid_local);
-    *(uint16_t*)&confirm_buf[0x46] = htons(session->sid_console);
-    memcpy(&confirm_buf[0x4b], &req[0x4b], 5);
-    uint8_t console_addr[16];
-    uint8_t console_port[2];
-    char *search_ptr = strchr(candidate->addr, '.');
-    if(search_ptr)
-    {
-        if(inet_pton(AF_INET, candidate->addr, console_addr) <= 0)
+        uint8_t confirm_buf[88] = {0};
+        *(uint32_t*)&confirm_buf[0] = htonl(MSG_TYPE_RESP);
+        memcpy(&confirm_buf[0x4], session->hashed_id_local, sizeof(session->hashed_id_local));
+        memcpy(&confirm_buf[0x24], session->hashed_id_console, sizeof(session->hashed_id_console));
+        *(uint16_t*)&confirm_buf[0x44] = htons(session->sid_local);
+        *(uint16_t*)&confirm_buf[0x46] = htons(session->sid_console);
+        memcpy(&confirm_buf[0x4b], &req[0x4b], 5);
+        uint8_t console_addr[16];
+        uint8_t console_port[2];
+        char *search_ptr = strchr(candidate->addr, '.');
+        if(search_ptr)
         {
-            CHIAKI_LOGE(session->log, "%s: inet_pton failed with error: " CHIAKI_SOCKET_ERROR_FMT "\n", candidate->addr, CHIAKI_SOCKET_ERROR_VALUE);
-            return CHIAKI_ERR_INVALID_DATA;
+            if(inet_pton(AF_INET, candidate->addr, console_addr) <= 0)
+            {
+                CHIAKI_LOGE(session->log, "%s: inet_pton failed with error: " CHIAKI_SOCKET_ERROR_FMT "\n", candidate->addr, CHIAKI_SOCKET_ERROR_VALUE);
+                return CHIAKI_ERR_INVALID_DATA;
+            }
         }
-    }
-    else
-    {
-        if(inet_pton(AF_INET6, candidate->addr, console_addr) <= 0)
+        else
         {
-            CHIAKI_LOGE(session->log, "%s: inet_pton failed with error: " CHIAKI_SOCKET_ERROR_FMT "\n", candidate->addr, CHIAKI_SOCKET_ERROR_VALUE);
-            return CHIAKI_ERR_INVALID_DATA;
+            if(inet_pton(AF_INET6, candidate->addr, console_addr) <= 0)
+            {
+                CHIAKI_LOGE(session->log, "%s: inet_pton failed with error: " CHIAKI_SOCKET_ERROR_FMT "\n", candidate->addr, CHIAKI_SOCKET_ERROR_VALUE);
+                return CHIAKI_ERR_INVALID_DATA;
+            }
         }
-    }
-    *(uint16_t*)console_port = htons(candidate->port);
-    *(uint16_t*)&confirm_buf[0x50] = htons(session->sid_local);
-    *(uint16_t*)&confirm_buf[0x52] = htons(session->sid_console);
-    *(uint16_t*)&confirm_buf[0x54] = htons(session->sid_local);
-    xor_bytes(&confirm_buf[0x50], console_addr, 4);
-    xor_bytes(&confirm_buf[0x54], console_port, 2);
+        *(uint16_t*)console_port = htons(candidate->port);
+        *(uint16_t*)&confirm_buf[0x50] = htons(session->sid_local);
+        *(uint16_t*)&confirm_buf[0x52] = htons(session->sid_console);
+        *(uint16_t*)&confirm_buf[0x54] = htons(session->sid_local);
+        xor_bytes(&confirm_buf[0x50], console_addr, 4);
+        xor_bytes(&confirm_buf[0x54], console_port, 2);
 
-    if (send(*sock, (CHIAKI_SOCKET_BUF_TYPE) confirm_buf, sizeof(confirm_buf), 0) < 0)
-    {
-        CHIAKI_LOGE(session->log, "check_candidates: Sending confirmation failed for %s:%d with error: " CHIAKI_SOCKET_ERROR_FMT, candidate->addr, candidate->port, CHIAKI_SOCKET_ERROR_VALUE);
-        return CHIAKI_ERR_NETWORK;
-    }
-    CHIAKI_LOGI(session->log, "Sent response to %s:%d", candidate->addr, candidate->port);
-    return CHIAKI_ERR_SUCCESS;
+        if (send(*sock, (CHIAKI_SOCKET_BUF_TYPE) confirm_buf, sizeof(confirm_buf), 0) < 0)
+        {
+            CHIAKI_LOGE(session->log, "check_candidates: Sending confirmation failed for %s:%d with error: " CHIAKI_SOCKET_ERROR_FMT, candidate->addr, candidate->port, CHIAKI_SOCKET_ERROR_VALUE);
+            return CHIAKI_ERR_NETWORK;
+        }
+        CHIAKI_LOGI(session->log, "Sent response to %s:%d", candidate->addr, candidate->port);
+        return CHIAKI_ERR_SUCCESS;
 }
 
 /**
@@ -4340,46 +4279,46 @@ static ChiakiErrorCode send_response_ps(Session *session, uint8_t *req, chiaki_s
  */
 static ChiakiErrorCode send_responseto_ps(Session *session, uint8_t *req, chiaki_socket_t *sock, Candidate *candidate, struct sockaddr *addr, socklen_t len)
 {
-    uint8_t confirm_buf[88] = {0};
-    *(uint32_t*)&confirm_buf[0] = htonl(MSG_TYPE_RESP);
-    memcpy(&confirm_buf[0x4], session->hashed_id_local, sizeof(session->hashed_id_local));
-    memcpy(&confirm_buf[0x24], session->hashed_id_console, sizeof(session->hashed_id_console));
-    *(uint16_t*)&confirm_buf[0x44] = htons(session->sid_local);
-    *(uint16_t*)&confirm_buf[0x46] = htons(session->sid_console);
-    memcpy(&confirm_buf[0x4b], &req[0x4b], 5);
-    uint8_t console_addr[16];
-    uint8_t console_port[2];
-    char *search_ptr = strchr(candidate->addr, '.');
-    if(search_ptr)
-    {
-        if(inet_pton(AF_INET, candidate->addr, console_addr) <= 0)
+        uint8_t confirm_buf[88] = {0};
+        *(uint32_t*)&confirm_buf[0] = htonl(MSG_TYPE_RESP);
+        memcpy(&confirm_buf[0x4], session->hashed_id_local, sizeof(session->hashed_id_local));
+        memcpy(&confirm_buf[0x24], session->hashed_id_console, sizeof(session->hashed_id_console));
+        *(uint16_t*)&confirm_buf[0x44] = htons(session->sid_local);
+        *(uint16_t*)&confirm_buf[0x46] = htons(session->sid_console);
+        memcpy(&confirm_buf[0x4b], &req[0x4b], 5);
+        uint8_t console_addr[16];
+        uint8_t console_port[2];
+        char *search_ptr = strchr(candidate->addr, '.');
+        if(search_ptr)
         {
-            CHIAKI_LOGE(session->log, "%s: inet_pton failed with error: " CHIAKI_SOCKET_ERROR_FMT "\n", candidate->addr, CHIAKI_SOCKET_ERROR_VALUE);
-            return CHIAKI_ERR_INVALID_DATA;
+            if(inet_pton(AF_INET, candidate->addr, console_addr) <= 0)
+            {
+                CHIAKI_LOGE(session->log, "%s: inet_pton failed with error: " CHIAKI_SOCKET_ERROR_FMT "\n", candidate->addr, CHIAKI_SOCKET_ERROR_VALUE);
+                return CHIAKI_ERR_INVALID_DATA;
+            }
         }
-    }
-    else
-    {
-        if(inet_pton(AF_INET6, candidate->addr, console_addr) <= 0)
+        else
         {
-            CHIAKI_LOGE(session->log, "%s: inet_pton failed with error: " CHIAKI_SOCKET_ERROR_FMT "\n", candidate->addr, CHIAKI_SOCKET_ERROR_VALUE);
-            return CHIAKI_ERR_INVALID_DATA;
+            if(inet_pton(AF_INET6, candidate->addr, console_addr) <= 0)
+            {
+                CHIAKI_LOGE(session->log, "%s: inet_pton failed with error: " CHIAKI_SOCKET_ERROR_FMT "\n", candidate->addr, CHIAKI_SOCKET_ERROR_VALUE);
+                return CHIAKI_ERR_INVALID_DATA;
+            }
         }
-    }
-    *(uint16_t*)console_port = htons(candidate->port);
-    *(uint16_t*)&confirm_buf[0x50] = htons(session->sid_local);
-    *(uint16_t*)&confirm_buf[0x52] = htons(session->sid_console);
-    *(uint16_t*)&confirm_buf[0x54] = htons(session->sid_local);
-    xor_bytes(&confirm_buf[0x50], console_addr, 4);
-    xor_bytes(&confirm_buf[0x54], console_port, 2);
+        *(uint16_t*)console_port = htons(candidate->port);
+        *(uint16_t*)&confirm_buf[0x50] = htons(session->sid_local);
+        *(uint16_t*)&confirm_buf[0x52] = htons(session->sid_console);
+        *(uint16_t*)&confirm_buf[0x54] = htons(session->sid_local);
+        xor_bytes(&confirm_buf[0x50], console_addr, 4);
+        xor_bytes(&confirm_buf[0x54], console_port, 2);
 
-    if (sendto(*sock, (CHIAKI_SOCKET_BUF_TYPE) confirm_buf, sizeof(confirm_buf), 0, addr, len) < 0)
-    {
-        CHIAKI_LOGE(session->log, "check_candidates: Sending confirmation failed for %s:%d with error: %s", candidate->addr, candidate->port, CHIAKI_SOCKET_ERROR_VALUE);
-        return CHIAKI_ERR_NETWORK;
-    }
-    CHIAKI_LOGI(session->log, "Sent response to %s:%d", candidate->addr, candidate->port);
-    return CHIAKI_ERR_SUCCESS;
+        if (sendto(*sock, (CHIAKI_SOCKET_BUF_TYPE) confirm_buf, sizeof(confirm_buf), 0, addr, len) < 0)
+        {
+            CHIAKI_LOGE(session->log, "check_candidates: Sending confirmation failed for %s:%d with error: %s", candidate->addr, candidate->port, CHIAKI_SOCKET_ERROR_VALUE);
+            return CHIAKI_ERR_NETWORK;
+        }
+        CHIAKI_LOGI(session->log, "Sent response to %s:%d", candidate->addr, candidate->port);
+        return CHIAKI_ERR_SUCCESS;
 }
 
 /**
@@ -4586,12 +4525,12 @@ static json_object* session_message_get_payload(ChiakiLog *log, json_object *ses
             CHIAKI_LOGE(log, json_object_to_json_string_ext(payload_json, JSON_C_TO_STRING_PRETTY));
         }
     }
-    // check if parse fails
-    if(message_json == NULL)
-    {
-        CHIAKI_LOGE(log, "Couldn't parse the following json: %s", json);
-        CHIAKI_LOGE(log, json_object_to_json_string_ext(payload_json, JSON_C_TO_STRING_PRETTY));
-    }
+        // check if parse fails
+        if(message_json == NULL)
+        {
+            CHIAKI_LOGE(log, "Couldn't parse the following json: %s", json);
+            CHIAKI_LOGE(log, json_object_to_json_string_ext(payload_json, JSON_C_TO_STRING_PRETTY));
+        }
 
     return message_json;
 }
@@ -4623,8 +4562,8 @@ static json_object* session_message_get_payload(ChiakiLog *log, json_object *ses
  * @param[in] timeout_ms The amount of time to wait before timing out
 */
 static ChiakiErrorCode wait_for_notification(
-        Session *session, Notification** out,
-        uint16_t types, uint64_t timeout_ms)
+    Session *session, Notification** out,
+    uint16_t types, uint64_t timeout_ms)
 {
     uint64_t waiting_since = chiaki_time_now_monotonic_us();
     uint64_t now = waiting_since;
@@ -4676,13 +4615,13 @@ static ChiakiErrorCode wait_for_notification(
         }
     }
 
-    cleanup:
+cleanup:
     chiaki_mutex_unlock(&session->notif_mutex);
     return err;
 }
 
 static ChiakiErrorCode clear_notification(
-        Session *session, Notification *notification)
+    Session *session, Notification *notification)
 {
     bool found = false;
     NotificationQueue *nq = session->ws_notification_queue;
@@ -4713,8 +4652,8 @@ static ChiakiErrorCode clear_notification(
  * @param[in] timeout_ms The amount of time to wait before timing out
 */
 static ChiakiErrorCode wait_for_session_message(
-        Session *session, SessionMessage** out,
-        uint16_t types, uint64_t timeout_ms)
+    Session *session, SessionMessage** out,
+    uint16_t types, uint64_t timeout_ms)
 {
     ChiakiErrorCode err;
     bool finished = false;
@@ -4783,7 +4722,7 @@ static ChiakiErrorCode wait_for_session_message(
 */
 
 static ChiakiErrorCode wait_for_session_message_ack(
-        Session *session, int req_id, uint64_t timeout_ms)
+    Session *session, int req_id, uint64_t timeout_ms)
 {
     ChiakiErrorCode err = CHIAKI_ERR_SUCCESS;
     SessionMessage *msg = NULL;
@@ -4833,7 +4772,7 @@ static ChiakiErrorCode wait_for_session_message_ack(
  * @param[in] out Pointer to a pointer to the created SessionMessage
 */
 static ChiakiErrorCode session_message_parse(
-        ChiakiLog *log, json_object *message_json, SessionMessage **out)
+    ChiakiLog *log, json_object *message_json, SessionMessage **out)
 {
     ChiakiErrorCode err = CHIAKI_ERR_SUCCESS;
     SessionMessage *msg = calloc(1, sizeof(SessionMessage));
@@ -4960,8 +4899,8 @@ static ChiakiErrorCode session_message_parse(
         const char *local_hashed_id_str = json_object_get_string(obj);
         size_t local_hashed_id_len = sizeof(msg->conn_request->local_hashed_id);
         err = chiaki_base64_decode(
-                local_hashed_id_str, strlen(local_hashed_id_str),
-                msg->conn_request->local_hashed_id, &local_hashed_id_len);
+            local_hashed_id_str, strlen(local_hashed_id_str),
+            msg->conn_request->local_hashed_id, &local_hashed_id_len);
         if (err != CHIAKI_ERR_SUCCESS)
         {
             CHIAKI_LOGE(log, "session_message_parse: Failed to decode localHashedId: '%s'", local_hashed_id_str);
@@ -5045,12 +4984,12 @@ static ChiakiErrorCode session_message_parse(
     *out = msg;
     goto cleanup;
 
-    invalid_schema:
+invalid_schema:
     CHIAKI_LOGE(log, "session_message_parse: Unexpected JSON schema for holepunch session message.");
     CHIAKI_LOGV(log, json_object_to_json_string_ext(message_json, JSON_C_TO_STRING_PRETTY));
     err = CHIAKI_ERR_UNKNOWN;
 
-    cleanup:
+cleanup:
     if (msg != NULL && err != CHIAKI_ERR_SUCCESS)
     {
         session_message_free(msg);
@@ -5068,7 +5007,7 @@ static ChiakiErrorCode session_message_parse(
  * @param[out] out_len Pointer to the sizse of the serialized msg array
 */
 static ChiakiErrorCode session_message_serialize(
-        Session *session, SessionMessage *message, char **out, size_t *out_len)
+    Session *session, SessionMessage *message, char **out, size_t *out_len)
 {
     ChiakiErrorCode err = CHIAKI_ERR_SUCCESS;
 
@@ -5077,8 +5016,8 @@ static ChiakiErrorCode session_message_serialize(
     // use snprintf to build the JSON string manually.
     char localpeeraddr_json[128] = {0};
     size_t localpeeraddr_len = snprintf(
-            localpeeraddr_json, sizeof(localpeeraddr_json), session_localpeeraddr_fmt,
-            session->account_id, "REMOTE_PLAY");
+        localpeeraddr_json, sizeof(localpeeraddr_json), session_localpeeraddr_fmt,
+        session->account_id, "REMOTE_PLAY");
 
     size_t candidate_str_len = sizeof(session_connrequest_candidate_fmt) * 2;
     char *candidates_json = calloc(1, candidate_str_len * message->conn_request->num_candidates + 3);
@@ -5117,9 +5056,9 @@ static ChiakiErrorCode session_message_serialize(
         }
         memset(candidate_str, 0, candidate_str_len);
         size_t candidate_len = snprintf(
-                candidate_str, candidate_str_len, session_connrequest_candidate_fmt,
-                candidate_type, candidate.addr, candidate.addr_mapped, candidate.port,
-                candidate.port_mapped);
+            candidate_str, candidate_str_len, session_connrequest_candidate_fmt,
+            candidate_type, candidate.addr, candidate.addr_mapped, candidate.port,
+            candidate.port_mapped);
         snprintf(candidates_json + candidates_len, candidate_len, "%s", candidate_str);
         // Take into account that char arrays are null-terminated
         if(i < (message->conn_request->num_candidates - 1))
@@ -5145,8 +5084,8 @@ static ChiakiErrorCode session_message_serialize(
     else
     {
         err = chiaki_base64_encode(
-                message->conn_request->local_hashed_id, sizeof(message->conn_request->local_hashed_id),
-                localhashedid_str, sizeof(localhashedid_str));
+            message->conn_request->local_hashed_id, sizeof(message->conn_request->local_hashed_id),
+            localhashedid_str, sizeof(localhashedid_str));
         if(err != CHIAKI_ERR_SUCCESS)
         {
             CHIAKI_LOGE(session->log, "session_message_serialize: Could not encode hashed_id into base64.");
@@ -5155,7 +5094,7 @@ static ChiakiErrorCode session_message_serialize(
     }
     char skey_str[25] = {0};
     err = chiaki_base64_encode (
-            message->conn_request->skey, sizeof(message->conn_request->skey), skey_str, sizeof(skey_str));
+        message->conn_request->skey, sizeof(message->conn_request->skey), skey_str, sizeof(skey_str));
     if(err != CHIAKI_ERR_SUCCESS)
     {
         CHIAKI_LOGE(session->log, "session_message_serialize: Could not encode skey into base64.");
@@ -5163,7 +5102,7 @@ static ChiakiErrorCode session_message_serialize(
     }
     size_t connreq_json_len = sizeof(session_connrequest_fmt) * 2 + localpeeraddr_len + candidates_len;
     char *connreq_json = calloc(
-            1, connreq_json_len);
+        1, connreq_json_len);
     if(!connreq_json)
     {
         err = CHIAKI_ERR_MEMORY;
@@ -5171,11 +5110,11 @@ static ChiakiErrorCode session_message_serialize(
     }
     char mac_addr[1] = { '\0' };
     CHIAKI_SSIZET_TYPE connreq_len = snprintf(
-            connreq_json, connreq_json_len, session_connrequest_fmt,
-            message->conn_request->sid, message->conn_request->peer_sid,
-            skey_str, message->conn_request->nat_type,
-            candidates_json, mac_addr,
-            localpeeraddr_json, localhashedid_str);
+        connreq_json, connreq_json_len, session_connrequest_fmt,
+        message->conn_request->sid, message->conn_request->peer_sid,
+        skey_str, message->conn_request->nat_type,
+        candidates_json, mac_addr,
+        localpeeraddr_json, localhashedid_str);
 
     char* action_str;
     switch (message->action)
@@ -5204,15 +5143,15 @@ static ChiakiErrorCode session_message_serialize(
         goto cleanup;
     }
     CHIAKI_SSIZET_TYPE msg_len = snprintf(
-            serialized_msg, serialized_msg_len, session_message_fmt,
-            action_str, message->req_id, message->error, connreq_json);
+        serialized_msg, serialized_msg_len, session_message_fmt,
+        action_str, message->req_id, message->error, connreq_json);
 
     *out = serialized_msg;
     *out_len = msg_len;
 
-    cleanup:
+cleanup:
     free(connreq_json);
-    cleanup_candidate_initial:
+cleanup_candidate_initial:
     free(candidate_str);
     free(candidates_json);
 
@@ -5228,7 +5167,7 @@ static ChiakiErrorCode session_message_serialize(
  * @param[out] out_len Pointer to the sizse of the serialized msg array
 */
 static ChiakiErrorCode short_message_serialize(
-        Session *session, SessionMessage *message, char **out, size_t *out_len)
+    Session *session, SessionMessage *message, char **out, size_t *out_len)
 {
     ChiakiErrorCode err = CHIAKI_ERR_SUCCESS;
 
@@ -5263,8 +5202,8 @@ static ChiakiErrorCode short_message_serialize(
     if(!serialized_msg)
         return CHIAKI_ERR_MEMORY;
     CHIAKI_SSIZET_TYPE msg_len = snprintf(
-            serialized_msg, serialized_msg_len, session_message_fmt,
-            action_str, message->req_id, message->error, connreq_json);
+        serialized_msg, serialized_msg_len, session_message_fmt,
+        action_str, message->req_id, message->error, connreq_json);
 
     *out = serialized_msg;
     *out_len = msg_len;
@@ -5312,8 +5251,8 @@ static ChiakiErrorCode get_stun_servers(Session *session)
     }
 
     HttpResponseData response_data = {
-            .data = malloc(0),
-            .size = 0,
+        .data = malloc(0),
+        .size = 0,
     };
 
     CURLcode res = curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
@@ -5331,12 +5270,6 @@ static ChiakiErrorCode get_stun_servers(Session *session)
     res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&response_data);
     if(res != CURLE_OK)
         CHIAKI_LOGW(session->log, "get_stun_servers: CURL setopt CURLOPT_WRITEDATA failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "get_stun_servers: CURL setopt CURLOPT_SSL_VERIFYPEER failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "get_stun_servers: CURL setopt CURLOPT_SSL_VERIFYHOST failed with CURL error %s", curl_easy_strerror(res));
 
     res = curl_easy_perform(curl);
     if (res != CURLE_OK)
@@ -5361,7 +5294,7 @@ static ChiakiErrorCode get_stun_servers(Session *session)
     {
         strcpy(server_strings[session->num_stun_servers], ptr);
         session->num_stun_servers++;
-        ptr = strtok(NULL, "\n");
+		ptr = strtok(NULL, "\n");
     }
     ptr = NULL;
     for(int i = 0; i < session->num_stun_servers; i++)
@@ -5420,12 +5353,6 @@ static ChiakiErrorCode get_stun_servers(Session *session)
     res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&response_data);
     if(res != CURLE_OK)
         CHIAKI_LOGW(session->log, "get_stun_servers: CURL setopt CURLOPT_WRITEDATA failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "get_stun_servers: CURL setopt CURLOPT_SSL_VERIFYPEER failed with CURL error %s", curl_easy_strerror(res));
-    res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-    if(res != CURLE_OK)
-        CHIAKI_LOGW(session->log, "get_stun_servers: CURL setopt CURLOPT_SSL_VERIFYHOST failed with CURL error %s", curl_easy_strerror(res));
 
     res = curl_easy_perform(curl);
     if (res != CURLE_OK)
@@ -5451,7 +5378,7 @@ static ChiakiErrorCode get_stun_servers(Session *session)
         // omit leading [
         strcpy(server_strings_ipv6[session->num_stun_servers_ipv6], ptr + 1);
         session->num_stun_servers_ipv6++;
-        ptr = strtok(NULL, "\n");
+		ptr = strtok(NULL, "\n");
     }
     ptr = NULL;
     for(int i = 0; i < session->num_stun_servers_ipv6; i++)
@@ -5483,7 +5410,7 @@ static ChiakiErrorCode get_stun_servers(Session *session)
         ptr = NULL;
     }
 
-    cleanup:
+cleanup:
     free(response_data.data);
     curl_easy_cleanup(curl);
     return err;
@@ -5517,7 +5444,7 @@ static void print_session_request(ChiakiLog *log, ConnectionRequest *req)
         char mac_addr[18] = {0};
         uint8_t *mac = req->default_route_mac_addr;
         snprintf(mac_addr, sizeof(mac_addr), "%02x:%02x:%02x:%02x:%02x:%02x",
-                 mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+            mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
         CHIAKI_LOGV(log, "default_route_mac_addr: %s", mac_addr);
     }
     uint8_t zero_bytes[sizeof(req->local_hashed_id)] = {0};
@@ -5560,7 +5487,7 @@ static void print_candidate(ChiakiLog *log, Candidate *candidate)
             break;
         default:
             CHIAKI_LOGV(log, "--------------CANDIDATE TYPE UNKNOWN--------------");
-            break;
+            break;    
     }
     CHIAKI_LOGV(log, "Address: %s", candidate->addr);
     CHIAKI_LOGV(log, "Mapped Address: %s", candidate->addr_mapped);

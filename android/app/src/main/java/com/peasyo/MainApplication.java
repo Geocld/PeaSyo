@@ -11,7 +11,7 @@ import com.facebook.soloader.SoLoader;
 import com.peasyo.session.HolepunchPackage;
 import com.peasyo.stream.StreamTextureViewPackage;
 import com.peasyo.stream.StreamViewPackage;
-//import com.umeng.commonsdk.UMConfigure;
+import com.umeng.commonsdk.UMConfigure;
 
 import android.util.Log;
 
@@ -74,8 +74,8 @@ public class MainApplication extends Application implements ReactApplication {
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
-//    UMConfigure.preInit(this,"678a1c1a9a16fe6dcd306942","PeaSyo");
-//    UMConfigure.init(this, "678a1c1a9a16fe6dcd306942", "PeaSyo", UMConfigure.DEVICE_TYPE_PHONE, "");
+    UMConfigure.preInit(this,"678a1c1a9a16fe6dcd306942","PeaSyo");
+    UMConfigure.init(this, "678a1c1a9a16fe6dcd306942", "PeaSyo", UMConfigure.DEVICE_TYPE_PHONE, "");
     ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
   }
 }

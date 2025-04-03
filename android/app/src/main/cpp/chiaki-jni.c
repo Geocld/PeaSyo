@@ -283,61 +283,12 @@ JNIEXPORT jdouble JNICALL JNI_FCN(getFrameLost)(JNIEnv *env, jobject obj, jlong 
     return lost;
 }
 
-static inline char nibble_char(uint8_t v)
-{
-    if(v > 0xf)
-        return '0';
-    if(v < 0xa)
-        return '0' + v;
-    return 'a' + v;
-}
-
-static inline ChiakiErrorCode format_hex(char *hex_buf, size_t hex_buf_size, const uint8_t *buf, size_t buf_size)
-{
-    if(hex_buf_size < buf_size * 2 + 1)
-        return CHIAKI_ERR_BUF_TOO_SMALL;
-
-    for(size_t i=0; i<buf_size; i++)
-    {
-        uint8_t v = buf[i];
-        hex_buf[i*2+0] = nibble_char(v >> 4);
-        hex_buf[i*2+1] = nibble_char(v & 0xf);
-    }
-    hex_buf[buf_size*2] = '\0';
-
-    return CHIAKI_ERR_SUCCESS;
-}
-
 JNIEXPORT jstring JNICALL JNI_FCN(getDeviceUid)(JNIEnv *env, jobject obj)
 {
     size_t duid_size = CHIAKI_DUID_STR_SIZE;
     char duid[duid_size];
     chiaki_holepunch_generate_client_device_uid(duid, &duid_size);
     jstring result = (*env)->NewStringUTF(env, duid);
-
-    CHIAKI_LOGE(&global_log, "lijiahao chiaki_holepunch_list_devices");
-    ChiakiHolepunchDeviceInfo *device_info_ps5;
-    size_t num_devices_ps5;
-
-    // TODO
-    const char *psn_oauth2_token = ""; // AccessToken
-    ChiakiErrorCode err = chiaki_holepunch_list_devices(psn_oauth2_token, CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5, &device_info_ps5, &num_devices_ps5, &global_log);
-    if (err != CHIAKI_ERR_SUCCESS)
-    {
-        CHIAKI_LOGE(&global_log, "chiaki_holepunch_list_devices !! Failed to get PS5 devices");
-        return result;
-    }
-    CHIAKI_LOGE(&global_log, ">> chiaki_holepunch_list_devices Found %zu devices\n", num_devices_ps5);
-    for (size_t i = 0; i < num_devices_ps5; i++)
-    {
-        ChiakiHolepunchDeviceInfo dev = device_info_ps5[i];
-        char duid_str[sizeof(dev.device_uid) * 2 + 1];
-        format_hex(duid_str, sizeof(duid_str), dev.device_uid, sizeof(dev.device_uid));
-        CHIAKI_LOGE(&global_log, "%s %s (%s) rp_enabled=%s\n",
-                    dev.type == CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5 ? "PS5" : "PS4",
-                    dev.device_name, duid_str, dev.remoteplay_enabled ? "true" : "false");
-    }
-
     return result;
 }
 
