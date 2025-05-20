@@ -266,8 +266,8 @@ function SettingsScreen({navigation}) {
           />
 
           <SettingItem
-            title={t('Version')}
-            description={`v${pkg.version}`}
+            title={t('About')}
+            description={`${t('About')} PeaSyo`}
             onPress={() => navigation.navigate('About')}
           />
 
@@ -279,11 +279,11 @@ function SettingsScreen({navigation}) {
             />
           )}
 
-          <SettingItem
+          {/* <SettingItem
             title={'DEBUG'}
             description={'Enter debug.'}
             onPress={() => handleItemPress('debug')}
-          />
+          /> */}
 
           {token && token.account_id && (
             <SettingItem
@@ -294,6 +294,15 @@ PSN ID: ${token.user_id}
               onPress={() => navigation.navigate('Users')}
             />
           )}
+        </View>
+
+        <View style={styles.version}>
+          <Text style={styles.versionText} variant="titleMedium">
+            Version: v{pkg.version}
+          </Text>
+          <Text style={styles.versionText} variant="titleSmall">
+            © 2025 Geocld
+          </Text>
         </View>
       </ScrollView>
     </View>
@@ -316,6 +325,15 @@ const styles = StyleSheet.create({
   },
   titleText: {
     color: '#DF6069',
+  },
+  version: {
+    paddingTop: 20,
+    paddingBottom: 50,
+    textAlign: 'center',
+  },
+  versionText: {
+    textAlign: 'center',
+    paddingTop: 10,
   },
 });
 

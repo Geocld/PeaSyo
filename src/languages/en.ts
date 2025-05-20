@@ -173,7 +173,8 @@ export default {
     RegistFailed:
       'Registration failed. Please check if the PIN code is correct and verify that the host login account matches the current account',
     SwapDpadTitle: 'D-pad Simulate Left Joystick',
-    SwapDpadDesc: 'Simulate the D-pad behavior as the left joystick(left joystick will not working in this mode).',
+    SwapDpadDesc:
+      'Simulate the D-pad behavior as the left joystick(left joystick will not working in this mode).',
     // Map
     MapDesc: 'Press the gamepad button to map it to:',
     MapDesc2: 'This window will close automatically after successful mapping',
@@ -228,10 +229,15 @@ export default {
     GamepadSettings: 'Gamepad and Vibration',
     SensorSettings: 'Sensor',
     gyroTitle: 'Enable Gyroscope Simulated Joystick',
-    gyroDesc:
-      'Force use of device/controller gyroscope to simulate joystick. when the LT button is pressed, the gyroscope simulates the right joystick, commonly used in FPS games.',
+    gyroDesc: 'Force use of device/controller gyroscope to simulate joystick.',
     gyroTips:
       'Controller gyroscope only supports Android 12+. recommended to use DualSense 5 controller.',
+    gyroTypeTitle: 'Gyroscope Trigger Type',
+    gyroTypeDesc:
+      'Set the gyroscope trigger to activate on L1/L2 press or globally',
+    'L2 press': 'L2 Press',
+    'L1 press': 'L1 Press',
+    Global: 'Global',
     gyroSenTitleX: 'Gyroscope X-axis Sensitivity',
     gyroSenDescX: 'Adjust gyroscope X-axis sensitivity',
     gyroSenTitleY: 'Gyroscope Y-axis Sensitivity',

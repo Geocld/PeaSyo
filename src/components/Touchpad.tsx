@@ -92,6 +92,7 @@ const Touchpad: React.FC<Props> = ({
     .runOnJS(true)
     .onTouchesDown(() => {
       showTouchpad();
+      isMoving.value = false;
     })
     .onTouchesMove(e => {
       // console.log('pan onTouchesMove');
@@ -145,32 +146,30 @@ const Touchpad: React.FC<Props> = ({
       }
     })
     .onTouchesUp(e => {
-      if (isMoving.value) {
-        // console.log('pan onTouchesUp:', e);
-        isMoving.value = false;
-        hideTouchpad();
+      // console.log('pan onTouchesUp:', e);
+      isMoving.value = false;
+      hideTouchpad();
 
-        const changedTouches = e.changedTouches;
+      const changedTouches = e.changedTouches;
 
-        const touches = [0, 0, -1, 0, 0, -1];
+      const touches = [0, 0, -1, 0, 0, -1];
 
-        changedTouches.forEach(touch => {
-          if (touch.id === 0) {
-            touchId1.value = -1;
-            const normalTouch = normalizeCoordinates(touch.x, touch.y);
-            touches[0] = normalTouch.x;
-            touches[1] = normalTouch.y;
-            touches[2] = -1;
-          } else {
-            touchId2.value = -1;
-            const normalTouch = normalizeCoordinates(touch.x, touch.y);
-            touches[3] = normalTouch.x;
-            touches[4] = normalTouch.y;
-            touches[5] = -1;
-          }
-        });
-        runOnJS(onTouch)(0, nextId.value, touches);
-      }
+      changedTouches.forEach(touch => {
+        if (touch.id === 0) {
+          touchId1.value = -1;
+          const normalTouch = normalizeCoordinates(touch.x, touch.y);
+          touches[0] = normalTouch.x;
+          touches[1] = normalTouch.y;
+          touches[2] = -1;
+        } else {
+          touchId2.value = -1;
+          const normalTouch = normalizeCoordinates(touch.x, touch.y);
+          touches[3] = normalTouch.x;
+          touches[4] = normalTouch.y;
+          touches[5] = -1;
+        }
+      });
+      runOnJS(onTouch)(0, nextId.value, touches);
     });
 
   // 单击

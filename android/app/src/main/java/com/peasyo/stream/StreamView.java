@@ -87,6 +87,7 @@ public class StreamView extends FrameLayout {
     private String usbController;
     private boolean useSensor;
     private boolean sensorInvert;
+    private int gyroscopeType;
     private float deadZone;
     private int edgeCompensation;
     private boolean isShortTrigger;
@@ -106,6 +107,7 @@ public class StreamView extends FrameLayout {
         this.usbController = "Xbox360Controller";
         this.useSensor = false;
         this.sensorInvert = false;
+        this.gyroscopeType = 1;
         this.deadZone = 0.2f;
         this.edgeCompensation = 0;
         this.isShortTrigger = false;
@@ -248,6 +250,7 @@ public class StreamView extends FrameLayout {
         String videoFormat = streamInfo.getString("videoFormat");
         boolean useSensor = streamInfo.getBoolean("useSensor");
         boolean sensorInvert = streamInfo.getBoolean("sensorInvert");
+        int gyroscopeType = streamInfo.getInt("gyroscopeType");
         float deadZone = (float)streamInfo.getDouble("deadZone");
         int edgeCompensation = streamInfo.getInt("edgeCompensation");
         boolean shortTrigger = streamInfo.getBoolean("shortTrigger");
@@ -263,6 +266,7 @@ public class StreamView extends FrameLayout {
         this.usbMode = usbMode;
         this.usbController = usbController;
         this.useSensor = useSensor;
+        this.gyroscopeType = gyroscopeType;
         this.sensorInvert = sensorInvert;
         this.deadZone = deadZone;
         this.edgeCompensation = edgeCompensation;
@@ -524,15 +528,34 @@ public class StreamView extends FrameLayout {
     public void handleSensorStick(float x, float y) {
         // gyroscope only work when Rightstick not moving and L2 button press
         if(!isRightstickMoving) {
-            // gyroscope only work when LT button press
-            if (Math.abs(controllerState.getL2State()) >= this.deadZone) {
+            if (this.gyroscopeType == 1) {
+                // gyroscope  work when LT button press
+                if (Math.abs(controllerState.getL2State()) >= this.deadZone) {
+                    controllerState.setRightX(signedAxis(x));
+                    controllerState.setRightY(signedAxis(y));
+                } else {
+                    controllerState.setRightX(signedAxis(0));
+                    controllerState.setRightY(signedAxis(0));
+                }
+                setControllerState(controllerState);
+            } else if (this.gyroscopeType == 2) {
+                // gyroscope  work when L1 button press
+                int buttons = controllerState.getButtons();
+                boolean isL1Pressed = (buttons & BUTTON_L1) != 0;
+                if (isL1Pressed) {
+                    controllerState.setRightX(signedAxis(x));
+                    controllerState.setRightY(signedAxis(y));
+                } else {
+                    controllerState.setRightX(signedAxis(0));
+                    controllerState.setRightY(signedAxis(0));
+                }
+                setControllerState(controllerState);
+            } else if (this.gyroscopeType == 3) {
+                // Global
                 controllerState.setRightX(signedAxis(x));
                 controllerState.setRightY(signedAxis(y));
-            } else {
-                controllerState.setRightX(signedAxis(0));
-                controllerState.setRightY(signedAxis(0));
+                setControllerState(controllerState);
             }
-            setControllerState(controllerState);
         }
     }
 

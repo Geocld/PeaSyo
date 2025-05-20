@@ -19,6 +19,7 @@ export type Settings = {
   sensor: boolean;
   sensor_invert: boolean;
   gyroscope: number;
+  gyroscope_type: number;
   gyroscope_sensitivity_x: number;
   gyroscope_sensitivity_y: number;
   gyroscope_invert: number;
@@ -57,6 +58,7 @@ const defaultSettings: Settings = {
   sensor: false,
   sensor_invert: false,
   gyroscope: 0,
+  gyroscope_type: 1,
   gyroscope_sensitivity_x: 15000,
   gyroscope_sensitivity_y: 15000,
   gyroscope_invert: 0,
