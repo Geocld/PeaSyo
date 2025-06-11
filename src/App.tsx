@@ -43,6 +43,7 @@ import VirtualGamepadSettingsScreen from './pages/VirtualGamepadSettings';
 import CustomGamepadScreen from './pages/CustomGamepad';
 import UsersScreen from './pages/Users';
 import RgbScreen from './pages/Rgb';
+import DeviceInfosScreen from './pages/DeviceInfos';
 import updater from './utils/updater';
 
 import {useTranslation} from 'react-i18next';
@@ -85,7 +86,7 @@ function App() {
         Alert.alert(
           t('Update Warning'),
           t(
-            `Check new version ${latestVer}, current version is ${version}. \n\n Update: \n\n ${updateText}`,
+            `Check new version ${latestVer}, current version is ${version}. \n\n ${updateText}`,
           ),
           [
             {
@@ -219,6 +220,11 @@ function App() {
                   name="RGB"
                   component={RgbScreen}
                   options={{title: t('RGB')}}
+                />
+                <RootStack.Screen
+                  name="DeviceInfos"
+                  component={DeviceInfosScreen}
+                  options={{title: t('Device testing')}}
                 />
                 <RootStack.Screen
                   name="Users"

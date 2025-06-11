@@ -24,6 +24,7 @@ export type Settings = {
   gyroscope_sensitivity_y: number;
   gyroscope_invert: number;
   bind_usb_device: boolean;
+  bind_usb_device_force_touchpad: boolean;
   dead_zone: number;
   edge_compensation: number;
   short_trigger: boolean;
@@ -63,6 +64,7 @@ const defaultSettings: Settings = {
   gyroscope_sensitivity_y: 15000,
   gyroscope_invert: 0,
   bind_usb_device: false,
+  bind_usb_device_force_touchpad: false,
   dead_zone: 0.2,
   edge_compensation: 0,
   short_trigger: false,

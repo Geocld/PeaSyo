@@ -465,7 +465,7 @@ function HomeScreen({navigation, route}) {
           isUsbMode,
         },
       });
-    }, 60 * 1000);
+    }, 50 * 1000);
   };
 
   const renderFab = () => {

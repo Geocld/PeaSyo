@@ -86,9 +86,12 @@ export default {
     RumbleDesc: '如果手柄支持振动，可以设置游戏中是否振动',
     'Override native gamepad support': '覆盖安卓手柄支持',
     bind_usb_device_description:
-      '强制PeaSyo的USB驱动接管所有受支持的Xbox/DualSense手柄(实验性)',
+      '强制PeaSyo的USB驱动接管所有受支持的Xbox/DualSense手柄',
     bind_usb_device_tips:
       '该设置只有支持xinput或dualsense协议的手柄有线连接(OTG)才生效',
+    'Force Nexus/PS button to simulate touchpad': '强制西瓜键/音量键模拟触摸板',
+    bind_usb_device_force_touchpad_desc:
+      '打开覆盖安卓手柄支持后，强制将xbox手柄西瓜键或DS手柄音量键模拟为触摸板点击',
     'Rumble intensity': '振动强度',
     RumbleIntensityDesc: '设置控制器振动强度',
     VeryWeak: '最弱',
@@ -281,5 +284,23 @@ export default {
     'Enable remote keyboard input': '开启远程键盘输入',
     'Currently no network connection, please connect and try again':
       '当前无网络连接，请连接后再使用',
+    'Device testing': '设备测试',
+    'Testing current device and controller': '测试当前设备和控制器',
+    Rumble1s: '振动1秒',
+    'Stop rumble': '停止振动',
+    ControllerRumble: '控制器振动',
+    Refresh: '刷新',
+    Model: '型号',
+    'Android Version': '安卓版本',
+    'API Version': 'API版本',
+    'Kernel Version': '内核版本',
+    'Webview Version': 'Webview版本',
+    'Device rumble': '设备振动',
+    supported: '支持',
+    unsupported: '不支持',
+    lowThanAndroid12: '安卓版本低于12不支持',
+    Controllers: '控制器',
+    Name: '名称',
+    Details: '详情',
   },
 };

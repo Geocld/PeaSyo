@@ -402,6 +402,21 @@ function StreamScreen({navigation, route}) {
     usbGpEventListener.current = eventEmitter.addListener(
       'onGamepadReport',
       states => {
+        if (_settings.bind_usb_device_force_touchpad) {
+          let buttonFlags = states.flags;
+          // Check if Nexus button is pressed
+          // eslint-disable-next-line no-bitwise
+          if (buttonFlags & (1 << 15)) {
+            // Remove Nexus button flag
+            // eslint-disable-next-line no-bitwise
+            buttonFlags &= ~(1 << 15);
+            // Add TOUCHPAD button flag
+            // eslint-disable-next-line no-bitwise
+            buttonFlags |= 1 << 14; // BUTTON_TOUCHPAD
+
+            states.flags = buttonFlags;
+          }
+        }
         // console.log('onGamepadReport:', states);
         streamViewRef.current?.usbController(states);
       },
@@ -411,6 +426,21 @@ function StreamScreen({navigation, route}) {
       'onDsGamepadReport',
       states => {
         // console.log('onDsGamepadReport:', states);
+        if (_settings.bind_usb_device_force_touchpad) {
+          let buttonFlags = states.flags;
+          // Check if MUTE button is pressed
+          // eslint-disable-next-line no-bitwise
+          if (buttonFlags & (1 << 16)) {
+            // Remove MUTE button flag
+            // eslint-disable-next-line no-bitwise
+            buttonFlags &= ~(1 << 16);
+            // Add TOUCHPAD button flag
+            // eslint-disable-next-line no-bitwise
+            buttonFlags |= 1 << 14; // BUTTON_TOUCHPAD
+
+            states.flags = buttonFlags;
+          }
+        }
         streamViewRef.current?.usbDsController(states);
       },
     );

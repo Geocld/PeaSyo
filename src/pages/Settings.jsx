@@ -260,6 +260,12 @@ function SettingsScreen({navigation}) {
           />
 
           <SettingItem
+            title={t('Device testing')}
+            description={t('Testing current device and controller')}
+            onPress={() => navigation.navigate('DeviceInfos')}
+          />
+
+          <SettingItem
             title={t('Reset')}
             description={t('Reset all settings to default')}
             onPress={() => handleItemPress('reset')}

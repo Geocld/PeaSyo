@@ -87,6 +87,10 @@ export default {
       'Force Peasyo’s USB driver to take over all supported /DualSense controllers (experimental)',
     bind_usb_device_tips:
       'This setting only takes effect for controllers that support XInput or DualSense protocol when connected via wired (OTG).',
+    'Force Nexus/PS button to simulate touchpad':
+      'Force Nexus/Volume button to simulate touchpad',
+    bind_usb_device_force_touchpad_desc:
+      'After enabling Android controller support override, force Xbox controller Nexus button or DS controller volume button to simulate touchpad clicks',
     'Rumble intensity': 'Rumble intensity',
     RumbleIntensityDesc: 'Set the controller rumble intensity',
     'Joystick dead zone': 'Joystick dead zone',
@@ -254,5 +258,24 @@ export default {
     show_menu_desc:
       'The quick menu is always displayed in the lower right corner of the streaming page.',
     ExitRemoteKb: 'Exit Remote keyboard',
+    'Device testing': 'Device testing',
+    'Testing current device and controller':
+      'Testing current device and controller',
+    Rumble1s: 'Rumble1s',
+    'Stop rumble': 'Stop rumble',
+    ControllerRumble: 'Controller Rumble',
+    Refresh: 'Refresh',
+    Model: 'Model',
+    'Android Version': 'Android Version',
+    'API Version': 'API Version',
+    'Kernal Version': 'Kernel Version',
+    'Webview Version': 'Webview Version',
+    'Device rumble': 'Device rumble',
+    supported: 'supported',
+    unsupported: 'unsupported',
+    lowThanAndroid12: 'Below Android 12',
+    Controllers: 'Controllers',
+    Name: 'Name',
+    Details: 'Details',
   },
 };

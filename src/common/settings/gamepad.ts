@@ -33,8 +33,18 @@ const gamepad = [
     description: t('bind_usb_device_description'),
     tips: t('bind_usb_device_tips'),
     data: [
-      {value: true, text: t('Enable')},
       {value: false, text: t('Disable')},
+      {value: true, text: t('Enable')},
+    ],
+  },
+  {
+    name: 'bind_usb_device_force_touchpad',
+    type: 'radio',
+    title: t('Force Nexus/PS button to simulate touchpad'),
+    description: t('bind_usb_device_force_touchpad_desc'),
+    data: [
+      {value: false, text: t('Disable')},
+      {value: true, text: t('Enable')},
     ],
   },
   {
