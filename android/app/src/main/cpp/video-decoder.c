@@ -131,6 +131,40 @@ void android_chiaki_video_decoder_set_surface(AndroidChiakiVideoDecoder *decoder
     int bufferSize = 2 * 1024 * 1024;
     AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_MAX_INPUT_SIZE, bufferSize);
 
+    // 添加低延迟设置
+#if __ANDROID_API__ >= 30
+    // Android 11+ 官方低延迟选项
+    AMediaFormat_setInt32(format, "low-latency", 1);
+#endif
+
+    // 设置高优先级和运行速率
+#if __ANDROID_API__ >= 23
+    // 使用字符串形式的键值，避免使用宏
+    AMediaFormat_setInt32(format, "priority", 0);
+    AMediaFormat_setInt32(format, "operating-rate", 0x7FFF); // Short.MAX_VALUE
+#endif
+
+    // MediaTek处理器
+    AMediaFormat_setInt32(format, "vdec-lowlatency", 1);
+
+    // 厂商特定低延迟选项 - 使用字符串形式
+    // Qualcomm/高通处理器
+    AMediaFormat_setInt32(format, "vendor.qti-ext-dec-picture-order.enable", 1);
+    AMediaFormat_setInt32(format, "vendor.qti-ext-dec-low-latency.enable", 1);
+    AMediaFormat_setInt32(format, "vendor.qti-ext-output-sw-fence-enable.value", 1);
+    AMediaFormat_setInt32(format, "vendor.qti-ext-output-fence.enable", 1);
+    AMediaFormat_setInt32(format, "vendor.qti-ext-output-fence.fence_type", 1);
+
+    // Exynos处理器
+    AMediaFormat_setInt32(format, "vendor.rtc-ext-dec-low-latency.enable", 1);
+
+    // Amlogic处理器
+    AMediaFormat_setInt32(format, "vendor.low-latency.enable", 1);
+
+    // Kirin处理器
+    AMediaFormat_setInt32(format, "vendor.hisi-ext-low-latency-video-dec.video-scene-for-low-latency-req", 1);
+    AMediaFormat_setInt32(format, "vendor.hisi-ext-low-latency-video-dec.video-scene-for-low-latency-rdy", -1);
+
     media_status_t r = AMediaCodec_configure(decoder->codec, format, decoder->window, NULL, 0);
     if(r != AMEDIA_OK)
     {
