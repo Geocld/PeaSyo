@@ -446,6 +446,59 @@ public class StreamView extends FrameLayout {
         return mask != null ? mask : 0;
     }
 
+    private int handleRemapping(int keyCode, KeyEvent event) {
+        InputDevice inputDevice = event.getDevice();
+        // Joycon left
+        if (inputDevice.getVendorId() == 0x057e && inputDevice.getProductId() == 0x2006) {
+            switch (event.getScanCode())
+            {
+                case 546:
+                    return KeyEvent.KEYCODE_DPAD_LEFT;
+                case 547:
+                    return KeyEvent.KEYCODE_DPAD_RIGHT;
+                case 544:
+                    return KeyEvent.KEYCODE_DPAD_UP;
+                case 545:
+                    return KeyEvent.KEYCODE_DPAD_DOWN;
+                case 309: // screenshot
+                    return KeyEvent.KEYCODE_BUTTON_MODE;
+                case 310:
+                    return KeyEvent.KEYCODE_BUTTON_L1;
+                case 312:
+                    return KeyEvent.KEYCODE_BUTTON_L2;
+                case 314:
+                    return KeyEvent.KEYCODE_BUTTON_SELECT;
+                case 317:
+                    return KeyEvent.KEYCODE_BUTTON_THUMBL;
+            }
+        }
+        // Joycon right
+        if (inputDevice.getVendorId() == 0x057e && inputDevice.getProductId() == 0x2007) {
+            switch (event.getScanCode())
+            {
+                case 307:
+                    return KeyEvent.KEYCODE_BUTTON_Y;
+                case 308:
+                    return KeyEvent.KEYCODE_BUTTON_X;
+                case 304:
+                    return KeyEvent.KEYCODE_BUTTON_A;
+                case 305:
+                    return KeyEvent.KEYCODE_BUTTON_B;
+                case 311:
+                    return KeyEvent.KEYCODE_BUTTON_R1;
+                case 313:
+                    return KeyEvent.KEYCODE_BUTTON_R2;
+                case 315:
+                    return KeyEvent.KEYCODE_BUTTON_START;
+                case 316:
+                    return KeyEvent.KEYCODE_BUTTON_MODE;
+                case 318:
+                    return KeyEvent.KEYCODE_BUTTON_THUMBR;
+            }
+        }
+        return keyCode;
+    }
+
     // 处理实体按键事件
     public boolean handleKeyEvent(KeyEvent event) {
 //        Log.d(TAG, "handleKeyEvent:" +  event);
@@ -454,7 +507,8 @@ public class StreamView extends FrameLayout {
         }
         if(event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN || event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP || (event.getAction() != KeyEvent.ACTION_DOWN && event.getAction() != KeyEvent.ACTION_UP))
             return false;
-        int buttonMask = getButtonMask(event.getKeyCode());
+        int finalKeyCode = handleRemapping(event.getKeyCode(), event);
+        int buttonMask = getButtonMask(finalKeyCode);
 
         int buttons = controllerState.getButtons();
         switch (event.getAction()) {
