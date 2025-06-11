@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import com.peasyo.utils.OrientationTracker;
+import com.peasyo.utils.Vector2d;
 
 public class StreamView extends FrameLayout {
 
@@ -95,6 +96,7 @@ public class StreamView extends FrameLayout {
     private boolean isLeftTriggerCanClick;
     private boolean isRightTriggerCanClick;
     private boolean isRightstickMoving;
+    private final Vector2d inputVector = new Vector2d();
 
     private final ReactContext reactContext;
 
@@ -787,58 +789,6 @@ public class StreamView extends FrameLayout {
     }
 
     private long lastTriggerTime = 0;
-    private void processJoystickInput(MotionEvent event,
-                                      int historyPos) {
-
-        InputDevice inputDevice = event.getDevice();
-
-        // Calculate the horizontal distance to move by
-        // using the input value from one of these physical controls:
-        // the left control stick, hat axis, or the right control stick.
-        float x = getCenteredAxis(event, inputDevice,
-                MotionEvent.AXIS_X, historyPos);
-
-        float rx = getCenteredAxis(event, inputDevice,
-                MotionEvent.AXIS_Z, historyPos);
-
-        // Calculate the vertical distance to move by
-        // using the input value from one of these physical controls:
-        // the left control stick, hat switch, or the right control stick.
-        float y = getCenteredAxis(event, inputDevice,
-                MotionEvent.AXIS_Y, historyPos);
-
-        float ry = getCenteredAxis(event, inputDevice,
-                MotionEvent.AXIS_RZ, historyPos);
-
-        x = normaliseAxis(x);
-        y = normaliseAxis(y);
-        rx = normaliseAxis(rx);
-        ry = normaliseAxis(ry);
-
-//        Log.d(TAG, "left axisX:" + x);
-//        Log.d(TAG, "left axisY:" + y);
-
-//        Log.d(TAG, "right axisX:" + rx);
-//        Log.d(TAG, "right axisY:" + ry);
-
-        long currentTime = System.currentTimeMillis();
-        if (Math.abs(rx) > 0.1 || Math.abs(ry) > 0.1) {
-            isRightstickMoving = true;
-            lastTriggerTime = currentTime;
-        } else {
-            if (isRightstickMoving && (currentTime - lastTriggerTime >= 500)) {
-                isRightstickMoving = false;
-            }
-        }
-
-        if (!this.swapDpad) {
-            controllerState.setLeftX(signedAxis(x));
-            controllerState.setLeftY(signedAxis(y));
-            controllerState.setRightX(signedAxis(rx));
-            controllerState.setRightY(signedAxis(ry));
-            setControllerState(controllerState);
-        }
-    }
 
     float normaliseAxis(float value) {
         if (this.deadZone > 0) {
@@ -940,6 +890,23 @@ public class StreamView extends FrameLayout {
                 new ControllerTouch((short)secondX, (short)secondY, (byte)-1)
         };
         handleTouchpadTap(false, (byte)nextId, touches);
+    }
+
+    private Vector2d populateCachedVector(float x, float y) {
+        // Reinitialize our cached Vector2d object
+        inputVector.initialize(x, y);
+        return inputVector;
+    }
+
+    private void handleDeadZone(Vector2d stickVector, float deadzoneRadius) {
+        if (stickVector.getMagnitude() <= deadzoneRadius) {
+            // Deadzone
+            stickVector.initialize(0, 0);
+        }
+
+        // We're not normalizing here because we let the computer handle the deadzones.
+        // Normalizing can make the deadzones larger than they should be after the computer also
+        // evaluates the deadzone.
     }
 
     public boolean handleGenericMotionEvent(MotionEvent event) {
@@ -1055,7 +1022,7 @@ public class StreamView extends FrameLayout {
             }
         }
 
-        // Joystick
+        // Trigger
         if ((event.getSource() & InputDevice.SOURCE_JOYSTICK) ==
                 InputDevice.SOURCE_JOYSTICK &&
                 event.getAction() == MotionEvent.ACTION_MOVE) {
@@ -1141,15 +1108,107 @@ public class StreamView extends FrameLayout {
                 controllerState.setR2State(unsignedAxis(rTrigger));
             }
 
-            // Process the movements starting from the
-            // earliest historical position in the batch
-            for (int i = 0; i < historySize; i++) {
-                // Process the event at historical position i
-                processJoystickInput(event, i);
+            if (this.swapDpad) {
+                setControllerState(controllerState);
             }
 
-            // Process the current movement sample in the batch (position -1)
-            processJoystickInput(event, -1);
+            // Joystick
+            int deadzonePercentage = 10;
+            int leftStickXAxis = MotionEvent.AXIS_X;
+            int leftStickYAxis = MotionEvent.AXIS_Y;
+            int rightStickXAxis = -1;
+            int rightStickYAxis = -1;
+            double stickDeadzone = (double)deadzonePercentage / 100.0;
+            float leftStickDeadzoneRadius = (float) stickDeadzone;
+            float rightStickDeadzoneRadius = (float) stickDeadzone;
+
+            InputDevice.MotionRange zRange = getMotionRangeForJoystickAxis(inputDevice, MotionEvent.AXIS_Z);
+            InputDevice.MotionRange rzRange = getMotionRangeForJoystickAxis(inputDevice, MotionEvent.AXIS_RZ);
+
+            if (zRange != null && rzRange != null) {
+                rightStickXAxis = MotionEvent.AXIS_Z;
+                rightStickYAxis = MotionEvent.AXIS_RZ;
+            } else {
+                // Try RX and RY now
+                InputDevice.MotionRange rxRange = getMotionRangeForJoystickAxis(inputDevice, MotionEvent.AXIS_RX);
+                InputDevice.MotionRange ryRange = getMotionRangeForJoystickAxis(inputDevice, MotionEvent.AXIS_RY);
+
+                if (rxRange != null && ryRange != null) {
+                    rightStickXAxis = MotionEvent.AXIS_RX;
+                    rightStickYAxis = MotionEvent.AXIS_RY;
+                }
+            }
+
+            float lsX = 0, lsY = 0, rsX = 0, rsY = 0, rt = 0, lt = 0, hatX = 0, hatY = 0;
+            lsX = event.getAxisValue(leftStickXAxis);
+            lsY = event.getAxisValue(leftStickYAxis);
+
+            rsX = event.getAxisValue(rightStickXAxis);
+            rsY = event.getAxisValue(rightStickYAxis);
+
+            // Left stick
+            Vector2d leftStickVector = populateCachedVector(lsX, lsY);
+            handleDeadZone(leftStickVector, leftStickDeadzoneRadius);
+
+            double leftStickX = leftStickVector.getX();
+            double leftStickY = leftStickVector.getY();
+
+            if(leftStickX > 1) {
+                leftStickX = 1;
+            }
+            if(leftStickX < -1) {
+                leftStickX = -1;
+            }
+            if(leftStickY > 1) {
+                leftStickY = 1;
+            }
+            if(leftStickY < -1) {
+                leftStickY = -1;
+            }
+
+            // Right stick
+            Vector2d rightStickVector = populateCachedVector(rsX, rsY);
+
+            handleDeadZone(rightStickVector, rightStickDeadzoneRadius);
+
+            double rightStickX = rightStickVector.getX();
+            double rightStickY = rightStickVector.getY();
+
+            if(rightStickX > 1) {
+                rightStickX = 1;
+            }
+            if(rightStickX < -1) {
+                rightStickX = -1;
+            }
+            if(rightStickY > 1) {
+                rightStickY = 1;
+            }
+            if(rightStickY < -1) {
+                rightStickY = -1;
+            }
+
+            leftStickX = normaliseAxis((float)leftStickX);
+            leftStickY = normaliseAxis((float)leftStickY);
+            rightStickX = normaliseAxis((float)rightStickX);
+            rightStickY = normaliseAxis((float)rightStickY);
+
+            long currentTime = System.currentTimeMillis();
+            if (Math.abs(rightStickX) > 0.1 || Math.abs(rightStickY) > 0.1) {
+                isRightstickMoving = true;
+                lastTriggerTime = currentTime;
+            } else {
+                if (isRightstickMoving && (currentTime - lastTriggerTime >= 500)) {
+                    isRightstickMoving = false;
+                }
+            }
+
+            if (!this.swapDpad) {
+                controllerState.setLeftX(signedAxis((float)leftStickX));
+                controllerState.setLeftY(signedAxis((float)leftStickY));
+                controllerState.setRightX(signedAxis((float)rightStickX));
+                controllerState.setRightY(signedAxis((float)rightStickY));
+                setControllerState(controllerState);
+            }
         }
 
         return true;
