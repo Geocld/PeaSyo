@@ -5242,7 +5242,7 @@ static ChiakiErrorCode session_message_free(SessionMessage *message)
 static ChiakiErrorCode get_stun_servers(Session *session)
 {
     ChiakiErrorCode err = CHIAKI_ERR_SUCCESS;
-    const char STUN_HOSTS_URL[] = "https://raw.githubusercontent.com/pradt2/always-online-stun/master/valid_hosts.txt";
+    const char STUN_HOSTS_URL[] = "https://cdn.jsdelivr.net/gh/Geocld/PeaSyo@main/valid_hosts.txt";
     CURL *curl = curl_easy_init();
     if(!curl)
     {
