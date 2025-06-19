@@ -37,6 +37,7 @@ export default {
       '👆點擊元素設置元素大小及顯示',
     'Drag elements to adjust their position': '✋拖動元素調整位置',
     'Name can not be empty': '名稱不能為空',
+    Options: '操作',
     // APP
     Login: '登录',
     Registry: '注册',

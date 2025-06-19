@@ -8,7 +8,14 @@ import {
   NativeModules,
   ToastAndroid,
 } from 'react-native';
-import {Button, Text, Portal, Dialog, TextInput, FAB} from 'react-native-paper';
+import {
+  Button,
+  Text,
+  Portal,
+  Dialog,
+  TextInput,
+  IconButton,
+} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
 import NetInfo from '@react-native-community/netinfo';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -50,10 +57,6 @@ function HomeScreen({navigation, route}) {
   const [consoles, setConsoles] = useState([]);
   const [numColumns, setNumColumns] = React.useState(2);
 
-  const [state, setState] = React.useState({open: false});
-  const onStateChange = ({open}) => setState({open});
-  const {open} = state;
-
   const isFocused = useIsFocused();
   const _isFocused = React.useRef(isFocused);
 
@@ -78,6 +81,19 @@ function HomeScreen({navigation, route}) {
   React.useEffect(() => {
     log.info('Page loaded.');
     SplashScreen.hide();
+
+    navigation.setOptions({
+      // eslint-disable-next-line react/no-unstable-nested-components
+      headerRight: () => (
+        <IconButton
+          icon="progress-wrench"
+          size={26}
+          onPress={() => {
+            navigation.navigate('Options');
+          }}
+        />
+      ),
+    });
 
     const unsubscribe = NetInfo.addEventListener(_state => {
       setIsConnected(_state.isConnected);
@@ -536,53 +552,6 @@ function HomeScreen({navigation, route}) {
     }, 45 * 1000);
   };
 
-  const renderFab = () => {
-    const fabActionsLogin = [
-      {
-        icon: 'square-edit-outline',
-        label: t('Manager'),
-        onPress: () => navigation.navigate('Consoles'),
-      },
-      {
-        icon: 'plus',
-        label: t('Registry'),
-        onPress: () => {
-          if (!isConnected) {
-            noNetWarning();
-            return;
-          }
-          navigation.navigate('Registry');
-        },
-      },
-    ];
-
-    const ts = new TokenStore();
-    ts.load();
-    const tokens = ts.getToken();
-
-    let actions = [
-      {
-        icon: 'cog-outline',
-        label: t('Settings'),
-        onPress: () => navigation.navigate('Settings'),
-      },
-    ];
-
-    if (tokens.length > 0) {
-      actions = actions.concat(fabActionsLogin);
-    }
-
-    return (
-      <FAB.Group
-        open={open}
-        visible
-        icon={open ? 'wrench' : 'wrench-outline'}
-        actions={actions}
-        onStateChange={onStateChange}
-      />
-    );
-  };
-
   const noNetWarning = () => {
     Alert.alert(
       t('Warning'),
@@ -655,8 +624,6 @@ function HomeScreen({navigation, route}) {
       />
 
       {renderContent()}
-
-      {renderFab()}
     </>
   );
 }

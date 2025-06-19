@@ -23,6 +23,7 @@ import customLightTheme from './theme/index';
 import customDarkTheme from './theme/index.dark';
 
 import HomeScreen from './pages/Home';
+import OptionsScreen from './pages/Options';
 import LoginScreen from './pages/Login';
 import LoginUsernameScreen from './pages/LoginUsername';
 import RegistryScreen from './pages/Registry';
@@ -135,6 +136,11 @@ function App() {
                   name="Home"
                   component={HomeScreen}
                   options={{title: t('Consoles')}}
+                />
+                <RootStack.Screen
+                  name="Options"
+                  component={OptionsScreen}
+                  options={{title: t('Options')}}
                 />
                 <RootStack.Screen
                   name="Login"
