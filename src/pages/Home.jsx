@@ -16,6 +16,8 @@ import {
   TextInput,
   IconButton,
 } from 'react-native-paper';
+import RNRestart from 'react-native-restart';
+import CookieManager from '@react-native-cookies/cookies';
 import {useFocusEffect} from '@react-navigation/native';
 import NetInfo from '@react-native-community/netinfo';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -424,6 +426,24 @@ function HomeScreen({navigation, route}) {
         .catch(e => {
           // 登录超时，需重新登录
           setLoading(false);
+          Alert.alert(t('Warning'), t(`Token is expired, Please login`), [
+            {
+              text: t('Cancel'),
+              style: 'default',
+              onPress: () => {},
+            },
+            {
+              text: t('Login'),
+              style: 'default',
+              onPress: () => {
+                ts.clear();
+                CookieManager.clearAll();
+                setTimeout(() => {
+                  RNRestart.restart();
+                }, 1000);
+              },
+            },
+          ]);
         });
     } else {
       console.log('psnAccountId:', token.account_id);
