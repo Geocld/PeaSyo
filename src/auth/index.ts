@@ -134,7 +134,6 @@ export const getUserInfoFromToken = (
   });
 };
 
-// TODO
 export const refreshAccessToken = (token: string): Promise<any> => {
   console.log('refreshAccessToken:', token);
   return new Promise((resolve, reject) => {
@@ -164,7 +163,11 @@ export const refreshAccessToken = (token: string): Promise<any> => {
       )
       .then(res => {
         console.log('[refreshToken] res:', res.data);
-        resolve('');
+        if (res.data && res.data.access_token) {
+          resolve(res.data);
+        } else {
+          resolve(null);
+        }
       })
       .catch(e => {
         console.log('[refreshToken] error:', e);

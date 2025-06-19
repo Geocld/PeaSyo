@@ -60,10 +60,14 @@ public class StreamViewManager extends SimpleViewManager<StreamView> {
         String parsedHost = streamInfo.getString("parsedHost");
         String registKeyBase64 = streamInfo.getString("registKey"); // base64
         String morningBase64 = streamInfo.getString("morning"); // base64
+        String psnAccountIdBase64 = streamInfo.getString("psnAccountId");
+        String accessToken = streamInfo.getString("accessToken");
+        String nickName = streamInfo.getString("nickName");
         boolean enableKeyboard = streamInfo.getBoolean("enableKeyboard");
 
         byte[] registKey = java.util.Base64.getDecoder().decode(registKeyBase64);
         byte[] morning = java.util.Base64.getDecoder().decode(morningBase64);
+        byte[] psnAccountId = java.util.Base64.getDecoder().decode(psnAccountIdBase64);
 
         int width = streamInfo.getInt("width");
         int height = streamInfo.getInt("height");
@@ -92,7 +96,7 @@ public class StreamViewManager extends SimpleViewManager<StreamView> {
                 codec  // codec
         );
 
-        ConnectInfo connectInfo = new ConnectInfo(ps5, host, parsedHost, registKey, morning, videoProfile, enableKeyboard);
+        ConnectInfo connectInfo = new ConnectInfo(ps5, host, parsedHost, registKey, morning, videoProfile, enableKeyboard, psnAccountId, accessToken, nickName);
         view.setConnectInfo(connectInfo, streamInfo);
     }
 
@@ -182,8 +186,8 @@ public class StreamViewManager extends SimpleViewManager<StreamView> {
                     double id2 = args.getDouble(7);
 
                     ControllerTouch[] touches = new ControllerTouch[] {
-                        new ControllerTouch((short)x1, (short)y1, (byte)id1),
-                        new ControllerTouch((short)x2, (short)y2, (byte)id2)
+                            new ControllerTouch((short)x1, (short)y1, (byte)id1),
+                            new ControllerTouch((short)x2, (short)y2, (byte)id2)
                     };
                     view.handleTouchpad((int)mask, (byte)nextId, touches);
                 }

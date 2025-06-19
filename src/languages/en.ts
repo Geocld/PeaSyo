@@ -128,6 +128,11 @@ export default {
     NicknameError: 'Console name cannot be empty',
     ConsoleDeleteWarn:
       'Are you sure you want to delete this console? Re-registration will be required after deletion',
+    RemotePlayTitle: 'PSN Remote Play (Experimental)',
+    RemotePlayDesc:
+      'If you don’t have a public IP or a local network setup, you can connect remotely directly through PSN servers. This requires logging into PSN, and your console must be updated to the latest system version.',
+    RemotePlayTips:
+      'Automatic remote connection may not work in all network environments, and even if available, multiple attempts may be required.',
     // Home
     Login: 'Login',
     Registry: 'Register',
@@ -189,6 +194,9 @@ export default {
     // Stream
     SurfaceRenderDesc:
       'Currently using performance rendering mode, interface initializing',
+    PSNConnecting:
+      'Connecting to PSN, this process may take a few minutes. Please wait patiently. If there is no response after 3 minutes, please close the app and try again.',
+    HolepunchFinished: 'PSN hole punching successful, connecting to console...',
     // Transfer
     ExportSuccess: 'Configuration exported successfully',
     ExportFail: 'Configuration export failed',

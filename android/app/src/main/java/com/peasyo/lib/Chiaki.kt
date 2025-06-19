@@ -73,7 +73,10 @@ data class ConnectInfo(
 	val registKey: ByteArray,
 	val morning: ByteArray,
 	val videoProfile: ConnectVideoProfile,
-	val enableKeyboard: Boolean
+	val enableKeyboard: Boolean,
+	val psnAccountId: ByteArray,
+	val accessToken: String,
+	val nickName: String,
 ): Parcelable
 
 private class ChiakiNative
@@ -97,6 +100,8 @@ private class ChiakiNative
 		@JvmStatic external fun getFps(ptr: Long): Double
 		@JvmStatic external fun getFrameLost(ptr: Long): Double
 		@JvmStatic external fun getDeviceUid(): String
+		@JvmStatic external fun getPsnDuid(token: String, isPs5: Boolean, nickName: String): String
+		@JvmStatic external fun connectPsnConnection(token: String, isPs5: Boolean, duid: String): String
 		@JvmStatic external fun sessionCreate(result: CreateResult, connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean, javaSession: Session)
 		@JvmStatic external fun sessionFree(ptr: Long)
 		@JvmStatic external fun sessionStart(ptr: Long): Int
@@ -135,14 +140,14 @@ class ChiakiLog(val levelMask: Int, val callback: (level: Int, text: String) -> 
 	{
 		fun formatLog(level: Int, text: String) =
 			"[${when(level)
-				{
-					Level.DEBUG.value -> "D"
-					Level.VERBOSE.value -> "V"
-					Level.INFO.value -> "I"
-					Level.WARNING.value -> "W"
-					Level.ERROR.value -> "E"
-					else -> "?"
-				}
+			{
+				Level.DEBUG.value -> "D"
+				Level.VERBOSE.value -> "V"
+				Level.INFO.value -> "I"
+				Level.WARNING.value -> "W"
+				Level.ERROR.value -> "E"
+				else -> "?"
+			}
 			}] $text"
 	}
 
@@ -360,6 +365,7 @@ class QuitReason(val value: Int)
 
 sealed class Event
 object ConnectedEvent: Event()
+object HolepunchFinishedEvent: Event()
 data class LoginPinRequestEvent(val pinIncorrect: Boolean): Event()
 data class QuitEvent(val reason: QuitReason, val reasonString: String?): Event()
 data class RumbleEvent(val left: Int, val right: Int): Event()
@@ -413,6 +419,11 @@ class Session(connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean)
 	private fun eventConnected()
 	{
 		event(ConnectedEvent)
+	}
+
+	private fun eventHolepunchFinish()
+	{
+		event(HolepunchFinishedEvent)
 	}
 
 	private fun eventLoginPinRequest(pinIncorrect: Boolean)
@@ -488,7 +499,7 @@ data class DiscoveryHost(
 		READY,
 		STANDBY
 	}
-	
+
 	val isPS5 get() = deviceDiscoveryProtocolVersion == "00030010"
 }
 
@@ -582,5 +593,31 @@ class RemotePsn {
 
 	fun getDeviceUid(): String {
 		return deviceUid
+	}
+}
+
+class RemotePsnDuid(
+	token: String,
+	isPs5: Boolean,
+	nickName: String
+) {
+	private var deviceUid: String = ""
+
+	init {
+		deviceUid = ChiakiNative.getPsnDuid(token, isPs5, nickName)
+	}
+
+	fun getDeviceUid(): String {
+		return deviceUid
+	}
+}
+
+class PsnConnect (
+	token: String,
+	isPs5: Boolean,
+	duid: String
+) {
+	init {
+		ChiakiNative.connectPsnConnection(token, isPs5, duid)
 	}
 }

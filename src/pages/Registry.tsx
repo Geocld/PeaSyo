@@ -134,6 +134,7 @@ function RegistryScreen({navigation}) {
       // Save regist infos
       const registedConsole = {
         ...result,
+        nickName: result.serverNickname || '',
         consoleId: currentConsoleId || uuid.v4(),
         host,
         remoteHost: '',

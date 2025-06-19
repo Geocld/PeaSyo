@@ -41,6 +41,7 @@ export type Settings = {
   theme: string;
   rgb: string;
   keyboard: boolean;
+  auto_remote: boolean;
   debug: boolean;
 };
 
@@ -81,6 +82,7 @@ const defaultSettings: Settings = {
   theme: 'dark',
   rgb: '#DF6069',
   keyboard: false,
+  auto_remote: false,
   debug: false,
 };
 

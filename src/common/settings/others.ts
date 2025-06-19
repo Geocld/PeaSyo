@@ -23,6 +23,17 @@ const others = [
       {value: false, text: t('Disable')},
     ],
   },
+  {
+    name: 'auto_remote',
+    type: 'radio',
+    title: t('RemotePlayTitle'),
+    description: t('RemotePlayDesc'),
+    tips: t('RemotePlayTips'),
+    data: [
+      {value: false, text: t('Disable')},
+      {value: true, text: t('Enable')},
+    ],
+  },
 ];
 
 export default others;

@@ -19,7 +19,11 @@ import ConsoleItem from '../components/ConsoleItem';
 import SplashScreen from 'react-native-splash-screen';
 import {useTranslation} from 'react-i18next';
 import {debugFactory} from '../utils/debug';
-import {getTokenFromRedirectUri, getUserInfoFromToken} from '../auth';
+import {
+  getTokenFromRedirectUri,
+  getUserInfoFromToken,
+  refreshAccessToken,
+} from '../auth';
 import {TokenStore} from '../store/tokenStore';
 import {getSettings} from '../store/settingStore';
 import {getConsoles, saveConsoles} from '../store/consolesStore';
@@ -27,7 +31,7 @@ import {discoverDevices} from '../discovery';
 import {wakeup} from '../wakeup';
 import {DOMAIN_REGEX} from '../common';
 
-const {RegistryManager, UsbRumbleManager} = NativeModules;
+const {RegistryManager, UsbRumbleManager, HolepunchManager} = NativeModules;
 
 const log = debugFactory('HomeScreen');
 
@@ -357,6 +361,56 @@ function HomeScreen({navigation, route}) {
     setRemoteHost(item.remoteHost || '');
   };
 
+  const handleAutoRemoteStream = item => {
+    if (!isConnected) {
+      noNetWarning();
+      return;
+    }
+    const ts = new TokenStore();
+    ts.load();
+    const tokens = ts.getToken();
+    const token = tokens[0];
+    const {accessToken, refreshToken, tokenExpiry} = token;
+
+    // token已过期，需刷新
+    if (new Date().getTime() - tokenExpiry > 0) {
+      // refresh token
+      console.log('need refresh token');
+      refreshAccessToken(refreshToken).then(res => {
+        if (res) {
+          const {access_token, refresh_token, expires_in} = res;
+          tokens[0].accessToken = access_token;
+          tokens[0].refreshToken = refresh_token;
+          tokens[0].tokenExpiry = new Date().getTime() + expires_in * 1000;
+          ts.setToken(tokens);
+          ts.save();
+          navigation.navigate({
+            name: 'Stream',
+            params: {
+              consoleInfo: {
+                ...item,
+                accessToken,
+                psnAccountId: token.account_id,
+              },
+            },
+          });
+        }
+      });
+    } else {
+      console.log('psnAccountId:', token.account_id);
+      navigation.navigate({
+        name: 'Stream',
+        params: {
+          consoleInfo: {
+            ...item,
+            accessToken,
+            psnAccountId: token.account_id,
+          },
+        },
+      });
+    }
+  };
+
   const handleCloseRemoteModal = () => {
     setShowRemoteModal(false);
   };
@@ -465,7 +519,7 @@ function HomeScreen({navigation, route}) {
           isUsbMode,
         },
       });
-    }, 50 * 1000);
+    }, 45 * 1000);
   };
 
   const renderFab = () => {

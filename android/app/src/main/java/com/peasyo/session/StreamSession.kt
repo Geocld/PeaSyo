@@ -15,6 +15,7 @@ import com.peasyo.MainActivity
 import com.peasyo.UsbRumbleManager
 import com.peasyo.lib.ConnectInfo
 import com.peasyo.lib.ConnectedEvent
+import com.peasyo.lib.HolepunchFinishedEvent
 import com.peasyo.lib.ControllerState
 import com.peasyo.lib.CreateError
 import com.peasyo.lib.Event
@@ -224,11 +225,17 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 	{
 		when(event)
 		{
-			is ConnectedEvent -> { // 连接成功
+			is ConnectedEvent -> {
 				_state.postValue(StreamStateConnected)
 
 				val params = Arguments.createMap().apply {
 					putString("type", "connected")
+				}
+				sendEvent("streamStateChange", params)
+			}
+			is HolepunchFinishedEvent -> {
+				val params = Arguments.createMap().apply {
+					putString("type", "holepunchFinished")
 				}
 				sendEvent("streamStateChange", params)
 			}

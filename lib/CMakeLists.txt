@@ -108,7 +108,30 @@ target_include_directories(chiaki-lib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/includ
 find_package(Threads REQUIRED)
 target_link_libraries(chiaki-lib Threads::Threads)
 
-target_link_libraries(chiaki-lib CURL::libcurl_static)
+# crypto
+add_library(lib_crypto STATIC IMPORTED)
+set_target_properties(lib_crypto PROPERTIES IMPORTED_LOCATION
+       ${CMAKE_SOURCE_DIR}/third-party/openssl/${ANDROID_ABI}/lib/libcrypto.a)
+target_link_libraries(chiaki-lib lib_crypto)
+
+# zlib
+add_library(lib_zlib STATIC IMPORTED)
+set_target_properties(lib_zlib PROPERTIES IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/third-party/zlib/${ANDROID_ABI}/lib/libz.a)
+target_link_libraries(chiaki-lib lib_zlib)
+
+# OpenSSL
+add_library(lib_openssl STATIC IMPORTED)
+set_target_properties(lib_openssl PROPERTIES IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/third-party/openssl/${ANDROID_ABI}/lib/libssl.a)
+target_link_libraries(chiaki-lib lib_openssl)
+
+# CURL
+add_library(lib_curl STATIC IMPORTED)
+set_target_properties(lib_curl PROPERTIES IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/third-party/curl/${ANDROID_ABI}/lib/libcurl.a)
+target_include_directories(chiaki-lib PRIVATE ${CMAKE_SOURCE_DIR}/third-party/curl/${ANDROID_ABI}/include)
+target_link_libraries(chiaki-lib lib_curl)
 
 # JSON-C
 target_link_libraries(chiaki-lib json-c)

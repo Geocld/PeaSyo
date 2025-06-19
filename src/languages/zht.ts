@@ -132,6 +132,11 @@ export default {
     ConsoleDeleteWarn: '确定要删除该终端吗，删除后需要重新注册终端',
     SwapDpadTitle: '十字键模拟左摇杆',
     SwapDpadDesc: '将十字键行为模拟为左摇杆(该模式下左摇杆将失效)',
+    RemotePlayTitle: '使用PSN遠端連接(實驗性)',
+    RemotePlayDesc:
+      '如果你沒有公網或沒有組網，可以直接通過PSN伺服器進行遠端連接，該操作需要登入PSN，且主機需要更新到最新系統。',
+    RemotePlayTips:
+      '自動遠端連接可能不適用所有網路環境，即使可用也可能需要連接多次。',
     // home
     NoLogin: '尚未登錄，請登錄',
     Login_PSN_Username:
@@ -186,6 +191,9 @@ export default {
     SurfaceRenderDesc: '當前正在使用性能渲染模式，界面初始化中',
     Connected: '連接成功',
     Connecting: '連接中...',
+    PSNConnecting:
+      'PSN連接中，過程可能要幾分鐘，請耐心等待，該步驟如三分鐘後無響應請關閉APP重試',
+    HolepunchFinished: 'PSN打洞成功，正在連接主機',
     'Toggle Performance': '顯示/隱藏性能資訊',
     'Toggle Virtual Gamepad': '顯示/隱藏虛擬手柄',
     'Toggle Touchpad': '顯示/隱藏觸控板',

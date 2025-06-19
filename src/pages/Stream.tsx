@@ -32,6 +32,7 @@ import {getSettings} from '../store/settingStore';
 import {debugFactory} from '../utils/debug';
 
 const CONNECTED = 'connected';
+const HOLEPUNCHFINISHED = 'holepunchFinished';
 const DSCONTROLLER_NAME = 'DualSenseController';
 
 const {
@@ -280,6 +281,9 @@ function StreamScreen({navigation, route}) {
       registKey: _consoleInfo.rpRegistKey,
       morning: _consoleInfo.rpKey,
       enableKeyboard: false,
+      accessToken: _consoleInfo.accessToken || '', // 用于远程自动连接
+      nickName: _consoleInfo.nickName || _consoleInfo.serverNickname || '', // 用于远程自动连接
+      psnAccountId: _consoleInfo.psnAccountId || '', // 用于远程自动连接
       width,
       height,
       fps,
@@ -374,6 +378,8 @@ function StreamScreen({navigation, route}) {
           perfTimer.current = setInterval(() => {
             streamViewRef.current?.getPerformance();
           }, 500);
+        } else if (event.type === HOLEPUNCHFINISHED) {
+          setLoadingText(t('HolepunchFinished'));
         } else {
           // {"reason": "Stopped", "reasonString": null, "type": "quit"}
           if (event.reason !== 'Stopped') {
@@ -652,7 +658,13 @@ function StreamScreen({navigation, route}) {
 
         setLoading(true);
 
-        setLoadingText(t('Connecting'));
+        // PSN connect
+        if (_streamInfo.accessToken) {
+          setLoadingText(t('PSNConnecting'));
+        } else {
+          // Normal connect
+          setLoadingText(t('Connecting'));
+        }
         setTimeout(() => {
           if (useSurface) {
             setConnectState('');

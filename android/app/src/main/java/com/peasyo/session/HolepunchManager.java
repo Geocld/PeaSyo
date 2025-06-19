@@ -25,4 +25,17 @@ public class HolepunchManager extends ReactContextBaseJavaModule {
         String duid = remote.getDeviceUid();
         return duid;
     }
+
+    @ReactMethod(isBlockingSynchronousMethod=true)
+    private String getPsnDuid(String token, Boolean isPs5, String nickName) {
+        RemotePsnDuid remote = new RemotePsnDuid(token, isPs5, nickName);
+        String duid = remote.getDeviceUid();
+        return duid;
+    }
+
+    @ReactMethod(isBlockingSynchronousMethod=true)
+    private String connectPsn(String token, Boolean isPs5, String duid) {
+        PsnConnect connect = new PsnConnect(token, isPs5, duid);
+        return "";
+    }
 }
