@@ -45,6 +45,7 @@ import CustomGamepadScreen from './pages/CustomGamepad';
 import UsersScreen from './pages/Users';
 import RgbScreen from './pages/Rgb';
 import DeviceInfosScreen from './pages/DeviceInfos';
+import ThanksScreen from './pages/Thanks';
 import updater from './utils/updater';
 
 import {useTranslation} from 'react-i18next';
@@ -236,6 +237,11 @@ function App() {
                   name="Users"
                   component={UsersScreen}
                   options={{title: t('Users')}}
+                />
+                <RootStack.Screen
+                  name="Thanks"
+                  component={ThanksScreen}
+                  options={{title: t('Thanks')}}
                 />
               </RootStack.Group>
 

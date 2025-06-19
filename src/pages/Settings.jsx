@@ -285,6 +285,11 @@ function SettingsScreen({navigation}) {
             />
           )}
 
+          <SettingItem
+            title={t('Thanks')}
+            onPress={() => navigation.navigate('Thanks')}
+          />
+
           {/* <SettingItem
             title={'DEBUG'}
             description={'Enter debug.'}

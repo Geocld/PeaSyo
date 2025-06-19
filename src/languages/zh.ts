@@ -40,6 +40,7 @@ export default {
     'Drag elements to adjust their position': '✋拖动元素调整位置',
     'Name can not be empty': '名称不能为空',
     Options: '操作',
+    Thanks: '鸣谢',
     // APP
     Login: '登录',
     Registry: '注册',
