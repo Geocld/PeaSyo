@@ -169,6 +169,8 @@ export default {
       '没有找到主机，请确保设备和主机正在同一个局域网，并且主机处于待机或开机状态。',
     Manager: '主机管理',
     ConsoleEdit: '编辑主机',
+    AutoRemoteDesc: '或者可以直接使用PSN自动连接:',
+    Start: '开始',
     // Regsistry
     RegistTips: '注意: 仅支持注册PS5或PS4(固件版本8+以上)主机',
     LookConsole: '正在寻找终端',

@@ -135,7 +135,6 @@ export const getUserInfoFromToken = (
 };
 
 export const refreshAccessToken = (token: string): Promise<any> => {
-  console.log('refreshAccessToken:', token);
   return new Promise((resolve, reject) => {
     const auth = {
       username: CLIENT_ID,

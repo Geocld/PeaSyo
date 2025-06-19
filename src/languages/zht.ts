@@ -167,6 +167,8 @@ export default {
       '沒有找到主機，請確保設備和主機正在同一個局域網，並且主機處於待機或開機狀態。',
     Manager: '終端管理',
     ConsoleEdit: '编辑終端',
+    AutoRemoteDesc: '或者你可以直接使用PSN自动連接:',
+    Start: '开始',
     // Regsistry
     RegistTips: '注意：僅支援註冊 PS5 或 PS4（固件版本 8 以上）主機',
     LookConsole: '正在尋找終端',

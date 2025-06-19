@@ -31,12 +31,13 @@ import {discoverDevices} from '../discovery';
 import {wakeup} from '../wakeup';
 import {DOMAIN_REGEX} from '../common';
 
-const {RegistryManager, UsbRumbleManager, HolepunchManager} = NativeModules;
+const {RegistryManager, UsbRumbleManager} = NativeModules;
 
 const log = debugFactory('HomeScreen');
 
 function HomeScreen({navigation, route}) {
   const {t} = useTranslation();
+  const [settings, setSettings] = React.useState({});
   const [loading, setLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('');
   const [currentConsole, setCurrentConsole] = useState(null);
@@ -68,6 +69,9 @@ function HomeScreen({navigation, route}) {
       const _consoles = getConsoles();
       log.info('consoles:', _consoles);
       setConsoles(_consoles);
+
+      const _settings = getSettings();
+      setSettings(_settings);
     }, []),
   );
 
@@ -336,7 +340,6 @@ function HomeScreen({navigation, route}) {
   };
 
   const handleToLocalStream = item => {
-    const settings = getSettings();
     const hasValidUsbDevice = UsbRumbleManager.getHasValidUsbDevice();
     const isUsbMode = settings.bind_usb_device && hasValidUsbDevice;
 
@@ -361,11 +364,13 @@ function HomeScreen({navigation, route}) {
     setRemoteHost(item.remoteHost || '');
   };
 
-  const handleAutoRemoteStream = item => {
+  const handleAutoRemoteStream = () => {
     if (!isConnected) {
       noNetWarning();
       return;
     }
+    setShowRemoteModal(false);
+    setLoading(true);
     const ts = new TokenStore();
     ts.load();
     const tokens = ts.getToken();
@@ -376,38 +381,49 @@ function HomeScreen({navigation, route}) {
     if (new Date().getTime() - tokenExpiry > 0) {
       // refresh token
       console.log('need refresh token');
-      refreshAccessToken(refreshToken).then(res => {
-        if (res) {
-          const {access_token, refresh_token, expires_in} = res;
-          tokens[0].accessToken = access_token;
-          tokens[0].refreshToken = refresh_token;
-          tokens[0].tokenExpiry = new Date().getTime() + expires_in * 1000;
-          ts.setToken(tokens);
-          ts.save();
-          navigation.navigate({
-            name: 'Stream',
-            params: {
-              consoleInfo: {
-                ...item,
-                accessToken,
-                psnAccountId: token.account_id,
-              },
-            },
-          });
-        }
-      });
+      refreshAccessToken(refreshToken)
+        .then(res => {
+          if (res) {
+            const {access_token, refresh_token, expires_in} = res;
+            tokens[0].accessToken = access_token;
+            tokens[0].refreshToken = refresh_token;
+            tokens[0].tokenExpiry = new Date().getTime() + expires_in * 1000;
+            ts.setToken(tokens);
+            ts.save();
+            setTimeout(() => {
+              setLoading(false);
+              navigation.navigate({
+                name: 'Stream',
+                params: {
+                  consoleInfo: {
+                    ...currentConsole,
+                    accessToken,
+                    psnAccountId: token.account_id,
+                  },
+                },
+              });
+            }, 500);
+          }
+        })
+        .catch(e => {
+          // 登录超时，需重新登录
+          setLoading(false);
+        });
     } else {
       console.log('psnAccountId:', token.account_id);
-      navigation.navigate({
-        name: 'Stream',
-        params: {
-          consoleInfo: {
-            ...item,
-            accessToken,
-            psnAccountId: token.account_id,
+      setTimeout(() => {
+        setLoading(false);
+        navigation.navigate({
+          name: 'Stream',
+          params: {
+            consoleInfo: {
+              ...currentConsole,
+              accessToken,
+              psnAccountId: token.account_id,
+            },
           },
-        },
-      });
+        });
+      }, 500);
     }
   };
 
@@ -439,7 +455,6 @@ function HomeScreen({navigation, route}) {
 
   const handleOnlyConnect = () => {
     setShowWakeModal(false);
-    const settings = getSettings();
     const hasValidUsbDevice = UsbRumbleManager.getHasValidUsbDevice();
     const isUsbMode = settings.bind_usb_device && hasValidUsbDevice;
     navigation.navigate({
@@ -500,7 +515,6 @@ function HomeScreen({navigation, route}) {
   const handleWakeAndToStream = (host, credential) => {
     const isPS5 = currentConsole.apName.indexOf('PS5') > -1;
     log.info('handleWakeAndToStream', host, credential);
-    const settings = getSettings();
     const hasValidUsbDevice = UsbRumbleManager.getHasValidUsbDevice();
     const isUsbMode = settings.bind_usb_device && hasValidUsbDevice;
 
@@ -593,6 +607,14 @@ function HomeScreen({navigation, route}) {
                 {t('RemoteDesc')}
               </Text>
             </View>
+            {settings.auto_remote && (
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text>{t('AutoRemoteDesc')}</Text>
+                <Button type="text" onPress={handleAutoRemoteStream}>
+                  {t('Start')}
+                </Button>
+              </View>
+            )}
             <TextInput
               label={t('RemoteHost')}
               value={remoteHost}

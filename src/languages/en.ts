@@ -167,6 +167,7 @@ export default {
       'Console not found. Please ensure your device and console are on the same network, and the console is in standby or powered on',
     Manager: 'Manage consoles',
     ConsoleEdit: 'Edit consoles',
+    AutoRemoteDesc: 'You can remote play via PSN:',
     // Regsistry
     RegistTips:
       'Note: Only supports registering PS5 or PS4 (firmware version 8 or above) consoles',
