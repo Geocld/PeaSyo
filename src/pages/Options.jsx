@@ -39,7 +39,7 @@ function OptionsScreen({navigation, route}) {
           />
         )}
 
-        {tokens.length && (
+        {tokens.length > 0 && (
           <List.Item
             title={t('Registry')}
             description={''}

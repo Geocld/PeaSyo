@@ -55,7 +55,8 @@ const PerfPanel: React.FC<Props> = ({resolution = '', performance = {}}) => {
     if (value === undefined) {
       return '-1';
     }
-    return (value / 10).toFixed(1) + 'M/s';
+    return value.toFixed(1) + 'Mbps';
+    // return (value / 10).toFixed(1) + 'M/s';
   };
 
   const computedPl = (value: number | undefined): string => {
@@ -109,7 +110,7 @@ const PerfPanel: React.FC<Props> = ({resolution = '', performance = {}}) => {
         </View> */}
         <View>
           <Text style={styles.text}>
-            {t('WD')}: {computedBitrate(performance.bitrate)}{' '}
+            {t('BT')}: {computedBitrate(performance.bitrate)}{' '}
             {isHorizon ? '| ' : ''}
           </Text>
         </View>
@@ -130,12 +131,12 @@ const PerfPanel: React.FC<Props> = ({resolution = '', performance = {}}) => {
             {isHorizon ? ' | ' : ''}
           </Text>
         </View>
-        <View>
+        {/* <View>
           <Text style={styles.text}>
             {t('FL')}: {computedFl(performance.frameLost)}
             {isHorizon ? ' | ' : ''}
           </Text>
-        </View>
+        </View> */}
         <View>
           <Text style={styles.text}>{renderBattery(battery)}</Text>
         </View>

@@ -455,7 +455,7 @@ function StreamScreen({navigation, route}) {
       'performance',
       states => {
         // console.log('Performance:', states);
-        if (performances.current.length < 10) {
+        if (performances.current.length < 5) {
           performances.current.push(states);
         } else {
           const _avgPerformance = {
