@@ -1,6 +1,7 @@
 import React from 'react';
 import {NativeModules} from 'react-native';
 import {WebView} from 'react-native-webview';
+import Spinner from 'react-native-loading-spinner-overlay';
 import {debugFactory} from '../utils/debug';
 
 const log = debugFactory('LoginScreen');
@@ -30,6 +31,15 @@ function LoginScreen({navigation, route}) {
         <WebView
           source={{uri: loginUrl}}
           originWhitelist={['*']}
+          startInLoadingState={true}
+          renderLoading={() => (
+            <Spinner
+              visible={true}
+              cancelable={true}
+              color={'#DF6069'}
+              overlayColor={'rgba(0, 0, 0, 0)'}
+            />
+          )}
           setSupportMultipleWindows={false}
           cacheMode={'LOAD_NO_CACHE'}
           cacheEnabled={false}
