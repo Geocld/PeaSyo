@@ -7,6 +7,7 @@ import {
   Dimensions,
   NativeModules,
   ToastAndroid,
+  Pressable,
 } from 'react-native';
 import {
   Button,
@@ -61,6 +62,8 @@ function HomeScreen({navigation, route}) {
 
   const isFocused = useIsFocused();
   const _isFocused = React.useRef(isFocused);
+
+  const ref = React.useRef(null);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -604,12 +607,21 @@ function HomeScreen({navigation, route}) {
                 </Button>
               </View>
             )}
-            <TextInput
-              label={t('RemoteHost')}
-              value={remoteHost}
-              style={styles.textCenter}
-              onChangeText={text => setRemoteHost(text.trim())}
-            />
+            <Pressable
+              onPress={() => {
+                if (ref && typeof ref !== 'function' && ref.current) {
+                  // @ts-ignore
+                  ref.current.focus();
+                }
+              }}>
+              <TextInput
+                label={t('RemoteHost')}
+                ref={ref}
+                value={remoteHost}
+                style={styles.textCenter}
+                onChangeText={text => setRemoteHost(text.trim())}
+              />
+            </Pressable>
             <Button
               mode="text"
               style={{marginTop: 10}}

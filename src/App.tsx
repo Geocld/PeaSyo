@@ -49,6 +49,7 @@ import ThanksScreen from './pages/Thanks';
 import updater from './utils/updater';
 
 import {useTranslation} from 'react-i18next';
+import {A11yProvider} from "react-native-a11y";
 
 import {SystemBars} from 'react-native-edge-to-edge';
 
@@ -129,132 +130,134 @@ function App() {
   return (
     <>
       <Provider store={store}>
-        <PaperProvider theme={paperTheme}>
-          <NavigationContainer theme={navigationTheme}>
-            <RootStack.Navigator>
-              <RootStack.Group>
-                <RootStack.Screen
-                  name="Home"
-                  component={HomeScreen}
-                  options={{title: t('Consoles')}}
-                />
-                <RootStack.Screen
-                  name="Options"
-                  component={OptionsScreen}
-                  options={{title: t('Options')}}
-                />
-                <RootStack.Screen
-                  name="Login"
-                  component={LoginScreen}
-                  options={{title: t('Login')}}
-                />
-                <RootStack.Screen
-                  name="LoginUsername"
-                  component={LoginUsernameScreen}
-                  options={{title: t('Login')}}
-                />
-                <RootStack.Screen
-                  name="Stream"
-                  component={StreamScreen}
-                  options={{headerShown: false}}
-                />
-                <RootStack.Screen
-                  name="Registry"
-                  component={RegistryScreen}
-                  options={{title: t('Registry')}}
-                />
-                <RootStack.Screen
-                  name="Settings"
-                  component={SettingsScreen}
-                  options={{title: t('Settings')}}
-                />
-                <RootStack.Screen
-                  name="Consoles"
-                  component={ConsolesScreen}
-                  options={{title: t('Consoles')}}
-                />
-                <RootStack.Screen
-                  name="ConsoleEdit"
-                  component={ConsoleEditScreen}
-                  options={{title: t('ConsoleEdit')}}
-                />
-                <RootStack.Screen
-                  name="Transfer"
-                  component={TransferScreen}
-                  options={{title: t('Transfer')}}
-                />
-                <RootStack.Screen
-                  name="DualSense"
-                  component={DualSenseScreen}
-                  options={{title: t('DualSense')}}
-                />
-                <RootStack.Screen
-                  name="DualSenseWeb"
-                  component={DualSenseWebScreen}
-                  options={{title: t('DualSense')}}
-                />
-                <RootStack.Screen name="Debug" component={DebugScreen} />
-                <RootStack.Screen
-                  name="CustomGamepad"
-                  component={CustomGamepadScreen}
-                  options={{headerShown: false}}
-                />
-                <RootStack.Screen
-                  name="VirtualGamepadSettings"
-                  component={VirtualGamepadSettingsScreen}
-                  options={{title: t('Custom')}}
-                />
-                <RootStack.Screen
-                  name="About"
-                  component={AboutScreen}
-                  options={{title: t('About')}}
-                />
-                <RootStack.Screen
-                  name="Feedback"
-                  component={FeedbackScreen}
-                  options={{title: t('Chat')}}
-                />
-                <RootStack.Screen
-                  name="SettingDetail"
-                  component={SettingDetailScreen}
-                />
-                <RootStack.Screen
-                  name="NativeGameMap"
-                  component={NativeGameMapScreen}
-                  options={{title: t('GameMap')}}
-                />
-                <RootStack.Screen
-                  name="RGB"
-                  component={RgbScreen}
-                  options={{title: t('RGB')}}
-                />
-                <RootStack.Screen
-                  name="DeviceInfos"
-                  component={DeviceInfosScreen}
-                  options={{title: t('Device testing')}}
-                />
-                <RootStack.Screen
-                  name="Users"
-                  component={UsersScreen}
-                  options={{title: t('Users')}}
-                />
-                <RootStack.Screen
-                  name="Thanks"
-                  component={ThanksScreen}
-                  options={{title: t('Thanks')}}
-                />
-              </RootStack.Group>
+        <A11yProvider>
+          <PaperProvider theme={paperTheme}>
+            <NavigationContainer theme={navigationTheme}>
+              <RootStack.Navigator>
+                <RootStack.Group>
+                  <RootStack.Screen
+                    name="Home"
+                    component={HomeScreen}
+                    options={{title: t('Consoles')}}
+                  />
+                  <RootStack.Screen
+                    name="Options"
+                    component={OptionsScreen}
+                    options={{title: t('Options')}}
+                  />
+                  <RootStack.Screen
+                    name="Login"
+                    component={LoginScreen}
+                    options={{title: t('Login')}}
+                  />
+                  <RootStack.Screen
+                    name="LoginUsername"
+                    component={LoginUsernameScreen}
+                    options={{title: t('Login')}}
+                  />
+                  <RootStack.Screen
+                    name="Stream"
+                    component={StreamScreen}
+                    options={{headerShown: false}}
+                  />
+                  <RootStack.Screen
+                    name="Registry"
+                    component={RegistryScreen}
+                    options={{title: t('Registry')}}
+                  />
+                  <RootStack.Screen
+                    name="Settings"
+                    component={SettingsScreen}
+                    options={{title: t('Settings')}}
+                  />
+                  <RootStack.Screen
+                    name="Consoles"
+                    component={ConsolesScreen}
+                    options={{title: t('Consoles')}}
+                  />
+                  <RootStack.Screen
+                    name="ConsoleEdit"
+                    component={ConsoleEditScreen}
+                    options={{title: t('ConsoleEdit')}}
+                  />
+                  <RootStack.Screen
+                    name="Transfer"
+                    component={TransferScreen}
+                    options={{title: t('Transfer')}}
+                  />
+                  <RootStack.Screen
+                    name="DualSense"
+                    component={DualSenseScreen}
+                    options={{title: t('DualSense')}}
+                  />
+                  <RootStack.Screen
+                    name="DualSenseWeb"
+                    component={DualSenseWebScreen}
+                    options={{title: t('DualSense')}}
+                  />
+                  <RootStack.Screen name="Debug" component={DebugScreen} />
+                  <RootStack.Screen
+                    name="CustomGamepad"
+                    component={CustomGamepadScreen}
+                    options={{headerShown: false}}
+                  />
+                  <RootStack.Screen
+                    name="VirtualGamepadSettings"
+                    component={VirtualGamepadSettingsScreen}
+                    options={{title: t('Custom')}}
+                  />
+                  <RootStack.Screen
+                    name="About"
+                    component={AboutScreen}
+                    options={{title: t('About')}}
+                  />
+                  <RootStack.Screen
+                    name="Feedback"
+                    component={FeedbackScreen}
+                    options={{title: t('Chat')}}
+                  />
+                  <RootStack.Screen
+                    name="SettingDetail"
+                    component={SettingDetailScreen}
+                  />
+                  <RootStack.Screen
+                    name="NativeGameMap"
+                    component={NativeGameMapScreen}
+                    options={{title: t('GameMap')}}
+                  />
+                  <RootStack.Screen
+                    name="RGB"
+                    component={RgbScreen}
+                    options={{title: t('RGB')}}
+                  />
+                  <RootStack.Screen
+                    name="DeviceInfos"
+                    component={DeviceInfosScreen}
+                    options={{title: t('Device testing')}}
+                  />
+                  <RootStack.Screen
+                    name="Users"
+                    component={UsersScreen}
+                    options={{title: t('Users')}}
+                  />
+                  <RootStack.Screen
+                    name="Thanks"
+                    component={ThanksScreen}
+                    options={{title: t('Thanks')}}
+                  />
+                </RootStack.Group>
 
-              <RootStack.Group screenOptions={{presentation: 'modal'}}>
-                <RootStack.Screen
-                  name="GameMapDetail"
-                  component={GameMapDetailScreen}
-                  options={{title: t('GameMap')}}
-                />
-              </RootStack.Group>
-            </RootStack.Navigator>
-          </NavigationContainer>
-        </PaperProvider>
+                <RootStack.Group screenOptions={{presentation: 'modal'}}>
+                  <RootStack.Screen
+                    name="GameMapDetail"
+                    component={GameMapDetailScreen}
+                    options={{title: t('GameMap')}}
+                  />
+                </RootStack.Group>
+              </RootStack.Navigator>
+            </NavigationContainer>
+          </PaperProvider>
+        </A11yProvider>
       </Provider>
       <SystemBars style="light" hidden={false} />
     </>

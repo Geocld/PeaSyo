@@ -1,8 +1,15 @@
 import React from 'react';
-import {StyleSheet, View, ScrollView, ToastAndroid} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  ToastAndroid,
+  Pressable,
+} from 'react-native';
 import {Button, Text, HelperText, TextInput} from 'react-native-paper';
 import {useTranslation} from 'react-i18next';
 import axios from 'axios';
+import {KeyboardFocusView} from 'react-native-a11y';
 import {TokenStore} from '../store/tokenStore';
 import type {PsnUsrtInfo} from '../types';
 
@@ -12,6 +19,7 @@ function LoginUsernameScreen({navigation, route}) {
   const {t} = useTranslation();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [username, setUsername] = React.useState<string>('');
+  const ref = React.useRef(null);
 
   React.useEffect(() => {}, [navigation]);
 
@@ -78,12 +86,24 @@ function LoginUsernameScreen({navigation, route}) {
             {t('Login_username_tips')}
           </HelperText>
         </View>
-        <TextInput
-          label={t('PSN username')}
-          value={username}
-          autoFocus={true}
-          onChangeText={text => setUsername(text)}
-        />
+        <KeyboardFocusView
+          onFocusChange={e => {
+            if (e.nativeEvent.isFocused) {
+              if (ref && typeof ref !== 'function' && ref.current) {
+                // @ts-ignore
+                ref.current.focus();
+              }
+            }
+          }}>
+          <Pressable style={{padding: 5}}>
+            <TextInput
+              label={t('PSN username')}
+              ref={ref}
+              value={username}
+              onChangeText={text => setUsername(text)}
+            />
+          </Pressable>
+        </KeyboardFocusView>
       </ScrollView>
 
       <View style={styles.buttonWrap}>

@@ -6,6 +6,7 @@ import {
   ScrollView,
   NativeModules,
   ToastAndroid,
+  Pressable,
 } from 'react-native';
 import {
   TextInput,
@@ -17,6 +18,7 @@ import {
 import Spinner from 'react-native-loading-spinner-overlay';
 import {useTranslation} from 'react-i18next';
 import uuid from 'react-native-uuid';
+import {KeyboardFocusView} from 'react-native-a11y';
 import {discoverDevices, type IDiscoveredDevice} from '../discovery';
 import {TokenStore} from '../store/tokenStore';
 import {getConsoles, saveConsoles} from '../store/consolesStore';
@@ -43,6 +45,9 @@ function RegistryScreen({navigation}) {
   const [host, setHost] = useState('');
   const [pin, setPin] = useState('');
   const [consoles, setConsoles] = useState<Console[]>([]);
+
+  const hostRef = React.useRef(null);
+  const pinRef = React.useRef(null);
 
   const [currentConsoleId, setCurrentConsoleId] = useState('');
 
@@ -201,6 +206,7 @@ function RegistryScreen({navigation}) {
         color={'#DF6069'}
         textContent={loadingText}
         textStyle={styles.spinnerTextStyle}
+        cancelable
       />
 
       <Text style={styles.tips} variant="titleMedium">
@@ -249,17 +255,37 @@ function RegistryScreen({navigation}) {
       <Divider />
 
       <View style={styles.wrap}>
-        <TextInput
-          label={t('Host')}
-          value={host}
-          onChangeText={text => setHost(text)}
-        />
+        <Pressable
+          style={{padding: 5}}
+          onPress={() => {
+            if (hostRef && typeof hostRef !== 'function' && hostRef.current) {
+              // @ts-ignore
+              hostRef.current.focus();
+            }
+          }}>
+          <TextInput
+            label={t('Host')}
+            ref={hostRef}
+            value={host}
+            onChangeText={text => setHost(text)}
+          />
+        </Pressable>
 
-        <TextInput
-          label="PIN"
-          value={pin}
-          onChangeText={text => setPin(text)}
-        />
+        <Pressable
+          style={{padding: 5}}
+          onPress={() => {
+            if (pinRef && typeof pinRef !== 'function' && pinRef.current) {
+              // @ts-ignore
+              pinRef.current.focus();
+            }
+          }}>
+          <TextInput
+            label="PIN"
+            ref={pinRef}
+            value={pin}
+            onChangeText={text => setPin(text)}
+          />
+        </Pressable>
       </View>
 
       <View style={[styles.wrap, {paddingBottom: 50}]}>

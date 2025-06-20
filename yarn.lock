@@ -8515,6 +8515,7 @@ __metadata:
     react: "npm:18.2.0"
     react-i18next: "npm:^14.1.2"
     react-native: "npm:0.72.14"
+    react-native-a11y: "npm:^0.5.8"
     react-native-crypto-js: "npm:^1.0.0"
     react-native-dns-lookup: "npm:^1.0.6"
     react-native-document-picker: "npm:^9.3.1"
@@ -8817,6 +8818,16 @@ __metadata:
   version: 17.0.2
   resolution: "react-is@npm:17.0.2"
   checksum: 10c0/2bdb6b93fbb1820b024b496042cce405c57e2f85e777c9aabd55f9b26d145408f9f74f5934676ffdc46f3dcff656d78413a6e43968e7b3f92eea35b3052e9053
+  languageName: node
+  linkType: hard
+
+"react-native-a11y@npm:^0.5.8":
+  version: 0.5.8
+  resolution: "react-native-a11y@npm:0.5.8"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/1d23aec743469721d945d16a88027159d0fc66c9d1a356834d2496640edf71bb031ea40049d0d65553c5117c32bc4a99c14e5755045ff310dd873a0544165b87
   languageName: node
   linkType: hard
 
