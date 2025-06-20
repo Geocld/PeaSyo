@@ -79,7 +79,8 @@ function OptionsScreen({navigation, route}) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    paddingLeft: 5,
+    paddingRight: 5,
   },
   buttonsWrap: {
     marginTop: 30,

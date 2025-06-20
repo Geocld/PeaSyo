@@ -81,6 +81,7 @@ function LoginUsernameScreen({navigation, route}) {
         <TextInput
           label={t('PSN username')}
           value={username}
+          autoFocus={true}
           onChangeText={text => setUsername(text)}
         />
       </ScrollView>
