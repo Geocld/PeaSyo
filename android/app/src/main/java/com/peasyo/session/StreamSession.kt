@@ -249,6 +249,7 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 				val state = StreamStateLoginPinRequest(event.pinIncorrect)
 				_state.postValue(state)
 				val params = createEventParams(state)
+				Log.d("StreamView", "loginPinRequest: $params")
 				sendEvent("streamStateChange", params)
 			}
 			is RumbleEvent -> {
@@ -465,5 +466,10 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 		this@StreamSession.surface = Surface(surfaceTexture)
 		// 在 onSurfaceTextureAvailable() 方法里面取得 SurfaceTexture 并包装成一个 Surface 再调用MediaPlayer的 setSurface 方法完成播放器的显示工作
 		session?.setSurface(Surface(surface))
+	}
+
+	fun setLoginPin(pin: String)
+	{
+		session?.setLoginPin(pin)
 	}
 }

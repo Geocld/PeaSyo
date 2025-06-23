@@ -308,6 +308,18 @@ const StreamView: ForwardRefRenderFunction<StreamViewRef, StreamViewProps> = (
         );
       }
     },
+    setLoginPin: (pin: string) => {
+      if (streamViewRef.current) {
+        const viewId = findNodeHandle(streamViewRef.current);
+
+        UIManager.dispatchViewManagerCommand(
+          viewId,
+          // @ts-ignore
+          UIManager.StreamView.Commands.setLoginPin.toString(),
+          [pin],
+        );
+      }
+    },
   }));
 
   const handleStreamStateChange = (event: any) => {

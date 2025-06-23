@@ -357,6 +357,12 @@ public class StreamView extends FrameLayout {
         }
     }
 
+    public void setLoginPin(String pin) {
+        if (session != null) {
+            session.setLoginPin(pin);
+        }
+    }
+
     // 默认掩码映射
     private static Map<Integer, Integer> DEFAULT_MAPPING = Map.ofEntries(
             Map.entry(KeyEvent.KEYCODE_BUTTON_A, BUTTON_CROSS),

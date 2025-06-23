@@ -40,6 +40,7 @@ public class StreamViewManager extends SimpleViewManager<StreamView> {
     public static final int COMMAND_SENSOR_STICK = 15;
     public static final int COMMAND_SEND_TEXT = 16;
     public static final int COMMAND_KEYBOARD_SWITCH = 17;
+    public static final int COMMAND_SET_LOGIN_PIN = 18;
 
     @Override
     @NonNull
@@ -123,6 +124,7 @@ public class StreamViewManager extends SimpleViewManager<StreamView> {
                 .put("stopSensor", COMMAND_STOP_SENSOR)
                 .put("sendText", COMMAND_SEND_TEXT)
                 .put("keyboardSwitch", COMMAND_KEYBOARD_SWITCH)
+                .put("setLoginPin", COMMAND_SET_LOGIN_PIN)
                 .build();
     }
 
@@ -319,6 +321,14 @@ public class StreamViewManager extends SimpleViewManager<StreamView> {
                         view.keyboardAccept();
                     }
                 }
+            }
+
+            case COMMAND_SET_LOGIN_PIN: {
+                if (args != null) {
+                    String pin = args.getString(0);
+                    view.setLoginPin(pin);
+                }
+                break;
             }
 
             default:

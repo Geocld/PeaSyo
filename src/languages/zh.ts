@@ -260,6 +260,8 @@ export default {
     Switch_user: '切换用户',
     'PSN login': 'PSN登录',
     'PSN username login': 'PSN用户名登录',
+    'Login PIN': '登录PIN码',
+    'Login PIN incorrect': '登录PIN码不正确',
     User_manager_desc1: '请选择当前登录用户',
     User_manager_desc2: '选择的用户只影响未注册的主机，已注册主机不受影响。',
     Delete_user_text: '确认删除此用户',

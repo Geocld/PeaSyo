@@ -251,6 +251,8 @@ export default {
     Switch_user: '切換用戶',
     'PSN login': 'PSN登錄',
     'PSN username login': 'PSN用戶名登錄',
+    'Login PIN': '登錄PIN',
+    'Login PIN incorrect': '登錄PIN不正确',
     User_manager_desc1: '請選擇當前登錄用戶。',
     User_manager_desc2: '選擇的用戶只影響未註冊的主機，已註冊主機不受影響。',
     Delete_user_text: '确认删除此用户',

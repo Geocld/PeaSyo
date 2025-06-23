@@ -17,6 +17,7 @@ import {
   IconButton,
   Button,
   TextInput,
+  HelperText,
 } from 'react-native-paper';
 import {useTranslation} from 'react-i18next';
 import Spinner from '../components/Spinner';
@@ -33,6 +34,7 @@ import {debugFactory} from '../utils/debug';
 
 const CONNECTED = 'connected';
 const HOLEPUNCHFINISHED = 'holepunchFinished';
+const PINREQUEST = 'pinRequest';
 const DSCONTROLLER_NAME = 'DualSenseController';
 
 const {
@@ -78,6 +80,9 @@ function StreamScreen({navigation, route}) {
   const [isUsbDs5, setIsUsbDs5] = React.useState(false);
   const [message, setMessage] = React.useState('');
   const [showMessageModal, setShowMessageModal] = React.useState(false);
+  const [loginPin, setLoginPin] = React.useState('');
+  const [showPinModal, setShowPinModal] = React.useState(false);
+  const [pinIncorrect, setPinIncorrect] = React.useState(false);
 
   const stateEventListener = React.useRef<any>(undefined);
   const usbGpEventListener = React.useRef<any>(undefined);
@@ -380,6 +385,9 @@ function StreamScreen({navigation, route}) {
           }, 500);
         } else if (event.type === HOLEPUNCHFINISHED) {
           setLoadingText(t('HolepunchFinished'));
+        } else if (event.type === PINREQUEST) {
+          setPinIncorrect(event.pinIncorrect || false);
+          setShowPinModal(true);
         } else {
           // {"reason": "Stopped", "reasonString": null, "type": "quit"}
           if (event.reason !== 'Stopped') {
@@ -653,6 +661,7 @@ function StreamScreen({navigation, route}) {
           setShowPerformance(true);
           setShowTouchpad(true);
           setShowMessageModal(true);
+          setShowPinModal(true);
           setShowVirtualGamepad(true);
         }
 
@@ -672,6 +681,7 @@ function StreamScreen({navigation, route}) {
             setShowPerformance(false);
             setShowTouchpad(false);
             setShowMessageModal(false);
+            setShowPinModal(false);
             setShowVirtualGamepad(false);
             setShowInitOverlay(false);
           }
@@ -819,6 +829,19 @@ function StreamScreen({navigation, route}) {
     setShowMessageModal(false);
   };
 
+  const handleSendLoginPin = () => {
+    if (!loginPin) {
+      return;
+    }
+    streamViewRef.current?.setLoginPin(loginPin);
+    setShowPinModal(false);
+  };
+
+  const handleExitLoginPin = () => {
+    setShowPinModal(false);
+    handleExit();
+  };
+
   const renderMessageModal = () => {
     if (!showMessageModal || !consoleInfo) {
       return null;
@@ -852,6 +875,42 @@ function StreamScreen({navigation, route}) {
     );
   };
 
+  const renderPinModal = () => {
+    if (!showPinModal) {
+      return null;
+    }
+
+    return (
+      <View style={styles.messageModal}>
+        <Card>
+          <Card.Content>
+            <TextInput
+              label={t('Login PIN')}
+              value={loginPin}
+              onChangeText={text => setLoginPin(text)}
+            />
+            <HelperText type="error" visible={pinIncorrect}>
+              {t('Login PIN incorrect')}
+            </HelperText>
+            <Button
+              mode="contained"
+              style={{marginTop: 10}}
+              onPress={handleSendLoginPin}>
+              {t('Confirm')}
+            </Button>
+
+            <Button
+              mode="contained"
+              style={{marginTop: 10}}
+              onPress={handleExitLoginPin}>
+              {t('Exit')}
+            </Button>
+          </Card.Content>
+        </Card>
+      </View>
+    );
+  };
+
   return (
     <View>
       {showInitOverlay && (
@@ -873,6 +932,8 @@ function StreamScreen({navigation, route}) {
       {renderTouchpad()}
 
       {renderMessageModal()}
+
+      {renderPinModal()}
 
       {settings.show_menu && (
         <View style={styles.quickMenu}>

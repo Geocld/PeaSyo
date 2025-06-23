@@ -38,6 +38,8 @@ public class StreamTextureViewManager extends SimpleViewManager<StreamTextureVie
     public static final int COMMAND_USB_DS_CONTROLLER = 14;
     public static final int COMMAND_SENSOR_STICK = 15;
     public static final int COMMAND_SEND_TEXT = 16;
+    public static final int COMMAND_KEYBOARD_SWITCH = 17;
+    public static final int COMMAND_SET_LOGIN_PIN = 18;
 
     @Override
     @NonNull
@@ -121,6 +123,7 @@ public class StreamTextureViewManager extends SimpleViewManager<StreamTextureVie
                 .put("startSensor", COMMAND_START_SENSOR)
                 .put("stopSensor", COMMAND_STOP_SENSOR)
                 .put("sendText", COMMAND_SEND_TEXT)
+                .put("setLoginPin", COMMAND_SET_LOGIN_PIN)
                 .build();
     }
 
@@ -304,6 +307,14 @@ public class StreamTextureViewManager extends SimpleViewManager<StreamTextureVie
                 if (args != null) {
                     String text = args.getString(0);
                     view.sendText(text);
+                }
+                break;
+            }
+
+            case COMMAND_SET_LOGIN_PIN: {
+                if (args != null) {
+                    String pin = args.getString(0);
+                    view.setLoginPin(pin);
                 }
                 break;
             }
