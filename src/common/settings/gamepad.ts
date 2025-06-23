@@ -68,7 +68,7 @@ const gamepad = [
     name: 'edge_compensation',
     type: 'slider',
     min: 0,
-    max: 20,
+    max: 90,
     step: 1,
     title: t('Joystick edge compensation'),
     description: t('EdgeDesc'),

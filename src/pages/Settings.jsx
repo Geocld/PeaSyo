@@ -254,6 +254,12 @@ function SettingsScreen({navigation}) {
           })}
 
           <SettingItem
+            title={t('Logs')}
+            description={t('LogsDesc')}
+            onPress={() => navigation.navigate('Logs')}
+          />
+
+          <SettingItem
             title={t('Configuration Transfer')}
             description={t('TransferDesc')}
             onPress={() => navigation.navigate('Transfer')}
@@ -269,11 +275,6 @@ function SettingsScreen({navigation}) {
             title={t('Reset')}
             description={t('Reset all settings to default')}
             onPress={() => handleItemPress('reset')}
-          />
-
-          <SettingItem
-            title={t('Logs')}
-            onPress={() => navigation.navigate('Logs')}
           />
 
           <SettingItem

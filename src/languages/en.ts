@@ -130,7 +130,7 @@ export default {
       'Are you sure you want to delete this console? Re-registration will be required after deletion',
     RemotePlayTitle: 'PSN Remote Play (Experimental)',
     RemotePlayDesc:
-      'If you don’t have a public IP or a local network setup, you can connect remotely directly through PSN servers. This requires logging into PSN, and your console must be updated to the latest system version.',
+      'If you don’t have a public IP or a local network setup, you can connect remotely directly through PSN servers. This requires logging into PSN, and your console must be updated to the latest system version(PS4 is not supported).',
     RemotePlayTips:
       'Automatic remote connection may not work in all network environments, and even if available, multiple attempts may be required.',
     // Home
@@ -286,5 +286,11 @@ export default {
     Controllers: 'Controllers',
     Name: 'Name',
     Details: 'Details',
+    LogsDesc: 'View historical streaming logs',
+    LogsTips:
+      'PeaSyo retains the 3 most recent streaming logs. To export a streaming log, click the share button on the right side of the filename.',
+    LogVerboseTitle: 'Enable verbose logging',
+    LogVerboseDesc:
+      'Records complete streaming logs. This may significantly increase log file size and could potentially impact streaming performance. Do not enable during regular gameplay.',
   },
 };

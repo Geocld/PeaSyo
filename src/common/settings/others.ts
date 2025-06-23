@@ -34,6 +34,16 @@ const others = [
       {value: true, text: t('Enable')},
     ],
   },
+  {
+    name: 'log_verbose',
+    type: 'radio',
+    title: t('LogVerboseTitle'),
+    description: t('LogVerboseDesc'),
+    data: [
+      {value: false, text: t('Disable')},
+      {value: true, text: t('Enable')},
+    ],
+  },
 ];
 
 export default others;

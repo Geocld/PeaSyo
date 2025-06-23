@@ -70,14 +70,13 @@ public class LogsModule extends ReactContextBaseJavaModule {
                             String dateStr = matcher.group(1);
                             Date date = DATE_FORMAT.parse(dateStr);
 
-                            WritableMap fileInfo = Arguments.createMap(); // 使用 WritableMap 替代 HashMap
+                            WritableMap fileInfo = Arguments.createMap();
                             fileInfo.putString("filename", filename);
                             fileInfo.putString("date", date != null ? date.toString() : "Unknown");
                             fileInfo.putString("path", file.getAbsolutePath());
-                            fileList.pushMap(fileInfo); // 将 map 添加到 array
+                            fileList.pushMap(fileInfo);
                         }
                     } catch (Exception e) {
-                        // 跳过格式不匹配的文件
                     }
                 }
             }
@@ -110,7 +109,6 @@ public class LogsModule extends ReactContextBaseJavaModule {
             File file = new File(baseDir, filename);
             Context context = getReactApplicationContext();
 
-            // 检查文件是否存在（关键安全步骤）
             if (!file.exists()) {
                 promise.reject("FILE_NOT_FOUND", "Log file not found: " + file.getAbsolutePath());
                 return;
@@ -123,7 +121,7 @@ public class LogsModule extends ReactContextBaseJavaModule {
             shareIntent.setType("text/plain");
             shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            shareIntent.setClipData(ClipData.newRawUri("", fileUri)); // 关键修复：显式设置 ClipData
+            shareIntent.setClipData(ClipData.newRawUri("", fileUri));
 
             List<ResolveInfo> resInfoList = context.getPackageManager()
                     .queryIntentActivities(shareIntent, PackageManager.MATCH_DEFAULT_ONLY);

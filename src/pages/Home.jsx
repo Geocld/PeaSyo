@@ -385,6 +385,28 @@ function HomeScreen({navigation, route}) {
     setRemoteHost(item.remoteHost || '');
   };
 
+  const handleToLogin = () => {
+    const ts = new TokenStore();
+    Alert.alert(t('Warning'), t('Token is expired, Please login'), [
+      {
+        text: t('Cancel'),
+        style: 'default',
+        onPress: () => {},
+      },
+      {
+        text: t('Login'),
+        style: 'default',
+        onPress: () => {
+          ts.clear();
+          CookieManager.clearAll();
+          setTimeout(() => {
+            RNRestart.restart();
+          }, 1000);
+        },
+      },
+    ]);
+  };
+
   const handleAutoRemoteStream = () => {
     if (!isConnected) {
       noNetWarning();
@@ -395,13 +417,29 @@ function HomeScreen({navigation, route}) {
     const ts = new TokenStore();
     ts.load();
     const tokens = ts.getToken();
-    const token = tokens[0];
+    if (!tokens.length) {
+      handleToLogin();
+      return;
+    }
+
+    let token = tokens[0];
+
+    tokens.forEach(item => {
+      if (item.is_default) {
+        token = item;
+      }
+    });
+
     const {accessToken, refreshToken, tokenExpiry} = token;
+
+    if (!accessToken || !refreshToken) {
+      handleToLogin();
+      return;
+    }
 
     // token已过期，需刷新
     if (new Date().getTime() - tokenExpiry > 0) {
       // refresh token
-      console.log('need refresh token');
       refreshAccessToken(refreshToken)
         .then(res => {
           if (res) {
@@ -427,26 +465,8 @@ function HomeScreen({navigation, route}) {
           }
         })
         .catch(e => {
-          // 登录超时，需重新登录
           setLoading(false);
-          Alert.alert(t('Warning'), t(`Token is expired, Please login`), [
-            {
-              text: t('Cancel'),
-              style: 'default',
-              onPress: () => {},
-            },
-            {
-              text: t('Login'),
-              style: 'default',
-              onPress: () => {
-                ts.clear();
-                CookieManager.clearAll();
-                setTimeout(() => {
-                  RNRestart.restart();
-                }, 1000);
-              },
-            },
-          ]);
+          handleToLogin();
         });
     } else {
       console.log('psnAccountId:', token.account_id);

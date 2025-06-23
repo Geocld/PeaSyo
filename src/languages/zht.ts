@@ -135,7 +135,7 @@ export default {
     SwapDpadDesc: '将十字键行为模拟为左摇杆(该模式下左摇杆将失效)',
     RemotePlayTitle: '使用PSN遠端連接(實驗性)',
     RemotePlayDesc:
-      '如果你沒有公網或沒有組網，可以直接通過PSN伺服器進行遠端連接，該操作需要登入PSN，且主機需要更新到最新系統。',
+      '如果你沒有公網或沒有組網，可以直接通過PSN伺服器進行遠端連接，該操作需要登入PSN，且主機需要更新到最新系統(不支援PS4)。',
     RemotePlayTips:
       '自動遠端連接可能不適用所有網路環境，即使可用也可能需要連接多次。',
     // home
@@ -308,5 +308,11 @@ export default {
     Controllers: '控制器',
     Name: '名稱',
     Details: '詳情',
+    LogsDesc: '查看歷史串流日誌',
+    LogsTips:
+      'PeaSyo 會保留3條最近的串流日誌，如需導出串流日誌，請點擊檔案名稱右側的分享按鈕。',
+    LogVerboseTitle: '啟用詳細日誌',
+    LogVerboseDesc:
+      '記錄完整的串流日誌，這會導致日誌檔案體積劇增，同時也可能影響串流體驗，請勿在常規遊戲中啟用。',
   },
 };

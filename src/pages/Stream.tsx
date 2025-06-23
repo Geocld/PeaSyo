@@ -246,6 +246,7 @@ function StreamScreen({navigation, route}) {
       useSurface,
       touchpad_type,
       swap_dpad,
+      log_verbose,
     } = _settings;
     if (_resolution === 360) {
       width = 640;
@@ -307,6 +308,7 @@ function StreamScreen({navigation, route}) {
       shortTrigger: short_trigger,
       gamepadMaping: gamepad_maping,
       swapDpad: swap_dpad,
+      logVerbose: log_verbose,
     };
 
     log.info('_streamInfo:', _streamInfo);

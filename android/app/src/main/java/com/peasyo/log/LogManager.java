@@ -14,11 +14,11 @@ import java.util.regex.Pattern;
 
 public class LogManager {
     private static final String BASE_DIR_NAME = "session_logs";
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS", Locale.US);
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS", Locale.SIMPLIFIED_CHINESE);
     private static final String FILE_PREFIX = "peasyo_session_";
     private static final String FILE_POSTFIX = ".log";
     private static final Pattern FILE_REGEX = Pattern.compile(FILE_PREFIX + "(.+)" + FILE_POSTFIX);
-    private static final int KEEP_LOG_FILES_COUNT = 5;
+    private static final int KEEP_LOG_FILES_COUNT = 2;
 
     private final File baseDir;
 

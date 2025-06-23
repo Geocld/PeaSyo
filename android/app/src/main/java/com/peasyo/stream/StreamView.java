@@ -93,6 +93,7 @@ public class StreamView extends FrameLayout {
     private int edgeCompensation;
     private boolean isShortTrigger;
     private boolean swapDpad;
+    private boolean logVerbose;
     private boolean isLeftTriggerCanClick;
     private boolean isRightTriggerCanClick;
     private boolean isRightstickMoving;
@@ -114,6 +115,7 @@ public class StreamView extends FrameLayout {
         this.edgeCompensation = 0;
         this.isShortTrigger = false;
         this.swapDpad = false;
+        this.logVerbose = false;
         this.isLeftTriggerCanClick = false;
         this.isRightTriggerCanClick = false;
         this.isRightstickMoving = false;
@@ -257,6 +259,7 @@ public class StreamView extends FrameLayout {
         int edgeCompensation = streamInfo.getInt("edgeCompensation");
         boolean shortTrigger = streamInfo.getBoolean("shortTrigger");
         boolean swapDpad = streamInfo.getBoolean("swapDpad");
+        boolean logVerbose = streamInfo.getBoolean("logVerbose");
         ReadableMap gamepadMaping = streamInfo.getMap("gamepadMaping");
 
         if (gamepadMaping != null) {
@@ -274,6 +277,7 @@ public class StreamView extends FrameLayout {
         this.edgeCompensation = edgeCompensation;
         this.isShortTrigger = shortTrigger;
         this.swapDpad = swapDpad;
+        this.logVerbose = logVerbose;
 
         if (videoFormat != null) {
             if (videoFormat.isEmpty()) {
@@ -307,7 +311,7 @@ public class StreamView extends FrameLayout {
         LogManager logManager = new LogManager(application);
 
         // 初始化session
-        session = new StreamSession(connectInfo, logManager, false, this.reactContext, this.rumble, this.rumbleIntensity, this.usbMode, this.usbController);
+        session = new StreamSession(connectInfo, logManager, this.logVerbose, this.reactContext, this.rumble, this.rumbleIntensity, this.usbMode, this.usbController);
 
         // 添加媒体流视图
         session.attachToSurfaceView(surface);
@@ -860,7 +864,7 @@ public class StreamView extends FrameLayout {
             value /= 1.0 - this.deadZone;
 
             // Joystick edge compensation
-            final double THRESHOLD = 0.8;
+            final double THRESHOLD = 0.2;
             final double MAX_VALUE = 1.0;
             float compensation = this.edgeCompensation / 100.0f;
 

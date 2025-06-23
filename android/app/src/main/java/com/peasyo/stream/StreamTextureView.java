@@ -88,6 +88,7 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
     private int edgeCompensation;
     private boolean isShortTrigger;
     private boolean swapDpad;
+    private boolean logVerbose;
     private boolean isLeftTriggerCanClick;
     private boolean isRightTriggerCanClick;
 
@@ -110,6 +111,7 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         this.edgeCompensation = 0;
         this.isShortTrigger = false;
         this.swapDpad = false;
+        this.logVerbose = false;
         this.isLeftTriggerCanClick = false;
         this.isRightTriggerCanClick = false;
         this.isRightstickMoving = false;
@@ -266,6 +268,8 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         float deadZone = (float)streamInfo.getDouble("deadZone");
         int edgeCompensation = streamInfo.getInt("edgeCompensation");
         boolean shortTrigger = streamInfo.getBoolean("shortTrigger");
+        boolean swapDpad = streamInfo.getBoolean("swapDpad");
+        boolean logVerbose = streamInfo.getBoolean("logVerbose");
         ReadableMap gamepadMaping = streamInfo.getMap("gamepadMaping");
 
         if (gamepadMaping != null) {
@@ -282,6 +286,8 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         this.deadZone = deadZone;
         this.edgeCompensation = edgeCompensation;
         this.isShortTrigger = shortTrigger;
+        this.swapDpad = swapDpad;
+        this.logVerbose = logVerbose;
 
         if (videoFormat != null) {
             if (videoFormat.isEmpty()) {
@@ -315,7 +321,7 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         LogManager logManager = new LogManager(application);
 
         // 初始化session
-        session = new StreamSession(connectInfo, logManager, false, this.reactContext, this.rumble, this.rumbleIntensity, this.usbMode, this.usbController);
+        session = new StreamSession(connectInfo, logManager, this.logVerbose, this.reactContext, this.rumble, this.rumbleIntensity, this.usbMode, this.usbController);
 
         session.resume();
 
