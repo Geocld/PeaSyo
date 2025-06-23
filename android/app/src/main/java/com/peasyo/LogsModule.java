@@ -116,18 +116,15 @@ public class LogsModule extends ReactContextBaseJavaModule {
                 return;
             }
 
-            // 获取 FileProvider URI（需确保 fileProviderAuthority 与 Manifest 一致）
             String fileProviderAuthority = context.getPackageName() + ".provider";
             Uri fileUri = FileProvider.getUriForFile(context, fileProviderAuthority, file);
 
-            // 构建分享 Intent（与 Kotlin 代码逻辑对齐）
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
             shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             shareIntent.setClipData(ClipData.newRawUri("", fileUri)); // 关键修复：显式设置 ClipData
 
-            // 授予临时权限给所有能接收的应用（增强兼容性）
             List<ResolveInfo> resInfoList = context.getPackageManager()
                     .queryIntentActivities(shareIntent, PackageManager.MATCH_DEFAULT_ONLY);
             for (ResolveInfo resolveInfo : resInfoList) {
@@ -138,10 +135,9 @@ public class LogsModule extends ReactContextBaseJavaModule {
                 );
             }
 
-            // 启动分享选择器（强制新建任务栈）
             Intent chooserIntent = Intent.createChooser(
                     shareIntent,
-                    "Share Log File" // 可替换为 RN 传递的标题
+                    "Share Log File"
             );
             chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(chooserIntent);
