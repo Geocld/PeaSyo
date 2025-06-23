@@ -272,6 +272,11 @@ function SettingsScreen({navigation}) {
           />
 
           <SettingItem
+            title={t('Logs')}
+            onPress={() => navigation.navigate('Logs')}
+          />
+
+          <SettingItem
             title={t('About')}
             description={`${t('About')} PeaSyo`}
             onPress={() => navigation.navigate('About')}

@@ -25,6 +25,16 @@
         android:name=".input.UsbDriverService"
         android:label="Usb Driver Service" />
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.peasyo.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
+
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

@@ -46,6 +46,7 @@ public class MainApplication extends Application implements ReactApplication {
             packages.add(new SensorPackage());
             packages.add(new GamepadSensorPackage());
             packages.add(new HolepunchPackage());
+            packages.add(new LogsPackage());
           return packages;
         }
 

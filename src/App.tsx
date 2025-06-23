@@ -46,10 +46,11 @@ import UsersScreen from './pages/Users';
 import RgbScreen from './pages/Rgb';
 import DeviceInfosScreen from './pages/DeviceInfos';
 import ThanksScreen from './pages/Thanks';
+import LogsScreen from './pages/Logs';
 import updater from './utils/updater';
 
 import {useTranslation} from 'react-i18next';
-import {A11yProvider} from "react-native-a11y";
+import {A11yProvider} from 'react-native-a11y';
 
 import {SystemBars} from 'react-native-edge-to-edge';
 
@@ -244,6 +245,11 @@ function App() {
                     name="Thanks"
                     component={ThanksScreen}
                     options={{title: t('Thanks')}}
+                  />
+                  <RootStack.Screen
+                    name="Logs"
+                    component={LogsScreen}
+                    options={{title: t('Logs')}}
                   />
                 </RootStack.Group>
 
