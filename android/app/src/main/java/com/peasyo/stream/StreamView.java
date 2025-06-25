@@ -776,6 +776,9 @@ public class StreamView extends FrameLayout {
         setControllerState(controllerState);
     }
 
+    private final Handler handler = new Handler();
+    private Runnable delayedStateSend;
+
     public void setControllerState(ControllerState controllerState) {
         Log.d(TAG, "setControllerState:" + controllerState);
 
@@ -783,6 +786,28 @@ public class StreamView extends FrameLayout {
 
         if (session != null) {
             session.setControllerState(controllerState);
+
+            if(
+                controllerState.getButtons() == 0 && controllerState.getL2State() == 0 && controllerState.getR2State() == 0 &&
+                controllerState.getLeftX() == 0 && controllerState.getLeftY() == 0 &&
+                controllerState.getRightX() == 0 && controllerState.getRightY() == 0
+            ) {
+                // 延迟50ms，确认都归零后重发一次重置，保证按键可靠性
+                delayedStateSend = new Runnable() {
+                    @Override
+                    public void run() {
+                        if(
+                                controllerState.getButtons() == 0 && controllerState.getL2State() == 0 && controllerState.getR2State() == 0 &&
+                                        controllerState.getLeftX() == 0 && controllerState.getLeftY() == 0 &&
+                                        controllerState.getRightX() == 0 && controllerState.getRightY() == 0
+                        ) {
+                            Log.d(TAG, "delay setControllerState:" + controllerState);
+                            session.setControllerState(controllerState);
+                        }
+                    }
+                };
+                handler.postDelayed(delayedStateSend, 100);
+            }
         }
     }
 

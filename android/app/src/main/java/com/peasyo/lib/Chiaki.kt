@@ -192,18 +192,23 @@ data class ControllerState constructor(
 	@set:JvmName("setL2State")
 	var l2State: UByte = 0U,
 
+	@get:JvmName("getR2State")
 	@set:JvmName("setR2State")
 	var r2State: UByte = 0U,
 
+	@get:JvmName("getLeftX")
 	@set:JvmName("setLeftX")
 	var leftX: Short = 0,
 
+	@get:JvmName("getLeftY")
 	@set:JvmName("setLeftY")
 	var leftY: Short = 0,
 
+	@get:JvmName("getRightX")
 	@set:JvmName("setRightX")
 	var rightX: Short = 0,
 
+	@get:JvmName("getRightY")
 	@set:JvmName("setRightY")
 	var rightY: Short = 0,
 
