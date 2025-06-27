@@ -408,13 +408,14 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_session_join(ChiakiSession *session)
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_set_controller_state(ChiakiSession *session, ChiakiControllerState *state)
 {
-	ChiakiErrorCode err = chiaki_mutex_lock(&session->stream_connection.feedback_sender_mutex);
-	if(err != CHIAKI_ERR_SUCCESS)
-		return err;
+    // test: remote sender lock tem
+//	ChiakiErrorCode err = chiaki_mutex_lock(&session->stream_connection.feedback_sender_mutex);
+//	if(err != CHIAKI_ERR_SUCCESS)
+//		return err;
 	session->controller_state = *state;
 	if(session->stream_connection.feedback_sender_active)
 		chiaki_feedback_sender_set_controller_state(&session->stream_connection.feedback_sender, &session->controller_state);
-	chiaki_mutex_unlock(&session->stream_connection.feedback_sender_mutex);
+//	chiaki_mutex_unlock(&session->stream_connection.feedback_sender_mutex);
 	return CHIAKI_ERR_SUCCESS;
 }
 
