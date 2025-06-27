@@ -28,6 +28,10 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.Arguments;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 public class LogsModule extends ReactContextBaseJavaModule {
@@ -39,12 +43,23 @@ public class LogsModule extends ReactContextBaseJavaModule {
     private static final Pattern FILE_REGEX = Pattern.compile(FILE_PREFIX + "(.+)" + FILE_POSTFIX);
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS", Locale.US);
 
+
+    private static final String CONFIGS_DIR_NAME = "peasyo_configs";
+    private static final String CONFIG_FILE_PREFIX = "peasyo_configs_";
+    private static final String CONFIG_FILE_POSTFIX = ".json";
+
     private final File baseDir;
+    private final File configsDir;
 
     public LogsModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
         this.baseDir = new File(reactContext.getFilesDir(), BASE_DIR_NAME);
+
+        this.configsDir = new File(baseDir, CONFIGS_DIR_NAME);
+        if (!configsDir.exists()) {
+            configsDir.mkdirs(); // Create the configs directory if it doesn't exist
+        }
     }
 
     @Override
@@ -136,6 +151,73 @@ public class LogsModule extends ReactContextBaseJavaModule {
             Intent chooserIntent = Intent.createChooser(
                     shareIntent,
                     "Share Log File"
+            );
+            chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(chooserIntent);
+
+            promise.resolve(true);
+        } catch (Exception e) {
+            promise.reject("SHARE_ERROR", "Failed to share file: " + e.getMessage(), e);
+        }
+    }
+
+    @ReactMethod
+    public void createAndShareConfigFile(String jsonString, Promise promise) {
+        try {
+            // Clear existing files in the configs directory
+            File[] existingFiles = configsDir.listFiles();
+            if (existingFiles != null) {
+                for (File file : existingFiles) {
+                    file.delete();
+                }
+            }
+
+            // Create new config file
+            String filename = CONFIG_FILE_PREFIX + new Date().getTime() + CONFIG_FILE_POSTFIX;
+            File configFile = new File(configsDir, filename);
+            try (FileWriter writer = new FileWriter(configFile)) {
+                writer.write(jsonString);
+            }
+
+            // Share the newly created config file
+            shareConfigFile(configFile.getName(), promise);
+        } catch (IOException e) {
+            promise.reject("FILE_WRITE_ERROR", "Failed to write config file: " + e.getMessage(), e);
+        }
+    }
+
+    private void shareConfigFile(String filename, Promise promise) {
+        try {
+            File file = new File(configsDir, filename);
+            Context context = getReactApplicationContext();
+
+            if (!file.exists()) {
+                promise.reject("FILE_NOT_FOUND", "Config file not found: " + file.getAbsolutePath());
+                return;
+            }
+
+            String fileProviderAuthority = context.getPackageName() + ".provider";
+            Uri fileUri = FileProvider.getUriForFile(context, fileProviderAuthority, file);
+
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("application/json");
+            shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            shareIntent.setClipData(ClipData.newRawUri("", fileUri));
+
+            List<ResolveInfo> resInfoList = context.getPackageManager()
+                    .queryIntentActivities(shareIntent, PackageManager.MATCH_DEFAULT_ONLY);
+            for (ResolveInfo resolveInfo : resInfoList) {
+                context.grantUriPermission(
+                        resolveInfo.activityInfo.packageName,
+                        fileUri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                );
+            }
+
+            Intent chooserIntent = Intent.createChooser(
+                    shareIntent,
+                    "Share Config File"
             );
             chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(chooserIntent);

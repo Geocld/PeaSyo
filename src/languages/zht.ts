@@ -234,6 +234,8 @@ export default {
       '你可以將PeaSyo配置匯出到本地，用於後續配置恢復及轉移到另一個裝置，無需重新登入及註冊主機。',
     ExportTips:
       '由於Android權限限制，您只能導出到Download文件夾下，例如Download/peasyo。',
+    ConfigShareTips: '你也可以直接將配置分享到其他應用。',
+    Share: '分享',
     ImportDesc: '如果你有PeaSyo配置，可以直接匯入配置檔案，無需重新註冊主機。',
     DS_test_title: 'DualSense 5控制器測試',
     DS_test_desc:

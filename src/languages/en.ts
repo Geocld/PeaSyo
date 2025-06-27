@@ -214,6 +214,9 @@ export default {
       'You can export PeaSyo configuration locally for future configuration recovery and transfer to another device, without the need to re-login or register hosts.',
     ExportTips:
       'Due to Android permission restrictions, you can only export to the Download folder, such as Download/peasyo.',
+    ConfigShareTips:
+      'You can also directly share the configuration with other applications.',
+    Share: 'Share',
     ImportDesc:
       'If you have a PeaSyo configuration, you can import the configuration file directly without re-registering hosts.',
     DS_test_title: 'DualSense 5 Controller Test',

@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, View, Alert, ScrollView} from 'react-native';
+import {StyleSheet, View, Alert, ScrollView, NativeModules} from 'react-native';
 import {Button, Text, HelperText, Divider} from 'react-native-paper';
 import {useTranslation} from 'react-i18next';
 import RNFS from 'react-native-fs';
@@ -9,6 +9,8 @@ import RNRestart from 'react-native-restart';
 import {TokenStore} from '../store/tokenStore';
 
 import {getConsoles, saveConsoles} from '../store/consolesStore';
+
+const {LogsModule} = NativeModules;
 
 const SECRET_KEY = 'pEa3yo';
 
@@ -75,6 +77,29 @@ function TransferScreen({navigation}) {
         message: t('ExportFail') + ':' + error.message,
       };
     }
+  };
+
+  const shareConfig = async () => {
+    const ts = new TokenStore();
+    ts.load();
+    const tokens = ts.getToken();
+    const consoles = getConsoles();
+
+    const configs = {
+      tokens,
+      consoles,
+    };
+
+    const jsonStr = JSON.stringify(configs);
+
+    const encryptStr = encrypt(jsonStr);
+
+    if (!encryptStr) {
+      Alert.alert('Warning', t('ExportFail') + ':' + 'encrypt string is empty');
+      return;
+    }
+
+    LogsModule.createAndShareConfigFile(encryptStr);
   };
 
   const importConfig = async () => {
@@ -175,6 +200,12 @@ function TransferScreen({navigation}) {
         </HelperText>
         <Button mode="contained" onPress={handleExport}>
           {t('ExportSettings')}
+        </Button>
+        <HelperText type="error" visible={true} style={{marginTop: 10}}>
+          {t('ConfigShareTips')}
+        </HelperText>
+        <Button mode="contained" onPress={shareConfig}>
+          {t('Share')}
         </Button>
       </View>
 

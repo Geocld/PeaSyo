@@ -237,6 +237,8 @@ export default {
       '你可以将PeaSyo配置导出到本地，用于后续配置恢复及转移到另一个设备，无需重新登录及注册主机。',
     ExportTips:
       '由于Android权限限制，你只能导出到Download(下载)文件夹下，如Download/peasyo。',
+    ConfigShareTips: '你也可以直接将配置分享到其他应用。',
+    Share: '分享',
     ImportDesc: '如果你有PeaSyo配置，可以直接导入配置文件，无需重新注册主机。',
     // Performance panel
     WD: '带宽',
