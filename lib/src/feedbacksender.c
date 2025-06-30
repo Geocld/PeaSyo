@@ -62,20 +62,20 @@ CHIAKI_EXPORT void chiaki_feedback_sender_fini(ChiakiFeedbackSender *feedback_se
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_feedback_sender_set_controller_state(ChiakiFeedbackSender *feedback_sender, ChiakiControllerState *state)
 {
-	ChiakiErrorCode err = chiaki_mutex_lock(&feedback_sender->state_mutex);
-	if(err != CHIAKI_ERR_SUCCESS)
-		return err;
+//	ChiakiErrorCode err = chiaki_mutex_lock(&feedback_sender->state_mutex);
+//	if(err != CHIAKI_ERR_SUCCESS)
+//		return err;
 
 	if(chiaki_controller_state_equals(&feedback_sender->controller_state, state))
 	{
-		chiaki_mutex_unlock(&feedback_sender->state_mutex);
+//		chiaki_mutex_unlock(&feedback_sender->state_mutex);
 		return CHIAKI_ERR_SUCCESS;
 	}
 
 	feedback_sender->controller_state = *state;
 	feedback_sender->controller_state_changed = true;
 
-	chiaki_mutex_unlock(&feedback_sender->state_mutex);
+//	chiaki_mutex_unlock(&feedback_sender->state_mutex);
 	chiaki_cond_signal(&feedback_sender->state_cond);
 
 	return CHIAKI_ERR_SUCCESS;
