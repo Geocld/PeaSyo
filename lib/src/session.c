@@ -261,13 +261,14 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_session_init(ChiakiSession *session, Chiaki
 	session->log = log;
 	session->quit_reason = CHIAKI_QUIT_REASON_NONE;
 	session->target = connect_info->ps5 ? CHIAKI_TARGET_PS5_1 : CHIAKI_TARGET_PS4_10;
+	session->auto_regist = connect_info->auto_regist;
 	session->holepunch_session = connect_info->holepunch_session;
 	session->rudp = NULL;
 
 	ChiakiErrorCode err = chiaki_cond_init(&session->state_cond);
 	if(err != CHIAKI_ERR_SUCCESS)
 		goto error;
-
+		
 	err = chiaki_mutex_init(&session->state_mutex, false);
 	if(err != CHIAKI_ERR_SUCCESS)
 		goto error_state_cond;
@@ -408,14 +409,13 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_session_join(ChiakiSession *session)
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_set_controller_state(ChiakiSession *session, ChiakiControllerState *state)
 {
-    // test: remote sender lock tem
-//	ChiakiErrorCode err = chiaki_mutex_lock(&session->stream_connection.feedback_sender_mutex);
-//	if(err != CHIAKI_ERR_SUCCESS)
-//		return err;
+	ChiakiErrorCode err = chiaki_mutex_lock(&session->stream_connection.feedback_sender_mutex);
+	if(err != CHIAKI_ERR_SUCCESS)
+		return err;
 	session->controller_state = *state;
 	if(session->stream_connection.feedback_sender_active)
 		chiaki_feedback_sender_set_controller_state(&session->stream_connection.feedback_sender, &session->controller_state);
-//	chiaki_mutex_unlock(&session->stream_connection.feedback_sender_mutex);
+	chiaki_mutex_unlock(&session->stream_connection.feedback_sender_mutex);
 	return CHIAKI_ERR_SUCCESS;
 }
 
@@ -517,7 +517,6 @@ static void *session_thread_func(void *arg)
 
 	CHECK_STOP(quit);
 
-	// 打洞逻辑
 	if(session->holepunch_session)
 	{
 		chiaki_socket_t *rudp_sock = chiaki_get_holepunch_sock(session->holepunch_session, CHIAKI_HOLEPUNCH_PORT_TYPE_CTRL);
@@ -528,8 +527,6 @@ static void *session_thread_func(void *arg)
 			CHECK_STOP(quit);
 		}
 	}
-
-	// 通过PSN服务器打洞
 	// PSN Connection
 	if(session->rudp)
 	{
@@ -550,6 +547,12 @@ static void *session_thread_func(void *arg)
 		chiaki_regist_stop(&regist);
 		chiaki_regist_fini(&regist);
 		CHECK_STOP(quit);
+	}
+	if(session->auto_regist)
+	{
+		CHIAKI_LOGI(session->log, "Console auto registered successfully");
+		session->quit_reason = CHIAKI_QUIT_REASON_STOPPED;
+		QUIT(quit);
 	}
 	CHIAKI_LOGI(session->log, "Starting session request for %s", session->connect_info.ps5 ? "PS5" : "PS4");
 
@@ -1155,9 +1158,16 @@ static void regist_cb(ChiakiRegistEvent *event, void *user)
 	{
 		case CHIAKI_REGIST_EVENT_TYPE_FINISHED_SUCCESS:
 			CHIAKI_LOGI(session->log, "%s successfully registered for Remote Play", event->registered_host->server_nickname);
+			if(session->auto_regist)
+			{
+				ChiakiEvent event_auto_regist = { 0 };
+				event_auto_regist.type = CHIAKI_EVENT_REGIST;
+				memcpy(&event_auto_regist.host, event->registered_host, sizeof(ChiakiRegisteredHost));
+				chiaki_session_send_event(session, &event_auto_regist);
+			}
 			memcpy(session->connect_info.morning, event->registered_host->rp_key, sizeof(session->connect_info.morning));
 			memcpy(session->connect_info.regist_key, event->registered_host->rp_regist_key, sizeof(session->connect_info.regist_key));
-			if(!session->connect_info.ps5)
+			if(!session->connect_info.ps5 && !session->auto_regist)
 			{
 				ChiakiEvent event_start = { 0 };
 				event_start.type = CHIAKI_EVENT_NICKNAME_RECEIVED;

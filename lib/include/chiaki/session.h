@@ -47,25 +47,25 @@ CHIAKI_EXPORT ChiakiTarget chiaki_rp_version_parse(const char *rp_version_str, b
 
 typedef struct chiaki_connect_video_profile_t
 {
-	unsigned int width;
-	unsigned int height;
-	unsigned int max_fps;
-	unsigned int bitrate;
-	ChiakiCodec codec;
+    unsigned int width;
+    unsigned int height;
+    unsigned int max_fps;
+    unsigned int bitrate;
+    ChiakiCodec codec;
 } ChiakiConnectVideoProfile;
 
 typedef enum {
-	// values must not change
-	CHIAKI_VIDEO_RESOLUTION_PRESET_360p = 1,
-	CHIAKI_VIDEO_RESOLUTION_PRESET_540p = 2,
-	CHIAKI_VIDEO_RESOLUTION_PRESET_720p = 3,
-	CHIAKI_VIDEO_RESOLUTION_PRESET_1080p = 4
+    // values must not change
+    CHIAKI_VIDEO_RESOLUTION_PRESET_360p = 1,
+    CHIAKI_VIDEO_RESOLUTION_PRESET_540p = 2,
+    CHIAKI_VIDEO_RESOLUTION_PRESET_720p = 3,
+    CHIAKI_VIDEO_RESOLUTION_PRESET_1080p = 4
 } ChiakiVideoResolutionPreset;
 
 typedef enum {
-	// values must not change
-	CHIAKI_VIDEO_FPS_PRESET_30 = 30,
-	CHIAKI_VIDEO_FPS_PRESET_60 = 60
+    // values must not change
+    CHIAKI_VIDEO_FPS_PRESET_30 = 30,
+    CHIAKI_VIDEO_FPS_PRESET_60 = 60
 } ChiakiVideoFPSPreset;
 
 CHIAKI_EXPORT void chiaki_connect_video_profile_preset(ChiakiConnectVideoProfile *profile, ChiakiVideoResolutionPreset resolution, ChiakiVideoFPSPreset fps);
@@ -74,113 +74,121 @@ CHIAKI_EXPORT void chiaki_connect_video_profile_preset(ChiakiConnectVideoProfile
 
 typedef struct chiaki_connect_info_t
 {
-	bool ps5;
-	const char *host; // null terminated
-	char regist_key[CHIAKI_SESSION_AUTH_SIZE]; // must be completely filled (pad with \0)
-	uint8_t morning[0x10];
-	ChiakiConnectVideoProfile video_profile;
-	bool video_profile_auto_downgrade; // Downgrade video_profile if server does not seem to support it.
-	bool enable_keyboard;
-	bool enable_dualsense;
-	ChiakiHolepunchSession holepunch_session;
-	chiaki_socket_t *rudp_sock;
-	uint8_t psn_account_id[CHIAKI_PSN_ACCOUNT_ID_SIZE];
-	double packet_loss_max;
+    bool ps5;
+    const char *host; // null terminated
+    char regist_key[CHIAKI_SESSION_AUTH_SIZE]; // must be completely filled (pad with \0)
+    uint8_t morning[0x10];
+    ChiakiConnectVideoProfile video_profile;
+    bool video_profile_auto_downgrade; // Downgrade video_profile if server does not seem to support it.
+    bool enable_keyboard;
+    bool enable_dualsense;
+    bool auto_regist;
+    ChiakiHolepunchSession holepunch_session;
+    chiaki_socket_t *rudp_sock;
+    uint8_t psn_account_id[CHIAKI_PSN_ACCOUNT_ID_SIZE];
+    double packet_loss_max;
 } ChiakiConnectInfo;
 
 
 typedef enum {
-	CHIAKI_QUIT_REASON_NONE,
-	CHIAKI_QUIT_REASON_STOPPED,
-	CHIAKI_QUIT_REASON_SESSION_REQUEST_UNKNOWN,
-	CHIAKI_QUIT_REASON_SESSION_REQUEST_CONNECTION_REFUSED,
-	CHIAKI_QUIT_REASON_SESSION_REQUEST_RP_IN_USE,
-	CHIAKI_QUIT_REASON_SESSION_REQUEST_RP_CRASH,
-	CHIAKI_QUIT_REASON_SESSION_REQUEST_RP_VERSION_MISMATCH,
-	CHIAKI_QUIT_REASON_CTRL_UNKNOWN,
-	CHIAKI_QUIT_REASON_CTRL_CONNECT_FAILED,
-	CHIAKI_QUIT_REASON_CTRL_CONNECTION_REFUSED,
-	CHIAKI_QUIT_REASON_STREAM_CONNECTION_UNKNOWN,
-	CHIAKI_QUIT_REASON_STREAM_CONNECTION_REMOTE_DISCONNECTED,
-	CHIAKI_QUIT_REASON_STREAM_CONNECTION_REMOTE_SHUTDOWN, // like REMOTE_DISCONNECTED, but because the server shut down
-	CHIAKI_QUIT_REASON_PSN_REGIST_FAILED,
+    CHIAKI_QUIT_REASON_NONE,
+    CHIAKI_QUIT_REASON_STOPPED,
+    CHIAKI_QUIT_REASON_SESSION_REQUEST_UNKNOWN,
+    CHIAKI_QUIT_REASON_SESSION_REQUEST_CONNECTION_REFUSED,
+    CHIAKI_QUIT_REASON_SESSION_REQUEST_RP_IN_USE,
+    CHIAKI_QUIT_REASON_SESSION_REQUEST_RP_CRASH,
+    CHIAKI_QUIT_REASON_SESSION_REQUEST_RP_VERSION_MISMATCH,
+    CHIAKI_QUIT_REASON_CTRL_UNKNOWN,
+    CHIAKI_QUIT_REASON_CTRL_CONNECT_FAILED,
+    CHIAKI_QUIT_REASON_CTRL_CONNECTION_REFUSED,
+    CHIAKI_QUIT_REASON_STREAM_CONNECTION_UNKNOWN,
+    CHIAKI_QUIT_REASON_STREAM_CONNECTION_REMOTE_DISCONNECTED,
+    CHIAKI_QUIT_REASON_STREAM_CONNECTION_REMOTE_SHUTDOWN, // like REMOTE_DISCONNECTED, but because the server shut down
+    CHIAKI_QUIT_REASON_PSN_REGIST_FAILED,
 } ChiakiQuitReason;
 
 CHIAKI_EXPORT const char *chiaki_quit_reason_string(ChiakiQuitReason reason);
 
 static inline bool chiaki_quit_reason_is_error(ChiakiQuitReason reason)
 {
-	return reason != CHIAKI_QUIT_REASON_STOPPED && reason != CHIAKI_QUIT_REASON_STREAM_CONNECTION_REMOTE_SHUTDOWN;
+    return reason != CHIAKI_QUIT_REASON_STOPPED && reason != CHIAKI_QUIT_REASON_STREAM_CONNECTION_REMOTE_SHUTDOWN;
 }
 
 typedef struct chiaki_quit_event_t
 {
-	ChiakiQuitReason reason;
-	const char *reason_str;
+    ChiakiQuitReason reason;
+    const char *reason_str;
 } ChiakiQuitEvent;
 
 typedef struct chiaki_keyboard_event_t
 {
-	const char *text_str;
+    const char *text_str;
 } ChiakiKeyboardEvent;
 
 typedef struct chiaki_audio_stream_info_event_t
 {
-	ChiakiAudioHeader audio_header;
+    ChiakiAudioHeader audio_header;
 } ChiakiAudioStreamInfoEvent;
 
 typedef struct chiaki_rumble_event_t
 {
-	uint8_t unknown;
-	uint8_t left; // low-frequency
-	uint8_t right; // high-frequency
+    uint8_t unknown;
+    uint8_t left; // low-frequency
+    uint8_t right; // high-frequency
 } ChiakiRumbleEvent;
 
 typedef struct chiaki_trigger_effects_event_t
 {
-	uint8_t type_left;
-	uint8_t type_right;
-	uint8_t left[10];
-	uint8_t right[10];
+    uint8_t type_left;
+    uint8_t type_right;
+    uint8_t left[10];
+    uint8_t right[10];
 } ChiakiTriggerEffectsEvent;
 
 typedef enum {
-	CHIAKI_EVENT_CONNECTED,
-	CHIAKI_EVENT_LOGIN_PIN_REQUEST,
-	CHIAKI_EVENT_HOLEPUNCH,
-	CHIAKI_EVENT_NICKNAME_RECEIVED,
-	CHIAKI_EVENT_KEYBOARD_OPEN,
-	CHIAKI_EVENT_KEYBOARD_TEXT_CHANGE,
-	CHIAKI_EVENT_KEYBOARD_REMOTE_CLOSE,
-	CHIAKI_EVENT_RUMBLE,
-	CHIAKI_EVENT_QUIT,
-	CHIAKI_EVENT_TRIGGER_EFFECTS,
-	CHIAKI_EVENT_MOTION_RESET,
+    CHIAKI_EVENT_CONNECTED,
+    CHIAKI_EVENT_LOGIN_PIN_REQUEST,
+    CHIAKI_EVENT_HOLEPUNCH,
+    CHIAKI_EVENT_REGIST,
+    CHIAKI_EVENT_NICKNAME_RECEIVED,
+    CHIAKI_EVENT_KEYBOARD_OPEN,
+    CHIAKI_EVENT_KEYBOARD_TEXT_CHANGE,
+    CHIAKI_EVENT_KEYBOARD_REMOTE_CLOSE,
+    CHIAKI_EVENT_RUMBLE,
+    CHIAKI_EVENT_QUIT,
+    CHIAKI_EVENT_TRIGGER_EFFECTS,
+    CHIAKI_EVENT_MOTION_RESET,
+    CHIAKI_EVENT_LED_COLOR,
+    CHIAKI_EVENT_HAPTIC_INTENSITY,
+    CHIAKI_EVENT_TRIGGER_INTENSITY,
 } ChiakiEventType;
 
 typedef struct chiaki_event_t
 {
-	ChiakiEventType type;
-	union
-	{
-		ChiakiQuitEvent quit;
-		ChiakiKeyboardEvent keyboard;
-		ChiakiRumbleEvent rumble;
-		ChiakiTriggerEffectsEvent trigger_effects;
-		struct
-		{
-			bool pin_incorrect; // false on first request, true if the pin entered before was incorrect
-		} login_pin_request;
-		struct
-		{
-			bool finished; // false when punching hole, true when finished
-		} data_holepunch;
-		struct
-		{
-			bool motion_reset; // true if resetting motion to zero at current value, false if returning motion to normal
-		} data_motion;
-		char server_nickname[0x20];
-	};
+    ChiakiEventType type;
+    union
+    {
+        ChiakiQuitEvent quit;
+        ChiakiKeyboardEvent keyboard;
+        ChiakiRumbleEvent rumble;
+        ChiakiRegisteredHost host;
+        ChiakiTriggerEffectsEvent trigger_effects;
+        uint8_t led_state[0x3];
+        struct
+        {
+            bool pin_incorrect; // false on first request, true if the pin entered before was incorrect
+        } login_pin_request;
+        struct
+        {
+            bool finished; // false when punching hole, true when finished
+        } data_holepunch;
+        struct
+        {
+            bool motion_reset; // true if resetting motion to zero at current value, false if returning motion to normal
+        } data_motion;
+        ChiakiDualSenseEffectIntensity intensity;
+        char server_nickname[0x20];
+    };
 } ChiakiEvent;
 
 typedef void (*ChiakiEventCallback)(ChiakiEvent *event, void *user);
@@ -195,73 +203,73 @@ typedef bool (*ChiakiVideoSampleCallback)(uint8_t *buf, size_t buf_size, int32_t
 
 typedef struct chiaki_session_t
 {
-	struct
-	{
-		bool ps5;
-		struct addrinfo *host_addrinfos;
-		struct addrinfo *host_addrinfo_selected;
-		char hostname[256];
-		char regist_key[CHIAKI_RPCRYPT_KEY_SIZE];
-		uint8_t morning[CHIAKI_RPCRYPT_KEY_SIZE];
-		uint8_t did[CHIAKI_RP_DID_SIZE];
-		ChiakiConnectVideoProfile video_profile;
-		bool video_profile_auto_downgrade;
-		bool enable_keyboard;
-		bool enable_dualsense;
-		uint8_t psn_account_id[CHIAKI_PSN_ACCOUNT_ID_SIZE];
-	} connect_info;
+    struct
+    {
+        bool ps5;
+        struct addrinfo *host_addrinfos;
+        struct addrinfo *host_addrinfo_selected;
+        char hostname[256];
+        char regist_key[CHIAKI_RPCRYPT_KEY_SIZE];
+        uint8_t morning[CHIAKI_RPCRYPT_KEY_SIZE];
+        uint8_t did[CHIAKI_RP_DID_SIZE];
+        ChiakiConnectVideoProfile video_profile;
+        bool video_profile_auto_downgrade;
+        bool enable_keyboard;
+        bool enable_dualsense;
+        uint8_t psn_account_id[CHIAKI_PSN_ACCOUNT_ID_SIZE];
+    } connect_info;
 
-	ChiakiTarget target;
+    ChiakiTarget target;
 
-	uint8_t nonce[CHIAKI_RPCRYPT_KEY_SIZE];
-	ChiakiRPCrypt rpcrypt;
-	char session_id[CHIAKI_SESSION_ID_SIZE_MAX]; // zero-terminated
-	uint8_t handshake_key[CHIAKI_HANDSHAKE_KEY_SIZE];
-	uint32_t mtu_in;
-	uint32_t mtu_out;
-	uint64_t rtt_us;
-	ChiakiECDH ecdh;
+    uint8_t nonce[CHIAKI_RPCRYPT_KEY_SIZE];
+    ChiakiRPCrypt rpcrypt;
+    char session_id[CHIAKI_SESSION_ID_SIZE_MAX]; // zero-terminated
+    uint8_t handshake_key[CHIAKI_HANDSHAKE_KEY_SIZE];
+    uint32_t mtu_in;
+    uint32_t mtu_out;
+    uint64_t rtt_us;
+    ChiakiECDH ecdh;
 
-	ChiakiQuitReason quit_reason;
-	char *quit_reason_str; // additional reason string from remote
+    ChiakiQuitReason quit_reason;
+    char *quit_reason_str; // additional reason string from remote
 
-	ChiakiEventCallback event_cb;
-	void *event_cb_user;
-	ChiakiVideoSampleCallback video_sample_cb;
-	void *video_sample_cb_user;
-	ChiakiAudioSink audio_sink;
-	ChiakiAudioSink haptics_sink;
-	ChiakiCtrlDisplaySink display_sink;
+    ChiakiEventCallback event_cb;
+    void *event_cb_user;
+    ChiakiVideoSampleCallback video_sample_cb;
+    void *video_sample_cb_user;
+    ChiakiAudioSink audio_sink;
+    ChiakiAudioSink haptics_sink;
+    ChiakiCtrlDisplaySink display_sink;
 
-	ChiakiThread session_thread;
+    ChiakiThread session_thread;
 
-	ChiakiCond state_cond;
-	ChiakiMutex state_mutex;
-	ChiakiStopPipe stop_pipe;
-	bool should_stop;
-	bool ctrl_failed;
-	bool ctrl_session_id_received;
-	bool ctrl_login_pin_requested;
-	bool ctrl_first_heartbeat_received;
-	bool login_pin_entered;
-	bool psn_regist_succeeded;
-	bool stream_connection_switch_received;
-	uint8_t *login_pin;
-	size_t login_pin_size;
+    ChiakiCond state_cond;
+    ChiakiMutex state_mutex;
+    ChiakiStopPipe stop_pipe;
+    bool auto_regist;
+    bool should_stop;
+    bool ctrl_failed;
+    bool ctrl_session_id_received;
+    bool ctrl_login_pin_requested;
+    bool ctrl_first_heartbeat_received;
+    bool login_pin_entered;
+    bool psn_regist_succeeded;
+    bool stream_connection_switch_received;
+    uint8_t *login_pin;
+    size_t login_pin_size;
 
-	ChiakiCtrl ctrl;
-	ChiakiHolepunchSession holepunch_session;
-	ChiakiRudp rudp;
+    ChiakiCtrl ctrl;
+    ChiakiHolepunchSession holepunch_session;
+    ChiakiRudp rudp;
 
-	ChiakiLog *log;
+    ChiakiLog *log;
 
-	ChiakiStreamConnection stream_connection;
+    ChiakiStreamConnection stream_connection;
 
-	ChiakiControllerState controller_state;
+    ChiakiControllerState controller_state;
 } ChiakiSession;
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_init(ChiakiSession *session, ChiakiConnectInfo *connect_info, ChiakiLog *log);
-CHIAKI_EXPORT ChiakiErrorCode chiaki_session_init_v6(ChiakiSession *session, ChiakiConnectInfo *connect_info, ChiakiLog *log);
 CHIAKI_EXPORT void chiaki_session_fini(ChiakiSession *session);
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_start(ChiakiSession *session);
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_stop(ChiakiSession *session);
@@ -279,14 +287,14 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_session_go_home(ChiakiSession *session);
 
 static inline void chiaki_session_set_event_cb(ChiakiSession *session, ChiakiEventCallback cb, void *user)
 {
-	session->event_cb = cb;
-	session->event_cb_user = user;
+    session->event_cb = cb;
+    session->event_cb_user = user;
 }
 
 static inline void chiaki_session_set_video_sample_cb(ChiakiSession *session, ChiakiVideoSampleCallback cb, void *user)
 {
-	session->video_sample_cb = cb;
-	session->video_sample_cb_user = user;
+    session->video_sample_cb = cb;
+    session->video_sample_cb_user = user;
 }
 
 /**
@@ -294,7 +302,7 @@ static inline void chiaki_session_set_video_sample_cb(ChiakiSession *session, Ch
  */
 static inline void chiaki_session_set_audio_sink(ChiakiSession *session, ChiakiAudioSink *sink)
 {
-	session->audio_sink = *sink;
+    session->audio_sink = *sink;
 }
 
 /**
@@ -302,7 +310,7 @@ static inline void chiaki_session_set_audio_sink(ChiakiSession *session, ChiakiA
  */
 static inline void chiaki_session_set_haptics_sink(ChiakiSession *session, ChiakiAudioSink *sink)
 {
-	session->haptics_sink = *sink;
+    session->haptics_sink = *sink;
 }
 
 /**
@@ -310,7 +318,7 @@ static inline void chiaki_session_set_haptics_sink(ChiakiSession *session, Chiak
  */
 static inline void chiaki_session_ctrl_set_display_sink(ChiakiSession *session, ChiakiCtrlDisplaySink *sink)
 {
-	session->display_sink = *sink;
+    session->display_sink = *sink;
 }
 
 #ifdef __cplusplus

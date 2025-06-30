@@ -1025,8 +1025,8 @@ function StreamScreen({navigation, route}) {
                       background={background}
                       onPress={() => {
                         streamViewRef.current?.sleep();
+                        handleCloseModal();
                         setTimeout(() => {
-                          handleCloseModal();
                           handleExit();
                         }, 1000);
                       }}

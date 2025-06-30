@@ -219,9 +219,9 @@ static void android_chiaki_event_cb(ChiakiEvent *event, void *user)
             E->CallVoidMethod(env, session->java_session,
                               session->java_session_event_rumble_tigger_meth,
                               (jint)event->trigger_effects.type_left,
-                              (jint)event->trigger_effects.left,
+                              (jint)(*event->trigger_effects.left),
                               (jint)event->trigger_effects.type_right,
-                              (jint)event->trigger_effects.right);
+                              (jint)(*event->trigger_effects.right));
             break;
         default:
             break;
