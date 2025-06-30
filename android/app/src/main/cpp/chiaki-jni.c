@@ -710,8 +710,22 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
         ChiakiErrorCode err = chiaki_holepunch_list_devices(access_token_cstr, CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5, &device_info_ps5, &num_devices_ps5, &global_log);
         if (err != CHIAKI_ERR_SUCCESS)
         {
-            CHIAKI_LOGE(&global_log, "holepunch !! Failed to get PS5 devices");
-            goto beach;
+            CHIAKI_LOGE(&global_log, "holepunch !! Failed to get PS5 devices, try again");
+
+            // Try again
+            ChiakiErrorCode err2 = chiaki_holepunch_list_devices(access_token_cstr, CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5, &device_info_ps5, &num_devices_ps5, &global_log);
+            if (err2 != CHIAKI_ERR_SUCCESS)
+            {
+                CHIAKI_LOGE(&global_log, "holepunch !! Failed to get PS5 devices");
+
+                // Try again
+                ChiakiErrorCode err3 = chiaki_holepunch_list_devices(access_token_cstr, CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5, &device_info_ps5, &num_devices_ps5, &global_log);
+                if (err3 != CHIAKI_ERR_SUCCESS)
+                {
+                    CHIAKI_LOGE(&global_log, "holepunch !! Failed to get PS5 devices");
+                    goto beach;
+                }
+            }
         }
         CHIAKI_LOGE(&global_log, ">> holepunch Found %zu devices\n", num_devices_ps5);
 
