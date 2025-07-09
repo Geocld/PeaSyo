@@ -92,8 +92,10 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
     private boolean logVerbose;
     private boolean isLeftTriggerCanClick;
     private boolean isRightTriggerCanClick;
-
     private boolean isRightstickMoving;
+    private int haptic_stable_threshold;
+    private int haptic_change_threshold;
+    private int haptic_diff_threshold;
     private final Vector2d inputVector = new Vector2d();
 
     private final ReactContext reactContext;
@@ -116,6 +118,11 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         this.isLeftTriggerCanClick = false;
         this.isRightTriggerCanClick = false;
         this.isRightstickMoving = false;
+
+        // haptic
+        this.haptic_stable_threshold = 3;
+        this.haptic_change_threshold = 5;
+        this.haptic_diff_threshold = 10;
 
         tracker = new OrientationTracker();
     }
@@ -273,6 +280,11 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         boolean logVerbose = streamInfo.getBoolean("logVerbose");
         ReadableMap gamepadMaping = streamInfo.getMap("gamepadMaping");
 
+        // haptic
+        int hapticStableThreshold = streamInfo.getInt("hapticStableThreshold");
+        int hapticChangeThreshold = streamInfo.getInt("hapticChangeThreshold");
+        int hapticDiffThreshold = streamInfo.getInt("hapticDiffThreshold");
+
         if (gamepadMaping != null) {
             updateButtonMapping(gamepadMaping);
         }
@@ -289,6 +301,9 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         this.isShortTrigger = shortTrigger;
         this.swapDpad = swapDpad;
         this.logVerbose = logVerbose;
+        this.haptic_stable_threshold = hapticStableThreshold;
+        this.haptic_change_threshold = hapticChangeThreshold;
+        this.haptic_diff_threshold = hapticDiffThreshold;
 
         if (videoFormat != null) {
             if (videoFormat.isEmpty()) {
@@ -321,8 +336,20 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
 
         LogManager logManager = new LogManager(application);
 
-        // 初始化session
-        session = new StreamSession(connectInfo, logManager, this.logVerbose, this.reactContext, this.rumble, this.rumbleIntensity, this.usbMode, this.usbController);
+        // Init session
+        session = new StreamSession(
+                connectInfo,
+                logManager,
+                this.logVerbose,
+                this.reactContext,
+                this.rumble,
+                this.rumbleIntensity,
+                this.usbMode,
+                this.usbController,
+                this.haptic_stable_threshold,
+                this.haptic_change_threshold,
+                this.haptic_diff_threshold
+        );
 
         session.resume();
 

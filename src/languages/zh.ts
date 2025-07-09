@@ -283,6 +283,17 @@ export default {
     DisplaySettings: '显示',
     GamepadSettings: '手柄及振动',
     SensorSettings: '传感器',
+    AdvanceSettings: '高级',
+    AdvanceSettingsDesc: '⚠️如果你不理解以下设置，请勿随意修改。',
+    Haptic_stable_threshold_title: '触觉反馈稳定次数(实验性)',
+    Haptic_stable_threshold_desc:
+      '修改PS5触觉反馈振动稳定次数，如果默认振动效果不理想，可以调整该值，数据越大，对突变式振动越不敏感',
+    Haptic_change_threshold_title: '触觉反馈突变阈值(实验性)',
+    Haptic_change_threshold_desc:
+      '稳定环境中出现突变值的阈值调整，数值越大，对突变式振动越不敏感',
+    Haptic_diff_threshold_title: '触觉反馈左右差异阈值(实验性)',
+    Haptic_diff_threshold_desc:
+      '调整触觉反馈左右信号差异阈值，值越小，振动次数越频繁，如果串流PS5过程中出现持续振动无法停下，建议加大该值。',
     gyroTitle: '启用陀螺仪模拟摇杆',
     gyroDesc: '是否强制使用设备/控制器陀螺仪模拟摇杆。',
     gyroTypeTitle: '陀螺仪触发类型',

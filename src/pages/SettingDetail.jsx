@@ -17,6 +17,7 @@ import remote from '../common/settings/remote';
 import display from '../common/settings/display';
 import gamepad from '../common/settings/gamepad';
 import sensor from '../common/settings/sensor';
+import advand from '../common/settings/advand';
 import others from '../common/settings/others';
 
 const {UsbRumbleManager} = NativeModules;
@@ -44,6 +45,7 @@ function SettingDetailScreen({navigation, route}) {
         ...display,
         ...gamepad,
         ...sensor,
+        ...advand,
         ...others,
       ];
       let metas = {};

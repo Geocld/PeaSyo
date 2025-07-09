@@ -256,6 +256,9 @@ function StreamScreen({navigation, route}) {
       swap_dpad,
       log_verbose,
       auto_remote,
+      haptic_stable_threshold,
+      haptic_change_threshold,
+      haptic_diff_threshold,
     } = _settings;
 
     // local
@@ -364,6 +367,9 @@ function StreamScreen({navigation, route}) {
       gamepadMaping: gamepad_maping,
       swapDpad: swap_dpad,
       logVerbose: log_verbose,
+      hapticStableThreshold: haptic_stable_threshold,
+      hapticChangeThreshold: haptic_change_threshold,
+      hapticDiffThreshold: haptic_diff_threshold,
     };
 
     log.info('_streamInfo:', _streamInfo);

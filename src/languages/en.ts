@@ -257,6 +257,21 @@ export default {
     RemoteSettings: 'Remote stream',
     GamepadSettings: 'Gamepad and Vibration',
     SensorSettings: 'Sensor',
+    AdvanceSettings: 'Advanced',
+    AdvanceSettingsDesc:
+      '⚠️If you do not understand the following settings, please do not modify them arbitrarily.',
+    Haptic_stable_threshold_title:
+      'Haptic Feedback Stability Count (Experimental)',
+    Haptic_stable_threshold_desc:
+      'Modify PS5 haptic feedback vibration stability count. If default vibration effect is not ideal, adjust this value. Higher values make it less sensitive to sudden vibrations',
+    Haptic_change_threshold_title:
+      'Haptic Feedback Mutation Threshold (Experimental)',
+    Haptic_change_threshold_desc:
+      'Adjust the threshold for sudden changes in stable environment. Higher values make it less sensitive to sudden vibrations',
+    Haptic_diff_threshold_title:
+      'Haptic Feedback Left/Right Difference Threshold (Experimental)',
+    Haptic_diff_threshold_desc:
+      'Adjust the threshold for left/right signal differences in haptic feedback. Lower values result in more frequent vibrations',
     gyroTitle: 'Enable Gyroscope Simulated Joystick',
     gyroDesc: 'Force use of device/controller gyroscope to simulate joystick.',
     gyroTips:

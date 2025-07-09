@@ -271,8 +271,19 @@ export default {
     LocalSettings: '本地串流',
     RemoteSettings: '遠程串流',
     DisplaySettings: '顯示',
-    GamepadSettings: '手把及震動',
+    GamepadSettings: '手把及振動',
     SensorSettings: '感應器',
+    AdvanceSettings: '進階',
+    AdvanceSettingsDesc: '⚠️如果你不理解以下設置，請勿隨意修改。',
+    Haptic_stable_threshold_title: '觸覺反饋穩定次數(實驗性)',
+    Haptic_stable_threshold_desc:
+      '修改PS5觸覺反饋振動穩定次數，如果預設振動效果不理想，可以調整該值，數據越大，對突變式振動越不敏感',
+    Haptic_change_threshold_title: '觸覺反饋突變閾值(實驗性)',
+    Haptic_change_threshold_desc:
+      '穩定環境中出現突變值的閾值調整，數值越大，對突變式振動越不敏感',
+    Haptic_diff_threshold_title: '觸覺反饋左右差異閾值(實驗性)',
+    Haptic_diff_threshold_desc:
+      '調整觸覺反饋左右信號差異閾值，值越小，振動次數越頻繁',
     gyroTitle: '啟用陀螺儀模擬搖桿',
     gyroDesc: '是否強制使用設備/控制器陀螺儀模擬搖桿。',
     gyroTips: '控制器陀螺儀只支持Android12+，推薦使用DualSense5控制器',

@@ -45,7 +45,19 @@ data class StreamStateCreateError(val error: CreateError): StreamState()
 data class StreamStateQuit(val reason: QuitReason, val reasonString: String?): StreamState()
 data class StreamStateLoginPinRequest(val pinIncorrect: Boolean): StreamState()
 
-class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, val logVerbose: Boolean, private val reactContext: ReactContext?, val rumble: Boolean, val rumbleIntensity: Int, val usbMode: Boolean, val usbController: String)
+class StreamSession(
+	val connectInfo: ConnectInfo,
+	val logManager: LogManager,
+	val logVerbose: Boolean,
+	private val reactContext: ReactContext?,
+	val rumble: Boolean,
+	val rumbleIntensity: Int,
+	val usbMode: Boolean,
+	val usbController: String,
+	val haptic_stable_threshold: Int,
+	val haptic_change_threshold: Int,
+	val haptic_diff_threshold: Int,
+)
 {
 	var session: Session? = null
 		private set
@@ -253,6 +265,7 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 				sendEvent("streamStateChange", params)
 			}
 			is RumbleEvent -> {
+				// TODO: Make rumble more precise
 //				Log.d("StreamView", "RumbleEvent: $event")
 				if (rumble) {
 
@@ -265,7 +278,7 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 
 					if (canSendEvent) {
 						// Situation1：left != right
-						if (abs(left - right) > CHANNEL_DIFF_THRESHOLD && left > 0 && right > 0) {
+						if (abs(left - right) >= haptic_diff_threshold && left > 0 && right > 0) {
 							shouldVibrate = true
 //							Log.d("StreamView", "Vibration triggered by Situation1: L=${left}, R=${right}")
 						}
@@ -280,8 +293,8 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 								abs((right - hapticsState.stableRight).toFloat() / hapticsState.stableRight) * 100
 							} else 0f
 
-							if ((leftChange > VALUE_CHANGE_THRESHOLD && leftChange < 30) ||
-								(rightChange > VALUE_CHANGE_THRESHOLD && rightChange < 30)) {
+							if ((leftChange >= haptic_change_threshold && leftChange < 30) ||
+								(rightChange >= haptic_change_threshold && rightChange < 30)) {
 								if(left + right  < 255) {
 									shouldVibrate = true
 									hapticsState.stableCount = 0
@@ -298,10 +311,10 @@ class StreamSession(val connectInfo: ConnectInfo, val logManager: LogManager, va
 						}
 					}
 
-					if (abs(left - hapticsState.lastLeft) <= VALUE_CHANGE_THRESHOLD &&
-						abs(right - hapticsState.lastRight) <= VALUE_CHANGE_THRESHOLD) {
+					if (abs(left - hapticsState.lastLeft) <= haptic_change_threshold &&
+						abs(right - hapticsState.lastRight) <= haptic_change_threshold) {
 						hapticsState.stableCount++
-						if (hapticsState.stableCount >= STABLE_THRESHOLD) {
+						if (hapticsState.stableCount >= haptic_stable_threshold) {
 							hapticsState.stableLeft = left
 							hapticsState.stableRight = right
 							hapticsState.isInitialized = true

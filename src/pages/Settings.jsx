@@ -22,6 +22,7 @@ import remote from '../common/settings/remote';
 import display from '../common/settings/display';
 import gamepad from '../common/settings/gamepad';
 import sensor from '../common/settings/sensor';
+import advand from '../common/settings/advand';
 import others from '../common/settings/others';
 import {TokenStore} from '../store/tokenStore';
 import pkg from '../../package.json';
@@ -262,6 +263,28 @@ function SettingsScreen({navigation}) {
           </View>
 
           {sensor.map((meta, idx) => {
+            return (
+              <SettingItem
+                key={meta.name || idx}
+                title={meta.title}
+                description={meta.description}
+                onPress={() => handleItemPress(meta.name)}
+              />
+            );
+          })}
+        </View>
+
+        <View>
+          <View style={styles.contentTitle}>
+            <Text variant="titleLarge" style={styles.titleText}>
+              {t('AdvanceSettings')}
+            </Text>
+            <Text variant="titleSmall" style={styles.titleText}>
+              {t('AdvanceSettingsDesc')}
+            </Text>
+          </View>
+
+          {advand.map((meta, idx) => {
             return (
               <SettingItem
                 key={meta.name || idx}
