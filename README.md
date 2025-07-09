@@ -26,7 +26,8 @@ PeaSyo, also known as Pixiu, is a PS4/5 streaming application for Android that s
 ## Features
 
 - Support for multiple console registration
-- Support for local and remote streaming (gateway configuration required)
+- Support for local and remote streaming
+- Remote play via PSN
 - Up to 1080P resolution with HDR support
 - Support gamepad vibration
 - Support for button mapping
