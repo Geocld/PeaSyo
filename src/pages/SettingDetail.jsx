@@ -12,6 +12,8 @@ import RNRestart from 'react-native-restart';
 import Slider from '@react-native-community/slider';
 import {getSettings, saveSettings} from '../store/settingStore';
 import bases from '../common/settings/bases';
+import local from '../common/settings/local';
+import remote from '../common/settings/remote';
 import display from '../common/settings/display';
 import gamepad from '../common/settings/gamepad';
 import sensor from '../common/settings/sensor';
@@ -37,6 +39,8 @@ function SettingDetailScreen({navigation, route}) {
       let currentVal = _settings[name];
       const settingsMeta = [
         ...bases,
+        ...local,
+        ...remote,
         ...display,
         ...gamepad,
         ...sensor,

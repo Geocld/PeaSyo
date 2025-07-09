@@ -44,6 +44,9 @@ export default {
     Resolution: 'Resolution',
     ResolutionDesc:
       'Set the streaming resolution, supports switching between 360P/540P/720P/1080P',
+    RemoteResolution: 'Remote resolution',
+    RemoteResolutionDesc:
+      'Set the remote streaming resolution, supports switching between 360P/540P/720P/1080P',
     'Video stream format': 'Aspect ratio',
     VideoFormatDesc:
       'If you want the video stream to fill the full screen, you can modify the corresponding ratio here',
@@ -53,6 +56,9 @@ export default {
     'Stream bitrate': 'Bitrate',
     BitrateDesc:
       'Set the maximum streaming bitrate. Note that the streaming bitrate of PS4/5 is dynamic',
+    'Remote stream bitrate': 'Remote bitrate',
+    RemoteBitrateDesc:
+      'Set the maximum remote streaming bitrate. Note that the streaming bitrate of PS4/5 is dynamic',
     BitrateTips:
       'Note that excessive bitrate may cause video artifacts. If artifacts occur, please reduce the bitrate accordingly',
     Auto: 'Auto',
@@ -60,8 +66,13 @@ export default {
     Codec: 'Video Codec',
     CodecDesc:
       'Set the video playback codec. H264 uses AVC decoding, H265 uses HEVC decoding',
+    RemoteCodec: 'Video Codec',
+    RemoteCodecDesc:
+      'Set the remote video playback codec. H264 uses AVC decoding, H265 uses HEVC decoding',
     FPS: 'FPS',
     FPSDesc: 'Set the streaming frame rate',
+    RemoteFPS: 'FPS',
+    RemoteFPSDesc: 'Set the remote streaming frame rate',
     'Performance render': 'Performance Rendering',
     PerformanceRenderDesc:
       'Use high-performance video rendering. By default, high-performance rendering is used, but note that streaming will stop when the app is sent to the background. If you need to frequently switch to the background while maintaining streaming, please turn off high-performance rendering mode',
@@ -242,6 +253,8 @@ export default {
     Delete_user_text: 'Delete user',
     BasesSettings: 'Basic',
     DisplaySettings: 'Display',
+    LocalSettings: 'Local stream',
+    RemoteSettings: 'Remote stream',
     GamepadSettings: 'Gamepad and Vibration',
     SensorSettings: 'Sensor',
     gyroTitle: 'Enable Gyroscope Simulated Joystick',
@@ -266,6 +279,9 @@ export default {
     x_axies: 'X Axis',
     y_axies: 'Y Axis',
     all_axies: 'All Axes',
+    xyInvertTitle: 'Swap Gyroscope X/Y Axis',
+    xyInvertDesc:
+      'Enable if your device gyroscope X/Y axis directions are reversed',
     show_menu_title: 'Display Quick Menu',
     show_menu_desc:
       'The quick menu is always displayed in the lower right corner of the streaming page.',

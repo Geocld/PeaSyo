@@ -78,6 +78,16 @@ const sensor = [
       {value: 3, text: t('all_axies')},
     ],
   },
+  {
+    name: 'xy_invert',
+    type: 'radio',
+    title: t('xyInvertTitle'),
+    description: t('xyInvertDesc'),
+    data: [
+      {value: false, text: t('Disable')},
+      {value: true, text: t('Enable')},
+    ],
+  },
 ];
 
 export default sensor;

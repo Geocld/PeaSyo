@@ -17,6 +17,8 @@ import CookieManager from '@react-native-cookies/cookies';
 import {useTranslation} from 'react-i18next';
 import {debugFactory} from '../utils/debug';
 import bases from '../common/settings/bases';
+import local from '../common/settings/local';
+import remote from '../common/settings/remote';
 import display from '../common/settings/display';
 import gamepad from '../common/settings/gamepad';
 import sensor from '../common/settings/sensor';
@@ -144,6 +146,42 @@ function SettingsScreen({navigation}) {
           </View>
 
           {bases.map((meta, idx) => {
+            return (
+              <SettingItem
+                key={meta.name || idx}
+                title={meta.title}
+                description={meta.description}
+                onPress={() => handleItemPress(meta.name)}
+              />
+            );
+          })}
+        </View>
+
+        <View>
+          <View style={styles.contentTitle}>
+            <Text variant="titleLarge" style={styles.titleText}>
+              {t('LocalSettings')}
+            </Text>
+          </View>
+          {local.map((meta, idx) => {
+            return (
+              <SettingItem
+                key={meta.name || idx}
+                title={meta.title}
+                description={meta.description}
+                onPress={() => handleItemPress(meta.name)}
+              />
+            );
+          })}
+        </View>
+
+        <View>
+          <View style={styles.contentTitle}>
+            <Text variant="titleLarge" style={styles.titleText}>
+              {t('RemoteSettings')}
+            </Text>
+          </View>
+          {remote.map((meta, idx) => {
             return (
               <SettingItem
                 key={meta.name || idx}
@@ -286,7 +324,7 @@ function SettingsScreen({navigation}) {
           {(currentLanguage === 'zh' || currentLanguage === 'zht') && (
             <SettingItem
               title={'支持及交流'}
-              description={'支持开发或交流更多串流技术'}
+              description={'支持开发或交流使用心得'}
               onPress={() => navigation.navigate('Feedback')}
             />
           )}

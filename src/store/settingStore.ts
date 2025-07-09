@@ -11,6 +11,11 @@ export type Settings = {
   bitrate: number;
   codec: string;
   fps: number;
+  remote_resolution: number;
+  remote_bitrate_mode: string;
+  remote_bitrate: number;
+  remote_codec: string;
+  remote_fps: number;
   useSurface: boolean;
   show_performance: boolean;
   performance_style: boolean;
@@ -23,6 +28,7 @@ export type Settings = {
   gyroscope_sensitivity_x: number;
   gyroscope_sensitivity_y: number;
   gyroscope_invert: number;
+  xy_invert: boolean;
   bind_usb_device: boolean;
   bind_usb_device_force_touchpad: boolean;
   dead_zone: number;
@@ -48,11 +54,16 @@ export type Settings = {
 
 const defaultSettings: Settings = {
   locale: 'en',
-  resolution: 720,
+  resolution: 1080,
   bitrate_mode: 'auto',
-  bitrate: 10000,
+  bitrate: 27000,
   codec: 'H265',
-  fps: 30,
+  fps: 60,
+  remote_resolution: 720,
+  remote_bitrate_mode: 'auto',
+  remote_bitrate: 10000,
+  remote_codec: 'H265',
+  remote_fps: 30,
   useSurface: true,
   show_performance: false,
   performance_style: true,
@@ -65,6 +76,7 @@ const defaultSettings: Settings = {
   gyroscope_sensitivity_x: 15000,
   gyroscope_sensitivity_y: 15000,
   gyroscope_invert: 0,
+  xy_invert: false,
   bind_usb_device: false,
   bind_usb_device_force_touchpad: false,
   dead_zone: 0.2,

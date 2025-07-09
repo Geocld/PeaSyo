@@ -227,12 +227,20 @@ function StreamScreen({navigation, route}) {
     let width = 1280;
     let height = 720;
 
+    let remote_width = 1280;
+    let remote_height = 720;
+
     let {
       resolution: _resolution,
       codec,
       fps,
       bitrate_mode,
       bitrate,
+      remote_resolution: remote_resolution,
+      remote_codec,
+      remote_fps,
+      remote_bitrate_mode,
+      remote_bitrate,
       rumble,
       rumble_intensity,
       video_format,
@@ -247,7 +255,10 @@ function StreamScreen({navigation, route}) {
       touchpad_type,
       swap_dpad,
       log_verbose,
+      auto_remote,
     } = _settings;
+
+    // local
     if (_resolution === 360) {
       width = 640;
       height = 360;
@@ -274,7 +285,51 @@ function StreamScreen({navigation, route}) {
       }
     }
 
-    setResolution(`${width} x ${height}`);
+    // remote
+    if (remote_resolution === 360) {
+      remote_width = 640;
+      remote_height = 360;
+      if (remote_bitrate_mode === 'auto') {
+        remote_bitrate = 2000;
+      }
+    } else if (remote_resolution === 540) {
+      remote_width = 960;
+      remote_height = 540;
+      if (remote_bitrate_mode === 'auto') {
+        remote_bitrate = 6000;
+      }
+    } else if (remote_resolution === 720) {
+      remote_width = 1280;
+      remote_height = 720;
+      if (remote_bitrate_mode === 'auto') {
+        remote_bitrate = 10000;
+      }
+    } else if (remote_resolution === 1080) {
+      remote_width = 1920;
+      remote_height = 1080;
+      if (remote_bitrate_mode === 'auto') {
+        remote_bitrate = 27000; // 27000kbps
+      }
+    }
+
+    let isRemote = route.params?.isRemote || auto_remote;
+
+    if (!auto_remote && route.params?.isRemote) {
+      if (_consoleInfo.remoteHost) {
+        if (
+          _consoleInfo.remoteHost.startsWith('192.') ||
+          _consoleInfo.remoteHost.startsWith('172.')
+        ) {
+          isRemote = false;
+        }
+      }
+    }
+
+    if (isRemote) {
+      setResolution(`${remote_width} X ${remote_height}`);
+    } else {
+      setResolution(`${width} x ${height}`);
+    }
     const _isTouchpadFull = touchpad_type === 1;
     setIsTouchpadFull(_isTouchpadFull);
 
@@ -290,11 +345,11 @@ function StreamScreen({navigation, route}) {
       accessToken: _consoleInfo.accessToken || '', // 用于远程自动连接
       nickName: _consoleInfo.nickName || _consoleInfo.serverNickname || '', // 用于远程自动连接
       psnAccountId: _consoleInfo.psnAccountId || '', // 用于远程自动连接
-      width,
-      height,
-      fps,
-      bitrate,
-      codec,
+      width: isRemote ? remote_width : width,
+      height: isRemote ? remote_height : height,
+      fps: isRemote ? remote_fps : fps,
+      bitrate: isRemote ? remote_bitrate : bitrate,
+      codec: isRemote ? remote_codec : codec,
       rumble,
       rumbleIntensity: rumble_intensity,
       usbMode: route.params?.isUsbMode || false,
@@ -597,7 +652,14 @@ function StreamScreen({navigation, route}) {
         params => {
           // gyroscope only work when Rightstick not moving
           if (!isRightstickMoving.current) {
-            const {x, y} = params;
+            let {x, y} = params;
+
+            // swap x/y
+            if (_settings.xy_invert) {
+              x = params.y;
+              y = params.x;
+            }
+
             let stickX = x / 32767;
             let stickY = y / 32767;
             const scaleX =
