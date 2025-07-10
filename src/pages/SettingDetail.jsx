@@ -59,6 +59,10 @@ function SettingDetailScreen({navigation, route}) {
         setValue2(_settings.bitrate);
       }
 
+      if (name === 'remote_bitrate_mode') {
+        setValue2(_settings.remote_bitrate);
+      }
+
       setValue(currentVal);
       setCurrent(name);
       setCurrentMetas(metas);
@@ -99,9 +103,31 @@ function SettingDetailScreen({navigation, route}) {
         default:
           break;
       }
+    } else if (current === 'remote_resolution') {
+      // Will reset bitrate when resolution change
+      settings.remote_bitrate_mode = 'auto';
+      switch (value) {
+        case 360:
+          settings.remote_bitrate = 2000;
+          break;
+        case 540:
+          settings.remote_bitrate = 6000;
+          break;
+        case 720:
+          settings.remote_bitrate = 10000;
+          break;
+        case 1080:
+          settings.remote_bitrate = 27000;
+          break;
+        default:
+          break;
+      }
     } else if (current === 'bitrate_mode') {
       settings.bitrate_mode = value;
       settings.bitrate = value2;
+    } else if (current === 'remote_bitrate_mode') {
+      settings.remote_bitrate_mode = value;
+      settings.remote_bitrate = value2;
     } else if (currentMetas.name === 'bind_usb_device') {
       UsbRumbleManager.setBindUsbDevice(value);
     }
@@ -120,7 +146,10 @@ function SettingDetailScreen({navigation, route}) {
     if (!currentMetas) {
       return null;
     }
-    if (currentMetas.name === 'bitrate_mode') {
+    if (
+      currentMetas.name === 'bitrate_mode' ||
+      currentMetas.name === 'remote_bitrate_mode'
+    ) {
       return (
         <>
           <RadioButton.Group onValueChange={val => setValue(val)} value={value}>
