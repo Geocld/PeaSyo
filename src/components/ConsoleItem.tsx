@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, useColorScheme} from 'react-native';
 import {Card, Text, Button} from 'react-native-paper';
 import {useTranslation} from 'react-i18next';
 import {SvgXml} from 'react-native-svg';
@@ -10,6 +10,7 @@ import icons from '../common/svg';
 const ConsoleItem = (props: any) => {
   const {t} = useTranslation();
   const settings = getSettings();
+  const colorScheme = useColorScheme();
   const theme = settings.theme ?? 'dark';
 
   const consoleItem = props.consoleItem;
@@ -29,6 +30,7 @@ const ConsoleItem = (props: any) => {
     }
   }
 
+  // Default is dark icon
   let icon = isPS5 ? (isPS5Pro ? icons.PS5Pro : icons.PS5) : icons.ConsoleIcon;
   let imageStyle = isPS5 ? styles.image : {};
   let iconHeight = 80;
@@ -36,7 +38,7 @@ const ConsoleItem = (props: any) => {
     iconHeight = 100;
   }
 
-  if (theme !== 'dark') {
+  if ((theme === 'auto' && colorScheme === 'light') || theme === 'light') {
     icon = isPS5
       ? isPS5Pro
         ? icons.PS5ProLight

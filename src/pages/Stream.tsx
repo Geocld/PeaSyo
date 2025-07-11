@@ -255,7 +255,6 @@ function StreamScreen({navigation, route}) {
       touchpad_type,
       swap_dpad,
       log_verbose,
-      auto_remote,
       haptic_stable_threshold,
       haptic_change_threshold,
       haptic_diff_threshold,
@@ -315,9 +314,9 @@ function StreamScreen({navigation, route}) {
       }
     }
 
-    let isRemote = route.params?.isRemote || auto_remote;
+    let isRemote = route.params?.isRemote || !!_consoleInfo.accessToken;
 
-    if (!auto_remote && route.params?.isRemote) {
+    if (!_consoleInfo.accessToken && route.params?.isRemote) {
       if (_consoleInfo.remoteHost) {
         if (
           _consoleInfo.remoteHost.startsWith('192.') ||

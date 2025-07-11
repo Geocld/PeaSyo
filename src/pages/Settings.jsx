@@ -376,7 +376,7 @@ PSN ID: ${token.user_id}
 
         <View style={styles.version}>
           <Text style={styles.versionText} variant="titleMedium">
-            Version: v{pkg.version}
+            {t('Version')}: v{pkg.version}
           </Text>
           <Text style={styles.versionText} variant="titleSmall">
             © 2025 Geocld
