@@ -87,10 +87,12 @@ function VirtualGamepadSettingsScreen({navigation, route}) {
                 mode="contained"
                 style={{marginTop: 20}}
                 onPress={() => {
+                  const _name = name;
                   if (!isError) {
                     setShowAddModal(false);
+                    setName('');
                     setTimeout(() => {
-                      navigation.navigate('CustomGamepad', {name});
+                      navigation.navigate('CustomGamepad', {name: _name});
                     }, 300);
                   }
                 }}>
@@ -117,7 +119,7 @@ function VirtualGamepadSettingsScreen({navigation, route}) {
 
       <View style={styles.buttonWrap}>
         <Button mode="contained" style={styles.button} onPress={handleSave}>
-          {t('Select')}
+          {t('Apply')}
         </Button>
         {value !== '' && (
           <Button mode="outlined" style={styles.button} onPress={handleEdit}>

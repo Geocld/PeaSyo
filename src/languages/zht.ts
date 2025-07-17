@@ -15,6 +15,7 @@ export default {
     Others: '其他',
     Back: '返回',
     Select: '選擇',
+    Apply: '應用',
     Edit: '編輯',
     Default: '默認',
     Version: '版本号',
@@ -124,6 +125,12 @@ export default {
     Fullscreen: '全屏',
     'Virtual Opacity': '虛擬按鍵透明度',
     'Config opacity of virtual gamepad': '設置虛擬按鍵透明度',
+    virtual_joystick_title: '虛擬搖桿佈局',
+    virtual_joystick_desc: '可設置虛擬搖桿佈局為固定/自由模式',
+    virtual_joystick_tips:
+      '自由模式下，螢幕左/右側空白區域均可分別操作左/右搖桿',
+    Fixed: '固定',
+    Free: '自由',
     'Low Latency Mode': 'WIFI低延遲模式',
     low_latency_mode_description:
       '使用Android wifi性能模式，以實現最佳的串流效果。可能導致某些設備藍牙出現延遲，如果遇到藍牙延遲問題，請選擇停用此模式',

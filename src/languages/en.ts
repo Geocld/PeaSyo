@@ -12,6 +12,7 @@ export default {
     Others: 'Others',
     Back: 'Back',
     Select: 'Select',
+    Apply: 'Apply',
     Edit: 'Edit',
     Default: 'Default',
     About: 'About',
@@ -117,6 +118,12 @@ export default {
     'Always display the virtual gamepad': 'Always display the virtual gamepad',
     'Virtual Opacity': 'Virtual button opacity',
     'Config opacity of virtual gamepad': 'Set virtual button opacity',
+    virtual_joystick_title: 'Virtual Joystick Layout',
+    virtual_joystick_desc: 'Set the virtual joystick layout to Fixed/Free mode',
+    virtual_joystick_tips:
+      'In Free mode, the left/right joystick can be operated in blank areas on either side of the screen',
+    Fixed: 'Fixed',
+    Free: 'Free',
     'Low Latency Mode': 'Low Latency Mode (Wi-Fi)',
     low_latency_mode_description:
       'Use Android’s Wi-Fi performance mode to achieve the best streaming experience. May cause Bluetooth latency on some devices. If you experience Bluetooth latency issues, please disable this mode',

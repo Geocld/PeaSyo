@@ -112,28 +112,36 @@ function StreamScreen({navigation, route}) {
 
   const handlePressIn = (name: string) => {
     // console.log('handlePressIn:', name);
-    const mask = CONTROLLERS[name];
-    if (mask) {
-      handlePressButton(mask, true);
+    if (name === 'TOUCHPAD') {
+      handleTouchpadTap(true, 1, [0, 0, -1, 0, 0, -1]);
     } else {
-      if (name === 'LeftTrigger') {
-        handleTrigger('left', 1);
-      } else if (name === 'RightTrigger') {
-        handleTrigger('right', 1);
+      const mask = CONTROLLERS[name];
+      if (mask) {
+        handlePressButton(mask, true);
+      } else {
+        if (name === 'LeftTrigger') {
+          handleTrigger('left', 1);
+        } else if (name === 'RightTrigger') {
+          handleTrigger('right', 1);
+        }
       }
     }
   };
 
   const handlePressOut = (name: string) => {
     // console.log('handlePressOut:', name);
-    const mask = CONTROLLERS[name];
-    if (mask) {
-      handlePressButton(mask, false);
+    if (name === 'TOUCHPAD') {
+      handleTouchpadTap(false, 1, [0, 0, -1, 0, 0, -1]);
     } else {
-      if (name === 'LeftTrigger') {
-        handleTrigger('left', 0);
-      } else if (name === 'RightTrigger') {
-        handleTrigger('right', 0);
+      const mask = CONTROLLERS[name];
+      if (mask) {
+        handlePressButton(mask, false);
+      } else {
+        if (name === 'LeftTrigger') {
+          handleTrigger('left', 0);
+        } else if (name === 'RightTrigger') {
+          handleTrigger('right', 0);
+        }
       }
     }
   };
@@ -144,7 +152,7 @@ function StreamScreen({navigation, route}) {
     const leveledY = data.y;
 
     const x = Number(leveledX);
-    const y = Number(-leveledY);
+    const y = Number(leveledY);
 
     if (name === 'right') {
       if (Math.abs(leveledX) > 0.1 || Math.abs(leveledY) > 0.1) {
@@ -756,10 +764,10 @@ function StreamScreen({navigation, route}) {
           }
 
           setTimeout(() => {
-            // streamViewRef.current?.startSession();
+            streamViewRef.current?.startSession();
 
-            setLoading(false);
-            setShowVirtualGamepad(true);
+            // setLoading(false);
+            // setShowVirtualGamepad(true);
           }, 100);
         }, 300);
       }, 300);
@@ -1063,7 +1071,7 @@ function StreamScreen({navigation, route}) {
                       background={background}
                       onPress={() => {
                         handlePressIn('PS');
-                        setTimeout(() => handlePressOut('PS'), 1500);
+                        setTimeout(() => handlePressOut('PS'), 2000);
                         handleCloseModal();
                       }}
                     />
@@ -1074,7 +1082,7 @@ function StreamScreen({navigation, route}) {
                       background={background}
                       onPress={() => {
                         handlePressIn('PS');
-                        setTimeout(() => handlePressOut('PS'), 200);
+                        setTimeout(() => handlePressOut('PS'), 350);
                         handleCloseModal();
                       }}
                     />

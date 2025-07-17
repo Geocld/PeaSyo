@@ -62,6 +62,7 @@ function CustomGamepadScreen({navigation, route}) {
       const nexusLeft = width * 0.5 - 20;
       const viewLeft = width * 0.5 - 100;
       const menuLeft = width * 0.5 + 60;
+      const touchpadLeft = width * 0.5 - 150;
 
       const _buttons = [
         {
@@ -69,45 +70,45 @@ function CustomGamepadScreen({navigation, route}) {
           psName: 'LeftTrigger',
           x: 20,
           y: 10,
-          width: 100,
-          height: 100,
+          width: 80,
+          height: 80,
           scale: 1,
           show: true,
         },
         {
           name: 'RightTrigger',
           psName: 'RightTrigger',
-          x: width - 45,
+          x: width - 65,
           y: 10,
-          width: 100,
-          height: 100,
+          width: 80,
+          height: 80,
           scale: 1,
           show: true,
         },
         {
           name: 'LeftShoulder',
           psName: 'L1',
-          x: 20,
-          y: 80,
-          width: 100,
-          height: 100,
+          x: 70,
+          y: 60,
+          width: 80,
+          height: 80,
           scale: 1,
           show: true,
         },
         {
           name: 'RightShoulder',
           psName: 'R1',
-          x: width - 45,
-          y: 80,
-          width: 100,
-          height: 100,
+          x: width - 110,
+          y: 60,
+          width: 80,
+          height: 80,
           scale: 1,
           show: true,
         },
         {
           name: 'A',
           psName: 'CROSS',
-          x: width - 70,
+          x: width - 90,
           y: height - 50,
           scale: 1,
           show: true,
@@ -115,7 +116,7 @@ function CustomGamepadScreen({navigation, route}) {
         {
           name: 'B',
           psName: 'MOON',
-          x: width - 30,
+          x: width - 40,
           y: height - 90,
           scale: 1,
           show: true,
@@ -123,7 +124,7 @@ function CustomGamepadScreen({navigation, route}) {
         {
           name: 'X',
           psName: 'BOX',
-          x: width - 110,
+          x: width - 140,
           y: height - 90,
           scale: 1,
           show: true,
@@ -131,7 +132,7 @@ function CustomGamepadScreen({navigation, route}) {
         {
           name: 'Y',
           psName: 'PYRAMID',
-          x: width - 70,
+          x: width - 90,
           y: height - 130,
           scale: 1,
           show: true,
@@ -139,8 +140,8 @@ function CustomGamepadScreen({navigation, route}) {
         {
           name: 'LeftThumb',
           psName: 'L3',
-          x: 150,
-          y: height - 60,
+          x: 225,
+          y: height - 80,
           width: 50,
           height: 50,
           scale: 1,
@@ -149,8 +150,8 @@ function CustomGamepadScreen({navigation, route}) {
         {
           name: 'RightThumb',
           psName: 'R3',
-          x: width - 210,
-          y: height - 40,
+          x: width - 225,
+          y: height - 80,
           width: 50,
           height: 50,
           scale: 1,
@@ -187,24 +188,50 @@ function CustomGamepadScreen({navigation, route}) {
           show: true,
         },
         {
-          name: 'Dpad',
-          x: 20,
-          y: height - 170,
-          width: 100,
-          height: 100,
-          scale: 1,
+          name: 'DPadUp',
+          psName: 'DPAD_UP',
+          x: 85,
+          y: height - 145,
+          show: true,
+        },
+        {
+          name: 'DPadLeft',
+          psName: 'DPAD_LEFT',
+          x: 35,
+          y: height - 95,
+          show: true,
+        },
+        {
+          name: 'DPadDown',
+          psName: 'DPAD_DOWN',
+          x: 85,
+          y: height - 45,
+          show: true,
+        },
+        {
+          name: 'DPadRight',
+          psName: 'DPAD_RIGHT',
+          x: 135,
+          y: height - 95,
           show: true,
         },
         {
           name: 'LeftStick',
-          x: 175,
-          y: height - 185,
+          x: 180,
+          y: height - 225,
           show: true,
         },
         {
           name: 'RightStick',
           x: width - 255,
-          y: height - 155,
+          y: height - 225,
+          show: true,
+        },
+        {
+          name: 'Touchpad',
+          psName: 'TOUCHPAD',
+          x: touchpadLeft,
+          y: height - 30,
           show: true,
         },
       ];
@@ -216,7 +243,7 @@ function CustomGamepadScreen({navigation, route}) {
       }
       setDefaultButtons(JSON.parse(JSON.stringify(_buttons)));
 
-      // setShowWarnShowModal(true);
+      setShowWarnShowModal(true);
     }, 500);
 
     navigation.addListener('beforeRemove', e => {
@@ -280,7 +307,185 @@ function CustomGamepadScreen({navigation, route}) {
   };
 
   const handleReset = () => {
-    setButtons([...defaultButtons]);
+    const {width, height} = Dimensions.get('window');
+
+    const nexusLeft = width * 0.5 - 20;
+    const viewLeft = width * 0.5 - 100;
+    const menuLeft = width * 0.5 + 60;
+    const touchpadLeft = width * 0.5 - 150;
+
+    const _buttons = [
+      {
+        name: 'LeftTrigger',
+        psName: 'LeftTrigger',
+        x: 20,
+        y: 10,
+        width: 80,
+        height: 80,
+        scale: 1,
+        show: true,
+      },
+      {
+        name: 'RightTrigger',
+        psName: 'RightTrigger',
+        x: width - 65,
+        y: 10,
+        width: 80,
+        height: 80,
+        scale: 1,
+        show: true,
+      },
+      {
+        name: 'LeftShoulder',
+        psName: 'L1',
+        x: 70,
+        y: 60,
+        width: 80,
+        height: 80,
+        scale: 1,
+        show: true,
+      },
+      {
+        name: 'RightShoulder',
+        psName: 'R1',
+        x: width - 110,
+        y: 60,
+        width: 80,
+        height: 80,
+        scale: 1,
+        show: true,
+      },
+      {
+        name: 'A',
+        psName: 'CROSS',
+        x: width - 90,
+        y: height - 50,
+        scale: 1,
+        show: true,
+      },
+      {
+        name: 'B',
+        psName: 'MOON',
+        x: width - 40,
+        y: height - 90,
+        scale: 1,
+        show: true,
+      },
+      {
+        name: 'X',
+        psName: 'BOX',
+        x: width - 140,
+        y: height - 90,
+        scale: 1,
+        show: true,
+      },
+      {
+        name: 'Y',
+        psName: 'PYRAMID',
+        x: width - 90,
+        y: height - 130,
+        scale: 1,
+        show: true,
+      },
+      {
+        name: 'LeftThumb',
+        psName: 'L3',
+        x: 225,
+        y: height - 80,
+        width: 50,
+        height: 50,
+        scale: 1,
+        show: true,
+      },
+      {
+        name: 'RightThumb',
+        psName: 'R3',
+        x: width - 225,
+        y: height - 80,
+        width: 50,
+        height: 50,
+        scale: 1,
+        show: true,
+      },
+      {
+        name: 'View',
+        psName: 'SHARE',
+        x: viewLeft,
+        y: height - 60,
+        width: 100,
+        height: 100,
+        scale: 1,
+        show: true,
+      },
+      {
+        name: 'Nexus',
+        psName: 'PS',
+        x: nexusLeft,
+        y: height - 40,
+        width: 50,
+        height: 50,
+        scale: 1,
+        show: true,
+      },
+      {
+        name: 'Menu',
+        psName: 'OPTIONS',
+        x: menuLeft,
+        y: height - 55,
+        width: 80,
+        height: 80,
+        scale: 1,
+        show: true,
+      },
+      {
+        name: 'DPadUp',
+        psName: 'DPAD_UP',
+        x: 85,
+        y: height - 145,
+        show: true,
+      },
+      {
+        name: 'DPadLeft',
+        psName: 'DPAD_LEFT',
+        x: 35,
+        y: height - 95,
+        show: true,
+      },
+      {
+        name: 'DPadDown',
+        psName: 'DPAD_DOWN',
+        x: 85,
+        y: height - 45,
+        show: true,
+      },
+      {
+        name: 'DPadRight',
+        psName: 'DPAD_RIGHT',
+        x: 135,
+        y: height - 95,
+        show: true,
+      },
+      {
+        name: 'LeftStick',
+        x: 180,
+        y: height - 225,
+        show: true,
+      },
+      {
+        name: 'RightStick',
+        x: width - 255,
+        y: height - 225,
+        show: true,
+      },
+      {
+        name: 'Touchpad',
+        psName: 'TOUCHPAD',
+        x: touchpadLeft,
+        y: height - 30,
+        show: true,
+      },
+    ];
+    setButtons([..._buttons]);
     setActionShowModal(false);
   };
 

@@ -1,13 +1,9 @@
 import React from 'react';
-import {TouchableOpacity} from 'react-native';
-import {GestureDetector, Gesture} from 'react-native-gesture-handler';
-import {runOnJS} from 'react-native-reanimated';
-import {SvgXml} from 'react-native-svg';
-import icons from '../../common/virtualgp';
+import ButtonView from '../ButtonView';
 
 type Props = {
   name: string;
-  psName?: string;
+  psName: string;
   width?: number;
   height?: number;
   scale?: number;
@@ -16,37 +12,54 @@ type Props = {
   onPressOut: (name: string) => void;
 };
 
+const mapping: any = {
+  LeftTrigger: 'control_button_l2',
+  RightTrigger: 'control_button_r2',
+  LeftShoulder: 'control_button_l1',
+  RightShoulder: 'control_button_r1',
+  A: 'control_button_cross',
+  B: 'control_button_moon',
+  X: 'control_button_box',
+  Y: 'control_button_pyramid',
+  LeftThumb: 'control_button_l3',
+  RightThumb: 'control_button_r3',
+  View: 'control_button_share',
+  Nexus: 'control_button_home',
+  Menu: 'control_button_options',
+  DPadUp: 'control_button_up',
+  DPadLeft: 'control_button_left',
+  DPadDown: 'control_button_down',
+  DPadRight: 'control_button_right',
+  Touchpad: 'control_button_touchpad',
+};
+
 const GamepadButton: React.FC<Props> = ({
   name,
-  psName = '',
-  width = 60,
-  height = 60,
+  psName,
+  width = 50,
+  height = 50,
   scale = 1,
   onPressIn,
   onPressOut,
   style,
 }) => {
-  const longPressGesture = Gesture.LongPress()
-    .onStart(() => {
-      'worklet';
-      onPressIn && runOnJS(onPressIn)(psName);
-    })
-    .onEnd(() => {
-      'worklet';
-      onPressOut && runOnJS(onPressOut)(psName);
-    })
-    .minDuration(16);
-
+  if (['View', 'Nexus', 'Menu'].indexOf(name) > -1) {
+    width = 50;
+    height = 50;
+  }
   return (
-    <GestureDetector gesture={longPressGesture}>
-      <TouchableOpacity style={style}>
-        <SvgXml
-          xml={icons[name]}
-          width={width * scale}
-          height={height * scale}
-        />
-      </TouchableOpacity>
-    </GestureDetector>
+    <ButtonView
+      style={[
+        style,
+        {
+          width: width * scale,
+          height: height * scale,
+        },
+      ]}
+      buttonName={mapping[name]}
+      onPressIn={() => onPressIn(psName)}
+      onPressOut={() => onPressOut(psName)}
+    />
   );
 };
 

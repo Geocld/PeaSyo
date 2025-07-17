@@ -1,8 +1,8 @@
 import React from 'react';
 import {StyleSheet, View, Dimensions} from 'react-native';
 import GamepadButton from './CustomGamepad/GamepadButton';
-import Dpad from './CustomGamepad/Dpad';
-import {ReactNativeJoystick} from '../components/Joystick';
+import AnalogStick from '../components/AnalogStick';
+import {getSettings as getLocalSettings} from '../store/settingStore';
 import {getSettings} from '../store/gamepadStore';
 
 type Props = {
@@ -21,6 +21,8 @@ const CustomVirtualGamepad: React.FC<Props> = ({
   onStickMove,
 }) => {
   const [buttons, setButtons] = React.useState<any>([]);
+  const localSettings = getLocalSettings();
+  const {width: clientW, height: clientH} = Dimensions.get('window');
 
   React.useEffect(() => {
     const _settings = getSettings();
@@ -201,71 +203,119 @@ const CustomVirtualGamepad: React.FC<Props> = ({
         if (!button.show) {
           return null;
         }
-        if (button.name === 'Dpad') {
-          return (
-            <Dpad
-              key={button.name}
-              scale={button.scale}
-              style={{
-                opacity: opacity,
-                left: button.x - 15,
-                top: button.y + 100,
-              }}
-              onPressIn={handlePressIn}
-              onPressOut={handlePressOut}
-            />
-          );
-        } else if (button.name === 'LeftStick') {
-          return (
-            <View
-              key={button.name}
-              style={[
-                styles.button,
-                {top: button.y, left: button.x},
-                {opacity},
-              ]}>
-              <ReactNativeJoystick
-                color="#ffffff"
-                radius={50}
-                onMove={data => handleStickMove('left', data)}
-                onStart={data => handleStickMove('left', data)}
-                onStop={data => handleStickMove('left', data)}
-              />
-            </View>
-          );
+        if (button.name === 'LeftStick') {
+          if (localSettings.virtual_gamepad_joystick === 1) {
+            return (
+              <View
+                key={button.name}
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  zIndex: 9,
+                  width: clientW * 0.5,
+                  height: clientH,
+                }}>
+                <AnalogStick
+                  style={{
+                    width: clientW * 0.5,
+                    height: clientH,
+                    opacity,
+                  }}
+                  radius={140}
+                  handleRadius={80}
+                  onStickChange={(data: any) => handleStickMove('left', data)}
+                />
+              </View>
+            );
+          } else {
+            return (
+              <View
+                key={button.name}
+                style={[
+                  styles.button,
+                  {top: button.y, left: button.x},
+                  {opacity},
+                ]}>
+                <View style={styles.leftJs}>
+                  <AnalogStick
+                    style={styles.analogStick}
+                    radius={140}
+                    handleRadius={80}
+                    onStickChange={(data: any) => handleStickMove('left', data)}
+                  />
+                </View>
+              </View>
+            );
+          }
         } else if (button.name === 'RightStick') {
-          return (
-            <View
-              key={button.name}
-              style={[
-                styles.button,
-                {top: button.y, left: button.x},
-                {opacity},
-              ]}>
-              <ReactNativeJoystick
-                color="#ffffff"
-                style={{opacity}}
-                radius={50}
-                onMove={data => handleStickMove('right', data)}
-                onStart={data => handleStickMove('right', data)}
-                onStop={data => handleStickMove('right', data)}
-              />
-            </View>
-          );
+          if (localSettings.virtual_gamepad_joystick === 1) {
+            return (
+              <View
+                key={button.name}
+                style={{
+                  position: 'absolute',
+                  right: 0,
+                  top: 0,
+                  zIndex: 9,
+                  width: clientW * 0.5,
+                  height: clientH,
+                }}>
+                <AnalogStick
+                  style={{
+                    width: clientW * 0.5,
+                    height: clientH,
+                    opacity,
+                  }}
+                  radius={150}
+                  handleRadius={100}
+                  onStickChange={(data: any) => handleStickMove('right', data)}
+                />
+              </View>
+            );
+          } else {
+            return (
+              <View
+                key={button.name}
+                style={[
+                  styles.button,
+                  {top: button.y, left: button.x},
+                  {opacity},
+                ]}>
+                <View style={styles.rightJs}>
+                  <AnalogStick
+                    style={styles.analogStick}
+                    radius={140}
+                    handleRadius={80}
+                    onStickChange={(data: any) =>
+                      handleStickMove('right', data)
+                    }
+                  />
+                </View>
+              </View>
+            );
+          }
         } else {
+          let y = button.y;
+          let x = button.x;
+          if (button.name === 'View') {
+            y += 20;
+          }
+          if (button.name === 'Menu') {
+            y += 15;
+          }
+          if (button.name === 'Touchpad') {
+            y -= 5;
+          }
           return (
             <GamepadButton
               key={button.name}
               name={button.name}
               psName={button.psName}
+              width={button.width || 50}
+              height={button.height || 50}
               scale={button.scale}
-              width={button.width}
-              height={button.height}
-              style={[
-                styles.button,
-                {opacity},
-                {top: button.y, left: button.x},
-              ]}
+              style={[styles.button, {opacity}, {top: y, left: x}]}
               onPressIn={handlePressIn}
               onPressOut={handlePressOut}
             />
@@ -287,8 +337,28 @@ const styles = StyleSheet.create({
     zIndex: 9,
   },
   button: {
-    opacity: 0.5,
+    opacity: 0.6,
     position: 'absolute',
+    zIndex: 10,
+  },
+  leftJs: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    overflow: 'hidden',
+  },
+  rightJs: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    overflow: 'hidden',
+  },
+  analogStick: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(255, 255, 255, .5)',
+    overflow: 'hidden',
   },
 });
 

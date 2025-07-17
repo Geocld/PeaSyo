@@ -38,6 +38,7 @@ const VirtualGamepad: React.FC<Props> = ({
   const nexusLeft = width * 0.5 - 20;
   const viewLeft = width * 0.5 - 100;
   const menuLeft = width * 0.5 + 60;
+  const touchpadLeft = width * 0.5 - 200;
 
   return (
     <View style={styles.wrap} pointerEvents="box-none">
@@ -160,6 +161,13 @@ const VirtualGamepad: React.FC<Props> = ({
         onPressOut={() => handlePressOut('DPAD_RIGHT')}
       />
 
+      <ButtonView
+        style={[styles.button, styles.touchpad, {left: touchpadLeft, opacity}]}
+        buttonName="control_button_touchpad"
+        onPressIn={() => handlePressIn('TOUCHPAD')}
+        onPressOut={() => handlePressOut('TOUCHPAD')}
+      />
+
       {settings.virtual_gamepad_joystick === 1 ? (
         <View
           // eslint-disable-next-line react-native/no-inline-styles
@@ -175,6 +183,7 @@ const VirtualGamepad: React.FC<Props> = ({
             style={{
               width: width * 0.5,
               height: height,
+              opacity,
             }}
             radius={140}
             handleRadius={80}
@@ -198,6 +207,7 @@ const VirtualGamepad: React.FC<Props> = ({
             style={{
               width: width * 0.5,
               height: height,
+              opacity,
             }}
             radius={150}
             handleRadius={100}
@@ -351,6 +361,9 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     backgroundColor: 'rgba(255, 255, 255, .5)',
     overflow: 'hidden',
+  },
+  touchpad: {
+    bottom: 0,
   },
 });
 
