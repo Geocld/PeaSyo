@@ -13,6 +13,9 @@ import com.peasyo.stream.StreamTextureViewPackage;
 import com.peasyo.stream.StreamViewPackage;
 import com.umeng.commonsdk.UMConfigure;
 
+import com.peasyo.touchcontrols.AnalogStickPackage;
+import com.peasyo.touchcontrols.ButtonViewPackage;
+
 import android.util.Log;
 
 import com.peasyo.registry.RegistryPackage;
@@ -47,6 +50,8 @@ public class MainApplication extends Application implements ReactApplication {
             packages.add(new GamepadSensorPackage());
             packages.add(new HolepunchPackage());
             packages.add(new LogsPackage());
+            packages.add(new AnalogStickPackage());
+            packages.add(new ButtonViewPackage());
           return packages;
         }
 

@@ -82,12 +82,23 @@ const display = [
   {
     name: 'virtual_gamepad_opacity',
     type: 'slider',
-    min: 0.1,
+    min: 0,
     max: 1,
     step: 0.1,
     title: t('Virtual Opacity'),
     description: t('Config opacity of virtual gamepad'),
     data: [],
+  },
+  {
+    name: 'virtual_gamepad_joystick',
+    type: 'radio',
+    title: t('virtual_joystick_title'),
+    description: t('virtual_joystick_desc'),
+    tips: t('virtual_joystick_tips'),
+    data: [
+      {value: 0, text: t('Fixed')},
+      {value: 1, text: t('Free')},
+    ],
   },
   {
     name: 'show_menu',

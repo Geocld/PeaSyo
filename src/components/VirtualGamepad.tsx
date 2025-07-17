@@ -1,7 +1,8 @@
 import React from 'react';
-import {StyleSheet, View, TouchableOpacity, Dimensions} from 'react-native';
-import GamepadButton from './GamepadButton';
-import {ReactNativeJoystick} from '../components/Joystick';
+import {StyleSheet, View, Dimensions} from 'react-native';
+import AnalogStick from '../components/AnalogStick';
+import ButtonView from './ButtonView';
+import {getSettings} from '../store/settingStore';
 
 type Props = {
   opacity: number;
@@ -11,11 +12,13 @@ type Props = {
 };
 
 const VirtualGamepad: React.FC<Props> = ({
-  opacity = 0.6,
+  opacity = 0.7,
   onPressIn,
   onPressOut,
   onStickMove,
 }) => {
+  const settings = getSettings();
+
   const handlePressIn = (name: string) => {
     onPressIn && onPressIn(name);
   };
@@ -30,7 +33,7 @@ const VirtualGamepad: React.FC<Props> = ({
     onStickMove && onStickMove(id, data);
   };
 
-  const {width} = Dimensions.get('window');
+  const {width, height} = Dimensions.get('window');
 
   const nexusLeft = width * 0.5 - 20;
   const viewLeft = width * 0.5 - 100;
@@ -38,172 +41,192 @@ const VirtualGamepad: React.FC<Props> = ({
 
   return (
     <View style={styles.wrap} pointerEvents="box-none">
-      <GamepadButton
-        name="LeftTrigger"
-        width={100}
-        height={100}
+      <ButtonView
         style={[styles.button, styles.lt, {opacity}]}
+        buttonName="control_button_l2"
         onPressIn={() => handlePressIn('LeftTrigger')}
         onPressOut={() => handlePressOut('LeftTrigger')}
       />
 
-      <GamepadButton
-        name="RightTrigger"
-        width={100}
-        height={100}
+      <ButtonView
         style={[styles.button, styles.rt, {opacity}]}
+        buttonName="control_button_r2"
         onPressIn={() => handlePressIn('RightTrigger')}
         onPressOut={() => handlePressOut('RightTrigger')}
       />
 
-      <GamepadButton
-        name="LeftShoulder"
-        width={100}
-        height={100}
+      <ButtonView
         style={[styles.button, styles.lb, {opacity}]}
+        buttonName="control_button_l1"
         onPressIn={() => handlePressIn('L1')}
         onPressOut={() => handlePressOut('L1')}
       />
 
-      <GamepadButton
-        name="RightShoulder"
-        width={100}
-        height={100}
+      <ButtonView
         style={[styles.button, styles.rb, {opacity}]}
+        buttonName="control_button_r1"
         onPressIn={() => handlePressIn('R1')}
         onPressOut={() => handlePressOut('R1')}
       />
 
-      <GamepadButton
-        name="A"
+      <ButtonView
         style={[styles.button, styles.a, {opacity}]}
+        buttonName="control_button_cross"
         onPressIn={() => handlePressIn('CROSS')}
         onPressOut={() => handlePressOut('CROSS')}
       />
 
-      <GamepadButton
-        name="B"
+      <ButtonView
         style={[styles.button, styles.b, {opacity}]}
+        buttonName="control_button_moon"
         onPressIn={() => handlePressIn('MOON')}
         onPressOut={() => handlePressOut('MOON')}
       />
 
-      <GamepadButton
-        name="X"
+      <ButtonView
         style={[styles.button, styles.x, {opacity}]}
+        buttonName="control_button_box"
         onPressIn={() => handlePressIn('BOX')}
         onPressOut={() => handlePressOut('BOX')}
       />
 
-      <GamepadButton
-        name="Y"
+      <ButtonView
         style={[styles.button, styles.y, {opacity}]}
+        buttonName="control_button_pyramid"
         onPressIn={() => handlePressIn('PYRAMID')}
         onPressOut={() => handlePressOut('PYRAMID')}
       />
 
-      <GamepadButton
-        name="LeftThumb"
-        width={50}
-        height={50}
+      <ButtonView
         style={[styles.button, styles.l3, {opacity}]}
+        buttonName="control_button_l3"
         onPressIn={() => handlePressIn('L3')}
         onPressOut={() => handlePressOut('L3')}
       />
 
-      <GamepadButton
-        name="RightThumb"
-        width={50}
-        height={50}
+      <ButtonView
         style={[styles.button, styles.r3, {opacity}]}
+        buttonName="control_button_r3"
         onPressIn={() => handlePressIn('R3')}
         onPressOut={() => handlePressOut('R3')}
       />
 
-      <GamepadButton
-        name="View"
-        width={100}
-        height={100}
+      <ButtonView
         style={[styles.button, styles.view, {left: viewLeft, opacity}]}
+        buttonName="control_button_share"
         onPressIn={() => handlePressIn('SHARE')}
         onPressOut={() => handlePressOut('SHARE')}
       />
 
-      <GamepadButton
-        name="Nexus"
-        width={50}
-        height={50}
+      <ButtonView
         style={[styles.button, styles.nexus, {left: nexusLeft, opacity}]}
+        buttonName="control_button_home"
         onPressIn={() => handlePressIn('PS')}
         onPressOut={() => handlePressOut('PS')}
       />
 
-      <GamepadButton
-        name="Menu"
-        width={100}
-        height={100}
+      <ButtonView
         style={[styles.button, styles.menu, {left: menuLeft, opacity}]}
+        buttonName="control_button_options"
         onPressIn={() => handlePressIn('OPTIONS')}
         onPressOut={() => handlePressOut('OPTIONS')}
       />
 
-      <TouchableOpacity
-        style={[styles.button, styles.dpadLeft, {opacity}]}
-        onPressIn={() => {
-          handlePressIn('DPAD_LEFT');
-        }}
-        onPressOut={() => {
-          handlePressOut('DPAD_LEFT');
-        }}
-      />
-      <TouchableOpacity
+      <ButtonView
         style={[styles.button, styles.dpadTop, {opacity}]}
-        onPressIn={() => {
-          handlePressIn('DPAD_UP');
-        }}
-        onPressOut={() => {
-          handlePressOut('DPAD_UP');
-        }}
+        buttonName="control_button_up"
+        onPressIn={() => handlePressIn('DPAD_UP')}
+        onPressOut={() => handlePressOut('DPAD_UP')}
       />
-      <TouchableOpacity
-        style={[styles.button, styles.dpadRight, {opacity}]}
-        onPressIn={() => {
-          handlePressIn('DPAD_RIGHT');
-        }}
-        onPressOut={() => {
-          handlePressOut('DPAD_RIGHT');
-        }}
+
+      <ButtonView
+        style={[styles.button, styles.dpadLeft, {opacity}]}
+        buttonName="control_button_left"
+        onPressIn={() => handlePressIn('DPAD_LEFT')}
+        onPressOut={() => handlePressOut('DPAD_LEFT')}
       />
-      <TouchableOpacity
+
+      <ButtonView
         style={[styles.button, styles.dpadBottom, {opacity}]}
-        onPressIn={() => {
-          handlePressIn('DPAD_DOWN');
-        }}
-        onPressOut={() => {
-          handlePressOut('DPAD_DOWN');
-        }}
+        buttonName="control_button_down"
+        onPressIn={() => handlePressIn('DPAD_DOWN')}
+        onPressOut={() => handlePressOut('DPAD_DOWN')}
       />
 
-      <View style={[styles.button, styles.leftJs, {opacity}]}>
-        <ReactNativeJoystick
-          color="#ffffff"
-          radius={50}
-          onMove={data => handleStickMove('left', data)}
-          onStart={data => handleStickMove('left', data)}
-          onStop={data => handleStickMove('left', data)}
-        />
-      </View>
+      <ButtonView
+        style={[styles.button, styles.dpadRight, {opacity}]}
+        buttonName="control_button_right"
+        onPressIn={() => handlePressIn('DPAD_RIGHT')}
+        onPressOut={() => handlePressOut('DPAD_RIGHT')}
+      />
 
-      <View style={[styles.button, styles.rightJs, {opacity}]}>
-        <ReactNativeJoystick
-          color="#ffffff"
-          style={{opacity}}
-          radius={50}
-          onMove={data => handleStickMove('right', data)}
-          onStart={data => handleStickMove('right', data)}
-          onStop={data => handleStickMove('right', data)}
-        />
-      </View>
+      {settings.virtual_gamepad_joystick === 1 ? (
+        <View
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            zIndex: 9,
+            width: width * 0.5,
+            height: height,
+          }}>
+          <AnalogStick
+            style={{
+              width: width * 0.5,
+              height: height,
+            }}
+            radius={140}
+            handleRadius={80}
+            onStickChange={(data: any) => handleStickMove('left', data)}
+          />
+        </View>
+      ) : null}
+
+      {settings.virtual_gamepad_joystick === 1 ? (
+        <View
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            zIndex: 9,
+            width: width * 0.5,
+            height: height,
+          }}>
+          <AnalogStick
+            style={{
+              width: width * 0.5,
+              height: height,
+            }}
+            radius={150}
+            handleRadius={100}
+            onStickChange={(data: any) => handleStickMove('right', data)}
+          />
+        </View>
+      ) : null}
+
+      {settings.virtual_gamepad_joystick === 0 ? (
+        <View style={[styles.button, styles.leftJs, {opacity}]}>
+          <AnalogStick
+            style={styles.analogStick}
+            radius={140}
+            handleRadius={80}
+            onStickChange={(data: any) => handleStickMove('left', data)}
+          />
+        </View>
+      ) : null}
+
+      {settings.virtual_gamepad_joystick === 0 ? (
+        <View style={[styles.button, styles.rightJs, {opacity}]}>
+          <AnalogStick
+            style={styles.analogStick}
+            radius={150}
+            handleRadius={100}
+            onStickChange={(data: any) => handleStickMove('right', data)}
+          />
+        </View>
+      ) : null}
     </View>
   );
 };
@@ -219,101 +242,115 @@ const styles = StyleSheet.create({
     zIndex: 9,
   },
   button: {
-    opacity: 0.5,
+    width: 50,
+    height: 50,
+    opacity: 0.6,
     position: 'absolute',
+    zIndex: 10,
   },
   lt: {
+    width: 80,
+    height: 80,
     left: 20,
     top: 10,
   },
   rt: {
-    right: -15,
+    width: 80,
+    height: 80,
+    right: 20,
     top: 10,
   },
   lb: {
-    left: 20,
-    top: 80,
+    width: 80,
+    height: 80,
+    left: 70,
+    top: 60,
   },
   rb: {
-    right: -15,
-    top: 80,
+    width: 80,
+    height: 80,
+    right: 70,
+    top: 60,
   },
   a: {
     bottom: 50,
-    right: 50,
+    right: 80,
   },
   b: {
-    bottom: 90,
-    right: 10,
+    bottom: 100,
+    right: 30,
   },
   x: {
-    bottom: 90,
-    right: 90,
+    bottom: 100,
+    right: 130,
   },
   y: {
-    bottom: 130,
-    right: 50,
+    bottom: 150,
+    right: 80,
   },
   l3: {
-    bottom: 60,
-    left: 195,
+    bottom: 80,
+    left: 225,
   },
   r3: {
-    bottom: 30,
-    right: 225,
+    bottom: 40,
+    right: 235,
   },
   view: {
     bottom: 0,
   },
   nexus: {
-    bottom: 30,
+    bottom: 0,
   },
   menu: {
     bottom: 0,
   },
   leftJs: {
-    left: 160,
-    bottom: 140,
+    left: 180,
+    bottom: 150,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    overflow: 'hidden',
   },
   rightJs: {
     right: 200,
     bottom: 100,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    overflow: 'hidden',
   },
   dpadLeft: {
-    width: 50,
-    height: 30,
-    borderWidth: 2,
-    borderColor: '#fff',
-    left: 30,
+    width: 60,
+    height: 60,
+    left: 20,
     bottom: 80,
-    borderRightWidth: 0,
   },
   dpadTop: {
-    width: 30,
-    height: 50,
-    borderWidth: 2,
-    borderColor: '#fff',
-    left: 78,
-    bottom: 110,
-    borderBottomWidth: 0,
+    width: 60,
+    height: 60,
+    left: 75,
+    bottom: 135,
   },
   dpadRight: {
-    width: 50,
-    height: 30,
-    borderWidth: 2,
-    borderColor: '#fff',
-    left: 106,
+    width: 60,
+    height: 60,
+    left: 130,
     bottom: 80,
-    borderLeftWidth: 0,
   },
   dpadBottom: {
-    width: 30,
-    height: 50,
-    borderWidth: 2,
-    borderColor: '#fff',
-    left: 78,
-    bottom: 30,
-    borderTopWidth: 0,
+    width: 60,
+    height: 60,
+    left: 75,
+    bottom: 25,
+  },
+  analogStick: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(255, 255, 255, .5)',
+    overflow: 'hidden',
   },
 });
 

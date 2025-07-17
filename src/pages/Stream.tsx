@@ -140,8 +140,8 @@ function StreamScreen({navigation, route}) {
 
   const handleStickMove = (name: string, data: any) => {
     // console.log('handleStickMove:', name, data);
-    const leveledX = data.dist.x;
-    const leveledY = data.dist.y;
+    const leveledX = data.x;
+    const leveledY = data.y;
 
     const x = Number(leveledX);
     const y = Number(-leveledY);
@@ -756,7 +756,10 @@ function StreamScreen({navigation, route}) {
           }
 
           setTimeout(() => {
-            streamViewRef.current?.startSession();
+            // streamViewRef.current?.startSession();
+
+            setLoading(false);
+            setShowVirtualGamepad(true);
           }, 100);
         }, 300);
       }, 300);

@@ -39,6 +39,7 @@ export type Settings = {
   show_touchpad: boolean;
   touchpad_type: number; // 0 - default, 1 - full
   virtual_gamepad_opacity: number;
+  virtual_gamepad_joystick: number;
   custom_virtual_gamepad: string;
   gamepad_maping: Record<string, number>;
   show_menu: boolean;
@@ -89,7 +90,8 @@ const defaultSettings: Settings = {
   show_virtual_gamead: false,
   show_touchpad: true,
   touchpad_type: 0,
-  virtual_gamepad_opacity: 0.6,
+  virtual_gamepad_opacity: 0.7,
+  virtual_gamepad_joystick: 0,
   custom_virtual_gamepad: '',
   gamepad_maping: {},
   show_menu: false,
