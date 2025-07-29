@@ -902,7 +902,7 @@ public class StreamView extends FrameLayout {
     }
 
     private byte unsignedAxis(float value) {
-        return (byte)((int)(value * 255.0f));
+        return (byte)((int)(value * 255.0f) & 0xFF);
     }
 
     private long lastTriggerTime = 0;
@@ -1204,6 +1204,9 @@ public class StreamView extends FrameLayout {
                     }
                 }
             }
+
+            lTrigger = Math.round(lTrigger * 100) / 100.0f;
+            rTrigger = Math.round(rTrigger * 100) / 100.0f;
 
 //            Log.d(TAG, "Left Trigger:" + lTrigger);
 //            Log.d(TAG, "Right Trigger:" + rTrigger);
