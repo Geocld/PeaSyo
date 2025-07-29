@@ -129,9 +129,9 @@ export default {
       'Use Android’s Wi-Fi performance mode to achieve the best streaming experience. May cause Bluetooth latency on some devices. If you experience Bluetooth latency issues, please disable this mode',
     'Touchpad type': 'Touchpad Type',
     TouchpadTypeDesc:
-      'Modify touchpad type, can be set to full-screen touchpad',
+      'Modify touchpad type, can be set to Fullscreen/Dual touchpad',
     TouchpadTypeTips:
-      'When using full-screen mode for touchpad, virtual buttons will be unavailable',
+      'When using Fullscreen/Dual for touchpad, virtual buttons will be unavailable',
     'Auto check update': 'Auto check updates',
     AutoUpdateDesc: 'Enable or disable automatic update checks for Peasyo',
     TransferDesc:

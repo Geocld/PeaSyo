@@ -37,6 +37,7 @@ const display = [
     data: [
       {value: 0, text: t('Default')},
       {value: 1, text: t('Fullscreen')},
+      {value: 2, text: t('Dual')},
     ],
   },
   {

@@ -208,6 +208,7 @@ const CustomVirtualGamepad: React.FC<Props> = ({
             return (
               <View
                 key={button.name}
+                // eslint-disable-next-line react-native/no-inline-styles
                 style={{
                   position: 'absolute',
                   left: 0,
@@ -253,6 +254,7 @@ const CustomVirtualGamepad: React.FC<Props> = ({
             return (
               <View
                 key={button.name}
+                // eslint-disable-next-line react-native/no-inline-styles
                 style={{
                   position: 'absolute',
                   right: 0,

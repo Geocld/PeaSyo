@@ -77,6 +77,7 @@ function StreamScreen({navigation, route}) {
   const [streamInfo, setStreamInfo] = React.useState<any>(null);
   const [resolution, setResolution] = React.useState('');
   const [isTouchpadFull, setIsTouchpadFull] = React.useState(false);
+  const [isTouchpadDual, setIsTouchpadDual] = React.useState(false);
   const [isUsbDs5, setIsUsbDs5] = React.useState(false);
   const [message, setMessage] = React.useState('');
   const [showMessageModal, setShowMessageModal] = React.useState(false);
@@ -130,20 +131,22 @@ function StreamScreen({navigation, route}) {
 
   const handlePressOut = (name: string) => {
     // console.log('handlePressOut:', name);
-    if (name === 'TOUCHPAD') {
-      handleTouchpadTap(false, 1, [0, 0, -1, 0, 0, -1]);
-    } else {
-      const mask = CONTROLLERS[name];
-      if (mask) {
-        handlePressButton(mask, false);
+    setTimeout(() => {
+      if (name === 'TOUCHPAD') {
+        handleTouchpadTap(false, 1, [0, 0, -1, 0, 0, -1]);
       } else {
-        if (name === 'LeftTrigger') {
-          handleTrigger('left', 0);
-        } else if (name === 'RightTrigger') {
-          handleTrigger('right', 0);
+        const mask = CONTROLLERS[name];
+        if (mask) {
+          handlePressButton(mask, false);
+        } else {
+          if (name === 'LeftTrigger') {
+            handleTrigger('left', 0);
+          } else if (name === 'RightTrigger') {
+            handleTrigger('right', 0);
+          }
         }
       }
-    }
+    }, 16);
   };
 
   const handleStickMove = (name: string, data: any) => {
@@ -193,7 +196,7 @@ function StreamScreen({navigation, route}) {
   };
 
   const handleTouch = (mask: number, nextId: number, touches: any[]) => {
-    // console.log('handleTouch touches:', touches)
+    // console.log('handleTouch touches:', touches);
     streamViewRef.current?.touch(mask, nextId, touches);
   };
 
@@ -341,7 +344,9 @@ function StreamScreen({navigation, route}) {
       setResolution(`${width} x ${height}`);
     }
     const _isTouchpadFull = touchpad_type === 1;
+    const _isTouchpadDual = touchpad_type === 2;
     setIsTouchpadFull(_isTouchpadFull);
+    setIsTouchpadDual(_isTouchpadDual);
 
     const _streamInfo = {
       ps5: _consoleInfo.apName.indexOf('PS5') > -1,
@@ -429,7 +434,11 @@ function StreamScreen({navigation, route}) {
 
           setTimeout(() => {
             // Alway show virtual gamepad
-            if (_settings.show_virtual_gamead && !_isTouchpadFull) {
+            if (
+              _settings.show_virtual_gamead &&
+              !_isTouchpadFull &&
+              !_isTouchpadDual
+            ) {
               setShowVirtualGamepad(true);
             }
 
@@ -766,8 +775,10 @@ function StreamScreen({navigation, route}) {
           setTimeout(() => {
             streamViewRef.current?.startSession();
 
+            // For debug without connect
             // setLoading(false);
             // setShowVirtualGamepad(true);
+            // setShowTouchpad(true);
           }, 100);
         }, 300);
       }, 300);
@@ -885,18 +896,45 @@ function StreamScreen({navigation, route}) {
     }
     const {touchpad_type} = settings;
     const touchpadStyle =
-      touchpad_type === 0 ? styles.touchpad : styles.touchpadFull;
+      touchpad_type === 0
+        ? styles.touchpad
+        : touchpad_type === 1
+        ? styles.touchpadFull
+        : styles.touchpadDual;
 
-    return (
-      <View style={touchpadStyle}>
-        <Touchpad
-          isPS5={consoleInfo.apName.indexOf('PS5') > -1}
-          isFull={isTouchpadFull}
-          onTap={handleTouchpadTap}
-          onTouch={handleTouch}
-        />
-      </View>
-    );
+    if (touchpad_type === 2) {
+      return (
+        <View style={touchpadStyle}>
+          <View style={styles.touchLeft}>
+            <Touchpad
+              isPS5={consoleInfo.apName.indexOf('PS5') > -1}
+              isDual={true}
+              onTap={handleTouchpadTap}
+              onTouch={handleTouch}
+            />
+          </View>
+          <View style={styles.touchRight}>
+            <Touchpad
+              isPS5={consoleInfo.apName.indexOf('PS5') > -1}
+              isDual={true}
+              onTap={handleTouchpadTap}
+              onTouch={handleTouch}
+            />
+          </View>
+        </View>
+      );
+    } else {
+      return (
+        <View style={touchpadStyle}>
+          <Touchpad
+            isPS5={consoleInfo.apName.indexOf('PS5') > -1}
+            isFull={isTouchpadFull}
+            onTap={handleTouchpadTap}
+            onTouch={handleTouch}
+          />
+        </View>
+      );
+    }
   };
 
   const handleSendMessage = () => {
@@ -1045,6 +1083,7 @@ function StreamScreen({navigation, route}) {
                   )}
                   {connectState === CONNECTED &&
                     !isTouchpadFull &&
+                    !isTouchpadDual &&
                     !isUsbDs5 && (
                       <List.Item
                         title={t('Toggle Virtual Gamepad')}
@@ -1186,6 +1225,25 @@ const styles = StyleSheet.create({
     bottom: 0,
     zIndex: 99,
     alignItems: 'center',
+  },
+  touchpadDual: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 99,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  touchLeft: {
+    position: 'absolute',
+    left: 0,
+  },
+  touchRight: {
+    position: 'absolute',
+    right: 0,
   },
   initOverlay: {
     position: 'absolute',

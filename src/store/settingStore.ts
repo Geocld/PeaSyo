@@ -91,7 +91,7 @@ const defaultSettings: Settings = {
   show_touchpad: true,
   touchpad_type: 0,
   virtual_gamepad_opacity: 0.7,
-  virtual_gamepad_joystick: 0,
+  virtual_gamepad_joystick: 1,
   custom_virtual_gamepad: '',
   gamepad_maping: {},
   show_menu: false,

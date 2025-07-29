@@ -299,11 +299,11 @@ const styles = StyleSheet.create({
     right: 80,
   },
   l3: {
-    bottom: 80,
-    left: 225,
+    bottom: 50,
+    left: 275,
   },
   r3: {
-    bottom: 40,
+    bottom: 20,
     right: 235,
   },
   view: {
@@ -316,8 +316,8 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   leftJs: {
-    left: 180,
-    bottom: 150,
+    left: 170,
+    bottom: 100,
     width: 120,
     height: 120,
     borderRadius: 60,
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   },
   rightJs: {
     right: 200,
-    bottom: 100,
+    bottom: 80,
     width: 120,
     height: 120,
     borderRadius: 60,
@@ -334,20 +334,20 @@ const styles = StyleSheet.create({
   dpadLeft: {
     width: 60,
     height: 60,
-    left: 20,
-    bottom: 80,
+    left: 30,
+    bottom: 65,
   },
   dpadTop: {
     width: 60,
     height: 60,
     left: 75,
-    bottom: 135,
+    bottom: 105,
   },
   dpadRight: {
     width: 60,
     height: 60,
-    left: 130,
-    bottom: 80,
+    left: 120,
+    bottom: 65,
   },
   dpadBottom: {
     width: 60,

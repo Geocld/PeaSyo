@@ -33,6 +33,7 @@ const MAX_TOUCH_ID = 120;
 type Props = {
   isPS5: boolean;
   isFull?: boolean;
+  isDual?: boolean;
   onTap: (isPressed: boolean, nextId: number, touches: any[]) => void;
   onTouch: (mask: number, nextId: number, touches: any[]) => void;
 };
@@ -40,6 +41,7 @@ type Props = {
 const Touchpad: React.FC<Props> = ({
   isPS5 = true,
   isFull = false,
+  isDual = false,
   onTap,
   onTouch,
 }) => {
@@ -56,8 +58,16 @@ const Touchpad: React.FC<Props> = ({
   dWidth = dWidth - 20;
   dHeight = dHeight - 20;
 
-  const padWidth = isFull ? dWidth : VIEW_WIDTH;
-  const padHeight = isFull ? dHeight : VIEW_HEIGHT;
+  let padWidth = VIEW_WIDTH;
+  let padHeight = VIEW_HEIGHT;
+
+  if (isFull) {
+    padWidth = dWidth;
+    padHeight = dHeight;
+  } else if (isDual) {
+    padWidth = padWidth * 0.7;
+    padHeight = padHeight * 0.7;
+  }
 
   const normalizeCoordinates = (x: number, y: number) => {
     'worklet';
@@ -180,7 +190,7 @@ const Touchpad: React.FC<Props> = ({
       showTouchpad();
     })
     .onStart(e => {
-      console.log('Single tap:', e);
+      // console.log('Single tap:', e);
 
       opacity.value = SHOW_OPACITY;
 
