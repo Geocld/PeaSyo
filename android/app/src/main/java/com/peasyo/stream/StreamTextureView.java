@@ -90,8 +90,6 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
     private boolean isShortTrigger;
     private boolean swapDpad;
     private boolean logVerbose;
-    private boolean isLeftTriggerCanClick;
-    private boolean isRightTriggerCanClick;
     private boolean isRightstickMoving;
     private int haptic_stable_threshold;
     private int haptic_change_threshold;
@@ -115,8 +113,6 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         this.isShortTrigger = false;
         this.swapDpad = false;
         this.logVerbose = false;
-        this.isLeftTriggerCanClick = false;
-        this.isRightTriggerCanClick = false;
         this.isRightstickMoving = false;
 
         // haptic
@@ -553,20 +549,20 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
                 break;
         }
 
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BUTTON_L2) {
-            this.isLeftTriggerCanClick = true;
-            if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                controllerState.setL2State(unsignedAxis(1));
-            } else {
-                controllerState.setL2State(unsignedAxis(0));
+        if (this.isShortTrigger) {
+            if (event.getKeyCode() == KeyEvent.KEYCODE_BUTTON_L2) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    controllerState.setL2State(unsignedAxis(1));
+                } else {
+                    controllerState.setL2State(unsignedAxis(0));
+                }
             }
-        }
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BUTTON_R2) {
-            this.isRightTriggerCanClick = true;
-            if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                controllerState.setR2State(unsignedAxis(1));
-            } else {
-                controllerState.setR2State(unsignedAxis(0));
+            if (event.getKeyCode() == KeyEvent.KEYCODE_BUTTON_R2) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    controllerState.setR2State(unsignedAxis(1));
+                } else {
+                    controllerState.setR2State(unsignedAxis(0));
+                }
             }
         }
 
@@ -1199,12 +1195,12 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
                 if (rTrigger >= triggerMax) {
                     rTrigger = 1;
                 }
-            }
-            if (!this.isLeftTriggerCanClick) {
-                controllerState.setL2State(unsignedAxis(lTrigger));
-            }
 
-            if (!this.isRightTriggerCanClick) {
+                controllerState.setL2State(unsignedAxis(lTrigger));
+                controllerState.setR2State(unsignedAxis(rTrigger));
+            }
+            if (!this.isShortTrigger) {
+                controllerState.setL2State(unsignedAxis(lTrigger));
                 controllerState.setR2State(unsignedAxis(rTrigger));
             }
 

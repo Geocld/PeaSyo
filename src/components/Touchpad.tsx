@@ -65,8 +65,8 @@ const Touchpad: React.FC<Props> = ({
     padWidth = dWidth;
     padHeight = dHeight;
   } else if (isDual) {
-    padWidth = padWidth * 0.7;
-    padHeight = padHeight * 0.7;
+    padWidth = padWidth * 0.8;
+    padHeight = padHeight * 0.8;
   }
 
   const normalizeCoordinates = (x: number, y: number) => {

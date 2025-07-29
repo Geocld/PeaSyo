@@ -78,10 +78,10 @@ const gamepad = [
     name: 'short_trigger',
     type: 'radio',
     title: t('Short Trigger'),
-    description: t('Modify the linear trigger action to a short trigger'),
+    description: t('ShortTriggerDesc'),
     data: [
-      {value: true, text: t('Enable')},
       {value: false, text: t('Disable')},
+      {value: true, text: t('Enable')},
     ],
   },
   {

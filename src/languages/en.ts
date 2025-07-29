@@ -112,6 +112,8 @@ export default {
     EdgeDesc:
       'If the controller has an edge dead zone, you can set edge compensation for optimal performance',
     'Short Trigger': 'Short Trigger',
+    ShortTriggerDesc:
+      "If you want to convert the controller's analog trigger input to digital trigger input, or if you are using a controller with digital triggers (such as Switch/NS Pro), please enable this option",
     'Modify the linear trigger action to a short trigger':
       'Modify the linear trigger action to a short trigger',
     'Virtual gamepad': 'Virtual gamepad',

@@ -891,7 +891,7 @@ JNIEXPORT void JNICALL JNI_FCN(sessionSetControllerState)(JNIEnv *env, jobject o
     controller_state.right_y = (int16_t)E->GetShortField(env, controller_state_java, session->java_controller_state_right_y);
     jobjectArray touch_array = E->GetObjectField(env, controller_state_java, session->java_controller_state_touches);
     size_t touch_array_len = (size_t)E->GetArrayLength(env, touch_array);
-    CHIAKI_LOGI(session->log, "sessionSetControllerState: r2_state = %u", (unsigned int)controller_state.r2_state);
+//    CHIAKI_LOGI(session->log, "sessionSetControllerState: r2_state = %u", (unsigned int)controller_state.r2_state);
     for(size_t i = 0; i < CHIAKI_CONTROLLER_TOUCHES_MAX; i++)
     {
         if(i < touch_array_len)

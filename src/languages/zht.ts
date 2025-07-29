@@ -113,6 +113,8 @@ export default {
     'Joystick edge compensation': '搖桿邊緣補償',
     EdgeDesc: '如果控制器存在邊緣死區，可以設置邊緣補償以達到最佳效果',
     'Short Trigger': '短扳機',
+    ShortTriggerDesc:
+      '如果你希望將控制器的線性扳機輸入為數位扳機輸入，或者你使用了非線性扳機的控制器(如Switch/NS Pro)，請開啟此選項',
     'Modify the linear trigger action to a short trigger':
       '將線性扳機動作修改為短扳機',
     'Virtual gamepad': '虛擬手柄',
