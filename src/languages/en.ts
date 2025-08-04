@@ -134,6 +134,14 @@ export default {
       'Modify touchpad type, can be set to Fullscreen/Dual touchpad',
     TouchpadTypeTips:
       'When using Fullscreen/Dual for touchpad, virtual buttons will be unavailable',
+    TouchpadScaleTitle: 'Touchpad Scale',
+    TouchpadScaleDesc:
+      'If the size of the virtual touchpad does not meet expectations, you can set the touchpad scaling ratio here.',
+    TouchpadOffsetTitle: 'Touchpad Position Offset',
+    TouchpadOffsetDesc:
+      'If the position of the virtual touchpad does not meet expectations, you can set the vertical offset of the touchpad here.',
+    TouchpadOffsetTips:
+      'This setting is invalid in fullscreen touchpad mode. The value is a percentage relative to the top of the device.',
     'Auto check update': 'Auto check updates',
     AutoUpdateDesc: 'Enable or disable automatic update checks for Peasyo',
     TransferDesc:
@@ -188,6 +196,9 @@ export default {
     Manager: 'Manage consoles',
     ConsoleEdit: 'Edit consoles',
     AutoRemoteDesc: 'You can remote play via PSN:',
+    AutoRemoteGuide:
+      "If you don't know how to fill in the following address, you can try using PSN Auto-Connect (Settings - Others - Use PSN Remote Connect)",
+    AutoConnect: 'Auto connect',
     // Regsistry
     RegistTips:
       'Note: Only supports registering PS5 or PS4 (firmware version 8 or above) consoles',
@@ -264,7 +275,8 @@ export default {
     DisplaySettings: 'Display',
     LocalSettings: 'Local stream',
     RemoteSettings: 'Remote stream',
-    GamepadSettings: 'Gamepad and Vibration',
+    GamepadSettings: 'Gamepad and Rumble',
+    TouchpadSettings: 'Touchpad',
     SensorSettings: 'Sensor',
     AdvanceSettings: 'Advanced',
     AdvanceSettingsDesc:

@@ -21,6 +21,7 @@ import local from '../common/settings/local';
 import remote from '../common/settings/remote';
 import display from '../common/settings/display';
 import gamepad from '../common/settings/gamepad';
+import touchpad from '../common/settings/touchpad';
 import sensor from '../common/settings/sensor';
 import advand from '../common/settings/advand';
 import others from '../common/settings/others';
@@ -253,6 +254,24 @@ function SettingsScreen({navigation}) {
               navigation.navigate('RGB');
             }}
           />
+        </View>
+
+        <View>
+          <View style={styles.contentTitle}>
+            <Text variant="titleLarge" style={styles.titleText}>
+              {t('TouchpadSettings')}
+            </Text>
+          </View>
+          {touchpad.map((meta, idx) => {
+            return (
+              <SettingItem
+                key={meta.name || idx}
+                title={meta.title}
+                description={meta.description}
+                onPress={() => handleItemPress(meta.name)}
+              />
+            );
+          })}
         </View>
 
         <View>

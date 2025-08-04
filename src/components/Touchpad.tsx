@@ -1,5 +1,6 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {StyleSheet, View, Dimensions} from 'react-native';
+import Svg, {Path} from 'react-native-svg';
 import {GestureDetector, Gesture} from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
@@ -7,7 +8,28 @@ import Animated, {
   runOnJS,
   withTiming,
   withDelay,
+  useDerivedValue,
 } from 'react-native-reanimated';
+
+function throttle(func, limit) {
+  let lastFunc;
+  let lastRan;
+  return function (...args) {
+    const context = this;
+    if (!lastRan) {
+      func.apply(context, args);
+      lastRan = Date.now();
+    } else {
+      clearTimeout(lastFunc);
+      lastFunc = setTimeout(() => {
+        if (Date.now() - lastRan >= limit) {
+          func.apply(context, args);
+          lastRan = Date.now();
+        }
+      }, limit - (Date.now() - lastRan));
+    }
+  };
+}
 
 // DualShock4 touchpad is 1920 x 942
 const TOUCHPAD_WIDTH = 1920;
@@ -34,6 +56,7 @@ type Props = {
   isPS5: boolean;
   isFull?: boolean;
   isDual?: boolean;
+  scale?: number;
   onTap: (isPressed: boolean, nextId: number, touches: any[]) => void;
   onTouch: (mask: number, nextId: number, touches: any[]) => void;
 };
@@ -42,6 +65,7 @@ const Touchpad: React.FC<Props> = ({
   isPS5 = true,
   isFull = false,
   isDual = false,
+  scale = 1,
   onTap,
   onTouch,
 }) => {
@@ -53,6 +77,12 @@ const Touchpad: React.FC<Props> = ({
   const touchId2 = useSharedValue(-1);
 
   const opacity = useSharedValue(0);
+
+  const path1String = useSharedValue('');
+  const path2String = useSharedValue('');
+
+  const [path1, setPath1] = useState('');
+  const [path2, setPath2] = useState('');
 
   let {width: dWidth, height: dHeight} = Dimensions.get('window');
   dWidth = dWidth - 20;
@@ -68,6 +98,9 @@ const Touchpad: React.FC<Props> = ({
     padWidth = padWidth * 0.8;
     padHeight = padHeight * 0.8;
   }
+
+  padWidth = padWidth * scale;
+  padHeight = padHeight * scale;
 
   const normalizeCoordinates = (x: number, y: number) => {
     'worklet';
@@ -128,6 +161,10 @@ const Touchpad: React.FC<Props> = ({
           touches[0] = normalTouch.x;
           touches[1] = normalTouch.y;
           touches[2] = _touchId1;
+
+          path1String.value += path1String.value
+            ? ` L ${touch.x} ${touch.y}`
+            : `M ${touch.x} ${touch.y}`;
         } else {
           if (_touchId2 === -1) {
             _currentId = _currentId + 1;
@@ -138,6 +175,10 @@ const Touchpad: React.FC<Props> = ({
           touches[3] = normalTouch.x;
           touches[4] = normalTouch.y;
           touches[5] = _touchId2;
+
+          path2String.value += path2String.value
+            ? ` L ${touch.x} ${touch.y}`
+            : `M ${touch.x} ${touch.y}`;
         }
       });
 
@@ -158,6 +199,10 @@ const Touchpad: React.FC<Props> = ({
     .onTouchesUp(e => {
       // console.log('pan onTouchesUp:', e);
       isMoving.value = false;
+
+      path1String.value = '';
+      path2String.value = '';
+
       hideTouchpad();
 
       const changedTouches = e.changedTouches;
@@ -266,8 +311,8 @@ const Touchpad: React.FC<Props> = ({
   const gesture = Gesture.Race(pan, longPress, singleTap);
 
   const generateDots = () => {
-    const rows = Math.ceil(VIEW_HEIGHT / DOT_SPACING);
-    const columns = Math.ceil(VIEW_WIDTH / DOT_SPACING);
+    const rows = Math.ceil(padHeight / DOT_SPACING);
+    const columns = Math.ceil(padWidth / DOT_SPACING);
     const dots: any[] = [];
 
     if (isFull) {
@@ -302,6 +347,30 @@ const Touchpad: React.FC<Props> = ({
     };
   });
 
+  const throttledSetPath1 = throttle(value => setPath1(value), 16);
+  const throttledSetPath2 = throttle(value => setPath2(value), 16);
+
+  useDerivedValue(() => {
+    runOnJS(throttledSetPath1)(path1String.value);
+  }, [path1String]);
+
+  useDerivedValue(() => {
+    runOnJS(throttledSetPath2)(path2String.value);
+  }, [path2String]);
+
+  const renderPaths = () => {
+    return (
+      <Svg width={padWidth} height={padHeight} style={StyleSheet.absoluteFill}>
+        {path1 && (
+          <Path d={path1} stroke="#f02f45" strokeWidth="8" fill="none" />
+        )}
+        {path2 && (
+          <Path d={path2} stroke="#f02f45" strokeWidth="8" fill="none" />
+        )}
+      </Svg>
+    );
+  };
+
   return (
     <GestureDetector gesture={gesture}>
       <View style={{width: padWidth, height: padHeight}}>
@@ -312,6 +381,7 @@ const Touchpad: React.FC<Props> = ({
             animatedStyle,
           ]}>
           {generateDots()}
+          {renderPaths()}
         </Animated.View>
       </View>
     </GestureDetector>

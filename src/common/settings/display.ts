@@ -29,18 +29,6 @@ const display = [
     ],
   },
   {
-    name: 'touchpad_type',
-    type: 'radio',
-    title: t('Touchpad type'),
-    description: t('TouchpadTypeDesc'),
-    tips: t('TouchpadTypeTips'),
-    data: [
-      {value: 0, text: t('Default')},
-      {value: 1, text: t('Fullscreen')},
-      {value: 2, text: t('Dual')},
-    ],
-  },
-  {
     name: 'show_performance',
     type: 'radio',
     title: t('Show performance'),
@@ -65,16 +53,6 @@ const display = [
     type: 'radio',
     title: t('Virtual gamepad'),
     description: t('Always display the virtual gamepad'),
-    data: [
-      {value: true, text: t('Enable')},
-      {value: false, text: t('Disable')},
-    ],
-  },
-  {
-    name: 'show_touchpad',
-    type: 'radio',
-    title: t('Touchpad'),
-    description: t('Always display touchpad'),
     data: [
       {value: true, text: t('Enable')},
       {value: false, text: t('Disable')},

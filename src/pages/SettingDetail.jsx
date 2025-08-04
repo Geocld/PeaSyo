@@ -16,6 +16,7 @@ import local from '../common/settings/local';
 import remote from '../common/settings/remote';
 import display from '../common/settings/display';
 import gamepad from '../common/settings/gamepad';
+import touchpad from '../common/settings/touchpad';
 import sensor from '../common/settings/sensor';
 import advand from '../common/settings/advand';
 import others from '../common/settings/others';
@@ -44,6 +45,7 @@ function SettingDetailScreen({navigation, route}) {
         ...remote,
         ...display,
         ...gamepad,
+        ...touchpad,
         ...sensor,
         ...advand,
         ...others,
@@ -61,6 +63,10 @@ function SettingDetailScreen({navigation, route}) {
 
       if (name === 'remote_bitrate_mode') {
         setValue2(_settings.remote_bitrate);
+      }
+
+      if (name === 'touchpad_offset_mode') {
+        setValue2(_settings.touchpad_offset);
       }
 
       setValue(currentVal);
@@ -128,6 +134,9 @@ function SettingDetailScreen({navigation, route}) {
     } else if (current === 'remote_bitrate_mode') {
       settings.remote_bitrate_mode = value;
       settings.remote_bitrate = value2;
+    } else if (current === 'touchpad_offset_mode') {
+      settings.touchpad_offset_mode = value;
+      settings.touchpad_offset = value2;
     } else if (currentMetas.name === 'bind_usb_device') {
       UsbRumbleManager.setBindUsbDevice(value);
     }
@@ -176,6 +185,44 @@ function SettingDetailScreen({navigation, route}) {
                 maximumValue={99999}
                 step={100}
                 lowerLimit={2000}
+                onValueChange={val => {
+                  setValue2(val);
+                }}
+                minimumTrackTintColor="#DF6069"
+                maximumTrackTintColor="grey"
+              />
+            </>
+          )}
+        </>
+      );
+    }
+    if (currentMetas.name === 'touchpad_offset_mode') {
+      return (
+        <>
+          <RadioButton.Group onValueChange={val => setValue(val)} value={value}>
+            {currentMetas &&
+              currentMetas.data.map((item, idx) => {
+                return (
+                  <RadioButton.Item
+                    key={idx}
+                    label={item.text}
+                    value={item.value}
+                  />
+                );
+              })}
+          </RadioButton.Group>
+          {value === 'custom' && (
+            <>
+              <Text style={styles.sliderTitle}>
+                {t('Current')}: {value2} %
+              </Text>
+              <Slider
+                style={styles.slider}
+                value={value2}
+                minimumValue={0}
+                maximumValue={90}
+                step={1}
+                lowerLimit={0}
                 onValueChange={val => {
                   setValue2(val);
                 }}

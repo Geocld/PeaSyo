@@ -902,21 +902,40 @@ function StreamScreen({navigation, route}) {
         ? styles.touchpadFull
         : styles.touchpadDual;
 
+    // Dual
     if (touchpad_type === 2) {
       return (
         <View style={touchpadStyle}>
-          <View style={styles.touchLeft}>
+          <View
+            style={[
+              styles.touchLeft,
+              settings.touchpad_offset_mode === 'custom'
+                ? {
+                    top: `${settings.touchpad_offset}%`,
+                  }
+                : {},
+            ]}>
             <Touchpad
               isPS5={consoleInfo.apName.indexOf('PS5') > -1}
               isDual={true}
+              scale={settings.touchpad_scale}
               onTap={handleTouchpadTap}
               onTouch={handleTouch}
             />
           </View>
-          <View style={styles.touchRight}>
+          <View
+            style={[
+              styles.touchRight,
+              settings.touchpad_offset_mode === 'custom'
+                ? {
+                    top: `${settings.touchpad_offset}%`,
+                  }
+                : {},
+            ]}>
             <Touchpad
               isPS5={consoleInfo.apName.indexOf('PS5') > -1}
               isDual={true}
+              scale={settings.touchpad_scale}
               onTap={handleTouchpadTap}
               onTouch={handleTouch}
             />
@@ -925,10 +944,17 @@ function StreamScreen({navigation, route}) {
       );
     } else {
       return (
-        <View style={touchpadStyle}>
+        <View
+          style={[
+            touchpadStyle,
+            settings.touchpad_offset_mode === 'custom' && !isTouchpadFull
+              ? {top: `${settings.touchpad_offset}%`}
+              : {},
+          ]}>
           <Touchpad
             isPS5={consoleInfo.apName.indexOf('PS5') > -1}
             isFull={isTouchpadFull}
+            scale={settings.touchpad_scale}
             onTap={handleTouchpadTap}
             onTouch={handleTouch}
           />

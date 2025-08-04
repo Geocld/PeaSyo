@@ -619,12 +619,22 @@ function HomeScreen({navigation, route}) {
                 {t('RemoteDesc')}
               </Text>
             </View>
-            {settings.auto_remote && (
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            {settings.auto_remote ? (
+              <View>
                 <Text>{t('AutoRemoteDesc')}</Text>
                 <Button type="text" onPress={handleAutoRemoteStream}>
-                  {t('Start')}
+                  {t('AutoConnect')}
                 </Button>
+              </View>
+            ) : (
+              <View
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingBottom: 5,
+                }}>
+                <Text variant="bodySmall">{t('AutoRemoteGuide')}</Text>
               </View>
             )}
             <Pressable
@@ -644,6 +654,7 @@ function HomeScreen({navigation, route}) {
             </Pressable>
             <Button
               mode="text"
+              // eslint-disable-next-line react-native/no-inline-styles
               style={{marginTop: 10}}
               onPress={handleSaveRemoteHost}>
               {t('Confirm')}

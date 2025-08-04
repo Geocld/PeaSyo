@@ -38,6 +38,9 @@ export type Settings = {
   show_virtual_gamead: boolean;
   show_touchpad: boolean;
   touchpad_type: number; // 0 - default, 1 - full
+  touchpad_scale: number;
+  touchpad_offset_mode: string;
+  touchpad_offset: number;
   virtual_gamepad_opacity: number;
   virtual_gamepad_joystick: number;
   custom_virtual_gamepad: string;
@@ -90,6 +93,9 @@ const defaultSettings: Settings = {
   show_virtual_gamead: false,
   show_touchpad: true,
   touchpad_type: 0,
+  touchpad_scale: 1,
+  touchpad_offset_mode: 'auto',
+  touchpad_offset: 0,
   virtual_gamepad_opacity: 0.7,
   virtual_gamepad_joystick: 1,
   custom_virtual_gamepad: '',

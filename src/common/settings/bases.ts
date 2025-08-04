@@ -10,6 +10,7 @@ const bases = [
     description: t('Set language of Peasyo'),
     data: [
       {value: 'en', text: 'English'},
+      {value: 'es', text: 'Spanish'},
       {value: 'zh', text: '简体中文'},
       {value: 'zht', text: '繁體中文'},
     ],

@@ -128,6 +128,14 @@ export default {
     'Touchpad type': '触摸板类型',
     TouchpadTypeDesc: '修改触摸板类型，可以设置为全屏/对称触摸板',
     TouchpadTypeTips: '触摸板使用全屏/对称模式后虚拟按键将无法使用',
+    TouchpadScaleTitle: '触摸板缩放',
+    TouchpadScaleDesc:
+      '如果虚拟触摸板大小不符合预期，可以在这里设置触摸板缩放比例',
+    TouchpadOffsetTitle: '触摸板位置偏移',
+    TouchpadOffsetDesc:
+      '如果虚拟触摸板的位置不符合预期，可以在这里设置触摸板的垂直偏移',
+    TouchpadOffsetTips:
+      '全屏触摸板模式下该设置无效，设置值为相对设备顶部的百分比',
     Fullscreen: '全屏',
     Dual: '对称',
     'Virtual Opacity': '虚拟按键透明度',
@@ -191,7 +199,10 @@ export default {
     Manager: '主机管理',
     ConsoleEdit: '编辑主机',
     AutoRemoteDesc: '或者可以直接使用PSN自动连接:',
+    AutoRemoteGuide:
+      '如果你不知道以下地址如何填写，可以尝试使用PSN自动连接(设置 - 其他 - 使用PSN远程连接)',
     Start: '开始',
+    AutoConnect: '自动连接',
     // Regsistry
     RegistTips: '注意: 仅支持注册PS5或PS4(固件版本8+以上)主机',
     LookConsole: '正在寻找终端',
@@ -291,6 +302,7 @@ export default {
     RemoteSettings: '远程串流',
     DisplaySettings: '显示',
     GamepadSettings: '手柄及振动',
+    TouchpadSettings: '虚拟触摸板',
     SensorSettings: '传感器',
     AdvanceSettings: '高级',
     AdvanceSettingsDesc: '⚠️如果你不理解以下设置，请勿随意修改。',
