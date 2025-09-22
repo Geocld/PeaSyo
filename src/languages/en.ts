@@ -276,6 +276,7 @@ export default {
     LocalSettings: 'Local stream',
     RemoteSettings: 'Remote stream',
     GamepadSettings: 'Gamepad and Rumble',
+    vGamepadSettings: 'Virtual controller',
     TouchpadSettings: 'Touchpad',
     SensorSettings: 'Sensor',
     AdvanceSettings: 'Advanced',
@@ -347,5 +348,14 @@ export default {
     LogVerboseTitle: 'Enable verbose logging',
     LogVerboseDesc:
       'Records complete streaming logs. This may significantly increase log file size and could potentially impact streaming performance. Do not enable during regular gameplay.',
+    'Auto toggle hold buttons': 'Auto toggle hold buttons',
+    'Select what buttons become toggle holdable':
+      'Select what buttons become toggle holdable',
+    HoldButtonsSettingsDesc:
+      'The auto toggle hold buttons feature allows you to automatically keep a button pressed when you hold it down, until you click the button again. This is useful for game scenarios that require continuous button presses, such as acceleration in racing games or firing in shooting games.',
+    'Hold Buttons': 'Hold Buttons',
+    History: 'History',
+    HistoryTitle: 'Update histories',
+    HistoryDesc: 'View update histories of PeaSyo',
   },
 };

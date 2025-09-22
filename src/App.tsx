@@ -42,11 +42,13 @@ import DualSenseScreen from './pages/DualSense';
 import DualSenseWebScreen from './pages/DualSenseWeb';
 import VirtualGamepadSettingsScreen from './pages/VirtualGamepadSettings';
 import CustomGamepadScreen from './pages/CustomGamepad';
+import HoldButtonsScreen from './pages/HoldButtons';
 import UsersScreen from './pages/Users';
 import RgbScreen from './pages/Rgb';
 import DeviceInfosScreen from './pages/DeviceInfos';
 import ThanksScreen from './pages/Thanks';
 import LogsScreen from './pages/Logs';
+import HistoryScreen from './pages/History';
 import updater from './utils/updater';
 
 import {useTranslation} from 'react-i18next';
@@ -208,6 +210,11 @@ function App() {
                     options={{title: t('Custom')}}
                   />
                   <RootStack.Screen
+                    name="HoldButtons"
+                    component={HoldButtonsScreen}
+                    options={{title: t('Hold Buttons')}}
+                  />
+                  <RootStack.Screen
                     name="About"
                     component={AboutScreen}
                     options={{title: t('About')}}
@@ -245,6 +252,11 @@ function App() {
                     name="Thanks"
                     component={ThanksScreen}
                     options={{title: t('Thanks')}}
+                  />
+                  <RootStack.Screen
+                    name="History"
+                    component={HistoryScreen}
+                    options={{title: t('HistoryTitle')}}
                   />
                   <RootStack.Screen
                     name="Logs"

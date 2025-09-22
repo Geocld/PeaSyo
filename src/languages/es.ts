@@ -3,7 +3,7 @@ export default {
     // common
     Loading: 'Cargando',
     Consoles: 'Consolas',
-    Settings: 'Configuraciones',
+    Settings: 'configuración',
     Warning: 'Advertencia',
     Cancel: 'Cancelar',
     Confirm: 'Confirmar',
@@ -25,8 +25,8 @@ export default {
     Current: 'Actual',
     LogoutText: '¿Deseas cerrar sesión?',
     'Reset all settings to default':
-      'Restablecer todas las configuraciones a los valores predeterminados',
-    ResetText: '¿Deseas restablecer todas las configuraciones?',
+      'Restablecer todas las configuración a los valores predeterminados',
+    ResetText: '¿Deseas restablecer todas las configuración?',
     UsbMappingDisable:
       'La asignación de teclas del gamepad no está disponible temporalmente después de anular el controlador de Android',
     'Customize virtual buttons': 'Personalizar botones virtuales',
@@ -286,11 +286,12 @@ export default {
     LocalSettings: 'Transmisión local',
     RemoteSettings: 'Transmisión remota',
     GamepadSettings: 'Gamepad y Vibración',
+    vGamepadSettings: 'Virtual controller',
     TouchpadSettings: 'Panel táctil',
     SensorSettings: 'Sensor',
     AdvanceSettings: 'Avanzado',
     AdvanceSettingsDesc:
-      '⚠️Si no entiendes las siguientes configuraciones, por favor no las modifiques arbitrariamente.',
+      '⚠️Si no entiendes las siguientes configuración, por favor no las modifiques arbitrariamente.',
     Haptic_stable_threshold_title:
       'Conteo de estabilidad de retroalimentación háptica (Experimental)',
     Haptic_stable_threshold_desc:
@@ -358,5 +359,14 @@ export default {
     LogVerboseTitle: 'Habilitar registro detallado',
     LogVerboseDesc:
       'Registra registros completos de transmisión. Esto puede aumentar significativamente el tamaño del archivo de registro y potencialmente afectar el rendimiento de la transmisión. No lo habilites durante el juego habitual.',
+    'Auto toggle hold buttons': 'Botones de retención automática',
+    'Select what buttons become toggle holdable':
+      'Selecciona qué botones se pueden mantener presionados',
+    HoldButtonsSettingsDesc:
+      'La función de botones de retención automática te permite mantener un botón presionado automáticamente cuando lo mantienes pulsado, hasta que hagas clic en el botón nuevamente. Esto es útil para escenarios de juego que requieren pulsaciones continuas de botones, como la aceleración en juegos de carreras o disparos en juegos de tiro.',
+    'Hold Buttons': 'Botones de retención',
+    History: 'History',
+    HistoryTitle: 'Update histories',
+    HistoryDesc: 'View update histories of PeaSyo',
   },
 };

@@ -57,6 +57,26 @@ function hexToRgb(hex: string): [number, number, number] {
   return [r, g, b];
 }
 
+// Record for hold buttons
+const gpState = {
+  CROSS: false,
+  MOON: false,
+  BOX: false,
+  PYRAMID: false,
+  L1: false,
+  R1: false,
+  LeftTrigger: false,
+  RightTrigger: false,
+  SHARE: false,
+  OPTIONS: false,
+  L3: false,
+  R3: false,
+  DPAD_UP: false,
+  DPAD_DOWN: false,
+  DPAD_LEFT: false,
+  DPAD_RIGHT: false,
+};
+
 function StreamScreen({navigation, route}) {
   const {t} = useTranslation();
 
@@ -117,12 +137,29 @@ function StreamScreen({navigation, route}) {
       handleTouchpadTap(true, 1, [0, 0, -1, 0, 0, -1]);
     } else {
       const mask = CONTROLLERS[name];
+      // Hold buttons
+      const hold_buttons = settings.hold_buttons || [];
       if (mask) {
+        if (hold_buttons.includes(name) && gpState[name] !== undefined) {
+          handlePressButton(mask, !gpState[name]);
+          gpState[name] = !gpState[name];
+          return;
+        }
         handlePressButton(mask, true);
       } else {
         if (name === 'LeftTrigger') {
+          if (hold_buttons.includes(name)) {
+            handleTrigger('left', gpState[name] ? 1 : 0);
+            gpState[name] = !gpState[name];
+            return;
+          }
           handleTrigger('left', 1);
         } else if (name === 'RightTrigger') {
+          if (hold_buttons.includes(name)) {
+            handleTrigger('right', gpState[name] ? 1 : 0);
+            gpState[name] = !gpState[name];
+            return;
+          }
           handleTrigger('right', 1);
         }
       }
@@ -132,6 +169,11 @@ function StreamScreen({navigation, route}) {
   const handlePressOut = (name: string) => {
     // console.log('handlePressOut:', name);
     setTimeout(() => {
+      const hold_buttons = settings.hold_buttons || [];
+      if (hold_buttons.includes(name)) {
+        return;
+      }
+
       if (name === 'TOUCHPAD') {
         handleTouchpadTap(false, 1, [0, 0, -1, 0, 0, -1]);
       } else {

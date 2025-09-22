@@ -16,6 +16,7 @@ import local from '../common/settings/local';
 import remote from '../common/settings/remote';
 import display from '../common/settings/display';
 import gamepad from '../common/settings/gamepad';
+import vgamepad from '../common/settings/vgamepad';
 import touchpad from '../common/settings/touchpad';
 import sensor from '../common/settings/sensor';
 import advand from '../common/settings/advand';
@@ -45,6 +46,7 @@ function SettingDetailScreen({navigation, route}) {
         ...remote,
         ...display,
         ...gamepad,
+        ...vgamepad,
         ...touchpad,
         ...sensor,
         ...advand,

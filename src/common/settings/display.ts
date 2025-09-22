@@ -49,26 +49,6 @@ const display = [
     ],
   },
   {
-    name: 'show_virtual_gamead',
-    type: 'radio',
-    title: t('Virtual gamepad'),
-    description: t('Always display the virtual gamepad'),
-    data: [
-      {value: true, text: t('Enable')},
-      {value: false, text: t('Disable')},
-    ],
-  },
-  {
-    name: 'virtual_gamepad_opacity',
-    type: 'slider',
-    min: 0,
-    max: 1,
-    step: 0.1,
-    title: t('Virtual Opacity'),
-    description: t('Config opacity of virtual gamepad'),
-    data: [],
-  },
-  {
     name: 'show_menu',
     type: 'radio',
     title: t('show_menu_title'),

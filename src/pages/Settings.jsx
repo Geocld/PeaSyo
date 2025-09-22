@@ -21,6 +21,7 @@ import local from '../common/settings/local';
 import remote from '../common/settings/remote';
 import display from '../common/settings/display';
 import gamepad from '../common/settings/gamepad';
+import vgamepad from '../common/settings/vgamepad';
 import touchpad from '../common/settings/touchpad';
 import sensor from '../common/settings/sensor';
 import advand from '../common/settings/advand';
@@ -232,14 +233,6 @@ function SettingsScreen({navigation}) {
           })}
 
           <SettingItem
-            title={t('Customize virtual buttons')}
-            description={t('Customize buttons of virtual gamepad')}
-            onPress={() => {
-              navigation.navigate('VirtualGamepadSettings');
-            }}
-          />
-
-          <SettingItem
             title={t('DS_test_title')}
             description={t('DS_test_desc')}
             onPress={() => {
@@ -252,6 +245,41 @@ function SettingsScreen({navigation}) {
             description={t('DS_RGB_desc')}
             onPress={() => {
               navigation.navigate('RGB');
+            }}
+          />
+        </View>
+
+        <View>
+          <View style={styles.contentTitle}>
+            <Text variant="titleLarge" style={styles.titleText}>
+              {t('vGamepadSettings')}
+            </Text>
+          </View>
+
+          {vgamepad.map((meta, idx) => {
+            return (
+              <SettingItem
+                key={meta.name || idx}
+                title={meta.title}
+                description={meta.description}
+                onPress={() => handleItemPress(meta.name)}
+              />
+            );
+          })}
+
+          <SettingItem
+            title={t('Customize virtual buttons')}
+            description={t('Customize buttons of virtual gamepad')}
+            onPress={() => {
+              navigation.navigate('VirtualGamepadSettings');
+            }}
+          />
+
+          <SettingItem
+            title={t('Auto toggle hold buttons')}
+            description={t('Select what buttons become toggle holdable')}
+            onPress={() => {
+              navigation.navigate('HoldButtons');
             }}
           />
         </View>
@@ -355,6 +383,12 @@ function SettingsScreen({navigation}) {
             title={t('Reset')}
             description={t('Reset all settings to default')}
             onPress={() => handleItemPress('reset')}
+          />
+
+          <SettingItem
+            title={t('HistoryTitle')}
+            description={`${t('HistoryDesc')}`}
+            onPress={() => navigation.navigate('History')}
           />
 
           <SettingItem

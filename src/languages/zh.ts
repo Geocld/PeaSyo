@@ -302,6 +302,7 @@ export default {
     RemoteSettings: '远程串流',
     DisplaySettings: '显示',
     GamepadSettings: '手柄及振动',
+    vGamepadSettings: '虚拟控制器',
     TouchpadSettings: '虚拟触摸板',
     SensorSettings: '传感器',
     AdvanceSettings: '高级',
@@ -373,5 +374,13 @@ export default {
     LogVerboseTitle: '启用详细日志',
     LogVerboseDesc:
       '记录完整的串流日志，这会导致日志文件体积剧增，同时也可能影响串流体验，请勿在常规游戏中启动。',
+    'Auto toggle hold buttons': '自动粘连按键',
+    'Select what buttons become toggle holdable': '选择哪些按键可以自动保持',
+    HoldButtonsSettingsDesc:
+      '自动保持按键功能可以让你在按住某个按键时，自动保持该按键为按下状态，直到你再次点击该按键。适用于需要持续按住某个按键的游戏场景，例如竞速游戏中的加速，射击游戏中的开火等。',
+    'Hold Buttons': '保持按键',
+    History: '更新日志',
+    HistoryTitle: '更新日志',
+    HistoryDesc: '查看PeaSyo历史更新日志',
   },
 };

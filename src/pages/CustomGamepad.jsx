@@ -20,6 +20,7 @@ import {useTranslation} from 'react-i18next';
 import Draggable from 'react-native-draggable';
 import Slider from '@react-native-community/slider';
 import GamepadButton from '../components/CustomGamepad/Button';
+import GridBackground from '../components/GridBackground';
 import {getSettings, saveSettings, deleteSetting} from '../store/gamepadStore';
 import {
   getSettings as getUserSettings,
@@ -37,6 +38,7 @@ function CustomGamepadScreen({navigation, route}) {
   const [showActionModal, setActionShowModal] = React.useState(false);
   const [showWarnModal, setShowWarnShowModal] = React.useState(false);
   const [showModal, setShowModal] = React.useState(false);
+  const [showGrid, setShowGrid] = React.useState(false);
   const [reloader, setReloader] = React.useState(Date.now());
 
   const [currentButton, setCurrentButton] = React.useState('');
@@ -244,6 +246,7 @@ function CustomGamepadScreen({navigation, route}) {
       setDefaultButtons(JSON.parse(JSON.stringify(_buttons)));
 
       setShowWarnShowModal(true);
+      setShowGrid(true);
     }, 500);
 
     navigation.addListener('beforeRemove', e => {
@@ -528,6 +531,8 @@ function CustomGamepadScreen({navigation, route}) {
   return (
     <SafeAreaView style={styles.container}>
       {renderWarningModal()}
+
+      {showGrid && <GridBackground gridSize={20} />}
 
       <Portal>
         <Modal

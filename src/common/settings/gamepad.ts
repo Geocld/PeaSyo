@@ -94,17 +94,6 @@ const gamepad = [
       {value: true, text: t('Enable')},
     ],
   },
-  {
-    name: 'virtual_gamepad_joystick',
-    type: 'radio',
-    title: t('virtual_joystick_title'),
-    description: t('virtual_joystick_desc'),
-    tips: t('virtual_joystick_tips'),
-    data: [
-      {value: 1, text: t('Free')},
-      {value: 0, text: t('Fixed')},
-    ],
-  },
 ];
 
 export default gamepad;

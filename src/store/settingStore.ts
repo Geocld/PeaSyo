@@ -45,6 +45,7 @@ export type Settings = {
   virtual_gamepad_joystick: number;
   custom_virtual_gamepad: string;
   gamepad_maping: Record<string, number>;
+  hold_buttons: [];
   show_menu: boolean;
   check_update: boolean;
   swap_dpad: boolean;
@@ -100,6 +101,7 @@ const defaultSettings: Settings = {
   virtual_gamepad_joystick: 1,
   custom_virtual_gamepad: '',
   gamepad_maping: {},
+  hold_buttons: [],
   show_menu: false,
   check_update: true,
   swap_dpad: false,
