@@ -382,5 +382,7 @@ export default {
     History: '更新日志',
     HistoryTitle: '更新日志',
     HistoryDesc: '查看PeaSyo历史更新日志',
+    'Local Wake': '本地唤醒',
+    WakePacketSent: '已发送WOL唤醒包',
   },
 };

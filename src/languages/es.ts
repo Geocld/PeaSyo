@@ -368,5 +368,7 @@ export default {
     History: 'History',
     HistoryTitle: 'Update histories',
     HistoryDesc: 'View update histories of PeaSyo',
+    'Local Wake': 'Local Wake',
+    WakePacketSent: 'Paquete de activación enviado',
   },
 };

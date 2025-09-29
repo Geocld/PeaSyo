@@ -271,6 +271,7 @@ function HomeScreen({navigation, route}) {
                   ]}>
                   <ConsoleItem
                     consoleItem={item}
+                    onWake={() => handleWakeConsole(item)}
                     onPress={() => handleLocalStream(item)}
                     onPressRemote={() => handleRemoteStream(item)}
                   />
@@ -283,6 +284,15 @@ function HomeScreen({navigation, route}) {
     } else {
       return null;
     }
+  };
+
+  const handleWakeConsole = item => {
+    try {
+      const credential = RegistryManager.getCredential(item.rpRegistKey);
+      const isPS5 = item.apName.indexOf('PS5') > -1;
+      wakeup(item.host, credential, isPS5);
+      ToastAndroid.show(t('WakePacketSent'), ToastAndroid.SHORT);
+    } catch (e) {}
   };
 
   const handleLocalStream = item => {

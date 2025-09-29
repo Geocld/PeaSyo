@@ -1,6 +1,6 @@
 import React from 'react';
 import {StyleSheet, View, useColorScheme} from 'react-native';
-import {Card, Text, Button} from 'react-native-paper';
+import {Card, Text, Button, Menu, IconButton} from 'react-native-paper';
 import {useTranslation} from 'react-i18next';
 import {SvgXml} from 'react-native-svg';
 import dayjs from 'dayjs';
@@ -11,6 +11,11 @@ const ConsoleItem = (props: any) => {
   const {t} = useTranslation();
   const settings = getSettings();
   const colorScheme = useColorScheme();
+
+  const [menuVisible, setMenuVisible] = React.useState(false);
+  const openMenu = () => setMenuVisible(true);
+  const closeMenu = () => setMenuVisible(false);
+
   const theme = settings.theme ?? 'dark';
 
   const consoleItem = props.consoleItem;
@@ -49,6 +54,23 @@ const ConsoleItem = (props: any) => {
   return (
     <Card style={styles.wrap}>
       <Card.Content>
+        <View style={styles.menuContainer}>
+          <Menu
+            visible={menuVisible}
+            onDismiss={closeMenu}
+            anchor={
+              <IconButton icon="dots-vertical" size={24} onPress={openMenu} />
+            }>
+            <Menu.Item
+              onPress={() => {
+                closeMenu();
+                props.onWake && props.onWake();
+              }}
+              title={t('Local Wake')}
+            />
+          </Menu>
+        </View>
+
         <View style={styles.consoleInfos}>
           <Text variant="titleLarge" style={styles.textCenter}>
             {consoleItem.serverNickname}
@@ -130,6 +152,12 @@ const styles = StyleSheet.create({
   },
   button: {
     marginBottom: 10,
+  },
+  menuContainer: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    zIndex: 1,
   },
 });
 
