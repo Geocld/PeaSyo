@@ -9,8 +9,7 @@
 #include <chiaki/session.h>
 #include <chiaki/regist.h>
 
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_main.h>
+#include <SDL.h>
 
 #include <string.h>
 #include <linux/in.h>
@@ -107,22 +106,22 @@ JNIEXPORT jstring JNICALL JNI_FCN(hello)(JNIEnv *env, jobject obj, jint value)
 {
     CHIAKI_LOGE(&global_log, "MainActivity1 test native method...");
 
+
+    SDL_SetMainReady();
+
+    SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS4_RUMBLE, "1");
+    SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS5_RUMBLE, "1");
+    SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+
     // FIXME: SDL initial crash
-//    SDL_GetAndroidJNIEnv();
-//    SDL_SetMainReady();
-//
-//    SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS4_RUMBLE, "1");
-//    SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS5_RUMBLE, "1");
-//    SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
-//
-//    if (SDL_Init(SDL_INIT_GAMEPAD)) {
+//    if (SDL_Init(SDL_INIT_GAMECONTROLLER)) {
 //        CHIAKI_LOGI(&global_log, "SDL initialized successfully for gamepad support");
 //        SDL_Log("SDL initialized successfully for gamepad support");
 //    } else {
 //        CHIAKI_LOGE(&global_log, "SDL initialization failed: %s", SDL_GetError());
 //    }
-//
-//    SDL_Log("SDL initialized successfully for gamepad support");
+
+    SDL_Log("SDL initialized successfully for gamepad support");
 
     return  E->NewStringUTF(env, "hello world");
 }

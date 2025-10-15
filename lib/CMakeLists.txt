@@ -133,14 +133,14 @@ set_target_properties(lib_curl PROPERTIES IMPORTED_LOCATION
 target_include_directories(chiaki-lib PRIVATE ${CMAKE_SOURCE_DIR}/third-party/curl/${ANDROID_ABI}/include)
 target_link_libraries(chiaki-lib lib_curl)
 
-# SDL3
-add_library(lib_sdl3 SHARED IMPORTED)
-set_target_properties(lib_sdl3 PROPERTIES IMPORTED_LOCATION
-        ${CMAKE_SOURCE_DIR}/third-party/sdl/${ANDROID_ABI}/lib/libSDL3.so)
-set_target_properties(lib_sdl3 PROPERTIES 
+# SDL2
+add_library(lib_sdl2 SHARED IMPORTED)
+set_target_properties(lib_sdl2 PROPERTIES IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/third-party/sdl/${ANDROID_ABI}/lib/libSDL2.so)
+set_target_properties(lib_sdl2 PROPERTIES 
         INTERFACE_INCLUDE_DIRECTORIES 
         ${CMAKE_SOURCE_DIR}/third-party/sdl/${ANDROID_ABI}/include)
-target_link_libraries(chiaki-lib lib_sdl3)
+target_link_libraries(chiaki-lib lib_sdl2)
 
 # JSON-C
 target_link_libraries(chiaki-lib json-c)
