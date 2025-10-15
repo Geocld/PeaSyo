@@ -1,0 +1,174 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_LoadWAV_IO:
+.\"   https://wiki.libsdl.org/SDL_LoadWAV_IO
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_LoadWAV_IO
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_LoadWAV_IO 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_LoadWAV_IO \- Load the audio data of a WAVE file into memory\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_audio\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "bool SDL_LoadWAV_IO(SDL_IOStream *src, bool closeio, SDL_AudioSpec *spec, Uint8 **audio_buf, Uint32 *audio_len);
+.fi
+.SH DESCRIPTION
+Loading a WAVE file requires
+.BR src
+,
+.BR spec
+,
+.BR audio_buf
+and
+.BR audio_len
+to
+be valid pointers\[char46] The entire data portion of the file is then loaded into
+memory and decoded if necessary\[char46]
+
+Supported formats are RIFF WAVE files with the formats PCM (8, 16, 24, and
+32 bits), IEEE Float (32 bits), Microsoft ADPCM and IMA ADPCM (4 bits), and
+A-law and mu-law (8 bits)\[char46] Other formats are currently unsupported and
+cause an error\[char46]
+
+If this function succeeds, the return value is zero and the pointer to the
+audio data allocated by the function is written to
+.BR audio_buf
+and its
+length in bytes to
+.BR audio_len
+\[char46] The 
+.BR SDL_AudioSpec
+ members
+.BR freq
+,
+.BR channels
+, and
+.BR format
+are set to the values of the audio data in
+the buffer\[char46]
+
+It's necessary to use 
+.BR SDL_free
+() to free the audio data
+returned in
+.BR audio_buf
+when it is no longer used\[char46]
+
+Because of the underspecification of the \[char46]WAV format, there are many
+problematic files in the wild that cause issues with strict decoders\[char46] To
+provide compatibility with these files, this decoder is lenient in regards
+to the truncation of the file, the fact chunk, and the size of the RIFF
+chunk\[char46] The hints
+
+.BR
+.BR SDL_HINT_WAVE_RIFF_CHUNK_SIZE
+,
+
+.BR
+.BR SDL_HINT_WAVE_TRUNCATION
+, and
+
+.BR
+.BR SDL_HINT_WAVE_FACT_CHUNK
+can be used to tune
+the behavior of the loading process\[char46]
+
+Any file that is invalid (due to truncation, corruption, or wrong values in
+the headers), too big, or unsupported causes an error\[char46] Additionally, any
+critical I/O error from the data source will terminate the loading process
+with an error\[char46] The function returns NULL on error and in all cases (with
+the exception of
+.BR src
+being NULL), an appropriate error message will be
+set\[char46]
+
+It is required that the data source supports seeking\[char46]
+
+Example:
+
+.IP
+.EX
+SDL_LoadWAV_IO(SDL_IOFromFile("sample.wav", "rb"), 1, &spec, &buf, &len);
+.EE
+.PP
+
+Note that the 
+.BR SDL_LoadWAV
+ function does this same thing for
+you, but in a less messy way:
+
+.IP
+.EX
+SDL_LoadWAV("sample.wav", &spec, &buf, &len);
+.EE
+.PP
+
+.SH FUNCTION PARAMETERS
+.TP
+.I src
+the data source for the WAVE data\[char46]
+.TP
+.I closeio
+if true, calls 
+.BR SDL_CloseIO
+() on
+.BR src
+before returning, even in the case of an error\[char46]
+.TP
+.I spec
+a pointer to an 
+.BR SDL_AudioSpec
+ that will be set to the WAVE data's format details on successful return\[char46]
+.TP
+.I audio_buf
+a pointer filled with the audio data, allocated by the function\[char46]
+.TP
+.I audio_len
+a pointer filled with the length of the audio data buffer in bytes\[char46]
+.SH RETURN VALUE
+Returns true on success\[char46]
+.BR audio_buf
+will be filled with a pointer
+to an allocated buffer containing the audio data, and
+.BR audio_len
+is filled
+with the length of that audio buffer in bytes\[char46]
+
+This function returns false if the \[char46]WAV file cannot be opened, uses an
+unknown data format, or is corrupt; call 
+.BR SDL_GetError
+() for
+more information\[char46]
+
+When the application is done with the data returned in
+.BR audio_buf
+, it
+should call 
+.BR SDL_free
+() to dispose of it\[char46]
+
+.SH THREAD SAFETY
+It is safe to call this function from any thread\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_free (3),
+.BR \(bu (3),
+.BR SDL_LoadWAV (3)

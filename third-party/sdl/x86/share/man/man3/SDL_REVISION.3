@@ -1,0 +1,40 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_REVISION:
+.\"   https://wiki.libsdl.org/SDL_REVISION
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_REVISION
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_REVISION 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_REVISION \- This macro is a string describing the source at a particular point in development\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_revision\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "#define SDL_REVISION "Some arbitrary string decided at SDL build time"
+.fi
+.SH DESCRIPTION
+This string is often generated from revision control's state at build time\[char46]
+
+This string can be quite complex and does not follow any standard\[char46] For
+example, it might be something like "SDL-prerelease-3\[char46]1\[char46]1-47-gf687e0732"\[char46]
+It might also be user-defined at build time, so it's best to treat it as a
+clue in debugging forensics and not something the app will parse in any
+way\[char46]
+
+.SH AVAILABILITY
+This macro is available since SDL 3\[char46]0\[char46]0\[char46]
+

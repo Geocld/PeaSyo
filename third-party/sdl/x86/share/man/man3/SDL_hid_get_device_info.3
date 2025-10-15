@@ -1,0 +1,52 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_hid_get_device_info:
+.\"   https://wiki.libsdl.org/SDL_hid_get_device_info
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_hid_get_device_info
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_hid_get_device_info 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_hid_get_device_info \- Get the device info from a HID device\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_hidapi\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "SDL_hid_device_info * SDL_hid_get_device_info(SDL_hid_device *dev);
+.fi
+.SH FUNCTION PARAMETERS
+.TP
+.I dev
+a device handle returned from 
+.BR SDL_hid_open
+()\[char46]
+.SH RETURN VALUE
+(
+.BR SDL_hid_device_info
+ *) Returns a pointer to the
+
+.BR SDL_hid_device_info
+ for this hid_device or NULL on
+failure; call 
+.BR SDL_GetError
+() for more information\[char46] This
+struct is valid until the device is closed with
+
+.BR SDL_hid_close
+()\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

@@ -1,0 +1,66 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_RequestAndroidPermission:
+.\"   https://wiki.libsdl.org/SDL_RequestAndroidPermission
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_RequestAndroidPermission
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_RequestAndroidPermission 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_RequestAndroidPermission \- Request permissions at runtime, asynchronously\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_system\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "bool SDL_RequestAndroidPermission(const char *permission, SDL_RequestAndroidPermissionCallback cb, void *userdata);
+.fi
+.SH DESCRIPTION
+You do not need to call this for built-in functionality of SDL; recording
+from a microphone or reading images from a camera, using standard SDL APIs,
+will manage permission requests for you\[char46]
+
+This function never blocks\[char46] Instead, the app-supplied callback will be
+called when a decision has been made\[char46] This callback may happen on a
+different thread, and possibly much later, as it might wait on a user to
+respond to a system dialog\[char46] If permission has already been granted for a
+specific entitlement, the callback will still fire, probably on the current
+thread and before this function returns\[char46]
+
+If the request submission fails, this function returns -1 and the callback
+will NOT be called, but this should only happen in catastrophic conditions,
+like memory running out\[char46] Normally there will be a yes or no to the request
+through the callback\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I permission
+the permission to request\[char46]
+.TP
+.I cb
+the callback to trigger when the request has a response\[char46]
+.TP
+.I userdata
+an app-controlled pointer that is passed to the callback\[char46]
+.SH RETURN VALUE
+Returns true if the request was submitted, false if there was an
+error submitting\[char46] The result of the request is only ever reported through
+the callback, not this return value\[char46]
+
+.SH THREAD SAFETY
+It is safe to call this function from any thread\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

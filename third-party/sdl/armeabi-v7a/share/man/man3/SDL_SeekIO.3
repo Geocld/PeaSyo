@@ -1,0 +1,92 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_SeekIO:
+.\"   https://wiki.libsdl.org/SDL_SeekIO
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_SeekIO
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_SeekIO 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_SeekIO \- Seek within an 
+.BR SDL_IOStream
+ data stream\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_iostream\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "Sint64 SDL_SeekIO(SDL_IOStream *context, Sint64 offset, SDL_IOWhence whence);
+.fi
+.SH DESCRIPTION
+This function seeks to byte
+.BR offset
+, relative to
+.BR whence
+\[char46]
+.BR whence
+may be any of the following values:
+
+
+\(bu 
+.BR
+.BR SDL_IO_SEEK_SET
+: seek from the beginning of data
+
+\(bu 
+.BR
+.BR SDL_IO_SEEK_CUR
+: seek relative to current read point
+
+\(bu 
+.BR
+.BR SDL_IO_SEEK_END
+: seek relative to the end of data
+
+If this stream can not seek, it will return -1\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I context
+a pointer to an 
+.BR SDL_IOStream
+ structure\[char46]
+.TP
+.I offset
+an offset in bytes, relative to
+.BR whence
+location; can be negative\[char46]
+.TP
+.I whence
+any of 
+.BR
+.BR SDL_IO_SEEK_SET
+, 
+.BR
+.BR SDL_IO_SEEK_CUR
+, 
+.BR
+.BR SDL_IO_SEEK_END
+\[char46]
+.SH RETURN VALUE
+Returns the final offset in the data stream after the seek or -1
+on failure; call 
+.BR SDL_GetError
+() for more information\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_TellIO (3)

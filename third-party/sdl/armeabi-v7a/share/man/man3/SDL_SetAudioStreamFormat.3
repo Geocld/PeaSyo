@@ -1,0 +1,76 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_SetAudioStreamFormat:
+.\"   https://wiki.libsdl.org/SDL_SetAudioStreamFormat
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_SetAudioStreamFormat
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_SetAudioStreamFormat 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_SetAudioStreamFormat \- Change the input and output formats of an audio stream\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_audio\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "bool SDL_SetAudioStreamFormat(SDL_AudioStream *stream, const SDL_AudioSpec *src_spec, const SDL_AudioSpec *dst_spec);
+.fi
+.SH DESCRIPTION
+Future calls to and
+
+.BR SDL_GetAudioStreamAvailable
+ and
+
+.BR SDL_GetAudioStreamData
+ will reflect the new
+format, and future calls to
+
+.BR SDL_PutAudioStreamData
+ must provide data in the
+new input formats\[char46]
+
+Data that was previously queued in the stream will still be operated on in
+the format that was current when it was added, which is to say you can put
+the end of a sound file in one format to a stream, change formats for the
+next sound file, and start putting that new data while the previous sound
+file is still queued, and everything will still play back correctly\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I stream
+the stream the format is being changed\[char46]
+.TP
+.I src_spec
+the new format of the audio input; if NULL, it is not changed\[char46]
+.TP
+.I dst_spec
+the new format of the audio output; if NULL, it is not changed\[char46]
+.SH RETURN VALUE
+Returns true on success or false on failure; call
+
+.BR SDL_GetError
+() for more information\[char46]
+
+.SH THREAD SAFETY
+It is safe to call this function from any thread, as it holds a
+stream-specific mutex while running\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_GetAudioStreamFormat (3),
+.BR \(bu (3),
+.BR SDL_SetAudioStreamFrequencyRatio (3)

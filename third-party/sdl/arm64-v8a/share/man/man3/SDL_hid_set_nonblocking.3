@@ -1,0 +1,58 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_hid_set_nonblocking:
+.\"   https://wiki.libsdl.org/SDL_hid_set_nonblocking
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_hid_set_nonblocking
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_hid_set_nonblocking 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_hid_set_nonblocking \- Set the device handle to be non-blocking\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_hidapi\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "int SDL_hid_set_nonblocking(SDL_hid_device *dev, int nonblock);
+.fi
+.SH DESCRIPTION
+In non-blocking mode calls to 
+.BR SDL_hid_read
+() will return
+immediately with a value of 0 if there is no data to be read\[char46] In blocking
+mode, 
+.BR SDL_hid_read
+() will wait (block) until there is data
+to read before returning\[char46]
+
+Nonblocking can be turned on and off at any time\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I dev
+a device handle returned from 
+.BR SDL_hid_open
+()\[char46]
+.TP
+.I nonblock
+enable or not the nonblocking reads - 1 to enable nonblocking - 0 to disable nonblocking\[char46]
+.SH RETURN VALUE
+Returns 0 on success or a negative error code on failure; call
+
+.BR SDL_GetError
+() for more information\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

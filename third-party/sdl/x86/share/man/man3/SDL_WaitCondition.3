@@ -1,0 +1,73 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_WaitCondition:
+.\"   https://wiki.libsdl.org/SDL_WaitCondition
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_WaitCondition
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_WaitCondition 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_WaitCondition \- Wait until a condition variable is signaled\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_mutex\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "void SDL_WaitCondition(SDL_Condition *cond, SDL_Mutex *mutex);
+.fi
+.SH DESCRIPTION
+This function unlocks the specified
+.BR mutex
+and waits for another thread to
+call 
+.BR SDL_SignalCondition
+() or
+
+.BR SDL_BroadcastCondition
+() on the condition
+variable
+.BR cond
+\[char46] Once the condition variable is signaled, the mutex is
+re-locked and the function returns\[char46]
+
+The mutex must be locked before calling this function\[char46] Locking the mutex
+recursively (more than once) is not supported and leads to undefined
+behavior\[char46]
+
+This function is the equivalent of calling
+
+.BR SDL_WaitConditionTimeout
+() with a time length
+of -1\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I cond
+the condition variable to wait on\[char46]
+.TP
+.I mutex
+the mutex used to coordinate thread access\[char46]
+.SH THREAD SAFETY
+It is safe to call this function from any thread\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_BroadcastCondition (3),
+.BR \(bu (3),
+.BR SDL_SignalCondition (3),
+.BR \(bu (3),
+.BR SDL_WaitConditionTimeout (3)

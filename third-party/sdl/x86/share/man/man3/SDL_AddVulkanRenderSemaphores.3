@@ -1,0 +1,72 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_AddVulkanRenderSemaphores:
+.\"   https://wiki.libsdl.org/SDL_AddVulkanRenderSemaphores
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_AddVulkanRenderSemaphores
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_AddVulkanRenderSemaphores 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_AddVulkanRenderSemaphores \- Add a set of synchronization semaphores for the current frame\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_render\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "bool SDL_AddVulkanRenderSemaphores(SDL_Renderer *renderer, Uint32 wait_stage_mask, Sint64 wait_semaphore, Sint64 signal_semaphore);
+.fi
+.SH DESCRIPTION
+The Vulkan renderer will wait for
+.BR wait_semaphore
+before submitting
+rendering commands and signal
+.BR signal_semaphore
+after rendering commands
+are complete for this frame\[char46]
+
+This should be called each frame that you want semaphore synchronization\[char46]
+The Vulkan renderer may have multiple frames in flight on the GPU, so you
+should have multiple semaphores that are used for synchronization\[char46] Querying
+
+.BR SDL_PROP_RENDERER_VULKAN_SWAPCHAIN_IMAGE_COUNT_NUMBER
+
+will give you the maximum number of semaphores you'll need\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I renderer
+the rendering context\[char46]
+.TP
+.I wait_stage_mask
+the VkPipelineStageFlags for the wait\[char46]
+.TP
+.I wait_semaphore
+a VkSempahore to wait on before rendering the current frame, or 0 if not needed\[char46]
+.TP
+.I signal_semaphore
+a VkSempahore that SDL will signal when rendering for the current frame is complete, or 0 if not needed\[char46]
+.SH RETURN VALUE
+Returns true on success or false on failure; call
+
+.BR SDL_GetError
+() for more information\[char46]
+
+.SH THREAD SAFETY
+It is
+.B NOT
+safe to call this function from two threads at once\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

@@ -1,0 +1,213 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_ComposeCustomBlendMode:
+.\"   https://wiki.libsdl.org/SDL_ComposeCustomBlendMode
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_ComposeCustomBlendMode
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_ComposeCustomBlendMode 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_ComposeCustomBlendMode \- Compose a custom blend mode for renderers\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_blendmode\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "SDL_BlendMode SDL_ComposeCustomBlendMode(SDL_BlendFactor srcColorFactor,
+.BI "                                     SDL_BlendFactor dstColorFactor,
+.BI "                                     SDL_BlendOperation colorOperation,
+.BI "                                     SDL_BlendFactor srcAlphaFactor,
+.BI "                                     SDL_BlendFactor dstAlphaFactor,
+.BI "                                     SDL_BlendOperation alphaOperation);
+.fi
+.SH DESCRIPTION
+The functions 
+.BR SDL_SetRenderDrawBlendMode
+ and
+
+.BR SDL_SetTextureBlendMode
+ accept the
+
+.BR SDL_BlendMode
+ returned by this function if the renderer
+supports it\[char46]
+
+A blend mode controls how the pixels from a drawing operation (source) get
+combined with the pixels from the render target (destination)\[char46] First, the
+components of the source and destination pixels get multiplied with their
+blend factors\[char46] Then, the blend operation takes the two products and
+calculates the result that will get stored in the render target\[char46]
+
+Expressed in pseudocode, it would look like this:
+
+.IP
+.EX
+dstRGB = colorOperation(srcRGB * srcColorFactor, dstRGB * dstColorFactor);
+dstA = alphaOperation(srcA * srcAlphaFactor, dstA * dstAlphaFactor);
+.EE
+.PP
+
+Where the functions
+.BR colorOperation(src, dst)
+and
+.BR alphaOperation(src,
+dst)
+can return one of the following:
+
+-
+.BR src + dst
+-
+.BR src - dst
+-
+.BR dst - src
+-
+.BR min(src, dst)
+-
+.BR max(src, dst)
+The red, green, and blue components are always multiplied with the first,
+second, and third components of the 
+.BR SDL_BlendFactor
+,
+respectively\[char46] The fourth component is not used\[char46]
+
+The alpha component is always multiplied with the fourth component of the
+
+.BR SDL_BlendFactor
+\[char46] The other components are not used in
+the alpha calculation\[char46]
+
+Support for these blend modes varies for each renderer\[char46] To check if a
+specific 
+.BR SDL_BlendMode
+ is supported, create a renderer and
+pass it to either 
+.BR SDL_SetRenderDrawBlendMode
+
+or 
+.BR SDL_SetTextureBlendMode
+\[char46] They will return
+with an error if the blend mode is not supported\[char46]
+
+This list describes the support of custom blend modes for each renderer\[char46]
+All renderers support the four blend modes listed in the
+
+.BR SDL_BlendMode
+ enumeration\[char46]
+
+-
+.B direct3d
+: Supports all operations with all factors\[char46] However, some
+  factors produce unexpected results with
+  
+.BR
+.BR SDL_BLENDOPERATION_MINIMUM
+and
+  
+.BR
+.BR SDL_BLENDOPERATION_MAXIMUM
+\[char46]
+-
+.B direct3d11
+: Same as Direct3D 9\[char46]
+-
+.B opengl
+: Supports the
+  
+.BR
+.BR SDL_BLENDOPERATION_ADD
+operation with all
+  factors\[char46] OpenGL versions 1\[char46]1, 1\[char46]2, and 1\[char46]3 do not work correctly here\[char46]
+-
+.B opengles2
+: Supports the
+  
+.BR
+.BR SDL_BLENDOPERATION_ADD
+,
+  
+.BR
+.BR SDL_BLENDOPERATION_SUBTRACT
+,
+  
+.BR
+.BR SDL_BLENDOPERATION_REV_SUBTRACT
+operations with all factors\[char46]
+-
+.B psp
+: No custom blend mode support\[char46]
+-
+.B software
+: No custom blend mode support\[char46]
+
+Some renderers do not provide an alpha component for the default render
+target\[char46] The 
+.BR
+.BR SDL_BLENDFACTOR_DST_ALPHA
+and
+
+.BR
+.BR SDL_BLENDFACTOR_ONE_MINUS_DST_ALPHA
+factors do not have an effect in this case\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I srcColorFactor
+the 
+.BR SDL_BlendFactor
+ applied to the red, green, and blue components of the source pixels\[char46]
+.TP
+.I dstColorFactor
+the 
+.BR SDL_BlendFactor
+ applied to the red, green, and blue components of the destination pixels\[char46]
+.TP
+.I colorOperation
+the 
+.BR SDL_BlendOperation
+ used to combine the red, green, and blue components of the source and destination pixels\[char46]
+.TP
+.I srcAlphaFactor
+the 
+.BR SDL_BlendFactor
+ applied to the alpha component of the source pixels\[char46]
+.TP
+.I dstAlphaFactor
+the 
+.BR SDL_BlendFactor
+ applied to the alpha component of the destination pixels\[char46]
+.TP
+.I alphaOperation
+the 
+.BR SDL_BlendOperation
+ used to combine the alpha component of the source and destination pixels\[char46]
+.SH RETURN VALUE
+(
+.BR SDL_BlendMode
+) Returns an 
+.BR SDL_BlendMode
+
+that represents the chosen factors and operations\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_SetRenderDrawBlendMode (3),
+.BR \(bu (3),
+.BR SDL_GetRenderDrawBlendMode (3),
+.BR \(bu (3),
+.BR SDL_SetTextureBlendMode (3),
+.BR \(bu (3),
+.BR SDL_GetTextureBlendMode (3)

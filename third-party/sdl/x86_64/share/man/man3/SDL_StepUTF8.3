@@ -1,0 +1,106 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_StepUTF8:
+.\"   https://wiki.libsdl.org/SDL_StepUTF8
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_StepUTF8
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_StepUTF8 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_StepUTF8 \- Decode a UTF-8 string, one Unicode codepoint at a time\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_stdinc\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "Uint32 SDL_StepUTF8(const char **pstr, size_t *pslen);
+.fi
+.SH DESCRIPTION
+This will return the first Unicode codepoint in the UTF-8 encoded string in
+.BR
+.I pstr
+, and then advance
+.BR 
+pstr
+past any consumed bytes before returning\[char46]
+
+It will not access more than
+.BR
+.I pslen
+bytes from the string\[char46]
+.BR 
+pslen
+will
+be adjusted, as well, subtracting the number of bytes consumed\[char46]
+.BR pslen
+is allowed to be NULL, in which case the string _must_ be
+NULL-terminated, as the function will blindly read until it sees the NULL
+char\[char46]
+
+if
+.BR
+.I pslen
+is zero, it assumes the end of string is reached and returns a
+zero codepoint regardless of the contents of the string buffer\[char46]
+
+If the resulting codepoint is zero (a NULL terminator), or
+.BR 
+pslen
+is
+zero, it will not advance
+.BR
+.I pstr
+or
+.BR 
+pslen
+at all\[char46]
+
+Generally this function is called in a loop until it returns zero,
+adjusting its parameters each iteration\[char46]
+
+If an invalid UTF-8 sequence is encountered, this function returns
+
+.BR SDL_INVALID_UNICODE_CODEPOINT
+ and advances
+the string/length by one byte (which is to say, a multibyte sequence might
+produce several
+
+.BR SDL_INVALID_UNICODE_CODEPOINT
+ returns
+before it syncs to the next valid UTF-8 sequence)\[char46]
+
+Several things can generate invalid UTF-8 sequences, including overlong
+encodings, the use of UTF-16 surrogate values, and truncated data\[char46] Please
+refer to
+
+.URL "https://www\[char46]ietf\[char46]org/rfc/rfc3629\[char46]txt" "RFC3629"
+
+for details\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I pstr
+a pointer to a UTF-8 string pointer to be read and adjusted\[char46]
+.TP
+.I pslen
+a pointer to the number of bytes in the string, to be read and adjusted\[char46] NULL is allowed\[char46]
+.SH RETURN VALUE
+Returns the first Unicode codepoint in the string\[char46]
+
+.SH THREAD SAFETY
+It is safe to call this function from any thread\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

@@ -1,0 +1,66 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_UCS4ToUTF8:
+.\"   https://wiki.libsdl.org/SDL_UCS4ToUTF8
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_UCS4ToUTF8
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_UCS4ToUTF8 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_UCS4ToUTF8 \- Convert a single Unicode codepoint to UTF-8\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_stdinc\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "char * SDL_UCS4ToUTF8(Uint32 codepoint, char *dst);
+.fi
+.SH DESCRIPTION
+The buffer pointed to by
+.BR dst
+must be at least 4 bytes long, as this
+function may generate between 1 and 4 bytes of output\[char46]
+
+This function returns the first byte _after_ the newly-written UTF-8
+sequence, which is useful for encoding multiple codepoints in a loop, or
+knowing where to write a NULL-terminator character to end the string (in
+either case, plan to have a buffer of _more_ than 4 bytes!)\[char46]
+
+If
+.BR codepoint
+is an invalid value (outside the Unicode range, or a UTF-16
+surrogate value, etc), this will use U+FFFD (REPLACEMENT CHARACTER) for the
+codepoint instead, and not set an error\[char46]
+
+If
+.BR dst
+is NULL, this returns NULL immediately without writing to the
+pointer and without setting an error\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I codepoint
+a Unicode codepoint to convert to UTF-8\[char46]
+.TP
+.I dst
+the location to write the encoded UTF-8\[char46] Must point to at least 4 bytes!
+.SH RETURN VALUE
+Returns the first byte past the newly-written UTF-8 sequence\[char46]
+
+.SH THREAD SAFETY
+It is safe to call this function from any thread\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

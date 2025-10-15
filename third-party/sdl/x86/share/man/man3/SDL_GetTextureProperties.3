@@ -1,0 +1,272 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_GetTextureProperties:
+.\"   https://wiki.libsdl.org/SDL_GetTextureProperties
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_GetTextureProperties
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_GetTextureProperties 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_GetTextureProperties \- Get the properties associated with a texture\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_render\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "SDL_PropertiesID SDL_GetTextureProperties(SDL_Texture *texture);
+.fi
+.SH DESCRIPTION
+The following read-only properties are provided by SDL:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_COLORSPACE_NUMBER
+:
+  an 
+.BR SDL_ColorSpace
+ value describing the texture
+  colorspace\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_FORMAT_NUMBER
+: one
+  of the enumerated values in 
+.BR SDL_PixelFormat
+\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_ACCESS_NUMBER
+: one
+  of the enumerated values in 
+.BR SDL_TextureAccess
+\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_WIDTH_NUMBER
+: the
+  width of the texture in pixels\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_HEIGHT_NUMBER
+: the
+  height of the texture in pixels\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_SDR_WHITE_POINT_FLOAT
+:
+  for HDR10 and floating point textures, this defines the value of 100%
+  diffuse white, with higher values being displayed in the High Dynamic
+  Range headroom\[char46] This defaults to 100 for HDR10 textures and 1\[char46]0 for other
+  textures\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_HDR_HEADROOM_FLOAT
+:
+  for HDR10 and floating point textures, this defines the maximum dynamic
+  range used by the content, in terms of the SDR white point\[char46] If this is
+  defined, any values outside the range supported by the display will be
+  scaled into the available HDR headroom, otherwise they are clipped\[char46] This
+  defaults to 1\[char46]0 for SDR textures, 4\[char46]0 for HDR10 textures, and no default
+  for floating point textures\[char46]
+
+With the direct3d11 renderer:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_D3D11_TEXTURE_POINTER
+:
+  the ID3D11Texture2D associated with the texture
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_D3D11_TEXTURE_U_POINTER
+:
+  the ID3D11Texture2D associated with the U plane of a YUV texture
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_D3D11_TEXTURE_V_POINTER
+:
+  the ID3D11Texture2D associated with the V plane of a YUV texture
+
+With the direct3d12 renderer:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_D3D12_TEXTURE_POINTER
+:
+  the ID3D12Resource associated with the texture
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_D3D12_TEXTURE_U_POINTER
+:
+  the ID3D12Resource associated with the U plane of a YUV texture
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_D3D12_TEXTURE_V_POINTER
+:
+  the ID3D12Resource associated with the V plane of a YUV texture
+
+With the vulkan renderer:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_VULKAN_TEXTURE_POINTER
+:
+  the VkImage associated with the texture
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_VULKAN_TEXTURE_U_POINTER
+:
+  the VkImage associated with the U plane of a YUV texture
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_VULKAN_TEXTURE_V_POINTER
+:
+  the VkImage associated with the V plane of a YUV texture
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_VULKAN_TEXTURE_UV_POINTER
+:
+  the VkImage associated with the UV plane of a NV12/NV21 texture
+
+With the opengl renderer:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_OPENGL_TEXTURE_NUMBER
+:
+  the GLuint texture associated with the texture
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_OPENGL_TEXTURE_UV_NUMBER
+:
+  the GLuint texture associated with the UV plane of an NV12 texture
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_OPENGL_TEXTURE_U_NUMBER
+:
+  the GLuint texture associated with the U plane of a YUV texture
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_OPENGL_TEXTURE_V_NUMBER
+:
+  the GLuint texture associated with the V plane of a YUV texture
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_OPENGL_TEXTURE_TARGET_NUMBER
+:
+  the GLenum for the texture target (
+.BR GL_TEXTURE_2D
+,
+.BR GL_TEXTURE_RECTANGLE_ARB
+, etc)
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_OPENGL_TEX_W_FLOAT
+:
+  the texture coordinate width of the texture (0\[char46]0 - 1\[char46]0)
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_OPENGL_TEX_H_FLOAT
+:
+  the texture coordinate height of the texture (0\[char46]0 - 1\[char46]0)
+
+With the opengles2 renderer:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_OPENGLES2_TEXTURE_NUMBER
+:
+  the GLuint texture associated with the texture
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_OPENGLES2_TEXTURE_UV_NUMBER
+:
+  the GLuint texture associated with the UV plane of an NV12 texture
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_OPENGLES2_TEXTURE_U_NUMBER
+:
+  the GLuint texture associated with the U plane of a YUV texture
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_OPENGLES2_TEXTURE_V_NUMBER
+:
+  the GLuint texture associated with the V plane of a YUV texture
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_OPENGLES2_TEXTURE_TARGET_NUMBER
+:
+  the GLenum for the texture target (
+.BR GL_TEXTURE_2D
+,
+.BR GL_TEXTURE_EXTERNAL_OES
+, etc)
+
+With the vulkan renderer:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTURE_VULKAN_TEXTURE_NUMBER
+:
+  the VkImage associated with the texture
+
+.SH FUNCTION PARAMETERS
+.TP
+.I texture
+the texture to query\[char46]
+.SH RETURN VALUE
+(
+.BR SDL_PropertiesID
+) Returns a valid property ID on
+success or 0 on failure; call 
+.BR SDL_GetError
+() for more
+information\[char46]
+
+.SH THREAD SAFETY
+It is safe to call this function from any thread\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

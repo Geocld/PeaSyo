@@ -1,0 +1,58 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_hid_open:
+.\"   https://wiki.libsdl.org/SDL_hid_open
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_hid_open
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_hid_open 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_hid_open \- Open a HID device using a Vendor ID (VID), Product ID (PID) and optionally a serial number\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_hidapi\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "SDL_hid_device * SDL_hid_open(unsigned short vendor_id, unsigned short product_id, const wchar_t *serial_number);
+.fi
+.SH DESCRIPTION
+If
+.BR serial_number
+is NULL, the first device with the specified VID and PID
+is opened\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I vendor_id
+the Vendor ID (VID) of the device to open\[char46]
+.TP
+.I product_id
+the Product ID (PID) of the device to open\[char46]
+.TP
+.I serial_number
+the Serial Number of the device to open (Optionally NULL)\[char46]
+.SH RETURN VALUE
+(
+.BR SDL_hid_device
+ *) Returns a pointer to a
+
+.BR SDL_hid_device
+ object on success or NULL on failure; call
+
+.BR SDL_GetError
+() for more information\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

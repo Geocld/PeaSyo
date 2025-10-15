@@ -1,0 +1,136 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_Colorspace:
+.\"   https://wiki.libsdl.org/SDL_Colorspace
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_Colorspace
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_Colorspace 3type "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 DATATYPES"
+.SH NAME
+SDL_Colorspace \- Colorspace definitions\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_pixels\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "typedef enum SDL_Colorspace
+.BI "{
+.BI "    SDL_COLORSPACE_UNKNOWN = 0,
+.BI "
+.BI "    /* sRGB is a gamma corrected colorspace, and the default colorspace for SDL rendering and 8-bit RGB surfaces */
+.BI "    SDL_COLORSPACE_SRGB = 0x120005a0u, /**< Equivalent to DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709 */
+.BI "        /* SDL_DEFINE_COLORSPACE(SDL_COLOR_TYPE_RGB,
+.BI "                                 SDL_COLOR_RANGE_FULL,
+.BI "                                 SDL_COLOR_PRIMARIES_BT709,
+.BI "                                 SDL_TRANSFER_CHARACTERISTICS_SRGB,
+.BI "                                 SDL_MATRIX_COEFFICIENTS_IDENTITY,
+.BI "                                 SDL_CHROMA_LOCATION_NONE), */
+.BI "
+.BI "    /* This is a linear colorspace and the default colorspace for floating point surfaces. On Windows this is the scRGB colorspace, and on Apple platforms this is kCGColorSpaceExtendedLinearSRGB for EDR content */
+.BI "    SDL_COLORSPACE_SRGB_LINEAR = 0x12000500u, /**< Equivalent to DXGI_COLOR_SPACE_RGB_FULL_G10_NONE_P709  */
+.BI "        /* SDL_DEFINE_COLORSPACE(SDL_COLOR_TYPE_RGB,
+.BI "                                 SDL_COLOR_RANGE_FULL,
+.BI "                                 SDL_COLOR_PRIMARIES_BT709,
+.BI "                                 SDL_TRANSFER_CHARACTERISTICS_LINEAR,
+.BI "                                 SDL_MATRIX_COEFFICIENTS_IDENTITY,
+.BI "                                 SDL_CHROMA_LOCATION_NONE), */
+.BI "
+.BI "    /* HDR10 is a non-linear HDR colorspace and the default colorspace for 10-bit surfaces */
+.BI "    SDL_COLORSPACE_HDR10 = 0x12002600u, /**< Equivalent to DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020  */
+.BI "        /* SDL_DEFINE_COLORSPACE(SDL_COLOR_TYPE_RGB,
+.BI "                                 SDL_COLOR_RANGE_FULL,
+.BI "                                 SDL_COLOR_PRIMARIES_BT2020,
+.BI "                                 SDL_TRANSFER_CHARACTERISTICS_PQ,
+.BI "                                 SDL_MATRIX_COEFFICIENTS_IDENTITY,
+.BI "                                 SDL_CHROMA_LOCATION_NONE), */
+.BI "
+.BI "    SDL_COLORSPACE_JPEG = 0x220004c6u, /**< Equivalent to DXGI_COLOR_SPACE_YCBCR_FULL_G22_NONE_P709_X601 */
+.BI "        /* SDL_DEFINE_COLORSPACE(SDL_COLOR_TYPE_YCBCR,
+.BI "                                 SDL_COLOR_RANGE_FULL,
+.BI "                                 SDL_COLOR_PRIMARIES_BT709,
+.BI "                                 SDL_TRANSFER_CHARACTERISTICS_BT601,
+.BI "                                 SDL_MATRIX_COEFFICIENTS_BT601,
+.BI "                                 SDL_CHROMA_LOCATION_NONE), */
+.BI "
+.BI "    SDL_COLORSPACE_BT601_LIMITED = 0x211018c6u, /**< Equivalent to DXGI_COLOR_SPACE_YCBCR_STUDIO_G22_LEFT_P601 */
+.BI "        /* SDL_DEFINE_COLORSPACE(SDL_COLOR_TYPE_YCBCR,
+.BI "                                 SDL_COLOR_RANGE_LIMITED,
+.BI "                                 SDL_COLOR_PRIMARIES_BT601,
+.BI "                                 SDL_TRANSFER_CHARACTERISTICS_BT601,
+.BI "                                 SDL_MATRIX_COEFFICIENTS_BT601,
+.BI "                                 SDL_CHROMA_LOCATION_LEFT), */
+.BI "
+.BI "    SDL_COLORSPACE_BT601_FULL = 0x221018c6u, /**< Equivalent to DXGI_COLOR_SPACE_YCBCR_STUDIO_G22_LEFT_P601 */
+.BI "        /* SDL_DEFINE_COLORSPACE(SDL_COLOR_TYPE_YCBCR,
+.BI "                                 SDL_COLOR_RANGE_FULL,
+.BI "                                 SDL_COLOR_PRIMARIES_BT601,
+.BI "                                 SDL_TRANSFER_CHARACTERISTICS_BT601,
+.BI "                                 SDL_MATRIX_COEFFICIENTS_BT601,
+.BI "                                 SDL_CHROMA_LOCATION_LEFT), */
+.BI "
+.BI "    SDL_COLORSPACE_BT709_LIMITED = 0x21100421u, /**< Equivalent to DXGI_COLOR_SPACE_YCBCR_STUDIO_G22_LEFT_P709 */
+.BI "        /* SDL_DEFINE_COLORSPACE(SDL_COLOR_TYPE_YCBCR,
+.BI "                                 SDL_COLOR_RANGE_LIMITED,
+.BI "                                 SDL_COLOR_PRIMARIES_BT709,
+.BI "                                 SDL_TRANSFER_CHARACTERISTICS_BT709,
+.BI "                                 SDL_MATRIX_COEFFICIENTS_BT709,
+.BI "                                 SDL_CHROMA_LOCATION_LEFT), */
+.BI "
+.BI "    SDL_COLORSPACE_BT709_FULL = 0x22100421u, /**< Equivalent to DXGI_COLOR_SPACE_YCBCR_STUDIO_G22_LEFT_P709 */
+.BI "        /* SDL_DEFINE_COLORSPACE(SDL_COLOR_TYPE_YCBCR,
+.BI "                                 SDL_COLOR_RANGE_FULL,
+.BI "                                 SDL_COLOR_PRIMARIES_BT709,
+.BI "                                 SDL_TRANSFER_CHARACTERISTICS_BT709,
+.BI "                                 SDL_MATRIX_COEFFICIENTS_BT709,
+.BI "                                 SDL_CHROMA_LOCATION_LEFT), */
+.BI "
+.BI "    SDL_COLORSPACE_BT2020_LIMITED = 0x21102609u, /**< Equivalent to DXGI_COLOR_SPACE_YCBCR_STUDIO_G22_LEFT_P2020 */
+.BI "        /* SDL_DEFINE_COLORSPACE(SDL_COLOR_TYPE_YCBCR,
+.BI "                                 SDL_COLOR_RANGE_LIMITED,
+.BI "                                 SDL_COLOR_PRIMARIES_BT2020,
+.BI "                                 SDL_TRANSFER_CHARACTERISTICS_PQ,
+.BI "                                 SDL_MATRIX_COEFFICIENTS_BT2020_NCL,
+.BI "                                 SDL_CHROMA_LOCATION_LEFT), */
+.BI "
+.BI "    SDL_COLORSPACE_BT2020_FULL = 0x22102609u, /**< Equivalent to DXGI_COLOR_SPACE_YCBCR_FULL_G22_LEFT_P2020 */
+.BI "        /* SDL_DEFINE_COLORSPACE(SDL_COLOR_TYPE_YCBCR,
+.BI "                                 SDL_COLOR_RANGE_FULL,
+.BI "                                 SDL_COLOR_PRIMARIES_BT2020,
+.BI "                                 SDL_TRANSFER_CHARACTERISTICS_PQ,
+.BI "                                 SDL_MATRIX_COEFFICIENTS_BT2020_NCL,
+.BI "                                 SDL_CHROMA_LOCATION_LEFT), */
+.BI "
+.BI "    SDL_COLORSPACE_RGB_DEFAULT = SDL_COLORSPACE_SRGB, /**< The default colorspace for RGB surfaces if no colorspace is specified */
+.BI "    SDL_COLORSPACE_YUV_DEFAULT = SDL_COLORSPACE_JPEG  /**< The default colorspace for YUV surfaces if no colorspace is specified */
+.BI "} SDL_Colorspace;
+.fi
+.SH DESCRIPTION
+Since similar colorspaces may vary in their details (matrix, transfer
+function, etc\[char46]), this is not an exhaustive list, but rather a
+representative sample of the kinds of colorspaces supported in SDL\[char46]
+
+.SH AVAILABILITY
+This enum is available since SDL 3\[char46]0\[char46]0\[char46]
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_ColorPrimaries (3type),
+.BR \(bu (3),
+.BR SDL_ColorRange (3type),
+.BR \(bu (3),
+.BR SDL_ColorType (3type),
+.BR \(bu (3),
+.BR SDL_MatrixCoefficients (3type),
+.BR \(bu (3),
+.BR SDL_TransferCharacteristics (3type)

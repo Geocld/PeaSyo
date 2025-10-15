@@ -1,0 +1,117 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_CreateCursor:
+.\"   https://wiki.libsdl.org/SDL_CreateCursor
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_CreateCursor
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_CreateCursor 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_CreateCursor \- Create a cursor using the specified bitmap data and mask (in MSB format)\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_mouse\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "SDL_Cursor * SDL_CreateCursor(const Uint8 * data,
+.BI "                         const Uint8 * mask,
+.BI "                         int w, int h, int hot_x,
+.BI "                         int hot_y);
+.fi
+.SH DESCRIPTION
+
+.BR mask
+has to be in MSB (Most Significant Bit) format\[char46]
+
+The cursor width (
+.BR w
+) must be a multiple of 8 bits\[char46]
+
+The cursor is created in black and white according to the following:
+
+
+\(bu data=0, mask=1: white
+
+\(bu data=1, mask=1: black
+
+\(bu data=0, mask=0: transparent
+
+\(bu data=1, mask=0: inverted color if possible, black if not\[char46]
+
+Cursors created with this function must be freed with
+
+.BR SDL_DestroyCursor
+()\[char46]
+
+If you want to have a color cursor, or create your cursor from an
+
+.BR SDL_Surface
+, you should use
+
+.BR SDL_CreateColorCursor
+()\[char46] Alternately, you can hide
+the cursor and draw your own as part of your game's rendering, but it will
+be bound to the framerate\[char46]
+
+Also, 
+.BR SDL_CreateSystemCursor
+() is available,
+which provides several readily-available system cursors to pick from\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I data
+the color value for each pixel of the cursor\[char46]
+.TP
+.I mask
+the mask value for each pixel of the cursor\[char46]
+.TP
+.I w
+the width of the cursor\[char46]
+.TP
+.I h
+the height of the cursor\[char46]
+.TP
+.I hot_x
+the x-axis offset from the left of the cursor image to the mouse x position, in the range of 0 to
+.BR w
+
+\(bu 1\[char46]
+.TP
+.I hot_y
+the y-axis offset from the top of the cursor image to the mouse y position, in the range of 0 to
+.BR h
+
+\(bu 1\[char46]
+.SH RETURN VALUE
+(
+.BR SDL_Cursor
+ *) Returns a new cursor with the specified
+parameters on success or NULL on failure; call
+
+.BR SDL_GetError
+() for more information\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_CreateColorCursor (3),
+.BR \(bu (3),
+.BR SDL_CreateSystemCursor (3),
+.BR \(bu (3),
+.BR SDL_DestroyCursor (3),
+.BR \(bu (3),
+.BR SDL_SetCursor (3)

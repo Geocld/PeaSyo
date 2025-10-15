@@ -1,0 +1,50 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_FunctionPointer:
+.\"   https://wiki.libsdl.org/SDL_FunctionPointer
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_FunctionPointer
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_FunctionPointer 3type "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 DATATYPES"
+.SH NAME
+SDL_FunctionPointer \- A generic function pointer\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_stdinc\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "typedef void (*SDL_FunctionPointer)(void);
+.fi
+.SH DESCRIPTION
+In theory, generic function pointers should use this, instead of
+.BR void
+.I 
+,
+since some platforms could treat code addresses differently than data
+addresses\[char46] Although in current times no popular platforms make this
+distinction, it is more correct and portable to use the correct type for a
+generic pointer\[char46]
+
+If for some reason you need to force this typedef to be an actual
+.BR void 
+,
+perhaps to work around a compiler or existing code, you can define
+
+.BR
+.BR SDL_FUNCTION_POINTER_IS_VOID_POINTER
+before including any SDL headers\[char46]
+
+.SH AVAILABILITY
+This datatype is available since SDL 3\[char46]0\[char46]0\[char46]
+

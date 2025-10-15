@@ -1,0 +1,48 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_HINT_MAC_OPENGL_ASYNC_DISPATCH:
+.\"   https://wiki.libsdl.org/SDL_HINT_MAC_OPENGL_ASYNC_DISPATCH
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_HINT_MAC_OPENGL_ASYNC_DISPATCH
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_HINT_MAC_OPENGL_ASYNC_DISPATCH 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_HINT_MAC_OPENGL_ASYNC_DISPATCH \- A variable controlling whether dispatching OpenGL context updates should block the dispatching thread until the main thread finishes processing on macOS\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_hints\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "#define SDL_HINT_MAC_OPENGL_ASYNC_DISPATCH "SDL_MAC_OPENGL_ASYNC_DISPATCH"
+.fi
+.SH DESCRIPTION
+The variable can be set to the following values:
+
+
+\(bu "0": Dispatching OpenGL context updates will block the dispatching thread
+  until the main thread finishes processing\[char46] (default)
+
+\(bu "1": Dispatching OpenGL context updates will allow the dispatching thread
+  to continue execution\[char46]
+
+Generally you want the default, but if you have OpenGL code in a background
+thread on a Mac, and the main thread hangs because it's waiting for that
+background thread, but that background thread is also hanging because it's
+waiting for the main thread to do an update, this might fix your issue\[char46]
+
+This hint can be set anytime\[char46]
+
+.SH AVAILABILITY
+This hint is available since SDL 3\[char46]0\[char46]0\[char46]
+

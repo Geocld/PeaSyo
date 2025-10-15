@@ -1,0 +1,50 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_HINT_VIDEO_DOUBLE_BUFFER:
+.\"   https://wiki.libsdl.org/SDL_HINT_VIDEO_DOUBLE_BUFFER
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_HINT_VIDEO_DOUBLE_BUFFER
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_HINT_VIDEO_DOUBLE_BUFFER 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_HINT_VIDEO_DOUBLE_BUFFER \- Tell the video driver that we only want a double buffer\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_hints\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "#define SDL_HINT_VIDEO_DOUBLE_BUFFER "SDL_VIDEO_DOUBLE_BUFFER"
+.fi
+.SH DESCRIPTION
+By default, most lowlevel 2D APIs will use a triple buffer scheme that
+wastes no CPU time on waiting for vsync after issuing a flip, but
+introduces a frame of latency\[char46] On the other hand, using a double buffer
+scheme instead is recommended for cases where low latency is an important
+factor because we save a whole frame of latency\[char46]
+
+We do so by waiting for vsync immediately after issuing a flip, usually
+just after eglSwapBuffers call in the backend's *_SwapWindow function\[char46]
+
+This hint is currently supported on the following drivers:
+
+
+\(bu Raspberry Pi (raspberrypi)
+
+\(bu Wayland (wayland)
+
+This hint should be set before SDL is initialized\[char46]
+
+.SH AVAILABILITY
+This hint is available since SDL 3\[char46]0\[char46]0\[char46]
+

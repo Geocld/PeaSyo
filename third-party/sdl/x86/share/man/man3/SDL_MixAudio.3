@@ -1,0 +1,91 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_MixAudio:
+.\"   https://wiki.libsdl.org/SDL_MixAudio
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_MixAudio
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_MixAudio 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_MixAudio \- Mix audio data in a specified format\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_audio\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "bool SDL_MixAudio(Uint8 *dst, const Uint8 *src, SDL_AudioFormat format, Uint32 len, float volume);
+.fi
+.SH DESCRIPTION
+This takes an audio buffer
+.BR src
+of
+.BR len
+bytes of
+.BR format
+data and mixes
+it into
+.BR dst
+, performing addition, volume adjustment, and overflow
+clipping\[char46] The buffer pointed to by
+.BR dst
+must also be
+.BR len
+bytes of
+.BR format
+data\[char46]
+
+This is provided for convenience -- you can mix your own audio data\[char46]
+
+Do not use this function for mixing together more than two streams of
+sample data\[char46] The output from repeated application of this function may be
+distorted by clipping, because there is no accumulator with greater range
+than the input (not to mention this being an inefficient way of doing it)\[char46]
+
+It is a common misconception that this function is required to write audio
+data to an output stream in an audio callback\[char46] While you can do that,
+
+.BR SDL_MixAudio
+() is really only needed when you're mixing a
+single audio stream with a volume adjustment\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I dst
+the destination for the mixed audio\[char46]
+.TP
+.I src
+the source audio buffer to be mixed\[char46]
+.TP
+.I format
+the 
+.BR SDL_AudioFormat
+ structure representing the desired audio format\[char46]
+.TP
+.I len
+the length of the audio buffer in bytes\[char46]
+.TP
+.I volume
+ranges from 0\[char46]0 - 1\[char46]0, and should be set to 1\[char46]0 for full audio volume\[char46]
+.SH RETURN VALUE
+Returns true on success or false on failure; call
+
+.BR SDL_GetError
+() for more information\[char46]
+
+.SH THREAD SAFETY
+It is safe to call this function from any thread\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

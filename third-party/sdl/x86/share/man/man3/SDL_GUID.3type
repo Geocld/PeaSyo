@@ -1,0 +1,47 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_GUID:
+.\"   https://wiki.libsdl.org/SDL_GUID
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_GUID
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_GUID 3type "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 DATATYPES"
+.SH NAME
+SDL_GUID \- An 
+.BR SDL_GUID
+ is a 128-bit identifier for an input device that identifies that device across runs of SDL programs on the same platform\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_guid\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "typedef struct SDL_GUID {
+.BI "    Uint8 data[16];
+.BI "} SDL_GUID;
+.fi
+.SH DESCRIPTION
+If the device is detached and then re-attached to a different port, or if
+the base system is rebooted, the device should still report the same GUID\[char46]
+
+GUIDs are as precise as possible but are not guaranteed to distinguish
+physically distinct but equivalent devices\[char46] For example, two game
+controllers from the same vendor with the same product ID and revision may
+have the same GUID\[char46]
+
+GUIDs may be platform-dependent (i\[char46]e\[char46], the same device may report different
+GUIDs on different operating systems)\[char46]
+
+.SH AVAILABILITY
+This struct is available since SDL 3\[char46]0\[char46]0\[char46]
+

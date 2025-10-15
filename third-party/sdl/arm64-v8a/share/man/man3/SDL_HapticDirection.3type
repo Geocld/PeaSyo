@@ -1,0 +1,183 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_HapticDirection:
+.\"   https://wiki.libsdl.org/SDL_HapticDirection
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_HapticDirection
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_HapticDirection 3type "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 DATATYPES"
+.SH NAME
+SDL_HapticDirection \- Structure that represents a haptic direction\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_haptic\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "typedef struct SDL_HapticDirection
+.BI "{
+.BI "    Uint8 type;         /**< The type of encoding. */
+.BI "    Sint32 dir[3];      /**< The encoded direction. */
+.BI "} SDL_HapticDirection;
+.fi
+.SH DESCRIPTION
+This is the direction where the force comes from, instead of the direction
+in which the force is exerted\[char46]
+
+Directions can be specified by:
+
+
+\(bu 
+.BR SDL_HAPTIC_POLAR
+ : Specified by polar coordinates\[char46]
+
+\(bu 
+.BR SDL_HAPTIC_CARTESIAN
+ : Specified by cartesian
+  coordinates\[char46]
+
+\(bu 
+.BR SDL_HAPTIC_SPHERICAL
+ : Specified by spherical
+  coordinates\[char46]
+
+Cardinal directions of the haptic device are relative to the positioning of
+the device\[char46] North is considered to be away from the user\[char46]
+
+The following diagram represents the cardinal directions:
+
+.IP
+.EX
+               .--.
+               |__| .-------.
+               |=.| |.-----.|
+               |--| ||     ||
+               |  | |'-----'|
+               |__|~')_____('
+                 [ COMPUTER ]
+
+
+                   North (0,-1)
+                       ^
+                       |
+                       |
+ (-1,0)  West <----[ HAPTIC ]----> East (1,0)
+                       |
+                       |
+                       v
+                    South (0,1)
+
+
+                    [ USER ]
+                      \|||/
+                      (o o)
+                ---ooO-(_)-Ooo---
+.EE
+.PP
+
+If type is 
+.BR SDL_HAPTIC_POLAR
+, direction is encoded by
+hundredths of a degree starting north and turning clockwise\[char46]
+
+.BR SDL_HAPTIC_POLAR
+ only uses the first
+.BR dir
+parameter\[char46]
+The cardinal directions would be:
+
+
+\(bu North: 0 (0 degrees)
+
+\(bu East: 9000 (90 degrees)
+
+\(bu South: 18000 (180 degrees)
+
+\(bu West: 27000 (270 degrees)
+
+If type is 
+.BR SDL_HAPTIC_CARTESIAN
+, direction is
+encoded by three positions (X axis, Y axis and Z axis (with 3 axes))\[char46]
+
+.BR SDL_HAPTIC_CARTESIAN
+ uses the first three
+.BR dir
+parameters\[char46] The cardinal directions would be:
+
+
+\(bu North: 0,-1, 0
+
+\(bu East: 1, 0, 0
+
+\(bu South: 0, 1, 0
+
+\(bu West: -1, 0, 0
+
+The Z axis represents the height of the effect if supported, otherwise it's
+unused\[char46] In cartesian encoding (1, 2) would be the same as (2, 4), you can
+use any multiple you want, only the direction matters\[char46]
+
+If type is 
+.BR SDL_HAPTIC_SPHERICAL
+, direction is
+encoded by two rotations\[char46] The first two
+.BR dir
+parameters are used\[char46] The
+.BR dir
+parameters are as follows (all values are in hundredths of degrees):
+
+
+\(bu Degrees from (1, 0) rotated towards (0, 1)\[char46]
+
+\(bu Degrees towards (0, 0, 1) (device needs at least 3 axes)\[char46]
+
+Example of force coming from the south with all encodings (force coming
+from the south means the user will have to pull the stick to counteract):
+
+.IP
+.EX
+ SDL_HapticDirection direction;
+
+ // Cartesian directions
+ direction.type = SDL_HAPTIC_CARTESIAN; // Using cartesian direction encoding.
+ direction.dir[0] = 0; // X position
+ direction.dir[1] = 1; // Y position
+ // Assuming the device has 2 axes, we don't need to specify third parameter.
+
+ // Polar directions
+ direction.type = SDL_HAPTIC_POLAR; // We'll be using polar direction encoding.
+ direction.dir[0] = 18000; // Polar only uses first parameter
+
+ // Spherical coordinates
+ direction.type = SDL_HAPTIC_SPHERICAL; // Spherical encoding
+ direction.dir[0] = 9000; // Since we only have two axes we don't need more parameters.
+.EE
+.PP
+
+.SH AVAILABILITY
+This struct is available since SDL 3\[char46]0\[char46]0\[char46]
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_HAPTIC_POLAR (3),
+.BR \(bu (3),
+.BR SDL_HAPTIC_CARTESIAN (3),
+.BR \(bu (3),
+.BR SDL_HAPTIC_SPHERICAL (3),
+.BR \(bu (3),
+.BR SDL_HAPTIC_STEERING_AXIS (3),
+.BR \(bu (3),
+.BR SDL_HapticEffect (3type),
+.BR \(bu (3),
+.BR SDL_GetNumHapticAxes (3)

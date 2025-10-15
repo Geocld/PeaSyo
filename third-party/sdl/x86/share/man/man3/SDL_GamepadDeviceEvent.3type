@@ -1,0 +1,37 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_GamepadDeviceEvent:
+.\"   https://wiki.libsdl.org/SDL_GamepadDeviceEvent
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_GamepadDeviceEvent
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_GamepadDeviceEvent 3type "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 DATATYPES"
+.SH NAME
+SDL_GamepadDeviceEvent \- Gamepad device event structure (event\[char46]gdevice\[char46]*)
+.SH HEADER FILE
+Defined in SDL3/SDL_events\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "typedef struct SDL_GamepadDeviceEvent
+.BI "{
+.BI "    SDL_EventType type; /**< SDL_EVENT_GAMEPAD_ADDED, SDL_EVENT_GAMEPAD_REMOVED, or SDL_EVENT_GAMEPAD_REMAPPED, SDL_EVENT_GAMEPAD_UPDATE_COMPLETE or SDL_EVENT_GAMEPAD_STEAM_HANDLE_UPDATED */
+.BI "    Uint32 reserved;
+.BI "    Uint64 timestamp;   /**< In nanoseconds, populated using SDL_GetTicksNS() */
+.BI "    SDL_JoystickID which;       /**< The joystick instance id */
+.BI "} SDL_GamepadDeviceEvent;
+.fi
+.SH AVAILABILITY
+This struct is available since SDL 3\[char46]0\[char46]0\[char46]
+

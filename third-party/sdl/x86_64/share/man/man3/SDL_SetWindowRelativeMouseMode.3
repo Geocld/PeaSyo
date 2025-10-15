@@ -1,0 +1,55 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_SetWindowRelativeMouseMode:
+.\"   https://wiki.libsdl.org/SDL_SetWindowRelativeMouseMode
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_SetWindowRelativeMouseMode
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_SetWindowRelativeMouseMode 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_SetWindowRelativeMouseMode \- Set relative mouse mode for a window\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_mouse\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "bool SDL_SetWindowRelativeMouseMode(SDL_Window *window, bool enabled);
+.fi
+.SH DESCRIPTION
+While the window has focus and relative mouse mode is enabled, the cursor
+is hidden, the mouse position is constrained to the window, and SDL will
+report continuous relative mouse motion even if the mouse is at the edge of
+the window\[char46]
+
+This function will flush any pending mouse motion for this window\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I window
+the window to change\[char46]
+.TP
+.I enabled
+true to enable relative mode, false to disable\[char46]
+.SH RETURN VALUE
+Returns true on success or false on failure; call
+
+.BR SDL_GetError
+() for more information\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_GetWindowRelativeMouseMode (3)

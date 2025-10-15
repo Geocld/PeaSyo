@@ -1,0 +1,48 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_DownloadFromGPUTexture:
+.\"   https://wiki.libsdl.org/SDL_DownloadFromGPUTexture
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_DownloadFromGPUTexture
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_DownloadFromGPUTexture 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_DownloadFromGPUTexture \- Copies data from a texture to a transfer buffer on the GPU timeline\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_gpu\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "void SDL_DownloadFromGPUTexture(
+.BI "    SDL_GPUCopyPass *copy_pass,
+.BI "    const SDL_GPUTextureRegion *source,
+.BI "    const SDL_GPUTextureTransferInfo *destination);
+.fi
+.SH DESCRIPTION
+This data is not guaranteed to be copied until the command buffer fence is
+signaled\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I copy_pass
+a copy pass handle\[char46]
+.TP
+.I source
+the source texture region\[char46]
+.TP
+.I destination
+the destination transfer buffer with image layout information\[char46]
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

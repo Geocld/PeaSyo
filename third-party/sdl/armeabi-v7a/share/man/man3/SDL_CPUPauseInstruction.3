@@ -1,0 +1,44 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_CPUPauseInstruction:
+.\"   https://wiki.libsdl.org/SDL_CPUPauseInstruction
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_CPUPauseInstruction
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_CPUPauseInstruction 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_CPUPauseInstruction \- A macro to insert a CPU-specific "pause" instruction into the program\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_atomic\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "#define SDL_CPUPauseInstruction() DoACPUPauseInACompilerAndArchitectureSpecificWay
+.fi
+.SH DESCRIPTION
+This can be useful in busy-wait loops, as it serves as a hint to the CPU as
+to the program's intent; some CPUs can use this to do more efficient
+processing\[char46] On some platforms, this doesn't do anything, so using this
+macro might just be a harmless no-op\[char46]
+
+Note that if you are busy-waiting, there are often more-efficient
+approaches with other synchronization primitives: mutexes, semaphores,
+condition variables, etc\[char46]
+
+.SH THREAD SAFETY
+This macro is safe to use from any thread\[char46]
+
+.SH AVAILABILITY
+This macro is available since SDL 3\[char46]0\[char46]0\[char46]
+

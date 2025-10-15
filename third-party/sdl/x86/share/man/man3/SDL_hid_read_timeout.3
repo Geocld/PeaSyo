@@ -1,0 +1,58 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_hid_read_timeout:
+.\"   https://wiki.libsdl.org/SDL_hid_read_timeout
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_hid_read_timeout
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_hid_read_timeout 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_hid_read_timeout \- Read an Input report from a HID device with timeout\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_hidapi\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "int SDL_hid_read_timeout(SDL_hid_device *dev, unsigned char *data, size_t length, int milliseconds);
+.fi
+.SH DESCRIPTION
+Input reports are returned to the host through the INTERRUPT IN endpoint\[char46]
+The first byte will contain the Report number if the device uses numbered
+reports\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I dev
+a device handle returned from 
+.BR SDL_hid_open
+()\[char46]
+.TP
+.I data
+a buffer to put the read data into\[char46]
+.TP
+.I length
+the number of bytes to read\[char46] For devices with multiple reports, make sure to read an extra byte for the report number\[char46]
+.TP
+.I milliseconds
+timeout in milliseconds or -1 for blocking wait\[char46]
+.SH RETURN VALUE
+Returns the actual number of bytes read and -1 on on failure; call
+
+.BR SDL_GetError
+() for more information\[char46] If no packet was
+available to be read within the timeout period, this function returns 0\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

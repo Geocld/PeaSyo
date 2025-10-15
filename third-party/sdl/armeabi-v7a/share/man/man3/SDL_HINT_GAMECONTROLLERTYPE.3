@@ -1,0 +1,55 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_HINT_GAMECONTROLLERTYPE:
+.\"   https://wiki.libsdl.org/SDL_HINT_GAMECONTROLLERTYPE
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_HINT_GAMECONTROLLERTYPE
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_HINT_GAMECONTROLLERTYPE 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_HINT_GAMECONTROLLERTYPE \- A variable that overrides the automatic controller type detection\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_hints\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "#define SDL_HINT_GAMECONTROLLERTYPE "SDL_GAMECONTROLLERTYPE"
+.fi
+.SH DESCRIPTION
+The variable should be comma separated entries, in the form: VID/PID=type
+
+The VID and PID should be hexadecimal with exactly 4 digits, e\[char46]g\[char46] 0x00fd
+
+This hint affects what low level protocol is used with the HIDAPI driver\[char46]
+
+The variable can be set to the following values:
+
+
+\(bu "Xbox360"
+
+\(bu "XboxOne"
+
+\(bu "PS3"
+
+\(bu "PS4"
+
+\(bu "PS5"
+
+\(bu "SwitchPro"
+
+This hint should be set before SDL is initialized\[char46]
+
+.SH AVAILABILITY
+This hint is available since SDL 3\[char46]0\[char46]0\[char46]
+

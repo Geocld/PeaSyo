@@ -1,0 +1,47 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_GetGamepadMappings:
+.\"   https://wiki.libsdl.org/SDL_GetGamepadMappings
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_GetGamepadMappings
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_GetGamepadMappings 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_GetGamepadMappings \- Get the current gamepad mappings\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_gamepad\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "char ** SDL_GetGamepadMappings(int *count);
+.fi
+.SH FUNCTION PARAMETERS
+.TP
+.I count
+a pointer filled in with the number of mappings returned, can be NULL\[char46]
+.SH RETURN VALUE
+(char
+.I 
+) Returns an array of the mapping strings, NULL-terminated, or NULL
+on failure; call 
+.BR SDL_GetError
+() for more information\[char46] This
+is a single allocation that should be freed with 
+.BR SDL_free
+()
+when it is no longer needed\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

@@ -1,0 +1,56 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_GPUCommandBuffer:
+.\"   https://wiki.libsdl.org/SDL_GPUCommandBuffer
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_GPUCommandBuffer
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_GPUCommandBuffer 3type "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 DATATYPES"
+.SH NAME
+SDL_GPUCommandBuffer \- An opaque handle representing a command buffer\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_gpu\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "typedef struct SDL_GPUCommandBuffer SDL_GPUCommandBuffer;
+.fi
+.SH DESCRIPTION
+Most state is managed via command buffers\[char46] When setting state using a
+command buffer, that state is local to the command buffer\[char46]
+
+Commands only begin execution on the GPU once
+
+.BR SDL_SubmitGPUCommandBuffer
+ is called\[char46] Once
+the command buffer is submitted, it is no longer valid to use it\[char46]
+
+Command buffers are executed in submission order\[char46] If you submit command
+buffer A and then command buffer B all commands in A will begin executing
+before any command in B begins executing\[char46]
+
+In multi-threading scenarios, you should acquire and submit a command
+buffer on the same thread\[char46] As long as you satisfy this requirement, all
+functionality related to command buffers is thread-safe\[char46]
+
+.SH AVAILABILITY
+This struct is available since SDL 3\[char46]0\[char46]0
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_AcquireGPUCommandBuffer (3),
+.BR \(bu (3),
+.BR SDL_SubmitGPUCommandBuffer (3),
+.BR \(bu (3),
+.BR SDL_SubmitGPUCommandBufferAndAcquireFence (3)

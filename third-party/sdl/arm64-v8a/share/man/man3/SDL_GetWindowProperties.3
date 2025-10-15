@@ -1,0 +1,305 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_GetWindowProperties:
+.\"   https://wiki.libsdl.org/SDL_GetWindowProperties
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_GetWindowProperties
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_GetWindowProperties 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_GetWindowProperties \- Get the properties associated with a window\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_video\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "SDL_PropertiesID SDL_GetWindowProperties(SDL_Window *window);
+.fi
+.SH DESCRIPTION
+The following read-only properties are provided by SDL:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_SHAPE_POINTER
+: the
+  surface associated with a shaped window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_HDR_ENABLED_BOOLEAN
+:
+  true if the window has HDR headroom above the SDR white point\[char46] This
+  property can change dynamically when
+  
+.BR SDL_EVENT_WINDOW_HDR_STATE_CHANGED
+
+  is sent\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_SDR_WHITE_LEVEL_FLOAT
+:
+  the value of SDR white in the
+  
+.BR SDL_COLORSPACE_SRGB_LINEAR
+ colorspace\[char46] On
+  Windows this corresponds to the SDR white level in scRGB colorspace, and
+  on Apple platforms this is always 1\[char46]0 for EDR content\[char46] This property can
+  change dynamically when
+  
+.BR SDL_EVENT_WINDOW_HDR_STATE_CHANGED
+
+  is sent\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_HDR_HEADROOM_FLOAT
+:
+  the additional high dynamic range that can be displayed, in terms of the
+  SDR white point\[char46] When HDR is not enabled, this will be 1\[char46]0\[char46] This property
+  can change dynamically when
+  
+.BR SDL_EVENT_WINDOW_HDR_STATE_CHANGED
+
+  is sent\[char46]
+
+On Android:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_ANDROID_WINDOW_POINTER
+:
+  the ANativeWindow associated with the window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_ANDROID_SURFACE_POINTER
+:
+  the EGLSurface associated with the window
+
+On iOS:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_UIKIT_WINDOW_POINTER
+:
+  the
+.BR (__unsafe_unretained)
+UIWindow associated with the window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_UIKIT_METAL_VIEW_TAG_NUMBER
+:
+  the NSInteger tag assocated with metal views on the window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_UIKIT_OPENGL_FRAMEBUFFER_NUMBER
+:
+  the OpenGL view's framebuffer object\[char46] It must be bound when rendering to
+  the screen using OpenGL\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_UIKIT_OPENGL_RENDERBUFFER_NUMBER
+:
+  the OpenGL view's renderbuffer object\[char46] It must be bound when
+  
+.BR SDL_GL_SwapWindow
+ is called\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_UIKIT_OPENGL_RESOLVE_FRAMEBUFFER_NUMBER
+:
+  the OpenGL view's resolve framebuffer, when MSAA is used\[char46]
+
+On KMS/DRM:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_KMSDRM_DEVICE_INDEX_NUMBER
+:
+  the device index associated with the window (e\[char46]g\[char46] the X in
+  /dev/dri/cardX)
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_KMSDRM_DRM_FD_NUMBER
+:
+  the DRM FD associated with the window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_KMSDRM_GBM_DEVICE_POINTER
+:
+  the GBM device associated with the window
+
+On macOS:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_COCOA_WINDOW_POINTER
+:
+  the
+.BR (__unsafe_unretained)
+NSWindow associated with the window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_COCOA_METAL_VIEW_TAG_NUMBER
+:
+  the NSInteger tag assocated with metal views on the window
+
+On Vivante:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_VIVANTE_DISPLAY_POINTER
+:
+  the EGLNativeDisplayType associated with the window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_VIVANTE_WINDOW_POINTER
+:
+  the EGLNativeWindowType associated with the window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_VIVANTE_SURFACE_POINTER
+:
+  the EGLSurface associated with the window
+
+On Windows:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_WIN32_HWND_POINTER
+:
+  the HWND associated with the window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_WIN32_HDC_POINTER
+:
+  the HDC associated with the window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_WIN32_INSTANCE_POINTER
+:
+  the HINSTANCE associated with the window
+
+On Wayland:
+
+Note: The
+.BR xdg_*
+window objects do not internally persist across window
+show/hide calls\[char46] They will be null if the window is hidden and must be
+queried each time it is shown\[char46]
+
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER
+:
+  the wl_display associated with the window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER
+:
+  the wl_surface associated with the window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_WAYLAND_EGL_WINDOW_POINTER
+:
+  the wl_egl_window associated with the window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_WAYLAND_XDG_SURFACE_POINTER
+:
+  the xdg_surface associated with the window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_WAYLAND_XDG_TOPLEVEL_POINTER
+:
+  the xdg_toplevel role associated with the window
+
+\(bu '
+.BR SDL_PROP_WINDOW_WAYLAND_XDG_TOPLEVEL_EXPORT_HANDLE_STRING
+':
+  the export handle associated with the window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_WAYLAND_XDG_POPUP_POINTER
+:
+  the xdg_popup role associated with the window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_WAYLAND_XDG_POSITIONER_POINTER
+:
+  the xdg_positioner associated with the window, in popup mode
+
+On X11:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_X11_DISPLAY_POINTER
+:
+  the X11 Display associated with the window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_X11_SCREEN_NUMBER
+:
+  the screen number associated with the window
+
+\(bu 
+.BR
+.BR SDL_PROP_WINDOW_X11_WINDOW_NUMBER
+:
+  the X11 Window associated with the window
+
+.SH FUNCTION PARAMETERS
+.TP
+.I window
+the window to query\[char46]
+.SH RETURN VALUE
+(
+.BR SDL_PropertiesID
+) Returns a valid property ID on
+success or 0 on failure; call 
+.BR SDL_GetError
+() for more
+information\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

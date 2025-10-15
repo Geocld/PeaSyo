@@ -1,0 +1,127 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_OpenAudioDeviceStream:
+.\"   https://wiki.libsdl.org/SDL_OpenAudioDeviceStream
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_OpenAudioDeviceStream
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_OpenAudioDeviceStream 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_OpenAudioDeviceStream \- Convenience function for straightforward audio init for the common case\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_audio\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "SDL_AudioStream * SDL_OpenAudioDeviceStream(SDL_AudioDeviceID devid, const SDL_AudioSpec *spec, SDL_AudioStreamCallback callback, void *userdata);
+.fi
+.SH DESCRIPTION
+If all your app intends to do is provide a single source of PCM audio, this
+function allows you to do all your audio setup in a single call\[char46]
+
+This is also intended to be a clean means to migrate apps from SDL2\[char46]
+
+This function will open an audio device, create a stream and bind it\[char46]
+Unlike other methods of setup, the audio device will be closed when this
+stream is destroyed, so the app can treat the returned
+
+.BR SDL_AudioStream
+ as the only object needed to manage
+audio playback\[char46]
+
+Also unlike other functions, the audio device begins paused\[char46] This is to map
+more closely to SDL2-style behavior, since there is no extra step here to
+bind a stream to begin audio flowing\[char46] The audio device should be resumed
+with
+.BR SDL_ResumeAudioStreamDevice(stream);
+This function works with both playback and recording devices\[char46]
+
+The
+.BR spec
+parameter represents the app's side of the audio stream\[char46] That
+is, for recording audio, this will be the output format, and for playing
+audio, this will be the input format\[char46] If spec is NULL, the system will
+choose the format, and the app can use
+
+.BR SDL_GetAudioStreamFormat
+() to obtain this
+information later\[char46]
+
+If you don't care about opening a specific audio device, you can (and
+probably _should_), use
+
+.BR SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK
+ for
+playback and
+
+.BR SDL_AUDIO_DEVICE_DEFAULT_RECORDING
+
+for recording\[char46]
+
+One can optionally provide a callback function; if NULL, the app is
+expected to queue audio data for playback (or unqueue audio data if
+capturing)\[char46] Otherwise, the callback will begin to fire once the device is
+unpaused\[char46]
+
+Destroying the returned stream with
+
+.BR SDL_DestroyAudioStream
+ will also close the audio
+device associated with this stream\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I devid
+an audio device to open, or 
+.BR SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK
+ or 
+.BR SDL_AUDIO_DEVICE_DEFAULT_RECORDING
+\[char46]
+.TP
+.I spec
+the audio stream's data format\[char46] Can be NULL\[char46]
+.TP
+.I callback
+a callback where the app will provide new data for playback, or receive new data for recording\[char46] Can be NULL, in which case the app will need to call 
+.BR SDL_PutAudioStreamData
+ or 
+.BR SDL_GetAudioStreamData
+ as necessary\[char46]
+.TP
+.I userdata
+app-controlled pointer passed to callback\[char46] Can be NULL\[char46] Ignored if callback is NULL\[char46]
+.SH RETURN VALUE
+(
+.BR SDL_AudioStream
+ *) Returns an audio stream on success,
+ready to use, or NULL on failure; call 
+.BR SDL_GetError
+() for
+more information\[char46] When done with this stream, call
+
+.BR SDL_DestroyAudioStream
+ to free resources and
+close the device\[char46]
+
+.SH THREAD SAFETY
+It is safe to call this function from any thread\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_GetAudioStreamDevice (3),
+.BR \(bu (3),
+.BR SDL_ResumeAudioStreamDevice (3)

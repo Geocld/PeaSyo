@@ -1,0 +1,71 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_RunApp:
+.\"   https://wiki.libsdl.org/SDL_RunApp
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_RunApp
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_RunApp 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_RunApp \- Initializes and launches an SDL application, by doing platform-specific initialization before calling your mainFunction and cleanups after it returns, if that is needed for a specific platform, otherwise it just calls mainFunction\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_main\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "int SDL_RunApp(int argc, char *argv[], SDL_main_func mainFunction, void *reserved);
+.fi
+.SH DESCRIPTION
+You can use this if you want to use your own main() implementation without
+using 
+.BR SDL_main
+ (like when using
+
+.BR SDL_MAIN_HANDLED
+)\[char46] When using this, you do
+.I not
+need
+
+.BR SDL_SetMainReady
+()\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I argc
+the argc parameter from the application's main() function, or 0 if the platform's main-equivalent has no argc\[char46]
+.TP
+.I argv
+the argv parameter from the application's main() function, or NULL if the platform's main-equivalent has no argv\[char46]
+.TP
+.I mainFunction
+your SDL app's C-style main()\[char46] NOT the function you're calling this from! Its name doesn't matter; it doesn't literally have to be
+.BR main
+\[char46]
+.TP
+.I reserved
+should be NULL (reserved for future use, will probably be platform-specific then)\[char46]
+.SH RETURN VALUE
+Returns the return value from mainFunction: 0 on success, otherwise
+failure; 
+.BR SDL_GetError
+() might have more information on the
+failure\[char46]
+
+.SH THREAD SAFETY
+Generally this is called once, near startup, from the process's initial
+thread\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

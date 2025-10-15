@@ -1,0 +1,45 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_SpinLock:
+.\"   https://wiki.libsdl.org/SDL_SpinLock
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_SpinLock
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_SpinLock 3type "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 DATATYPES"
+.SH NAME
+SDL_SpinLock \- An atomic spinlock\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_atomic\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "typedef int SDL_SpinLock;
+.fi
+.SH DESCRIPTION
+The atomic locks are efficient spinlocks using CPU instructions, but are
+vulnerable to starvation and can spin forever if a thread holding a lock
+has been terminated\[char46] For this reason you should minimize the code executed
+inside an atomic lock and never do expensive things like API or system
+calls while holding them\[char46]
+
+They are also vulnerable to starvation if the thread holding the lock is
+lower priority than other threads and doesn't get scheduled\[char46] In general you
+should use mutexes instead, since they have better performance and
+contention behavior\[char46]
+
+The atomic locks are not safe to lock recursively\[char46]
+
+Porting Note: The spin lock functions and type are required and can not be
+emulated because they are used in the atomic emulation code\[char46]
+

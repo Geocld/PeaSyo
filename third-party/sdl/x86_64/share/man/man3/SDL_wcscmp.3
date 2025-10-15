@@ -1,0 +1,50 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_wcscmp:
+.\"   https://wiki.libsdl.org/SDL_wcscmp
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_wcscmp
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_wcscmp 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_wcscmp \- Compare two null-terminated wide strings\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_stdinc\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "int SDL_wcscmp(const wchar_t *str1, const wchar_t *str2);
+.fi
+.SH DESCRIPTION
+This only compares wchar_t values until it hits a null-terminating
+character; it does not care if the string is well-formed UTF-16 (or UTF-32,
+depending on your platform's wchar_t size), or uses valid Unicode values\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I str1
+the first string to compare\[char46] NULL is not permitted!
+.TP
+.I str2
+the second string to compare\[char46] NULL is not permitted!
+.SH RETURN VALUE
+Returns less than zero if str1 is "less than" str2, greater than zero
+if str1 is "greater than" str2, and zero if the strings match exactly\[char46]
+
+.SH THREAD SAFETY
+It is safe to call this function from any thread\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

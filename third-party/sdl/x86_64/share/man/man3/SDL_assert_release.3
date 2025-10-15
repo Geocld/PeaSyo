@@ -1,0 +1,61 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_assert_release:
+.\"   https://wiki.libsdl.org/SDL_assert_release
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_assert_release
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_assert_release 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_assert_release \- An assertion test that is performed even in release builds\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_assert\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "#define SDL_assert_release(condition) SDL_disabled_assert(condition)
+.fi
+.SH DESCRIPTION
+This macro is enabled when the 
+.BR SDL_ASSERT_LEVEL
+ is >=
+1, otherwise it is disabled\[char46] This is meant to be for tests that are cheap
+to make and extremely unlikely to fail; generally it is frowned upon to
+have an assertion failure in a release build, so these assertions generally
+need to be of more than life-and-death importance if there's a chance they
+might trigger\[char46] You should almost always consider handling these cases more
+gracefully than an assert allows\[char46]
+
+When assertions are disabled, this wraps
+.BR condition
+in a
+.BR sizeof
+operator, which means any function calls and side effects will not run, but
+the compiler will not complain about any otherwise-unused variables that
+are only referenced in the assertion\[char46]
+
+One can set the environment variable "
+.BR SDL_ASSERT
+" to one of
+several strings ("abort", "break", "retry", "ignore", "always_ignore") to
+force a default behavior, which may be desirable for automation purposes\[char46]
+If your platform requires GUI interfaces to happen on the main thread but
+you're debugging an assertion in a background thread, it might be desirable
+to set this to "break" so that your debugger takes control as soon as
+assert is triggered, instead of risking a bad UI interaction (deadlock,
+etc) in the application\[char46] *
+
+.SH AVAILABILITY
+This macro is available since SDL 3\[char46]0\[char46]0\[char46]
+

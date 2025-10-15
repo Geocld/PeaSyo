@@ -1,0 +1,74 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_hid_device_info:
+.\"   https://wiki.libsdl.org/SDL_hid_device_info
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_hid_device_info
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_hid_device_info 3type "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 DATATYPES"
+.SH NAME
+SDL_hid_device_info \- Information about a connected HID device
+.SH HEADER FILE
+Defined in SDL3/SDL_hidapi\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "typedef struct SDL_hid_device_info
+.BI "{
+.BI "    /** Platform-specific device path */
+.BI "    char *path;
+.BI "    /** Device Vendor ID */
+.BI "    unsigned short vendor_id;
+.BI "    /** Device Product ID */
+.BI "    unsigned short product_id;
+.BI "    /** Serial Number */
+.BI "    wchar_t *serial_number;
+.BI "    /** Device Release Number in binary-coded decimal,
+.BI "        also known as Device Version Number */
+.BI "    unsigned short release_number;
+.BI "    /** Manufacturer String */
+.BI "    wchar_t *manufacturer_string;
+.BI "    /** Product string */
+.BI "    wchar_t *product_string;
+.BI "    /** Usage Page for this Device/Interface
+.BI "        (Windows/Mac/hidraw only) */
+.BI "    unsigned short usage_page;
+.BI "    /** Usage for this Device/Interface
+.BI "        (Windows/Mac/hidraw only) */
+.BI "    unsigned short usage;
+.BI "    /** The USB interface which this logical device
+.BI "        represents.
+.BI "
+.BI "        Valid only if the device is a USB HID device.
+.BI "        Set to -1 in all other cases.
+.BI "    */
+.BI "    int interface_number;
+.BI "
+.BI "    /** Additional information about the USB interface.
+.BI "        Valid on libusb and Android implementations. */
+.BI "    int interface_class;
+.BI "    int interface_subclass;
+.BI "    int interface_protocol;
+.BI "
+.BI "    /** Underlying bus type */
+.BI "    SDL_hid_bus_type bus_type;
+.BI "
+.BI "    /** Pointer to the next device */
+.BI "    struct SDL_hid_device_info *next;
+.BI "
+.BI "} SDL_hid_device_info;
+.fi
+.SH AVAILABILITY
+This struct is available since SDL 3\[char46]0\[char46]0\[char46]
+

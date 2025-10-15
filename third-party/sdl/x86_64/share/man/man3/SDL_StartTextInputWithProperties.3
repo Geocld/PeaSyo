@@ -1,0 +1,137 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_StartTextInputWithProperties:
+.\"   https://wiki.libsdl.org/SDL_StartTextInputWithProperties
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_StartTextInputWithProperties
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_StartTextInputWithProperties 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_StartTextInputWithProperties \- Start accepting Unicode text input events in a window, with properties describing the input\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_keyboard\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "bool SDL_StartTextInputWithProperties(SDL_Window *window, SDL_PropertiesID props);
+.fi
+.SH DESCRIPTION
+This function will enable text input
+(
+.BR SDL_EVENT_TEXT_INPUT
+ and
+
+.BR SDL_EVENT_TEXT_EDITING
+ events) in the specified
+window\[char46] Please use this function paired with
+
+.BR SDL_StopTextInput
+()\[char46]
+
+Text input events are not received by default\[char46]
+
+On some platforms using this function shows the screen keyboard\[char46]
+
+These are the supported properties:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTINPUT_TYPE_NUMBER
+
+\(bu an
+  
+.BR SDL_TextInputType
+ value that describes text being
+  input, defaults to 
+.BR SDL_TEXTINPUT_TYPE_TEXT
+\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTINPUT_CAPITALIZATION_NUMBER
+
+\(bu an 
+.BR SDL_Capitalization
+ value that describes how
+  text should be capitalized, defaults to
+  
+.BR SDL_CAPITALIZE_SENTENCES
+ for normal text
+  entry, 
+.BR SDL_CAPITALIZE_WORDS
+ for
+  
+.BR SDL_TEXTINPUT_TYPE_TEXT_NAME
+, and
+  
+.BR SDL_CAPITALIZE_NONE
+ for e-mail addresses,
+  usernames, and passwords\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTINPUT_AUTOCORRECT_BOOLEAN
+
+\(bu true to enable auto completion and auto correction, defaults to true\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTINPUT_MULTILINE_BOOLEAN
+
+\(bu true if multiple lines of text are allowed\[char46] This defaults to true if
+  
+.BR SDL_HINT_RETURN_KEY_HIDES_IME
+ is "0" or
+  is not set, and defaults to false if
+  
+.BR SDL_HINT_RETURN_KEY_HIDES_IME
+ is "1"\[char46]
+
+On Android you can directly specify the input type:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_TEXTINPUT_ANDROID_INPUTTYPE_NUMBER
+
+\(bu the text input type to use, overriding other properties\[char46] This is
+  documented at
+  https://developer\[char46]android\[char46]com/reference/android/text/InputType
+
+.SH FUNCTION PARAMETERS
+.TP
+.I window
+the window to enable text input\[char46]
+.TP
+.I props
+the properties to use\[char46]
+.SH RETURN VALUE
+Returns true on success or false on failure; call
+
+.BR SDL_GetError
+() for more information\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_SetTextInputArea (3),
+.BR \(bu (3),
+.BR SDL_StartTextInput (3),
+.BR \(bu (3),
+.BR SDL_StopTextInput (3),
+.BR \(bu (3),
+.BR SDL_TextInputActive (3)

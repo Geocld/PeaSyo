@@ -1,0 +1,61 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_SetWindowShape:
+.\"   https://wiki.libsdl.org/SDL_SetWindowShape
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_SetWindowShape
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_SetWindowShape 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_SetWindowShape \- Set the shape of a transparent window\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_video\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "bool SDL_SetWindowShape(SDL_Window *window, SDL_Surface *shape);
+.fi
+.SH DESCRIPTION
+This sets the alpha channel of a transparent window and any fully
+transparent areas are also transparent to mouse clicks\[char46] If you are using
+something besides the SDL render API, then you are responsible for setting
+the alpha channel of the window yourself\[char46]
+
+The shape is copied inside this function, so you can free it afterwards\[char46] If
+your shape surface changes, you should call
+
+.BR SDL_SetWindowShape
+() again to update the window\[char46]
+
+The window must have been created with the
+
+.BR SDL_WINDOW_TRANSPARENT
+ flag\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I window
+the window\[char46]
+.TP
+.I shape
+the surface representing the shape of the window, or NULL to remove any current shape\[char46]
+.SH RETURN VALUE
+Returns true on success or false on failure; call
+
+.BR SDL_GetError
+() for more information\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

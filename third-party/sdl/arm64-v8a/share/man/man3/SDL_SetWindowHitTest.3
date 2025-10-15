@@ -1,0 +1,79 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_SetWindowHitTest:
+.\"   https://wiki.libsdl.org/SDL_SetWindowHitTest
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_SetWindowHitTest
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_SetWindowHitTest 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_SetWindowHitTest \- Provide a callback that decides if a window region has special properties\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_video\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "bool SDL_SetWindowHitTest(SDL_Window *window, SDL_HitTest callback, void *callback_data);
+.fi
+.SH DESCRIPTION
+Normally windows are dragged and resized by decorations provided by the
+system window manager (a title bar, borders, etc), but for some apps, it
+makes sense to drag them from somewhere else inside the window itself; for
+example, one might have a borderless window that wants to be draggable from
+any part, or simulate its own title bar, etc\[char46]
+
+This function lets the app provide a callback that designates pieces of a
+given window as special\[char46] This callback is run during event processing if we
+need to tell the OS to treat a region of the window specially; the use of
+this callback is known as "hit testing\[char46]"
+
+Mouse input may not be delivered to your application if it is within a
+special area; the OS will often apply that input to moving the window or
+resizing the window and not deliver it to the application\[char46]
+
+Specifying NULL for a callback disables hit-testing\[char46] Hit-testing is
+disabled by default\[char46]
+
+Platforms that don't support this functionality will return false
+unconditionally, even if you're attempting to disable hit-testing\[char46]
+
+Your callback may fire at any time, and its firing does not indicate any
+specific behavior (for example, on Windows, this certainly might fire when
+the OS is deciding whether to drag your window, but it fires for lots of
+other reasons, too, some unrelated to anything you probably care about _and
+when the mouse isn't actually at the location it is testing_)\[char46] Since this
+can fire at any time, you should try to keep your callback efficient,
+devoid of allocations, etc\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I window
+the window to set hit-testing on\[char46]
+.TP
+.I callback
+the function to call when doing a hit-test\[char46]
+.TP
+.I callback_data
+an app-defined void pointer passed to
+.B callback
+\[char46]
+.SH RETURN VALUE
+Returns true on success or false on failure; call
+
+.BR SDL_GetError
+() for more information\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

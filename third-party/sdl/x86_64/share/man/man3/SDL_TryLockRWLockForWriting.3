@@ -1,0 +1,65 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_TryLockRWLockForWriting:
+.\"   https://wiki.libsdl.org/SDL_TryLockRWLockForWriting
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_TryLockRWLockForWriting
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_TryLockRWLockForWriting 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_TryLockRWLockForWriting \- Try to lock a read/write lock _for writing_ without blocking\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_mutex\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "bool SDL_TryLockRWLockForWriting(SDL_RWLock *rwlock);
+.fi
+.SH DESCRIPTION
+This works just like
+
+.BR SDL_LockRWLockForWriting
+(), but if the rwlock
+is not available, then this function returns false immediately\[char46]
+
+This technique is useful if you need exclusive access to a resource but
+don't want to wait for it, and will return to it to try again later\[char46]
+
+It is illegal for the owning thread to lock an already-locked rwlock for
+writing (read-only may be locked recursively, writing can not)\[char46] Doing so
+results in undefined behavior\[char46]
+
+It is illegal to request a write lock from a thread that already holds a
+read-only lock\[char46] Doing so results in undefined behavior\[char46] Unlock the
+read-only lock before requesting a write lock\[char46]
+
+This function returns true if passed a NULL rwlock\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I rwlock
+the rwlock to try to lock\[char46]
+.SH RETURN VALUE
+Returns true on success, false if the lock would block\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_LockRWLockForWriting (3),
+.BR \(bu (3),
+.BR SDL_TryLockRWLockForReading (3),
+.BR \(bu (3),
+.BR SDL_UnlockRWLock (3)

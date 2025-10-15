@@ -1,0 +1,77 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_AudioPostmixCallback:
+.\"   https://wiki.libsdl.org/SDL_AudioPostmixCallback
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_AudioPostmixCallback
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_AudioPostmixCallback 3type "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 DATATYPES"
+.SH NAME
+SDL_AudioPostmixCallback \- A callback that fires when data is about to be fed to an audio device\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_audio\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "typedef void (SDLCALL *SDL_AudioPostmixCallback)(void *userdata, const SDL_AudioSpec *spec, float *buffer, int buflen);
+.fi
+.SH DESCRIPTION
+This is useful for accessing the final mix, perhaps for writing a
+visualizer or applying a final effect to the audio data before playback\[char46]
+
+This callback should run as quickly as possible and not block for any
+significant time, as this callback delays submission of data to the audio
+device, which can cause audio playback problems\[char46]
+
+The postmix callback _must_ be able to handle any audio data format
+specified in
+.BR spec
+, which can change between callbacks if the audio device
+changed\[char46] However, this only covers frequency and channel count; data is
+always provided here in 
+.BR SDL_AUDIO_F32
+ format\[char46]
+
+The postmix callback runs _after_ logical device gain and audiostream gain
+have been applied, which is to say you can make the output data louder at
+this point than the gain settings would suggest\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I userdata
+a pointer provided by the app through 
+.BR SDL_SetAudioPostmixCallback
+, for its own use\[char46]
+.TP
+.I spec
+the current format of audio that is to be submitted to the audio device\[char46]
+.TP
+.I buffer
+the buffer of audio samples to be submitted\[char46] The callback can inspect and/or modify this data\[char46]
+.TP
+.I buflen
+the size of
+.BR buffer
+in bytes\[char46]
+.SH THREAD SAFETY
+This will run from a background thread owned by SDL\[char46] The application is
+responsible for locking resources the callback touches that need to be
+protected\[char46]
+
+.SH AVAILABILITY
+This datatype is available since SDL 3\[char46]0\[char46]0\[char46]
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_SetAudioPostmixCallback (3)

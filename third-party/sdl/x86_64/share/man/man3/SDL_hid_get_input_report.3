@@ -1,0 +1,62 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_hid_get_input_report:
+.\"   https://wiki.libsdl.org/SDL_hid_get_input_report
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_hid_get_input_report
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_hid_get_input_report 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_hid_get_input_report \- Get an input report from a HID device\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_hidapi\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "int SDL_hid_get_input_report(SDL_hid_device *dev, unsigned char *data, size_t length);
+.fi
+.SH DESCRIPTION
+Set the first byte of
+.BR data
+to the Report ID of the report to be read\[char46]
+Make sure to allow space for this extra byte in
+.BR data
+\[char46] Upon return, the
+first byte will still contain the Report ID, and the report data will start
+in data[1]\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I dev
+a device handle returned from 
+.BR SDL_hid_open
+()\[char46]
+.TP
+.I data
+a buffer to put the read data into, including the Report ID\[char46] Set the first byte of
+.BR data
+to the Report ID of the report to be read, or set it to zero if your device does not use numbered reports\[char46]
+.TP
+.I length
+the number of bytes to read, including an extra byte for the report ID\[char46] The buffer can be longer than the actual report\[char46]
+.SH RETURN VALUE
+Returns the number of bytes read plus one for the report ID (which is
+still in the first byte), or -1 on on failure; call
+
+.BR SDL_GetError
+() for more information\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

@@ -1,0 +1,40 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_GPUVertexInputState:
+.\"   https://wiki.libsdl.org/SDL_GPUVertexInputState
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_GPUVertexInputState
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_GPUVertexInputState 3type "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 DATATYPES"
+.SH NAME
+SDL_GPUVertexInputState \- A structure specifying the parameters of a graphics pipeline vertex input state\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_gpu\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "typedef struct SDL_GPUVertexInputState
+.BI "{
+.BI "    const SDL_GPUVertexBufferDescription *vertex_buffer_descriptions; /**< A pointer to an array of vertex buffer descriptions. */
+.BI "    Uint32 num_vertex_buffers;                                        /**< The number of vertex buffer descriptions in the above array. */
+.BI "    const SDL_GPUVertexAttribute *vertex_attributes;                  /**< A pointer to an array of vertex attribute descriptions. */
+.BI "    Uint32 num_vertex_attributes;                                     /**< The number of vertex attribute descriptions in the above array. */
+.BI "} SDL_GPUVertexInputState;
+.fi
+.SH AVAILABILITY
+This struct is available since SDL 3\[char46]0\[char46]0
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_GPUGraphicsPipelineCreateInfo (3type)

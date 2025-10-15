@@ -1,0 +1,47 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_HINT_RENDER_LINE_METHOD:
+.\"   https://wiki.libsdl.org/SDL_HINT_RENDER_LINE_METHOD
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_HINT_RENDER_LINE_METHOD
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_HINT_RENDER_LINE_METHOD 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_HINT_RENDER_LINE_METHOD \- A variable controlling how the 2D render API renders lines\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_hints\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "#define SDL_HINT_RENDER_LINE_METHOD "SDL_RENDER_LINE_METHOD"
+.fi
+.SH DESCRIPTION
+The variable can be set to the following values:
+
+
+\(bu "0": Use the default line drawing method (Bresenham's line algorithm)
+
+\(bu "1": Use the driver point API using Bresenham's line algorithm (correct,
+  draws many points)
+
+\(bu "2": Use the driver line API (occasionally misses line endpoints based on
+  hardware driver quirks
+
+\(bu "3": Use the driver geometry API (correct, draws thicker diagonal lines)
+
+This hint should be set before creating a renderer\[char46]
+
+.SH AVAILABILITY
+This hint is available since SDL 3\[char46]0\[char46]0\[char46]
+

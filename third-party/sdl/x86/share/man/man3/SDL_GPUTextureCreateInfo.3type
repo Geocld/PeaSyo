@@ -1,0 +1,51 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_GPUTextureCreateInfo:
+.\"   https://wiki.libsdl.org/SDL_GPUTextureCreateInfo
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_GPUTextureCreateInfo
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_GPUTextureCreateInfo 3type "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 DATATYPES"
+.SH NAME
+SDL_GPUTextureCreateInfo \- A structure specifying the parameters of a texture\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_gpu\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "typedef struct SDL_GPUTextureCreateInfo
+.BI "{
+.BI "    SDL_GPUTextureType type;          /**< The base dimensionality of the texture. */
+.BI "    SDL_GPUTextureFormat format;      /**< The pixel format of the texture. */
+.BI "    SDL_GPUTextureUsageFlags usage;   /**< How the texture is intended to be used by the client. */
+.BI "    Uint32 width;                     /**< The width of the texture. */
+.BI "    Uint32 height;                    /**< The height of the texture. */
+.BI "    Uint32 layer_count_or_depth;      /**< The layer count or depth of the texture. This value is treated as a layer count on 2D array textures, and as a depth value on 3D textures. */
+.BI "    Uint32 num_levels;                /**< The number of mip levels in the texture. */
+.BI "    SDL_GPUSampleCount sample_count;  /**< The number of samples per texel. Only applies if the texture is used as a render target. */
+.BI "
+.BI "    SDL_PropertiesID props;           /**< A properties ID for extensions. Should be 0 if no extensions are needed. */
+.BI "} SDL_GPUTextureCreateInfo;
+.fi
+.SH DESCRIPTION
+Usage flags can be bitwise OR'd together for combinations of usages\[char46] Note
+that certain usage combinations are invalid, for example SAMPLER and
+GRAPHICS_STORAGE\[char46]
+
+.SH AVAILABILITY
+This struct is available since SDL 3\[char46]0\[char46]0
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_CreateGPUTexture (3)

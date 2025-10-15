@@ -1,0 +1,52 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_HINT_QUIT_ON_LAST_WINDOW_CLOSE:
+.\"   https://wiki.libsdl.org/SDL_HINT_QUIT_ON_LAST_WINDOW_CLOSE
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_HINT_QUIT_ON_LAST_WINDOW_CLOSE
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_HINT_QUIT_ON_LAST_WINDOW_CLOSE 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_HINT_QUIT_ON_LAST_WINDOW_CLOSE \- A variable that decides whether to send 
+.BR SDL_EVENT_QUIT
+ when closing the last window\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_hints\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "#define SDL_HINT_QUIT_ON_LAST_WINDOW_CLOSE "SDL_QUIT_ON_LAST_WINDOW_CLOSE"
+.fi
+.SH DESCRIPTION
+The variable can be set to the following values:
+
+
+\(bu "0": SDL will not send an 
+.BR SDL_EVENT_QUIT
+ event when the
+  last window is requesting to close\[char46] Note that in this case, there are
+  still other legitimate reasons one might get an
+  
+.BR SDL_EVENT_QUIT
+ event: choosing "Quit" from the macOS
+  menu bar, sending a SIGINT (ctrl-c) on Unix, etc\[char46]
+
+\(bu "1": SDL will send a quit event when the last window is requesting to
+  close\[char46] (default)
+
+This hint can be set anytime\[char46]
+
+.SH AVAILABILITY
+This hint is available since SDL 3\[char46]0\[char46]0\[char46]
+

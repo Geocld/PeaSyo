@@ -1,0 +1,182 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_IOFromFile:
+.\"   https://wiki.libsdl.org/SDL_IOFromFile
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_IOFromFile
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_IOFromFile 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_IOFromFile \- Use this function to create a new 
+.BR SDL_IOStream
+ structure for reading from and/or writing to a named file\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_iostream\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "SDL_IOStream * SDL_IOFromFile(const char *file, const char *mode);
+.fi
+.SH DESCRIPTION
+The
+.BR mode
+string is treated roughly the same as in a call to the C
+library's fopen(), even if SDL doesn't happen to use fopen() behind the
+scenes\[char46]
+
+Available
+.BR mode
+strings:
+
+
+\(bu "r": Open a file for reading\[char46] The file must exist\[char46]
+
+\(bu "w": Create an empty file for writing\[char46] If a file with the same name
+  already exists its content is erased and the file is treated as a new
+  empty file\[char46]
+
+\(bu "a": Append to a file\[char46] Writing operations append data at the end of the
+  file\[char46] The file is created if it does not exist\[char46]
+
+\(bu "r+": Open a file for update both reading and writing\[char46] The file must
+  exist\[char46]
+
+\(bu "w+": Create an empty file for both reading and writing\[char46] If a file with
+  the same name already exists its content is erased and the file is
+  treated as a new empty file\[char46]
+
+\(bu "a+": Open a file for reading and appending\[char46] All writing operations are
+  performed at the end of the file, protecting the previous content to be
+  overwritten\[char46] You can reposition (fseek, rewind) the internal pointer to
+  anywhere in the file for reading, but writing operations will move it
+  back to the end of file\[char46] The file is created if it does not exist\[char46]
+.B NOTE
+: In order to open a file as a binary file, a "b" character has to
+be included in the
+.BR mode
+string\[char46] This additional "b" character can either
+be appended at the end of the string (thus making the following compound
+modes: "rb", "wb", "ab", "r+b", "w+b", "a+b") or be inserted between the
+letter and the "+" sign for the mixed modes ("rb+", "wb+", "ab+")\[char46]
+Additional characters may follow the sequence, although they should have no
+effect\[char46] For example, "t" is sometimes appended to make explicit the file is
+a text file\[char46]
+
+This function supports Unicode filenames, but they must be encoded in UTF-8
+format, regardless of the underlying operating system\[char46]
+
+In Android, 
+.BR SDL_IOFromFile
+() can be used to open
+content:// URIs\[char46] As a fallback, 
+.BR SDL_IOFromFile
+() will
+transparently open a matching filename in the app's
+.BR assets
+\[char46]
+
+Closing the 
+.BR SDL_IOStream
+ will close SDL's internal file
+handle\[char46]
+
+The following properties may be set at creation time by SDL:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_IOSTREAM_WINDOWS_HANDLE_POINTER
+:
+  a pointer, that can be cast to a win32
+.BR HANDLE
+, that this
+  
+.BR SDL_IOStream
+ is using to access the filesystem\[char46] If the
+  program isn't running on Windows, or SDL used some other method to access
+  the filesystem, this property will not be set\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_IOSTREAM_STDIO_FILE_POINTER
+:
+  a pointer, that can be cast to a stdio
+.BR FILE
+.I 
+, that this
+  
+.BR SDL_IOStream
+ is using to access the filesystem\[char46] If SDL
+  used some other method to access the filesystem, this property will not
+  be set\[char46] PLEASE NOTE that if SDL is using a different C runtime than your
+  app, trying to use this pointer will almost certainly result in a crash!
+  This is mostly a problem on Windows; make sure you build SDL and your app
+  with the same compiler and settings to avoid it\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_IOSTREAM_FILE_DESCRIPTOR_NUMBER
+:
+  a file descriptor that this 
+.BR SDL_IOStream
+ is using to
+  access the filesystem\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_IOSTREAM_ANDROID_AASSET_POINTER
+:
+  a pointer, that can be cast to an Android NDK
+.BR AAsset 
+, that this
+  
+.BR SDL_IOStream
+ is using to access the filesystem\[char46] If SDL
+  used some other method to access the filesystem, this property will not
+  be set\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I file
+a UTF-8 string representing the filename to open\[char46]
+.TP
+.I mode
+an ASCII string representing the mode to be used for opening the file\[char46]
+.SH RETURN VALUE
+(
+.BR SDL_IOStream
+ *) Returns a pointer to the
+
+.BR SDL_IOStream
+ structure that is created or NULL on failure;
+call 
+.BR SDL_GetError
+() for more information\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_CloseIO (3),
+.BR \(bu (3),
+.BR SDL_FlushIO (3),
+.BR \(bu (3),
+.BR SDL_ReadIO (3),
+.BR \(bu (3),
+.BR SDL_SeekIO (3),
+.BR \(bu (3),
+.BR SDL_TellIO (3),
+.BR \(bu (3),
+.BR SDL_WriteIO (3)

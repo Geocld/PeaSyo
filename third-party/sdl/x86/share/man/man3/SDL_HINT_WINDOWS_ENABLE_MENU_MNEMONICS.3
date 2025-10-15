@@ -1,0 +1,57 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_HINT_WINDOWS_ENABLE_MENU_MNEMONICS:
+.\"   https://wiki.libsdl.org/SDL_HINT_WINDOWS_ENABLE_MENU_MNEMONICS
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_HINT_WINDOWS_ENABLE_MENU_MNEMONICS
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_HINT_WINDOWS_ENABLE_MENU_MNEMONICS 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_HINT_WINDOWS_ENABLE_MENU_MNEMONICS \- A variable controlling whether menus can be opened with their keyboard shortcut (Alt+mnemonic)\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_hints\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "#define SDL_HINT_WINDOWS_ENABLE_MENU_MNEMONICS "SDL_WINDOWS_ENABLE_MENU_MNEMONICS"
+.fi
+.SH DESCRIPTION
+If the mnemonics are enabled, then menus can be opened by pressing the Alt
+key and the corresponding mnemonic (for example, Alt+F opens the File
+menu)\[char46] However, in case an invalid mnemonic is pressed, Windows makes an
+audible beep to convey that nothing happened\[char46] This is true even if the
+window has no menu at all!
+
+Because most SDL applications don't have menus, and some want to use the
+Alt key for other purposes, SDL disables mnemonics (and the beeping) by
+default\[char46]
+
+Note: This also affects keyboard events: with mnemonics enabled, when a
+menu is opened from the keyboard, you will not receive a KEYUP event for
+the mnemonic key, and
+.I might
+not receive one for Alt\[char46]
+
+The variable can be set to the following values:
+
+
+\(bu "0": Alt+mnemonic does nothing, no beeping\[char46] (default)
+
+\(bu "1": Alt+mnemonic opens menus, invalid mnemonics produce a beep\[char46]
+
+This hint can be set anytime\[char46]
+
+.SH AVAILABILITY
+This hint is available since SDL 3\[char46]0\[char46]0\[char46]
+

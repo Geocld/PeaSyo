@@ -1,0 +1,84 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_HINT_KEYCODE_OPTIONS:
+.\"   https://wiki.libsdl.org/SDL_HINT_KEYCODE_OPTIONS
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_HINT_KEYCODE_OPTIONS
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_HINT_KEYCODE_OPTIONS 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_HINT_KEYCODE_OPTIONS \- A variable that controls keycode representation in keyboard events\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_hints\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "#define SDL_HINT_KEYCODE_OPTIONS "SDL_KEYCODE_OPTIONS"
+.fi
+.SH DESCRIPTION
+This variable is a comma separated set of options for translating keycodes
+in events:
+
+
+\(bu "none": Keycode options are cleared, this overrides other options\[char46]
+
+\(bu "hide_numpad": The numpad keysyms will be translated into their
+  non-numpad versions based on the current NumLock state\[char46] For example,
+  
+.BR SDLK_KP_4
+ would become 
+.BR SDLK_4
+ if
+  
+.BR SDL_KMOD_NUM
+ is set in the event modifiers, and
+  
+.BR SDLK_LEFT
+ if it is unset\[char46]
+
+\(bu "french_numbers": The number row on French keyboards is inverted, so
+  pressing the 1 key would yield the keycode 
+.BR SDLK_1
+, or '1',
+  instead of 
+.BR SDLK_AMPERSAND
+, or '&'
+
+\(bu "latin_letters": For keyboards using non-Latin letters, such as Russian
+  or Thai, the letter keys generate keycodes as though it had an en_US
+  layout\[char46] e\[char46]g\[char46] pressing the key associated with
+  
+.BR SDL_SCANCODE_A
+ on a Russian keyboard would yield 'a'
+  instead of a Cyrillic letter\[char46]
+
+The default value for this hint is "french_numbers,latin_letters"
+
+Some platforms like Emscripten only provide modified keycodes and the
+options are not used\[char46]
+
+These options do not affect the return value of
+
+.BR SDL_GetKeyFromScancode
+() or
+
+.BR SDL_GetScancodeFromKey
+(), they just apply to the
+keycode included in key events\[char46]
+
+This hint can be set anytime\[char46]
+
+.SH AVAILABILITY
+This hint is available since SDL 3\[char46]0\[char46]0\[char46]
+

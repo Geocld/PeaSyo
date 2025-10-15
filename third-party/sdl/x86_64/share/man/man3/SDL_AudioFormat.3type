@@ -1,0 +1,78 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_AudioFormat:
+.\"   https://wiki.libsdl.org/SDL_AudioFormat
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_AudioFormat
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_AudioFormat 3type "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 DATATYPES"
+.SH NAME
+SDL_AudioFormat \- Audio format\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_audio\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "typedef enum SDL_AudioFormat
+.BI "{
+.BI "    SDL_AUDIO_UNKNOWN   = 0x0000u,  /**< Unspecified audio format */
+.BI "    SDL_AUDIO_U8        = 0x0008u,  /**< Unsigned 8-bit samples */
+.BI "        /* SDL_DEFINE_AUDIO_FORMAT(0, 0, 0, 8), */
+.BI "    SDL_AUDIO_S8        = 0x8008u,  /**< Signed 8-bit samples */
+.BI "        /* SDL_DEFINE_AUDIO_FORMAT(1, 0, 0, 8), */
+.BI "    SDL_AUDIO_S16LE     = 0x8010u,  /**< Signed 16-bit samples */
+.BI "        /* SDL_DEFINE_AUDIO_FORMAT(1, 0, 0, 16), */
+.BI "    SDL_AUDIO_S16BE     = 0x9010u,  /**< As above, but big-endian byte order */
+.BI "        /* SDL_DEFINE_AUDIO_FORMAT(1, 1, 0, 16), */
+.BI "    SDL_AUDIO_S32LE     = 0x8020u,  /**< 32-bit integer samples */
+.BI "        /* SDL_DEFINE_AUDIO_FORMAT(1, 0, 0, 32), */
+.BI "    SDL_AUDIO_S32BE     = 0x9020u,  /**< As above, but big-endian byte order */
+.BI "        /* SDL_DEFINE_AUDIO_FORMAT(1, 1, 0, 32), */
+.BI "    SDL_AUDIO_F32LE     = 0x8120u,  /**< 32-bit floating point samples */
+.BI "        /* SDL_DEFINE_AUDIO_FORMAT(1, 0, 1, 32), */
+.BI "    SDL_AUDIO_F32BE     = 0x9120u,  /**< As above, but big-endian byte order */
+.BI "        /* SDL_DEFINE_AUDIO_FORMAT(1, 1, 1, 32), */
+.BI "
+.BI "    /* These represent the current system's byteorder. */
+.BI "    #if SDL_BYTEORDER == SDL_LIL_ENDIAN
+.BI "    SDL_AUDIO_S16 = SDL_AUDIO_S16LE,
+.BI "    SDL_AUDIO_S32 = SDL_AUDIO_S32LE,
+.BI "    SDL_AUDIO_F32 = SDL_AUDIO_F32LE
+.BI "    #else
+.BI "    SDL_AUDIO_S16 = SDL_AUDIO_S16BE,
+.BI "    SDL_AUDIO_S32 = SDL_AUDIO_S32BE,
+.BI "    SDL_AUDIO_F32 = SDL_AUDIO_F32BE
+.BI "    #endif
+.BI "} SDL_AudioFormat;
+.fi
+.SH AVAILABILITY
+This enum is available since SDL 3\[char46]0\[char46]0\[char46]
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_AUDIO_BITSIZE (3),
+.BR \(bu (3),
+.BR SDL_AUDIO_BYTESIZE (3),
+.BR \(bu (3),
+.BR SDL_AUDIO_ISINT (3),
+.BR \(bu (3),
+.BR SDL_AUDIO_ISFLOAT (3),
+.BR \(bu (3),
+.BR SDL_AUDIO_ISBIGENDIAN (3),
+.BR \(bu (3),
+.BR SDL_AUDIO_ISLITTLEENDIAN (3),
+.BR \(bu (3),
+.BR SDL_AUDIO_ISSIGNED (3),
+.BR \(bu (3),
+.BR SDL_AUDIO_ISUNSIGNED (3)

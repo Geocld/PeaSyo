@@ -1,0 +1,90 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_InitState:
+.\"   https://wiki.libsdl.org/SDL_InitState
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_InitState
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_InitState 3type "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 DATATYPES"
+.SH NAME
+SDL_InitState \- A structure used for thread-safe initialization and shutdown\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_mutex\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "typedef struct SDL_InitState
+.BI "{
+.BI "    SDL_AtomicInt status;
+.BI "    SDL_ThreadID thread;
+.BI "    void *reserved;
+.BI "} SDL_InitState;
+.fi
+.SH DESCRIPTION
+Here is an example of using this:
+
+.IP
+.EX
+   static SDL_AtomicInitState init;
+
+   bool InitSystem(void)
+   {
+       if (!SDL_ShouldInit(&init)) {
+           // The system is initialized
+           return true;
+       }
+
+       // At this point, you should not leave this function without calling SDL_SetInitialized()
+
+       bool initialized = DoInitTasks();
+       SDL_SetInitialized(&init, initialized);
+       return initialized;
+   }
+
+   bool UseSubsystem(void)
+   {
+       if (SDL_ShouldInit(&init)) {
+           // Error, the subsystem isn't initialized
+           SDL_SetInitialized(&init, false);
+           return false;
+       }
+
+       // Do work using the initialized subsystem
+
+       return true;
+   }
+
+   void QuitSystem(void)
+   {
+       if (!SDL_ShouldQuit(&init)) {
+           // The system is not initialized
+           return true;
+       }
+
+       // At this point, you should not leave this function without calling SDL_SetInitialized()
+
+       DoQuitTasks();
+       SDL_SetInitialized(&init, false);
+   }
+.EE
+.PP
+
+Note that this doesn't protect any resources created during initialization,
+or guarantee that nobody is using those resources during cleanup\[char46] You
+should use other mechanisms to protect those, if that's a concern for your
+code\[char46]
+
+.SH AVAILABILITY
+This struct is available since SDL 3\[char46]0\[char46]0\[char46]
+

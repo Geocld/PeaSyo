@@ -1,0 +1,49 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_HINT_VIDEO_WIN_D3DCOMPILER:
+.\"   https://wiki.libsdl.org/SDL_HINT_VIDEO_WIN_D3DCOMPILER
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_HINT_VIDEO_WIN_D3DCOMPILER
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_HINT_VIDEO_WIN_D3DCOMPILER 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_HINT_VIDEO_WIN_D3DCOMPILER \- A variable specifying which shader compiler to preload when using the Chrome ANGLE binaries\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_hints\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "#define SDL_HINT_VIDEO_WIN_D3DCOMPILER "SDL_VIDEO_WIN_D3DCOMPILER"
+.fi
+.SH DESCRIPTION
+SDL has EGL and OpenGL ES2 support on Windows via the ANGLE project\[char46] It can
+use two different sets of binaries, those compiled by the user from source
+or those provided by the Chrome browser\[char46] In the later case, these binaries
+require that SDL loads a DLL providing the shader compiler\[char46]
+
+The variable can be set to the following values:
+
+
+\(bu "d3dcompiler_46\[char46]dll" - best for Vista or later\[char46] (default)
+
+\(bu "d3dcompiler_43\[char46]dll" - for XP support\[char46]
+
+\(bu "none" - do not load any library, useful if you compiled ANGLE from
+  source and included the compiler in your binaries\[char46]
+
+This hint should be set before SDL is initialized\[char46]
+
+.SH AVAILABILITY
+This hint is available since SDL 3\[char46]0\[char46]0\[char46]
+

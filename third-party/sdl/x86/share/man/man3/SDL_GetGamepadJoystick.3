@@ -1,0 +1,67 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_GetGamepadJoystick:
+.\"   https://wiki.libsdl.org/SDL_GetGamepadJoystick
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_GetGamepadJoystick
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_GetGamepadJoystick 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_GetGamepadJoystick \- Get the underlying joystick from a gamepad\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_gamepad\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "SDL_Joystick * SDL_GetGamepadJoystick(SDL_Gamepad *gamepad);
+.fi
+.SH DESCRIPTION
+This function will give you a 
+.BR SDL_Joystick
+ object, which
+allows you to use the 
+.BR SDL_Joystick
+ functions with a
+
+.BR SDL_Gamepad
+ object\[char46] This would be useful for getting a
+joystick's position at any given time, even if it hasn't moved (moving it
+would produce an event, which would have the axis' value)\[char46]
+
+The pointer returned is owned by the 
+.BR SDL_Gamepad
+\[char46] You should
+not call 
+.BR SDL_CloseJoystick
+() on it, for example, since
+doing so will likely cause SDL to crash\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I gamepad
+the gamepad object that you want to get a joystick from\[char46]
+.SH RETURN VALUE
+(
+.BR SDL_Joystick
+ *) Returns an 
+.BR SDL_Joystick
+
+object, or NULL on failure; call 
+.BR SDL_GetError
+() for more
+information\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

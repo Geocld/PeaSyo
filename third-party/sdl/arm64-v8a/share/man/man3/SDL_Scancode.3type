@@ -1,0 +1,421 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_Scancode:
+.\"   https://wiki.libsdl.org/SDL_Scancode
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_Scancode
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_Scancode 3type "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 DATATYPES"
+.SH NAME
+SDL_Scancode \- The SDL keyboard scancode representation\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_scancode\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "typedef enum SDL_Scancode
+.BI "{
+.BI "    SDL_SCANCODE_UNKNOWN = 0,
+.BI "
+.BI "    /**
+.BI "     *  \name Usage page 0x07
+.BI "     *
+.BI "     *  These values are from usage page 0x07 (USB keyboard page).
+.BI "     */
+.BI "    /* @{ */
+.BI "
+.BI "    SDL_SCANCODE_A = 4,
+.BI "    SDL_SCANCODE_B = 5,
+.BI "    SDL_SCANCODE_C = 6,
+.BI "    SDL_SCANCODE_D = 7,
+.BI "    SDL_SCANCODE_E = 8,
+.BI "    SDL_SCANCODE_F = 9,
+.BI "    SDL_SCANCODE_G = 10,
+.BI "    SDL_SCANCODE_H = 11,
+.BI "    SDL_SCANCODE_I = 12,
+.BI "    SDL_SCANCODE_J = 13,
+.BI "    SDL_SCANCODE_K = 14,
+.BI "    SDL_SCANCODE_L = 15,
+.BI "    SDL_SCANCODE_M = 16,
+.BI "    SDL_SCANCODE_N = 17,
+.BI "    SDL_SCANCODE_O = 18,
+.BI "    SDL_SCANCODE_P = 19,
+.BI "    SDL_SCANCODE_Q = 20,
+.BI "    SDL_SCANCODE_R = 21,
+.BI "    SDL_SCANCODE_S = 22,
+.BI "    SDL_SCANCODE_T = 23,
+.BI "    SDL_SCANCODE_U = 24,
+.BI "    SDL_SCANCODE_V = 25,
+.BI "    SDL_SCANCODE_W = 26,
+.BI "    SDL_SCANCODE_X = 27,
+.BI "    SDL_SCANCODE_Y = 28,
+.BI "    SDL_SCANCODE_Z = 29,
+.BI "
+.BI "    SDL_SCANCODE_1 = 30,
+.BI "    SDL_SCANCODE_2 = 31,
+.BI "    SDL_SCANCODE_3 = 32,
+.BI "    SDL_SCANCODE_4 = 33,
+.BI "    SDL_SCANCODE_5 = 34,
+.BI "    SDL_SCANCODE_6 = 35,
+.BI "    SDL_SCANCODE_7 = 36,
+.BI "    SDL_SCANCODE_8 = 37,
+.BI "    SDL_SCANCODE_9 = 38,
+.BI "    SDL_SCANCODE_0 = 39,
+.BI "
+.BI "    SDL_SCANCODE_RETURN = 40,
+.BI "    SDL_SCANCODE_ESCAPE = 41,
+.BI "    SDL_SCANCODE_BACKSPACE = 42,
+.BI "    SDL_SCANCODE_TAB = 43,
+.BI "    SDL_SCANCODE_SPACE = 44,
+.BI "
+.BI "    SDL_SCANCODE_MINUS = 45,
+.BI "    SDL_SCANCODE_EQUALS = 46,
+.BI "    SDL_SCANCODE_LEFTBRACKET = 47,
+.BI "    SDL_SCANCODE_RIGHTBRACKET = 48,
+.BI "    SDL_SCANCODE_BACKSLASH = 49, /**< Located at the lower left of the return
+.BI "                                  *   key on ISO keyboards and at the right end
+.BI "                                  *   of the QWERTY row on ANSI keyboards.
+.BI "                                  *   Produces REVERSE SOLIDUS (backslash) and
+.BI "                                  *   VERTICAL LINE in a US layout, REVERSE
+.BI "                                  *   SOLIDUS and VERTICAL LINE in a UK Mac
+.BI "                                  *   layout, NUMBER SIGN and TILDE in a UK
+.BI "                                  *   Windows layout, DOLLAR SIGN and POUND SIGN
+.BI "                                  *   in a Swiss German layout, NUMBER SIGN and
+.BI "                                  *   APOSTROPHE in a German layout, GRAVE
+.BI "                                  *   ACCENT and POUND SIGN in a French Mac
+.BI "                                  *   layout, and ASTERISK and MICRO SIGN in a
+.BI "                                  *   French Windows layout.
+.BI "                                  */
+.BI "    SDL_SCANCODE_NONUSHASH = 50, /**< ISO USB keyboards actually use this code
+.BI "                                  *   instead of 49 for the same key, but all
+.BI "                                  *   OSes I've seen treat the two codes
+.BI "                                  *   identically. So, as an implementor, unless
+.BI "                                  *   your keyboard generates both of those
+.BI "                                  *   codes and your OS treats them differently,
+.BI "                                  *   you should generate SDL_SCANCODE_BACKSLASH
+.BI "                                  *   instead of this code. As a user, you
+.BI "                                  *   should not rely on this code because SDL
+.BI "                                  *   will never generate it with most (all?)
+.BI "                                  *   keyboards.
+.BI "                                  */
+.BI "    SDL_SCANCODE_SEMICOLON = 51,
+.BI "    SDL_SCANCODE_APOSTROPHE = 52,
+.BI "    SDL_SCANCODE_GRAVE = 53, /**< Located in the top left corner (on both ANSI
+.BI "                              *   and ISO keyboards). Produces GRAVE ACCENT and
+.BI "                              *   TILDE in a US Windows layout and in US and UK
+.BI "                              *   Mac layouts on ANSI keyboards, GRAVE ACCENT
+.BI "                              *   and NOT SIGN in a UK Windows layout, SECTION
+.BI "                              *   SIGN and PLUS-MINUS SIGN in US and UK Mac
+.BI "                              *   layouts on ISO keyboards, SECTION SIGN and
+.BI "                              *   DEGREE SIGN in a Swiss German layout (Mac:
+.BI "                              *   only on ISO keyboards), CIRCUMFLEX ACCENT and
+.BI "                              *   DEGREE SIGN in a German layout (Mac: only on
+.BI "                              *   ISO keyboards), SUPERSCRIPT TWO and TILDE in a
+.BI "                              *   French Windows layout, COMMERCIAL AT and
+.BI "                              *   NUMBER SIGN in a French Mac layout on ISO
+.BI "                              *   keyboards, and LESS-THAN SIGN and GREATER-THAN
+.BI "                              *   SIGN in a Swiss German, German, or French Mac
+.BI "                              *   layout on ANSI keyboards.
+.BI "                              */
+.BI "    SDL_SCANCODE_COMMA = 54,
+.BI "    SDL_SCANCODE_PERIOD = 55,
+.BI "    SDL_SCANCODE_SLASH = 56,
+.BI "
+.BI "    SDL_SCANCODE_CAPSLOCK = 57,
+.BI "
+.BI "    SDL_SCANCODE_F1 = 58,
+.BI "    SDL_SCANCODE_F2 = 59,
+.BI "    SDL_SCANCODE_F3 = 60,
+.BI "    SDL_SCANCODE_F4 = 61,
+.BI "    SDL_SCANCODE_F5 = 62,
+.BI "    SDL_SCANCODE_F6 = 63,
+.BI "    SDL_SCANCODE_F7 = 64,
+.BI "    SDL_SCANCODE_F8 = 65,
+.BI "    SDL_SCANCODE_F9 = 66,
+.BI "    SDL_SCANCODE_F10 = 67,
+.BI "    SDL_SCANCODE_F11 = 68,
+.BI "    SDL_SCANCODE_F12 = 69,
+.BI "
+.BI "    SDL_SCANCODE_PRINTSCREEN = 70,
+.BI "    SDL_SCANCODE_SCROLLLOCK = 71,
+.BI "    SDL_SCANCODE_PAUSE = 72,
+.BI "    SDL_SCANCODE_INSERT = 73, /**< insert on PC, help on some Mac keyboards (but
+.BI "                                   does send code 73, not 117) */
+.BI "    SDL_SCANCODE_HOME = 74,
+.BI "    SDL_SCANCODE_PAGEUP = 75,
+.BI "    SDL_SCANCODE_DELETE = 76,
+.BI "    SDL_SCANCODE_END = 77,
+.BI "    SDL_SCANCODE_PAGEDOWN = 78,
+.BI "    SDL_SCANCODE_RIGHT = 79,
+.BI "    SDL_SCANCODE_LEFT = 80,
+.BI "    SDL_SCANCODE_DOWN = 81,
+.BI "    SDL_SCANCODE_UP = 82,
+.BI "
+.BI "    SDL_SCANCODE_NUMLOCKCLEAR = 83, /**< num lock on PC, clear on Mac keyboards
+.BI "                                     */
+.BI "    SDL_SCANCODE_KP_DIVIDE = 84,
+.BI "    SDL_SCANCODE_KP_MULTIPLY = 85,
+.BI "    SDL_SCANCODE_KP_MINUS = 86,
+.BI "    SDL_SCANCODE_KP_PLUS = 87,
+.BI "    SDL_SCANCODE_KP_ENTER = 88,
+.BI "    SDL_SCANCODE_KP_1 = 89,
+.BI "    SDL_SCANCODE_KP_2 = 90,
+.BI "    SDL_SCANCODE_KP_3 = 91,
+.BI "    SDL_SCANCODE_KP_4 = 92,
+.BI "    SDL_SCANCODE_KP_5 = 93,
+.BI "    SDL_SCANCODE_KP_6 = 94,
+.BI "    SDL_SCANCODE_KP_7 = 95,
+.BI "    SDL_SCANCODE_KP_8 = 96,
+.BI "    SDL_SCANCODE_KP_9 = 97,
+.BI "    SDL_SCANCODE_KP_0 = 98,
+.BI "    SDL_SCANCODE_KP_PERIOD = 99,
+.BI "
+.BI "    SDL_SCANCODE_NONUSBACKSLASH = 100, /**< This is the additional key that ISO
+.BI "                                        *   keyboards have over ANSI ones,
+.BI "                                        *   located between left shift and Y.
+.BI "                                        *   Produces GRAVE ACCENT and TILDE in a
+.BI "                                        *   US or UK Mac layout, REVERSE SOLIDUS
+.BI "                                        *   (backslash) and VERTICAL LINE in a
+.BI "                                        *   US or UK Windows layout, and
+.BI "                                        *   LESS-THAN SIGN and GREATER-THAN SIGN
+.BI "                                        *   in a Swiss German, German, or French
+.BI "                                        *   layout. */
+.BI "    SDL_SCANCODE_APPLICATION = 101, /**< windows contextual menu, compose */
+.BI "    SDL_SCANCODE_POWER = 102, /**< The USB document says this is a status flag,
+.BI "                               *   not a physical key - but some Mac keyboards
+.BI "                               *   do have a power key. */
+.BI "    SDL_SCANCODE_KP_EQUALS = 103,
+.BI "    SDL_SCANCODE_F13 = 104,
+.BI "    SDL_SCANCODE_F14 = 105,
+.BI "    SDL_SCANCODE_F15 = 106,
+.BI "    SDL_SCANCODE_F16 = 107,
+.BI "    SDL_SCANCODE_F17 = 108,
+.BI "    SDL_SCANCODE_F18 = 109,
+.BI "    SDL_SCANCODE_F19 = 110,
+.BI "    SDL_SCANCODE_F20 = 111,
+.BI "    SDL_SCANCODE_F21 = 112,
+.BI "    SDL_SCANCODE_F22 = 113,
+.BI "    SDL_SCANCODE_F23 = 114,
+.BI "    SDL_SCANCODE_F24 = 115,
+.BI "    SDL_SCANCODE_EXECUTE = 116,
+.BI "    SDL_SCANCODE_HELP = 117,    /**< AL Integrated Help Center */
+.BI "    SDL_SCANCODE_MENU = 118,    /**< Menu (show menu) */
+.BI "    SDL_SCANCODE_SELECT = 119,
+.BI "    SDL_SCANCODE_STOP = 120,    /**< AC Stop */
+.BI "    SDL_SCANCODE_AGAIN = 121,   /**< AC Redo/Repeat */
+.BI "    SDL_SCANCODE_UNDO = 122,    /**< AC Undo */
+.BI "    SDL_SCANCODE_CUT = 123,     /**< AC Cut */
+.BI "    SDL_SCANCODE_COPY = 124,    /**< AC Copy */
+.BI "    SDL_SCANCODE_PASTE = 125,   /**< AC Paste */
+.BI "    SDL_SCANCODE_FIND = 126,    /**< AC Find */
+.BI "    SDL_SCANCODE_MUTE = 127,
+.BI "    SDL_SCANCODE_VOLUMEUP = 128,
+.BI "    SDL_SCANCODE_VOLUMEDOWN = 129,
+.BI "/* not sure whether there's a reason to enable these */
+.BI "/*     SDL_SCANCODE_LOCKINGCAPSLOCK = 130,  */
+.BI "/*     SDL_SCANCODE_LOCKINGNUMLOCK = 131, */
+.BI "/*     SDL_SCANCODE_LOCKINGSCROLLLOCK = 132, */
+.BI "    SDL_SCANCODE_KP_COMMA = 133,
+.BI "    SDL_SCANCODE_KP_EQUALSAS400 = 134,
+.BI "
+.BI "    SDL_SCANCODE_INTERNATIONAL1 = 135, /**< used on Asian keyboards, see
+.BI "                                            footnotes in USB doc */
+.BI "    SDL_SCANCODE_INTERNATIONAL2 = 136,
+.BI "    SDL_SCANCODE_INTERNATIONAL3 = 137, /**< Yen */
+.BI "    SDL_SCANCODE_INTERNATIONAL4 = 138,
+.BI "    SDL_SCANCODE_INTERNATIONAL5 = 139,
+.BI "    SDL_SCANCODE_INTERNATIONAL6 = 140,
+.BI "    SDL_SCANCODE_INTERNATIONAL7 = 141,
+.BI "    SDL_SCANCODE_INTERNATIONAL8 = 142,
+.BI "    SDL_SCANCODE_INTERNATIONAL9 = 143,
+.BI "    SDL_SCANCODE_LANG1 = 144, /**< Hangul/English toggle */
+.BI "    SDL_SCANCODE_LANG2 = 145, /**< Hanja conversion */
+.BI "    SDL_SCANCODE_LANG3 = 146, /**< Katakana */
+.BI "    SDL_SCANCODE_LANG4 = 147, /**< Hiragana */
+.BI "    SDL_SCANCODE_LANG5 = 148, /**< Zenkaku/Hankaku */
+.BI "    SDL_SCANCODE_LANG6 = 149, /**< reserved */
+.BI "    SDL_SCANCODE_LANG7 = 150, /**< reserved */
+.BI "    SDL_SCANCODE_LANG8 = 151, /**< reserved */
+.BI "    SDL_SCANCODE_LANG9 = 152, /**< reserved */
+.BI "
+.BI "    SDL_SCANCODE_ALTERASE = 153,    /**< Erase-Eaze */
+.BI "    SDL_SCANCODE_SYSREQ = 154,
+.BI "    SDL_SCANCODE_CANCEL = 155,      /**< AC Cancel */
+.BI "    SDL_SCANCODE_CLEAR = 156,
+.BI "    SDL_SCANCODE_PRIOR = 157,
+.BI "    SDL_SCANCODE_RETURN2 = 158,
+.BI "    SDL_SCANCODE_SEPARATOR = 159,
+.BI "    SDL_SCANCODE_OUT = 160,
+.BI "    SDL_SCANCODE_OPER = 161,
+.BI "    SDL_SCANCODE_CLEARAGAIN = 162,
+.BI "    SDL_SCANCODE_CRSEL = 163,
+.BI "    SDL_SCANCODE_EXSEL = 164,
+.BI "
+.BI "    SDL_SCANCODE_KP_00 = 176,
+.BI "    SDL_SCANCODE_KP_000 = 177,
+.BI "    SDL_SCANCODE_THOUSANDSSEPARATOR = 178,
+.BI "    SDL_SCANCODE_DECIMALSEPARATOR = 179,
+.BI "    SDL_SCANCODE_CURRENCYUNIT = 180,
+.BI "    SDL_SCANCODE_CURRENCYSUBUNIT = 181,
+.BI "    SDL_SCANCODE_KP_LEFTPAREN = 182,
+.BI "    SDL_SCANCODE_KP_RIGHTPAREN = 183,
+.BI "    SDL_SCANCODE_KP_LEFTBRACE = 184,
+.BI "    SDL_SCANCODE_KP_RIGHTBRACE = 185,
+.BI "    SDL_SCANCODE_KP_TAB = 186,
+.BI "    SDL_SCANCODE_KP_BACKSPACE = 187,
+.BI "    SDL_SCANCODE_KP_A = 188,
+.BI "    SDL_SCANCODE_KP_B = 189,
+.BI "    SDL_SCANCODE_KP_C = 190,
+.BI "    SDL_SCANCODE_KP_D = 191,
+.BI "    SDL_SCANCODE_KP_E = 192,
+.BI "    SDL_SCANCODE_KP_F = 193,
+.BI "    SDL_SCANCODE_KP_XOR = 194,
+.BI "    SDL_SCANCODE_KP_POWER = 195,
+.BI "    SDL_SCANCODE_KP_PERCENT = 196,
+.BI "    SDL_SCANCODE_KP_LESS = 197,
+.BI "    SDL_SCANCODE_KP_GREATER = 198,
+.BI "    SDL_SCANCODE_KP_AMPERSAND = 199,
+.BI "    SDL_SCANCODE_KP_DBLAMPERSAND = 200,
+.BI "    SDL_SCANCODE_KP_VERTICALBAR = 201,
+.BI "    SDL_SCANCODE_KP_DBLVERTICALBAR = 202,
+.BI "    SDL_SCANCODE_KP_COLON = 203,
+.BI "    SDL_SCANCODE_KP_HASH = 204,
+.BI "    SDL_SCANCODE_KP_SPACE = 205,
+.BI "    SDL_SCANCODE_KP_AT = 206,
+.BI "    SDL_SCANCODE_KP_EXCLAM = 207,
+.BI "    SDL_SCANCODE_KP_MEMSTORE = 208,
+.BI "    SDL_SCANCODE_KP_MEMRECALL = 209,
+.BI "    SDL_SCANCODE_KP_MEMCLEAR = 210,
+.BI "    SDL_SCANCODE_KP_MEMADD = 211,
+.BI "    SDL_SCANCODE_KP_MEMSUBTRACT = 212,
+.BI "    SDL_SCANCODE_KP_MEMMULTIPLY = 213,
+.BI "    SDL_SCANCODE_KP_MEMDIVIDE = 214,
+.BI "    SDL_SCANCODE_KP_PLUSMINUS = 215,
+.BI "    SDL_SCANCODE_KP_CLEAR = 216,
+.BI "    SDL_SCANCODE_KP_CLEARENTRY = 217,
+.BI "    SDL_SCANCODE_KP_BINARY = 218,
+.BI "    SDL_SCANCODE_KP_OCTAL = 219,
+.BI "    SDL_SCANCODE_KP_DECIMAL = 220,
+.BI "    SDL_SCANCODE_KP_HEXADECIMAL = 221,
+.BI "
+.BI "    SDL_SCANCODE_LCTRL = 224,
+.BI "    SDL_SCANCODE_LSHIFT = 225,
+.BI "    SDL_SCANCODE_LALT = 226, /**< alt, option */
+.BI "    SDL_SCANCODE_LGUI = 227, /**< windows, command (apple), meta */
+.BI "    SDL_SCANCODE_RCTRL = 228,
+.BI "    SDL_SCANCODE_RSHIFT = 229,
+.BI "    SDL_SCANCODE_RALT = 230, /**< alt gr, option */
+.BI "    SDL_SCANCODE_RGUI = 231, /**< windows, command (apple), meta */
+.BI "
+.BI "    SDL_SCANCODE_MODE = 257,    /**< I'm not sure if this is really not covered
+.BI "                                 *   by any of the above, but since there's a
+.BI "                                 *   special SDL_KMOD_MODE for it I'm adding it here
+.BI "                                 */
+.BI "
+.BI "    /* @} *//* Usage page 0x07 */
+.BI "
+.BI "    /**
+.BI "     *  \name Usage page 0x0C
+.BI "     *
+.BI "     *  These values are mapped from usage page 0x0C (USB consumer page).
+.BI "     *
+.BI "     *  There are way more keys in the spec than we can represent in the
+.BI "     *  current scancode range, so pick the ones that commonly come up in
+.BI "     *  real world usage.
+.BI "     */
+.BI "    /* @{ */
+.BI "
+.BI "    SDL_SCANCODE_SLEEP = 258,                   /**< Sleep */
+.BI "    SDL_SCANCODE_WAKE = 259,                    /**< Wake */
+.BI "
+.BI "    SDL_SCANCODE_CHANNEL_INCREMENT = 260,       /**< Channel Increment */
+.BI "    SDL_SCANCODE_CHANNEL_DECREMENT = 261,       /**< Channel Decrement */
+.BI "
+.BI "    SDL_SCANCODE_MEDIA_PLAY = 262,          /**< Play */
+.BI "    SDL_SCANCODE_MEDIA_PAUSE = 263,         /**< Pause */
+.BI "    SDL_SCANCODE_MEDIA_RECORD = 264,        /**< Record */
+.BI "    SDL_SCANCODE_MEDIA_FAST_FORWARD = 265,  /**< Fast Forward */
+.BI "    SDL_SCANCODE_MEDIA_REWIND = 266,        /**< Rewind */
+.BI "    SDL_SCANCODE_MEDIA_NEXT_TRACK = 267,    /**< Next Track */
+.BI "    SDL_SCANCODE_MEDIA_PREVIOUS_TRACK = 268, /**< Previous Track */
+.BI "    SDL_SCANCODE_MEDIA_STOP = 269,          /**< Stop */
+.BI "    SDL_SCANCODE_MEDIA_EJECT = 270,         /**< Eject */
+.BI "    SDL_SCANCODE_MEDIA_PLAY_PAUSE = 271,    /**< Play / Pause */
+.BI "    SDL_SCANCODE_MEDIA_SELECT = 272,        /* Media Select */
+.BI "
+.BI "    SDL_SCANCODE_AC_NEW = 273,              /**< AC New */
+.BI "    SDL_SCANCODE_AC_OPEN = 274,             /**< AC Open */
+.BI "    SDL_SCANCODE_AC_CLOSE = 275,            /**< AC Close */
+.BI "    SDL_SCANCODE_AC_EXIT = 276,             /**< AC Exit */
+.BI "    SDL_SCANCODE_AC_SAVE = 277,             /**< AC Save */
+.BI "    SDL_SCANCODE_AC_PRINT = 278,            /**< AC Print */
+.BI "    SDL_SCANCODE_AC_PROPERTIES = 279,       /**< AC Properties */
+.BI "
+.BI "    SDL_SCANCODE_AC_SEARCH = 280,           /**< AC Search */
+.BI "    SDL_SCANCODE_AC_HOME = 281,             /**< AC Home */
+.BI "    SDL_SCANCODE_AC_BACK = 282,             /**< AC Back */
+.BI "    SDL_SCANCODE_AC_FORWARD = 283,          /**< AC Forward */
+.BI "    SDL_SCANCODE_AC_STOP = 284,             /**< AC Stop */
+.BI "    SDL_SCANCODE_AC_REFRESH = 285,          /**< AC Refresh */
+.BI "    SDL_SCANCODE_AC_BOOKMARKS = 286,        /**< AC Bookmarks */
+.BI "
+.BI "    /* @} *//* Usage page 0x0C */
+.BI "
+.BI "
+.BI "    /**
+.BI "     *  \name Mobile keys
+.BI "     *
+.BI "     *  These are values that are often used on mobile phones.
+.BI "     */
+.BI "    /* @{ */
+.BI "
+.BI "    SDL_SCANCODE_SOFTLEFT = 287, /**< Usually situated below the display on phones and
+.BI "                                      used as a multi-function feature key for selecting
+.BI "                                      a software defined function shown on the bottom left
+.BI "                                      of the display. */
+.BI "    SDL_SCANCODE_SOFTRIGHT = 288, /**< Usually situated below the display on phones and
+.BI "                                       used as a multi-function feature key for selecting
+.BI "                                       a software defined function shown on the bottom right
+.BI "                                       of the display. */
+.BI "    SDL_SCANCODE_CALL = 289, /**< Used for accepting phone calls. */
+.BI "    SDL_SCANCODE_ENDCALL = 290, /**< Used for rejecting phone calls. */
+.BI "
+.BI "    /* @} *//* Mobile keys */
+.BI "
+.BI "    /* Add any other keys here. */
+.BI "
+.BI "    SDL_SCANCODE_RESERVED = 400,    /**< 400-500 reserved for dynamic keycodes */
+.BI "
+.BI "    SDL_SCANCODE_COUNT = 512 /**< not a key, just marks the number of scancodes for array bounds */
+.BI "
+.BI "} SDL_Scancode;
+.fi
+.SH DESCRIPTION
+An SDL scancode is the physical representation of a key on the keyboard,
+independent of language and keyboard mapping\[char46]
+
+Values of this type are used to represent keyboard keys, among other places
+in the
+.BR scancode
+field of the 
+.BR SDL_KeyboardEvent
+
+structure\[char46]
+
+The values in this enumeration are based on the USB usage page standard:
+https://usb\[char46]org/sites/default/files/hut1_5\[char46]pdf
+
+.SH AVAILABILITY
+This enum is available since SDL 3\[char46]0\[char46]0\[char46]
+

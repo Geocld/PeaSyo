@@ -1,0 +1,77 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_WaitThread:
+.\"   https://wiki.libsdl.org/SDL_WaitThread
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_WaitThread
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_WaitThread 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_WaitThread \- Wait for a thread to finish\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_thread\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "void SDL_WaitThread(SDL_Thread *thread, int *status);
+.fi
+.SH DESCRIPTION
+Threads that haven't been detached will remain (as a "zombie") until this
+function cleans them up\[char46] Not doing so is a resource leak\[char46]
+
+Once a thread has been cleaned up through this function, the
+
+.BR SDL_Thread
+ that references it becomes invalid and should not
+be referenced again\[char46] As such, only one thread may call
+
+.BR SDL_WaitThread
+() on another\[char46]
+
+The return code for the thread function is placed in the area pointed to by
+.BR status
+, if
+.BR status
+is not NULL\[char46]
+
+You may not wait on a thread that has been used in a call to
+
+.BR SDL_DetachThread
+()\[char46] Use either that function or this
+one, but not both, or behavior is undefined\[char46]
+
+It is safe to pass a NULL thread to this function; it is a no-op\[char46]
+
+Note that the thread pointer is freed by this function and is not valid
+afterward\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I thread
+the 
+.BR SDL_Thread
+ pointer that was returned from the 
+.BR SDL_CreateThread
+() call that started this thread\[char46]
+.TP
+.I status
+pointer to an integer that will receive the value returned from the thread function by its 'return', or NULL to not receive such value back\[char46]
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_CreateThread (3),
+.BR \(bu (3),
+.BR SDL_DetachThread (3)

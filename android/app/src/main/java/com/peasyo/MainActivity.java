@@ -2,6 +2,8 @@ package com.peasyo;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import com.facebook.react.ReactActivity;
 import com.facebook.react.bridge.ReactContext;

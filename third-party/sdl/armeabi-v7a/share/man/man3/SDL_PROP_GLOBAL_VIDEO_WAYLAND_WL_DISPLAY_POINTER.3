@@ -1,0 +1,43 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_PROP_GLOBAL_VIDEO_WAYLAND_WL_DISPLAY_POINTER:
+.\"   https://wiki.libsdl.org/SDL_PROP_GLOBAL_VIDEO_WAYLAND_WL_DISPLAY_POINTER
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_PROP_GLOBAL_VIDEO_WAYLAND_WL_DISPLAY_POINTER
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_PROP_GLOBAL_VIDEO_WAYLAND_WL_DISPLAY_POINTER 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_PROP_GLOBAL_VIDEO_WAYLAND_WL_DISPLAY_POINTER \- The pointer to the global
+.BR wl_display
+object used by the Wayland video backend\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_video\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "#define SDL_PROP_GLOBAL_VIDEO_WAYLAND_WL_DISPLAY_POINTER "SDL.video.wayland.wl_display"
+.fi
+.SH DESCRIPTION
+Can be set before the video subsystem is initialized to import an external
+.BR wl_display
+object from an application or toolkit for use in SDL, or read
+after initialization to export the
+.BR wl_display
+used by the Wayland video
+backend\[char46] Setting this property after the video subsystem has been
+initialized has no effect, and reading it when the video subsystem is
+uninitialized will either return the user provided value, if one was set
+prior to initialization, or NULL\[char46] See docs/README-wayland\[char46]md for more
+information\[char46]
+

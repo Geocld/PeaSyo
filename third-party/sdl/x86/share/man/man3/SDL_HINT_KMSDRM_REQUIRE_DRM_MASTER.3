@@ -1,0 +1,54 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_HINT_KMSDRM_REQUIRE_DRM_MASTER:
+.\"   https://wiki.libsdl.org/SDL_HINT_KMSDRM_REQUIRE_DRM_MASTER
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_HINT_KMSDRM_REQUIRE_DRM_MASTER
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_HINT_KMSDRM_REQUIRE_DRM_MASTER 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_HINT_KMSDRM_REQUIRE_DRM_MASTER \- A variable that controls whether SDL requires DRM master access in order to initialize the KMSDRM video backend\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_hints\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "#define SDL_HINT_KMSDRM_REQUIRE_DRM_MASTER "SDL_KMSDRM_REQUIRE_DRM_MASTER"
+.fi
+.SH DESCRIPTION
+The DRM subsystem has a concept of a "DRM master" which is a DRM client
+that has the ability to set planes, set cursor, etc\[char46] When SDL is DRM
+master, it can draw to the screen using the SDL rendering APIs\[char46] Without DRM
+master, SDL is still able to process input and query attributes of attached
+displays, but it cannot change display state or draw to the screen
+directly\[char46]
+
+In some cases, it can be useful to have the KMSDRM backend even if it
+cannot be used for rendering\[char46] An app may want to use SDL for input
+processing while using another rendering API (such as an MMAL overlay on
+Raspberry Pi) or using its own code to render to DRM overlays that SDL
+doesn't support\[char46]
+
+The variable can be set to the following values:
+
+
+\(bu "0": SDL will allow usage of the KMSDRM backend without DRM master\[char46]
+
+\(bu "1": SDL Will require DRM master to use the KMSDRM backend\[char46] (default)
+
+This hint should be set before SDL is initialized\[char46]
+
+.SH AVAILABILITY
+This hint is available since SDL 3\[char46]0\[char46]0\[char46]
+

@@ -1,0 +1,69 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_WriteSurfacePixel:
+.\"   https://wiki.libsdl.org/SDL_WriteSurfacePixel
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_WriteSurfacePixel
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_WriteSurfacePixel 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_WriteSurfacePixel \- Writes a single pixel to a surface\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_surface\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "bool SDL_WriteSurfacePixel(SDL_Surface *surface, int x, int y, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+.fi
+.SH DESCRIPTION
+This function prioritizes correctness over speed: it is suitable for unit
+tests, but is not intended for use in a game engine\[char46]
+
+Like 
+.BR SDL_MapRGBA
+, this uses the entire 0\[char46]\[char46]255 range when
+converting color components from pixel formats with less than 8 bits per
+RGB component\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I surface
+the surface to write\[char46]
+.TP
+.I x
+the horizontal coordinate, 0 <= x < width\[char46]
+.TP
+.I y
+the vertical coordinate, 0 <= y < height\[char46]
+.TP
+.I r
+the red channel value, 0-255\[char46]
+.TP
+.I g
+the green channel value, 0-255\[char46]
+.TP
+.I b
+the blue channel value, 0-255\[char46]
+.TP
+.I a
+the alpha channel value, 0-255\[char46]
+.SH RETURN VALUE
+Returns true on success or false on failure; call
+
+.BR SDL_GetError
+() for more information\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

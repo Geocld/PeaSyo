@@ -1,0 +1,78 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_GetSurfaceProperties:
+.\"   https://wiki.libsdl.org/SDL_GetSurfaceProperties
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_GetSurfaceProperties
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_GetSurfaceProperties 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_GetSurfaceProperties \- Get the properties associated with a surface\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_surface\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "SDL_PropertiesID SDL_GetSurfaceProperties(SDL_Surface *surface);
+.fi
+.SH DESCRIPTION
+The following properties are understood by SDL:
+
+
+\(bu 
+.BR
+.BR SDL_PROP_SURFACE_SDR_WHITE_POINT_FLOAT
+:
+  for HDR10 and floating point surfaces, this defines the value of 100%
+  diffuse white, with higher values being displayed in the High Dynamic
+  Range headroom\[char46] This defaults to 203 for HDR10 surfaces and 1\[char46]0 for
+  floating point surfaces\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_SURFACE_HDR_HEADROOM_FLOAT
+:
+  for HDR10 and floating point surfaces, this defines the maximum dynamic
+  range used by the content, in terms of the SDR white point\[char46] This defaults
+  to 0\[char46]0, which disables tone mapping\[char46]
+
+\(bu 
+.BR
+.BR SDL_PROP_SURFACE_TONEMAP_OPERATOR_STRING
+:
+  the tone mapping operator used when compressing from a surface with high
+  dynamic range to another with lower dynamic range\[char46] Currently this
+  supports "chrome", which uses the same tone mapping that Chrome uses for
+  HDR content, the form "*=N", where N is a floating point scale factor
+  applied in linear space, and "none", which disables tone mapping\[char46] This
+  defaults to "chrome"\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I surface
+the 
+.BR SDL_Surface
+ structure to query\[char46]
+.SH RETURN VALUE
+(
+.BR SDL_PropertiesID
+) Returns a valid property ID on
+success or 0 on failure; call 
+.BR SDL_GetError
+() for more
+information\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

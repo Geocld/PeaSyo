@@ -1,0 +1,46 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_DestroyProperties:
+.\"   https://wiki.libsdl.org/SDL_DestroyProperties
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_DestroyProperties
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_DestroyProperties 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_DestroyProperties \- Destroy a group of properties\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_properties\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "void SDL_DestroyProperties(SDL_PropertiesID props);
+.fi
+.SH DESCRIPTION
+All properties are deleted and their cleanup functions will be called, if
+any\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I props
+the properties to destroy\[char46]
+.SH THREAD SAFETY
+This function should not be called while these properties are locked or
+other threads might be setting or getting values from these properties\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_CreateProperties (3)

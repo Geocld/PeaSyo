@@ -1,0 +1,57 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_GetRectUnion:
+.\"   https://wiki.libsdl.org/SDL_GetRectUnion
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_GetRectUnion
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_GetRectUnion 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_GetRectUnion \- Calculate the union of two rectangles\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_rect\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "bool SDL_GetRectUnion(const SDL_Rect *A, const SDL_Rect *B, SDL_Rect *result);
+.fi
+.SH FUNCTION PARAMETERS
+.TP
+.I A
+an 
+.BR SDL_Rect
+ structure representing the first rectangle\[char46]
+.TP
+.I B
+an 
+.BR SDL_Rect
+ structure representing the second rectangle\[char46]
+.TP
+.I result
+an 
+.BR SDL_Rect
+ structure filled in with the union of rectangles
+.BR A
+and
+.BR B
+\[char46]
+.SH RETURN VALUE
+Returns true on success or false on failure; call
+
+.BR SDL_GetError
+() for more information\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+

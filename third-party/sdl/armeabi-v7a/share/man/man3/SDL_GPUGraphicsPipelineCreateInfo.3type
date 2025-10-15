@@ -1,0 +1,46 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_GPUGraphicsPipelineCreateInfo:
+.\"   https://wiki.libsdl.org/SDL_GPUGraphicsPipelineCreateInfo
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_GPUGraphicsPipelineCreateInfo
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_GPUGraphicsPipelineCreateInfo 3type "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 DATATYPES"
+.SH NAME
+SDL_GPUGraphicsPipelineCreateInfo \- A structure specifying the parameters of a graphics pipeline state\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_gpu\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "typedef struct SDL_GPUGraphicsPipelineCreateInfo
+.BI "{
+.BI "    SDL_GPUShader *vertex_shader;                   /**< The vertex shader used by the graphics pipeline. */
+.BI "    SDL_GPUShader *fragment_shader;                 /**< The fragment shader used by the graphics pipeline. */
+.BI "    SDL_GPUVertexInputState vertex_input_state;     /**< The vertex layout of the graphics pipeline. */
+.BI "    SDL_GPUPrimitiveType primitive_type;            /**< The primitive topology of the graphics pipeline. */
+.BI "    SDL_GPURasterizerState rasterizer_state;        /**< The rasterizer state of the graphics pipeline. */
+.BI "    SDL_GPUMultisampleState multisample_state;      /**< The multisample state of the graphics pipeline. */
+.BI "    SDL_GPUDepthStencilState depth_stencil_state;   /**< The depth-stencil state of the graphics pipeline. */
+.BI "    SDL_GPUGraphicsPipelineTargetInfo target_info;  /**< Formats and blend modes for the render targets of the graphics pipeline. */
+.BI "
+.BI "    SDL_PropertiesID props;                         /**< A properties ID for extensions. Should be 0 if no extensions are needed. */
+.BI "} SDL_GPUGraphicsPipelineCreateInfo;
+.fi
+.SH AVAILABILITY
+This struct is available since SDL 3\[char46]0\[char46]0
+
+.SH SEE ALSO
+.BR \(bu (3),
+.BR SDL_CreateGPUGraphicsPipeline (3)

@@ -1,0 +1,50 @@
+.\" This manpage content is licensed under Creative Commons
+.\"  Attribution 4.0 International (CC BY 4.0)
+.\"   https://creativecommons.org/licenses/by/4.0/
+.\" This manpage was generated from SDL's wiki page for SDL_isprint:
+.\"   https://wiki.libsdl.org/SDL_isprint
+.\" Generated with SDL/build-scripts/wikiheaders.pl
+.\"  revision SDL-preview-3.1.3
+.\" Please report issues in this manpage's content at:
+.\"   https://github.com/libsdl-org/sdlwiki/issues/new
+.\" Please report issues in the generation of this manpage from the wiki at:
+.\"   https://github.com/libsdl-org/SDL/issues/new?title=Misgenerated%20manpage%20for%20SDL_isprint
+.\" SDL can be found at https://libsdl.org/
+.de URL
+\$2 \(laURL: \$1 \(ra\$3
+..
+.if \n[.g] .mso www.tmac
+.TH SDL_isprint 3 "SDL 3.1.3" "Simple Directmedia Layer" "SDL3 FUNCTIONS"
+.SH NAME
+SDL_isprint \- Report if a character is "printable"\[char46]
+.SH HEADER FILE
+Defined in SDL3/SDL_stdinc\[char46]h
+
+.SH SYNOPSIS
+.nf
+.B #include \(dqSDL3/SDL.h\(dq
+.PP
+.BI "int SDL_isprint(int x);
+.fi
+.SH DESCRIPTION
+Be advised that "printable" has a definition that goes back to text
+terminals from the dawn of computing, making this a sort of special case
+function that is not suitable for Unicode (or most any) text management\[char46]
+.B WARNING
+: Regardless of system locale, this will only treat ASCII values
+' ' (0x20) through '~' (0x7E) as true\[char46]
+
+.SH FUNCTION PARAMETERS
+.TP
+.I x
+character value to check\[char46]
+.SH RETURN VALUE
+Returns non-zero if x falls within the character class, zero
+otherwise\[char46]
+
+.SH THREAD SAFETY
+It is safe to call this function from any thread\[char46]
+
+.SH AVAILABILITY
+This function is available since SDL 3\[char46]0\[char46]0\[char46]
+
