@@ -83,6 +83,8 @@ public class UsbRumbleManager extends ReactContextBaseJavaModule {
         }
     }
 
+    // TODO: Any idea for haptic feedback on HID output?
+    // Reference: https://controllers.fandom.com/wiki/Sony_DualSense#Output_Reports
     @ReactMethod
     private void setDsController(int led_r, int led_g, int led_b, int mute, int player_led, int player_light, int rumble_heavy, int rumble_soft, int left_trigger_type, ReadableArray left_trigger_data, int right_trigger_type, ReadableArray right_trigger_data) {
         MainActivity mainActivity = (MainActivity) getCurrentActivity();
