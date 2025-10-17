@@ -479,13 +479,14 @@ function StreamScreen({navigation, route}) {
             if (
               _settings.show_virtual_gamead &&
               !_isTouchpadFull &&
-              !_isTouchpadDual
+              !_isTouchpadDual &&
+              !route.params?.isUsbMode
             ) {
               setShowVirtualGamepad(true);
             }
 
             // Alway show touchpad
-            if (_settings.show_touchpad) {
+            if (_settings.show_touchpad && !route.params?.isUsbMode) {
               setShowTouchpad(true);
             }
 
@@ -650,7 +651,7 @@ function StreamScreen({navigation, route}) {
           return;
         }
         // console.log('dsRumble:', states);
-        const {right} = states;
+        const {left, right} = states;
 
         UsbRumbleManager.setDsController(
           lightRGB.current[0] || 0, // r
@@ -659,8 +660,8 @@ function StreamScreen({navigation, route}) {
           0,
           0,
           0,
-          0,
-          right * 0.5,
+          left,
+          right,
           leftTriggerType.current,
           leftTriggerData.current,
           rightTriggerType.current,

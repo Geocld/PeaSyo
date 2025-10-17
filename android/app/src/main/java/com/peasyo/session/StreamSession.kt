@@ -78,6 +78,8 @@ class StreamSession(
 
 	private val DSCONTROLLER_NAME = "DualSenseController"
 
+	private var isRuningVib = false
+
 	private data class AudioHapticsState(
 		var lastLeft: Int = 0,
 		var lastRight: Int = 0,
@@ -362,11 +364,18 @@ class StreamSession(
 										putInt("left", 0)
 										putInt("right", 0)
 									}
+
+									if (isRuningVib) {
+										return
+									}
 									vibrateScope.launch {
 										vibrateMutex.withLock {
+											isRuningVib = true
 											sendEvent("dsRumble", params)
-											delay(20)
+											delay(30)
 											sendEvent("dsRumble", params0)
+											delay(5)
+											isRuningVib = false
 										}
 									}
 								} else {

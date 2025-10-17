@@ -82,6 +82,45 @@ function DebugScreen({navigation, route}) {
       />
 
       <SettingItem
+        title={'Rumble(DualSense)'}
+        description={'Test DualSense5 rumble'}
+        onPress={() => {
+          console.log('setDsController');
+          UsbRumbleManager.setDsController(
+            255, // r
+            0, // g
+            0, // b
+            0,
+            0,
+            0,
+            190, // left
+            190, // right
+            0,
+            [],
+            0,
+            [],
+          );
+
+          setTimeout(() => {
+            UsbRumbleManager.setDsController(
+              0, // r
+              0, // g
+              0, // b
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              [],
+              0,
+              [],
+            );
+          }, 500);
+        }}
+      />
+
+      <SettingItem
         title={'Trigger Rumble(xbox one controller)'}
         description={'Test gamepad trigger rumble with x-input mode'}
         onPress={() => {

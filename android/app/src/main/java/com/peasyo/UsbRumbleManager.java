@@ -102,11 +102,14 @@ public class UsbRumbleManager extends ReactContextBaseJavaModule {
 
             byte[] reportData = new byte[] {
                     0x02, // Report ID
-                    (byte)0xff, // valid_flag0
+                    (byte)0x02, // valid_flag0
                     (byte)0xf7, // valid_flag1
                     (byte)rumble_soft, // right motor rumble
                     (byte)rumble_heavy, // left motor rumble
-                    0x00, 0x00, 0x00, 0x00,
+                    0x00, // headphone_volume /* 0x0 - 0x7f */
+                    0x00, // speaker_volume;	/* 0x0 - 0xff */
+                    0x00, // mic_volume /* 0x0 - 0x40 */
+                    0x00, // audio_control
                     (byte)mute,  // mute_button_led (0: mute LED off  | 1: mute LED on)
                     mute == 1 ? (byte)0x00 : (byte)0x10, // power_save_control(mute led on  = 0x00, off = 0x10)
                     (byte) right_trigger_type,          // R2 trigger effect mode
@@ -128,10 +131,10 @@ public class UsbRumbleManager extends ReactContextBaseJavaModule {
                     (byte) left_data[6],       // L2 trigger effect parameter 7
                     0x00, 0x00, 0x00,
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                    0x03,
+                    0x04, // valid_flag2
                     0x02,
                     0x00,
-                    0x02,
+                    0x02, // lightbar_setup
                     (byte)player_light,     // player light brightness
                     (byte)player_led,       // player leds
                     (byte)led_r, (byte)led_g, (byte)led_b // RGB values
