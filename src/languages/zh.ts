@@ -30,6 +30,8 @@ export default {
     Users: '用户',
     Logout: '退出登录',
     Current: '当前',
+    MaxRate: '最大',
+    StandardRate: '标准',
     LogoutText: '需要退出登录吗?',
     'Reset all settings to default': '设置恢复默认值',
     ResetText: '你需要重置全部设置吗?',
@@ -83,6 +85,8 @@ export default {
     'Performance render': '高性能渲染',
     PerformanceRenderDesc:
       '使用高性能视频渲染，默认使用高性能渲染，但要注意应用退到后台会停止串流，如果需要频繁切换后台并保持串流，请关闭高性能渲染模式',
+    'maximum operating rate': '解码运行速率',
+    MaxOperatingRateDesc: '设置解码运行速率,设置为最大值有助于降低解码延迟,但是在部分机型上存在兼容性问题,请酌情开启',
     Sensor: '传感器',
     SensorDesc: '使用设备传感器',
     'Invert Sensor': '反转传感器',
@@ -382,7 +386,5 @@ export default {
     History: '更新日志',
     HistoryTitle: '更新日志',
     HistoryDesc: '查看PeaSyo历史更新日志',
-    'Local Wake': '本地唤醒',
-    WakePacketSent: '已发送WOL唤醒包',
   },
 };

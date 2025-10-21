@@ -23,6 +23,8 @@ export default {
     Feedback: 'Feedback and Support',
     Logout: 'Logout',
     Current: 'Current',
+    MaxRate: 'Max',
+    StandardRate: 'Standard',
     LogoutText: 'Do you want to log out?',
     'Reset all settings to default': 'Reset all settings to default',
     ResetText: 'Do you want to reset all settings?',
@@ -77,6 +79,8 @@ export default {
     'Performance render': 'Performance Rendering',
     PerformanceRenderDesc:
       'Use high-performance video rendering. By default, high-performance rendering is used, but note that streaming will stop when the app is sent to the background. If you need to frequently switch to the background while maintaining streaming, please turn off high-performance rendering mode',
+    "maximum operating rate": "Maximum Operating Rate",
+    MaxOperatingRateDesc: "Set the decoding operating rate. Setting it to the maximum value helps reduce decoding latency, but there may be compatibility issues on some devices. Please enable with caution.",
     Sensor: 'Sensor',
     SensorDesc: 'Use device sensors',
     'Invert Sensor': 'Invert Sensor',
@@ -357,7 +361,5 @@ export default {
     History: 'History',
     HistoryTitle: 'Update histories',
     HistoryDesc: 'View update histories of PeaSyo',
-    'Local Wake': 'Local Wake',
-    WakePacketSent: 'Wake-on-LAN packet sent',
   },
 };

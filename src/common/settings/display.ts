@@ -24,8 +24,19 @@ const display = [
     title: t('Performance render'),
     description: t('PerformanceRenderDesc'),
     data: [
-      {value: true, text: t('Enable')},
-      {value: false, text: t('Disable')},
+      { value: true, text: t('Enable') },
+      { value: false, text: t('Disable') },
+    ],
+  },
+  {
+    name: 'maxOperatingRate',
+    type: 'radio',
+    title: t('maximum operating rate'),
+    description: t('MaxOperatingRateDesc'),
+    data: [
+      { value: 0x7FFF, text: t('MaxRate') },
+      { value: 120, text: t('StandardRate') },
+      { value: 0, text: t('Disable') },
     ],
   },
   {

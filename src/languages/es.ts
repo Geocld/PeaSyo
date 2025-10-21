@@ -23,6 +23,8 @@ export default {
     Feedback: 'Comentarios y soporte',
     Logout: 'Cerrar sesión',
     Current: 'Actual',
+    MaxRate: 'Máximo',
+    StandardRate: 'Estándar',
     LogoutText: '¿Deseas cerrar sesión?',
     'Reset all settings to default':
       'Restablecer todas las configuración a los valores predeterminados',
@@ -78,6 +80,8 @@ export default {
     'Performance render': 'Renderizado de rendimiento',
     PerformanceRenderDesc:
       'Usar renderizado de video de alto rendimiento. Por defecto, se utiliza renderizado de alto rendimiento, pero ten en cuenta que la transmisión se detendrá si la aplicación se envía al fondo. Si necesitas cambiar frecuentemente al fondo mientras mantienes la transmisión, desactiva el modo de renderizado de alto rendimiento',
+    "maximum operating rate": "Tasa Máxima de Operación",
+    MaxOperatingRateDesc: "Configure la tasa de operación de decodificación. Establecerla al valor máximo ayuda a reducir la latencia de decodificación, pero puede haber problemas de compatibilidad en algunos dispositivos. Por favor, actívelo con precaución.",
     Sensor: 'Sensor',
     SensorDesc: 'Usar sensores del dispositivo',
     'Invert Sensor': 'Invertir sensor',
@@ -368,7 +372,5 @@ export default {
     History: 'History',
     HistoryTitle: 'Update histories',
     HistoryDesc: 'View update histories of PeaSyo',
-    'Local Wake': 'Local Wake',
-    WakePacketSent: 'Paquete de activación enviado',
   },
 };
