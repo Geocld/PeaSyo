@@ -23,6 +23,8 @@ DerivedData
 *.ipa
 *.xcuserstate
 ios/.xcode.env.local
+third-party/openssl-3.5.3
+third-party/nanopb
 
 # Android/IntelliJ
 #
