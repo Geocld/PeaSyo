@@ -410,11 +410,11 @@ function SettingsScreen({navigation}) {
             onPress={() => navigation.navigate('Thanks')}
           />
 
-          {/* <SettingItem
+          <SettingItem
             title={'DEBUG'}
             description={'Enter debug.'}
             onPress={() => handleItemPress('debug')}
-          /> */}
+          />
 
           {token && token.account_id && (
             <SettingItem

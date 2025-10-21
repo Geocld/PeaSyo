@@ -13,7 +13,7 @@ import {Portal, Dialog, Switch} from 'react-native-paper';
 import {getSettings, saveSettings} from '../store/settingStore';
 import SettingItem from '../components/SettingItem';
 
-const {GamepadManager, UsbRumbleManager} = NativeModules;
+const {GamepadManager, UsbRumbleManager, HapticModule} = NativeModules;
 
 function DebugScreen({navigation, route}) {
   let authentication = useSelector(state => state.authentication);
@@ -129,6 +129,14 @@ function DebugScreen({navigation, route}) {
           setTimeout(() => {
             UsbRumbleManager.rumbleTriggers(0, 0);
           }, 1000);
+        }}
+      />
+
+      <SettingItem
+        title={'Haptic test'}
+        description={''}
+        onPress={() => {
+          HapticModule.sendAudioSignal();
         }}
       />
     </ScrollView>

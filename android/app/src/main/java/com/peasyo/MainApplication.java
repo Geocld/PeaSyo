@@ -52,6 +52,7 @@ public class MainApplication extends Application implements ReactApplication {
             packages.add(new LogsPackage());
             packages.add(new AnalogStickPackage());
             packages.add(new ButtonViewPackage());
+            packages.add(new HapticPackage());
           return packages;
         }
 
