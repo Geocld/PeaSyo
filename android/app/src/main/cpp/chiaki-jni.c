@@ -587,6 +587,7 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
     jclass codec_class = E->GetObjectClass(env, codec_obj);
     jint target_value = E->GetIntField(env, codec_obj, E->GetFieldID(env, codec_class, "value", "I"));
     connect_info.video_profile.codec = (ChiakiCodec)target_value;
+    connect_info.video_profile.max_operating_rate = (unsigned int)E->GetIntField(env, connect_video_profile_obj, E->GetFieldID(env, connect_video_profile_class, "maxOperatingRate", "I"));
 
     connect_info.video_profile_auto_downgrade = true;
 
