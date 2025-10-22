@@ -74,6 +74,10 @@ public class StreamTextureViewManager extends SimpleViewManager<StreamTextureVie
         int fps = streamInfo.getInt("fps");
         int bitrate = streamInfo.getInt("bitrate");
 
+        int maxOperatingRate = 0x7FFF; // 默认值
+        if (streamInfo.hasKey("maxOperatingRate")) {
+            maxOperatingRate = streamInfo.getInt("maxOperatingRate");
+        }
         Codec codec = Codec.CODEC_H265;
         String streamCodec = streamInfo.getString("codec");
         if (streamCodec != null) {
@@ -94,7 +98,8 @@ public class StreamTextureViewManager extends SimpleViewManager<StreamTextureVie
                 height,            // height
                 fps,             // maxFPS
                 bitrate,        // bitrate
-                codec  // codec
+                codec,  // codec
+                maxOperatingRate // maxOperatingRate
         );
 
         ConnectInfo connectInfo = new ConnectInfo(ps5, host, parsedHost, registKey, morning, videoProfile, enableKeyboard, psnAccountId, accessToken, nickName);
