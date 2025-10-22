@@ -104,7 +104,7 @@ public class UsbRumbleManager extends ReactContextBaseJavaModule {
 
             byte[] reportData = new byte[] {
                     0x02, // Report ID
-                    (byte)0x02, // valid_flag0
+                    (byte)0xff, // valid_flag0
                     (byte)0xf7, // valid_flag1
                     (byte)rumble_soft, // right motor rumble
                     (byte)rumble_heavy, // left motor rumble

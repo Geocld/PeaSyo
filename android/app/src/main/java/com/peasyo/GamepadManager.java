@@ -63,10 +63,10 @@ public class GamepadManager extends ReactContextBaseJavaModule {
         int simulatedAmplitude = Math.min(255, (int)((lowFreqMotor) + (highFreqMotor)));
 
         if (intensity == 1) { // very weak
-            simulatedAmplitude = Math.min(255, (int)((lowFreqMotor * 0.5) + (highFreqMotor * 0.4)));
+            simulatedAmplitude = Math.min(255, (int)((lowFreqMotor * 0.2) + (highFreqMotor * 0.1)));
         }
         if (intensity == 2) { // weak
-            simulatedAmplitude = Math.min(255, (int)((lowFreqMotor * 0.9) + (highFreqMotor * 0.8)));
+            simulatedAmplitude = Math.min(255, (int)((lowFreqMotor * 0.5) + (highFreqMotor * 0.3)));
         }
         if (intensity == 4) { // strong
             simulatedAmplitude = Math.min(255, (int)((lowFreqMotor * 1.5) + (highFreqMotor * 2)));

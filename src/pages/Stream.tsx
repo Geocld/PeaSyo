@@ -651,7 +651,6 @@ function StreamScreen({navigation, route}) {
         if (usbController !== 'DualSenseController') {
           return;
         }
-        console.log('dsRumble:', states);
         const {left, right} = states;
 
         UsbRumbleManager.setDsController(
@@ -662,7 +661,7 @@ function StreamScreen({navigation, route}) {
           0,
           0,
           left * 0.1,
-          right * 0.1,
+          right * 0.5,
           leftTriggerType.current,
           leftTriggerData.current,
           rightTriggerType.current,
@@ -689,9 +688,9 @@ function StreamScreen({navigation, route}) {
         rightTriggerData.current = rightArr;
 
         UsbRumbleManager.setDsController(
-          0,
-          10,
-          0,
+          lightRGB.current[0] || 0, // r
+          lightRGB.current[1] || 0, // g
+          lightRGB.current[2] || 0, // b
           0,
           0,
           0,

@@ -588,6 +588,17 @@ function HomeScreen({navigation, route}) {
     const isUsbMode = settings.bind_usb_device && hasValidUsbDevice;
 
     wakeup(host, credential, isPS5);
+
+    // Ensure wake after 5s
+    setTimeout(() => {
+      wakeup(host, credential, isPS5);
+
+      // Ensure again(15s)
+      setTimeout(() => {
+        wakeup(host, credential, isPS5);
+      }, 10 * 1000);
+    }, 5000);
+
     currentConsole.parsedHost = host;
 
     setLoadingText(t('Waking'));
