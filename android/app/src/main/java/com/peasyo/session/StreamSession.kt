@@ -36,6 +36,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.withLock
 import java.lang.Math.abs
+import android.content.Context
 
 sealed class StreamState
 object StreamStateIdle: StreamState()
@@ -79,6 +80,7 @@ class StreamSession(
 	private val DSCONTROLLER_NAME = "DualSenseController"
 
 	private var isRuningVib = false
+	private val maxOperatingRate = connectInfo.videoProfile.maxOperatingRate // 从 connectInfo 获取
 
 	private data class AudioHapticsState(
 		var lastLeft: Int = 0,
@@ -188,8 +190,9 @@ class StreamSession(
 			session.eventCallback = this::eventCallback
 			session.start()
 			val surface = surface
-			if(surface != null)
-				session.setSurface(surface)
+			if(surface != null) {
+				session.setSurface(surface, maxOperatingRate)
+			}
 			this.session = session
 		}
 		catch(e: CreateError)
@@ -457,7 +460,7 @@ class StreamSession(
 			val currentSurface = surfaceView.holder.surface
 			if (currentSurface != null && currentSurface.isValid) {
 				this@StreamSession.surface = currentSurface
-				session?.setSurface(currentSurface)
+				session?.setSurface(currentSurface, maxOperatingRate)
 			}
 		}
 
@@ -469,14 +472,14 @@ class StreamSession(
 				val surface = holder.surface
 				Log.d("StreamView", "surfaceChanged:" + surface)
 				this@StreamSession.surface = surface
-				session?.setSurface(surface)
+				session?.setSurface(surface, maxOperatingRate)
 			}
 
 			override fun surfaceDestroyed(holder: SurfaceHolder)
 			{
 				Log.d("StreamView", "surfaceDestroyed:" + surface)
 				this@StreamSession.surface = null
-				session?.setSurface(null)
+				session?.setSurface(null, 0x7FFF) // or a sensible default when surface is destroyed
 			}
 		})
 	}
@@ -486,8 +489,7 @@ class StreamSession(
 		Log.d("StreamView", "handleSessionSetSurface")
 		surfaceTexture = surface
 		this@StreamSession.surface = Surface(surfaceTexture)
-		// 在 onSurfaceTextureAvailable() 方法里面取得 SurfaceTexture 并包装成一个 Surface 再调用MediaPlayer的 setSurface 方法完成播放器的显示工作
-		session?.setSurface(Surface(surface))
+		session?.setSurface(Surface(surface), maxOperatingRate)
 	}
 
 	fun setLoginPin(pin: String)

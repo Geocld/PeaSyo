@@ -52,6 +52,7 @@ typedef struct chiaki_connect_video_profile_t
     unsigned int max_fps;
     unsigned int bitrate;
     ChiakiCodec codec;
+    unsigned int max_operating_rate;
 } ChiakiConnectVideoProfile;
 
 typedef enum {

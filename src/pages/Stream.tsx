@@ -311,6 +311,7 @@ function StreamScreen({navigation, route}) {
       haptic_stable_threshold,
       haptic_change_threshold,
       haptic_diff_threshold,
+      maxOperatingRate,
     } = _settings;
 
     // local
@@ -424,6 +425,7 @@ function StreamScreen({navigation, route}) {
       hapticStableThreshold: haptic_stable_threshold,
       hapticChangeThreshold: haptic_change_threshold,
       hapticDiffThreshold: haptic_diff_threshold,
+      maxOperatingRate: maxOperatingRate,
     };
 
     log.info('_streamInfo:', _streamInfo);
@@ -479,14 +481,13 @@ function StreamScreen({navigation, route}) {
             if (
               _settings.show_virtual_gamead &&
               !_isTouchpadFull &&
-              !_isTouchpadDual &&
-              !route.params?.isUsbMode
+              !_isTouchpadDual
             ) {
               setShowVirtualGamepad(true);
             }
 
             // Alway show touchpad
-            if (_settings.show_touchpad && !route.params?.isUsbMode) {
+            if (_settings.show_touchpad) {
               setShowTouchpad(true);
             }
 
@@ -650,7 +651,7 @@ function StreamScreen({navigation, route}) {
         if (usbController !== 'DualSenseController') {
           return;
         }
-        // console.log('dsRumble:', states);
+        console.log('dsRumble:', states);
         const {left, right} = states;
 
         UsbRumbleManager.setDsController(
@@ -660,8 +661,8 @@ function StreamScreen({navigation, route}) {
           0,
           0,
           0,
-          left,
-          right,
+          left * 0.1,
+          right * 0.1,
           leftTriggerType.current,
           leftTriggerData.current,
           rightTriggerType.current,

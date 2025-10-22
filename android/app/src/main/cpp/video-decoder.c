@@ -67,7 +67,7 @@ void android_chiaki_video_decoder_fini(AndroidChiakiVideoDecoder *decoder)
 }
 
 // 视频解码器输出 Surface
-void android_chiaki_video_decoder_set_surface(AndroidChiakiVideoDecoder *decoder, JNIEnv *env, jobject surface)
+void android_chiaki_video_decoder_set_surface(AndroidChiakiVideoDecoder *decoder, JNIEnv *env, jobject surface, int32_t max_operating_rate)
 {
     CHIAKI_LOGI(decoder->log, "StreamView android_chiaki_video_decoder_set_surface");
 
@@ -141,7 +141,8 @@ void android_chiaki_video_decoder_set_surface(AndroidChiakiVideoDecoder *decoder
 #if __ANDROID_API__ >= 23
     // 使用字符串形式的键值，避免使用宏
     AMediaFormat_setInt32(format, "priority", 0);
-    AMediaFormat_setInt32(format, "operating-rate", 0x7FFF); // Short.MAX_VALUE
+    CHIAKI_LOGI(decoder->log, "maxOperatingRate %d", max_operating_rate);
+    AMediaFormat_setInt32(format, "operating-rate", max_operating_rate);
 #endif
 
     // MediaTek处理器

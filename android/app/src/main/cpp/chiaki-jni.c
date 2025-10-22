@@ -138,10 +138,11 @@ JNIEXPORT jboolean JNICALL JNI_FCN(quitReasonIsError)(JNIEnv *env, jobject obj, 
     return chiaki_quit_reason_is_error(value);
 }
 
-JNIEXPORT jobject JNICALL JNI_FCN(videoProfilePreset)(JNIEnv *env, jobject obj, jint resolution_preset, jint fps_preset, jobject codec)
+JNIEXPORT jobject JNICALL JNI_FCN(videoProfilePreset)(JNIEnv *env, jobject obj, jint resolution_preset, jint fps_preset, jobject codec, jint max_operating_rate)
 {
     ChiakiConnectVideoProfile profile = { 0 };
     chiaki_connect_video_profile_preset(&profile, (ChiakiVideoResolutionPreset)resolution_preset, (ChiakiVideoFPSPreset)fps_preset);
+    profile.max_operating_rate = max_operating_rate;
     jclass profile_class = E->FindClass(env, BASE_PACKAGE"/ConnectVideoProfile");
     jmethodID profile_ctor = E->GetMethodID(env, profile_class, "<init>", "(IIIIL"BASE_PACKAGE"/Codec;)V");
     return E->NewObject(env, profile_class, profile_ctor, profile.width, profile.height, profile.max_fps, profile.bitrate, codec);
@@ -586,6 +587,7 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
     jclass codec_class = E->GetObjectClass(env, codec_obj);
     jint target_value = E->GetIntField(env, codec_obj, E->GetFieldID(env, codec_class, "value", "I"));
     connect_info.video_profile.codec = (ChiakiCodec)target_value;
+    connect_info.video_profile.max_operating_rate = (unsigned int)E->GetIntField(env, connect_video_profile_obj, E->GetFieldID(env, connect_video_profile_class, "maxOperatingRate", "I"));
 
     connect_info.video_profile_auto_downgrade = true;
 
@@ -888,10 +890,10 @@ JNIEXPORT jint JNICALL JNI_FCN(sessionJoin)(JNIEnv *env, jobject obj, jlong ptr)
     return chiaki_session_join(&session->session);
 }
 
-JNIEXPORT void JNICALL JNI_FCN(sessionSetSurface)(JNIEnv *env, jobject obj, jlong ptr, jobject surface)
+JNIEXPORT void JNICALL JNI_FCN(sessionSetSurface)(JNIEnv *env, jobject obj, jlong ptr, jobject surface, jint maxOperatingRate)
 {
     AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;
-    android_chiaki_video_decoder_set_surface(&session->video_decoder, env, surface);
+    android_chiaki_video_decoder_set_surface(&session->video_decoder, env, surface, maxOperatingRate);
 }
 
 JNIEXPORT void JNICALL JNI_FCN(sessionSetControllerState)(JNIEnv *env, jobject obj, jlong ptr, jobject controller_state_java)

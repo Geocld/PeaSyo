@@ -17,6 +17,7 @@ export type Settings = {
   remote_codec: string;
   remote_fps: number;
   useSurface: boolean;
+  maxOperatingRate: number;
   show_performance: boolean;
   performance_style: boolean;
   rumble: boolean;
@@ -73,6 +74,7 @@ const defaultSettings: Settings = {
   remote_codec: 'H265',
   remote_fps: 30,
   useSurface: true,
+  maxOperatingRate: 0x7FFF,
   show_performance: false,
   performance_style: true,
   rumble: true,
