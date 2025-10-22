@@ -81,8 +81,9 @@ export default {
     'Performance render': '高性能渲染',
     PerformanceRenderDesc:
       '使用高性能視頻渲染，默認使用高性能渲染，但要注意應用退到後台會停止串流，如果需要頻繁切換後台並保持串流，請關閉高性能渲染模式',
-    "maximum operating rate": "最大解碼運行速率",
-    MaxOperatingRateDesc: "設置解碼運行速率，設置為最大值有助於降低解碼延遲，但在部分機型上存在兼容性問題，請酌情開啟。",
+    'maximum operating rate': '最大解碼運行速率',
+    MaxOperatingRateDesc:
+      '設置解碼運行速率，設置為最大值有助於降低解碼延遲，但在部分機型上存在兼容性問題，請酌情開啟。',
     Sensor: '傳感器',
     SensorDesc: '使用設備傳感器',
     'Invert Sensor': '反轉傳感器',
@@ -193,6 +194,7 @@ export default {
     WakeDesc: '如果主機處於休眠狀態，是否要喚醒主機，喚醒耗時大約一分鐘。',
     OnlyConnect: '僅連接',
     WakeAndConnect: '喚醒並連接',
+    'Local Wake': '本地喚醒',
     Waking: '正在喚醒主機...',
     FindConsole: '正在寻找主機...',
     ConsoleNotFound:

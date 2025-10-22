@@ -86,7 +86,8 @@ export default {
     PerformanceRenderDesc:
       '使用高性能视频渲染，默认使用高性能渲染，但要注意应用退到后台会停止串流，如果需要频繁切换后台并保持串流，请关闭高性能渲染模式',
     'maximum operating rate': '解码运行速率',
-    MaxOperatingRateDesc: '设置解码运行速率,设置为最大值有助于降低解码延迟,但是在部分机型上存在兼容性问题,请酌情开启',
+    MaxOperatingRateDesc:
+      '设置解码运行速率,设置为最大值有助于降低解码延迟,但是在部分机型上存在兼容性问题,请酌情开启',
     Sensor: '传感器',
     SensorDesc: '使用设备传感器',
     'Invert Sensor': '反转传感器',
@@ -196,6 +197,7 @@ export default {
     WakeDesc: '如果主机处于休眠状态，是否要唤醒主机，唤醒耗时大约一分钟。',
     OnlyConnect: '仅连接',
     WakeAndConnect: '唤醒并连接',
+    'Local Wake': '本地唤醒',
     Waking: '正在唤醒主机...',
     FindConsole: '正在寻找主机...',
     ConSoleNotFound:
