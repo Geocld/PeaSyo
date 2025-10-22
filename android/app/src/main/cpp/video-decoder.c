@@ -141,6 +141,7 @@ void android_chiaki_video_decoder_set_surface(AndroidChiakiVideoDecoder *decoder
 #if __ANDROID_API__ >= 23
     // 使用字符串形式的键值，避免使用宏
     AMediaFormat_setInt32(format, "priority", 0);
+    #CHIAKI_LOGI(decoder->log, "maxOperatingRate %s", std::to_string(max_operating_rate).c_str());
     AMediaFormat_setInt32(format, "operating-rate", max_operating_rate);
 #endif
 
