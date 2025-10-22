@@ -55,13 +55,14 @@ data class ConnectVideoProfile(
 	val height: Int,
 	val maxFPS: Int,
 	val bitrate: Int,
-	val codec: Codec
+	val codec: Codec,
+	val maxOperatingRate: Int
 ): Parcelable
 {
 	companion object
 	{
-		fun preset(resolutionPreset: VideoResolutionPreset, fpsPreset: VideoFPSPreset, codec: Codec)
-				= ChiakiNative.videoProfilePreset(resolutionPreset.value, fpsPreset.value, codec)
+		fun preset(resolutionPreset: VideoResolutionPreset, fpsPreset: VideoFPSPreset, codec: Codec, maxOperatingRate: Int = 0x7fff)
+				= ChiakiNative.videoProfilePreset(resolutionPreset.value, fpsPreset.value, codec,maxOperatingRate)
 	}
 }
 
@@ -92,7 +93,7 @@ private class ChiakiNative
 		@JvmStatic external fun errorCodeToString(value: Int): String
 		@JvmStatic external fun quitReasonToString(value: Int): String
 		@JvmStatic external fun quitReasonIsError(value: Int): Boolean
-		@JvmStatic external fun videoProfilePreset(resolutionPreset: Int, fpsPreset: Int, codec: Codec): ConnectVideoProfile
+		@JvmStatic external fun videoProfilePreset(resolutionPreset: Int, fpsPreset: Int, codec: Codec, maxOperatingRate: Int): ConnectVideoProfile
 		@JvmStatic external fun getRtt(ptr: Long): Double
 		@JvmStatic external fun getMeasuredBitrate(ptr: Long): Double
 		@JvmStatic external fun getPacketLoss(ptr: Long): Double

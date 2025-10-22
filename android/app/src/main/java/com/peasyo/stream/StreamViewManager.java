@@ -77,6 +77,7 @@ public class StreamViewManager extends SimpleViewManager<StreamView> {
 
         Codec codec = Codec.CODEC_H265;
         String streamCodec = streamInfo.getString("codec");
+        int maxOperatingRate = streamInfo.getInt("maxOperatingRate");
         if (streamCodec != null) {
             switch (streamCodec) {
                 case "H264":
@@ -94,7 +95,9 @@ public class StreamViewManager extends SimpleViewManager<StreamView> {
                 height,            // height
                 fps,             // maxFPS
                 bitrate,        // bitrate
-                codec  // codec
+                codec,  // codec
+                maxOperatingRate
+
         );
 
         ConnectInfo connectInfo = new ConnectInfo(ps5, host, parsedHost, registKey, morning, videoProfile, enableKeyboard, psnAccountId, accessToken, nickName);
