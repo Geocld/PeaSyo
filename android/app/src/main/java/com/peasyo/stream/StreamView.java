@@ -92,6 +92,7 @@ public class StreamView extends FrameLayout {
     private float deadZone;
     private int edgeCompensation;
     private boolean isShortTrigger;
+    private boolean isTriggerWork;
     private boolean swapDpad;
     private boolean logVerbose;
     private boolean isRightstickMoving;
@@ -115,6 +116,7 @@ public class StreamView extends FrameLayout {
         this.deadZone = 0.2f;
         this.edgeCompensation = 0;
         this.isShortTrigger = false;
+        this.isTriggerWork = false;
         this.swapDpad = false;
         this.logVerbose = false;
         this.isRightstickMoving = false;
@@ -1203,9 +1205,15 @@ public class StreamView extends FrameLayout {
 
 //            Log.d(TAG, "Left Trigger:" + lTrigger);
 //            Log.d(TAG, "Right Trigger:" + rTrigger);
+
+            // Notice: some controllers will emit onTrigger and onGamepadKeyDown at the same time
+            if(!this.isTriggerWork && (lTrigger > 0 || rTrigger > 0)) {
+                this.isTriggerWork = true;
+            }
+
             // Short trigger
-            if (this.isShortTrigger) {
-                float triggerMax = this.deadZone + 0.1f;
+            if (this.isShortTrigger && !this.isTriggerWork) {
+                float triggerMax = this.deadZone + 0.05f;
                 if (lTrigger >= triggerMax) {
                     lTrigger = 1;
                 }

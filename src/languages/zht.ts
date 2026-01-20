@@ -173,8 +173,9 @@ export default {
     // home
     NoLogin: '尚未登錄，請登錄',
     Login_PSN_Username:
-      '如果你無法打開PSN登錄頁面，可以選擇使用PSN用戶名直接登錄。',
-    Login_with_username: '使用用戶名登錄',
+      '如果你無法打開PSN登錄頁面，可以選擇使用PSN用戶名或賬號base64 ID直接登錄。',
+    Login_with_username: '用戶名登錄',
+    Login_with_account_id: '賬號base64 ID登錄',
     NoRegistry: '尚未註冊主機，請註冊',
     EmptyRegistry: '清空註冊主機',
     'Login Successful': '登錄成功',
@@ -284,6 +285,8 @@ export default {
       '您可以直接使用PSN用戶名（在線ID）進行登錄，注意不是PSN賬號。',
     Login_username_tips:
       '您的隱私設置需要允許「任何人」在搜索中找到您。否則將登錄失敗。',
+    Login_base64_title:
+      '您可以直接使用PSN賬號的base64 ID進行登錄，該ID可以通過第三方網站獲取（結果如：ABCD==）。',
     User_not_found: '沒有找到該用戶，請確認您的PSN用戶名輸入正確。',
     PSN_username: 'PSN用戶名',
     Switch_user: '切換用戶',

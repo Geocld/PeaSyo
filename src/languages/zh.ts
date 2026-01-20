@@ -176,8 +176,9 @@ export default {
     // Home
     NoLogin: '尚未登录，请登录',
     Login_PSN_Username:
-      '如果你无法打开PSN登录页面，可以选择使用PSN用户名直接登录',
-    Login_with_username: '使用用户名登录',
+      '如果你无法打开PSN登录页面，可以选择使用PSN用户名或账号base64 ID直接登录',
+    Login_with_username: '用户名登录',
+    Login_with_account_id: '账号base64 ID登录',
     NoRegistry: '尚未注册主机，请注册',
     EmptyRegistry: '清空注册主机',
     'Login Successful': '登录成功',
@@ -293,6 +294,8 @@ export default {
       '你可以直接使用PSN用户名(在线ID)进行登录，注意不是PSN账号。',
     Login_username_tips:
       '您的隐私设置需要允许“任何人”在搜索中找到您。否则将登录失败。',
+    Login_base64_title:
+      '你可以直接使用PSN账号的base64 ID进行登录，该ID可以通过第三方网站获取(结果如: ABCD==)。',
     User_not_found: '没有找到该用户，请确认您的PSN用户名输入正确',
     PSN_username: 'PSN用户名',
     Switch_user: '切换用户',

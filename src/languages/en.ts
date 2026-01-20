@@ -79,8 +79,9 @@ export default {
     'Performance render': 'Performance Rendering',
     PerformanceRenderDesc:
       'Use high-performance video rendering. By default, high-performance rendering is used, but note that streaming will stop when the app is sent to the background. If you need to frequently switch to the background while maintaining streaming, please turn off high-performance rendering mode',
-    "maximum operating rate": "Maximum Operating Rate",
-    MaxOperatingRateDesc: "Set the decoding operating rate. Setting it to the maximum value helps reduce decoding latency, but there may be compatibility issues on some devices. Please enable with caution.",
+    'maximum operating rate': 'Maximum Operating Rate',
+    MaxOperatingRateDesc:
+      'Set the decoding operating rate. Setting it to the maximum value helps reduce decoding latency, but there may be compatibility issues on some devices. Please enable with caution.',
     Sensor: 'Sensor',
     SensorDesc: 'Use device sensors',
     'Invert Sensor': 'Invert Sensor',
@@ -170,8 +171,9 @@ export default {
     Registry: 'Register',
     NoLogin: 'Not logged in, please login',
     Login_PSN_Username:
-      'If you cannot open the PSN login page, you can choose to log in directly with your PSN username.',
+      'If you cannot open the PSN login page, you can choose to log in directly with your PSN username/account base64 ID below.',
     Login_with_username: 'Login with username',
+    Login_with_account_id: 'Login with account base64 ID',
     NoRegistry: 'Host not registered, please register',
     EmptyRegistry: 'Clear registered hosts',
     'Login Successful': 'Login successful',
@@ -265,6 +267,8 @@ export default {
       'You can log in directly using your PSN username (online ID), note that it is not your PSN account.',
     Login_username_tips:
       "Your privacy settings need to allow 'Anyone' to find you in search. Otherwise, login will fail.",
+    Login_base64_title:
+      "You can log in directly using your PSN account's base64 ID, which can be obtained through third-party websites (result like: ABCD==).",
     User_not_found:
       'User not found, please confirm that your PSN username is entered correctly.',
     PSN_username: 'PSN Username',

@@ -126,6 +126,13 @@ function UsersScreen({navigation}) {
   const handleToLoginPage = () => {
     if (loginType === 'psn') {
       navigation.navigate('Login');
+    } else if (loginType === 'account_id') {
+      navigation.navigate({
+        name: 'LoginBase64Id',
+        params: {
+          from: 'add',
+        },
+      });
     } else {
       navigation.navigate({
         name: 'LoginUsername',
@@ -159,6 +166,11 @@ function UsersScreen({navigation}) {
                       key={2}
                       label={t('PSN username login')}
                       value={'psn_username'}
+                    />
+                    <RadioButton.Item
+                      key={3}
+                      label={t('Account ID login')}
+                      value={'account_id'}
                     />
                   </RadioButton.Group>
                 </View>

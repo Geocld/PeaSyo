@@ -80,8 +80,9 @@ export default {
     'Performance render': 'Renderizado de rendimiento',
     PerformanceRenderDesc:
       'Usar renderizado de video de alto rendimiento. Por defecto, se utiliza renderizado de alto rendimiento, pero ten en cuenta que la transmisión se detendrá si la aplicación se envía al fondo. Si necesitas cambiar frecuentemente al fondo mientras mantienes la transmisión, desactiva el modo de renderizado de alto rendimiento',
-    "maximum operating rate": "Tasa Máxima de Operación",
-    MaxOperatingRateDesc: "Configure la tasa de operación de decodificación. Establecerla al valor máximo ayuda a reducir la latencia de decodificación, pero puede haber problemas de compatibilidad en algunos dispositivos. Por favor, actívelo con precaución.",
+    'maximum operating rate': 'Tasa Máxima de Operación',
+    MaxOperatingRateDesc:
+      'Configure la tasa de operación de decodificación. Establecerla al valor máximo ayuda a reducir la latencia de decodificación, pero puede haber problemas de compatibilidad en algunos dispositivos. Por favor, actívelo con precaución.',
     Sensor: 'Sensor',
     SensorDesc: 'Usar sensores del dispositivo',
     'Invert Sensor': 'Invertir sensor',
@@ -175,8 +176,9 @@ export default {
     Registry: 'Registrar',
     NoLogin: 'No has iniciado sesión, por favor inicia sesión',
     Login_PSN_Username:
-      'Si no puedes abrir la página de inicio de sesión de PSN, puedes optar por iniciar sesión directamente con tu nombre de usuario de PSN.',
+      'Si no puedes abrir la página de inicio de sesión de PSN, puedes optar por iniciar sesión directamente con tu nombre de usuario de PSN o ID de cuenta base64.',
     Login_with_username: 'Iniciar sesión con nombre de usuario',
+    Login_with_account_id: 'Iniciar sesión con ID de cuenta base64',
     NoRegistry: 'Host no registrado, por favor regístrate',
     EmptyRegistry: 'Eliminar hosts registrados',
     'Login Successful': 'Inicio de sesión exitoso',
@@ -274,6 +276,8 @@ export default {
       'Puedes iniciar sesión directamente utilizando tu nombre de usuario de PSN (ID en línea), ten en cuenta que no es tu cuenta de PSN.',
     Login_username_tips:
       "Tu configuración de privacidad debe permitir que 'Cualquiera' te encuentre en la búsqueda. De lo contrario, el inicio de sesión fallará.",
+    Login_base64_title:
+      'Puedes iniciar sesión directamente usando el ID base64 de tu cuenta de PSN, que puede obtenerse a través de sitios web de terceros (ejemplo: ABCD==).',
     User_not_found:
       'Usuario no encontrado, por favor confirma que tu nombre de usuario de PSN está ingresado correctamente.',
     PSN_username: 'Nombre de usuario de PSN',

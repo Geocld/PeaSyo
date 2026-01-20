@@ -229,6 +229,18 @@ function HomeScreen({navigation, route}) {
             }}>
             {t('Login_with_username')}
           </Button>
+          <Button
+            mode="text"
+            onPress={() => {
+              navigation.navigate({
+                name: 'LoginBase64Id',
+                params: {
+                  from: 'home',
+                },
+              });
+            }}>
+            {t('Login_with_account_id')}
+          </Button>
         </View>
       </View>
     );

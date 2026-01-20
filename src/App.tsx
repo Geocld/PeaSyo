@@ -26,6 +26,7 @@ import HomeScreen from './pages/Home';
 import OptionsScreen from './pages/Options';
 import LoginScreen from './pages/Login';
 import LoginUsernameScreen from './pages/LoginUsername';
+import LoginBase64IdScreen from './pages/LoginBase64Id';
 import RegistryScreen from './pages/Registry';
 import ConsolesScreen from './pages/Consoles';
 import ConsoleEditScreen from './pages/ConsoleEdit';
@@ -156,6 +157,11 @@ function App() {
                   <RootStack.Screen
                     name="LoginUsername"
                     component={LoginUsernameScreen}
+                    options={{title: t('Login')}}
+                  />
+                  <RootStack.Screen
+                    name="LoginBase64Id"
+                    component={LoginBase64IdScreen}
                     options={{title: t('Login')}}
                   />
                   <RootStack.Screen
