@@ -488,8 +488,20 @@ class StreamSession(
 	fun handleSessionSetSurface(surface: SurfaceTexture) {
 		Log.d("StreamView", "handleSessionSetSurface")
 		surfaceTexture = surface
-		this@StreamSession.surface = Surface(surfaceTexture)
-		session?.setSurface(Surface(surface), maxOperatingRate)
+		this@StreamSession.surface?.release()
+		val newSurface = Surface(surfaceTexture)
+		this@StreamSession.surface = newSurface
+		session?.setSurface(newSurface, maxOperatingRate)
+	}
+
+	fun handleSessionClearSurface() {
+		Log.d("StreamView", "handleSessionClearSurface")
+		surfaceTexture = null
+		session?.setSurface(null, 0x7FFF)
+		this@StreamSession.surface?.let {
+			it.release()
+		}
+		this@StreamSession.surface = null
 	}
 
 	fun setLoginPin(pin: String)

@@ -15,6 +15,8 @@ import androidx.media3.common.util.GlUtil;
 import androidx.media3.common.util.GlUtil.GlException;
 import androidx.media3.common.util.UnstableApi;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.microedition.khronos.egl.EGL10;
@@ -74,7 +76,6 @@ public class VideoProcessingGLSurfaceView extends GLSurfaceView {
             renderer.release();
             videoProcessor.release();
         });
-        mainHandler.post(surfaceListener::onInputSurfaceDestroyed);
     }
 
     private final class VideoRenderer implements Renderer {
@@ -96,6 +97,7 @@ public class VideoProcessingGLSurfaceView extends GLSurfaceView {
 
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+            destroyInputSurfaceTexture(true);
             try {
                 textureId = GlUtil.createExternalTexture();
             } catch (GlException e) {
@@ -168,19 +170,45 @@ public class VideoProcessingGLSurfaceView extends GLSurfaceView {
         }
 
         void release() {
-            if (inputSurfaceTexture != null) {
-                inputSurfaceTexture.release();
+            destroyInputSurfaceTexture(true);
+        }
+
+        private void notifySurfaceAvailable(SurfaceTexture surfaceTexture) {
+            Log.d(TAG, "Input SurfaceTexture available");
+            mainHandler.post(() -> surfaceListener.onInputSurfaceAvailable(surfaceTexture));
+        }
+
+        private void destroyInputSurfaceTexture(boolean notifyListener) {
+            SurfaceTexture oldSurfaceTexture = inputSurfaceTexture;
+            if (oldSurfaceTexture != null) {
+                if (notifyListener) {
+                    notifySurfaceDestroyedBlocking();
+                }
+                oldSurfaceTexture.release();
                 inputSurfaceTexture = null;
             }
             if (textureId != 0) {
                 GLES20.glDeleteTextures(1, new int[]{textureId}, 0);
                 textureId = 0;
             }
+            frameAvailable.set(false);
         }
 
-        private void notifySurfaceAvailable(SurfaceTexture surfaceTexture) {
-            Log.d(TAG, "Input SurfaceTexture available");
-            mainHandler.post(() -> surfaceListener.onInputSurfaceAvailable(surfaceTexture));
+        private void notifySurfaceDestroyedBlocking() {
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                surfaceListener.onInputSurfaceDestroyed();
+                return;
+            }
+            CountDownLatch latch = new CountDownLatch(1);
+            mainHandler.post(() -> {
+                surfaceListener.onInputSurfaceDestroyed();
+                latch.countDown();
+            });
+            try {
+                latch.await(300, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 

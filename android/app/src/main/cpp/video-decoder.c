@@ -83,7 +83,7 @@ void android_chiaki_video_decoder_set_surface(AndroidChiakiVideoDecoder *decoder
         } else {
             CHIAKI_LOGI(decoder->log, "StreamView decoder->codec is null");
         }
-        return;
+        goto beach;
     }
 
     CHIAKI_LOGI(decoder->log, "StreamView android_chiaki_video_decoder_set_surface22222");

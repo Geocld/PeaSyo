@@ -53,6 +53,9 @@ import com.peasyo.stream.fsr.VideoProcessingGLSurfaceView;
                     public void onInputSurfaceDestroyed() {
                         Log.d(TAG, "Input SurfaceTexture destroyed");
                         surfaceTexture = null;
+                        if (session != null) {
+                            session.handleSessionClearSurface();
+                        }
                     }
                 }
         );
