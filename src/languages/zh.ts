@@ -278,6 +278,7 @@ export default {
     Share: '分享',
     ImportDesc: '如果你有PeaSyo配置，可以直接导入配置文件，无需重新注册主机。',
     // Performance panel
+    RTT: '延迟',
     WD: '带宽',
     BT: '码率',
     PL: '丢包率',

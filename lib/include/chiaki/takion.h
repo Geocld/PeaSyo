@@ -89,6 +89,7 @@ typedef struct chiaki_takion_event_t
 		struct
 		{
 			ChiakiSeqNum32 seq_num;
+			uint64_t rtt_ms;
 		} data_ack;
 
 		ChiakiTakionAVPacket *av;

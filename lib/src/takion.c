@@ -1231,14 +1231,16 @@ static void takion_handle_packet_message_data_ack(ChiakiTakion *takion, uint8_t 
 			cumulative_seq_num, a_rwnd, gap_ack_blocks_count, dup_tsns_count);
 
 	ChiakiSeqNum32 acked_seq_nums[TAKION_SEND_BUFFER_SIZE];
+	uint64_t acked_rtt_ms[TAKION_SEND_BUFFER_SIZE];
 	size_t acked_seq_nums_count = 0;
-	chiaki_takion_send_buffer_ack(&takion->send_buffer, cumulative_seq_num, acked_seq_nums, &acked_seq_nums_count);
+	chiaki_takion_send_buffer_ack(&takion->send_buffer, cumulative_seq_num, acked_seq_nums, &acked_seq_nums_count, acked_rtt_ms);
 
 	for(size_t i=0; i<acked_seq_nums_count; i++)
 	{
 		ChiakiTakionEvent event = { 0 };
 		event.type = CHIAKI_TAKION_EVENT_TYPE_DATA_ACK;
 		event.data_ack.seq_num = acked_seq_nums[i];
+		event.data_ack.rtt_ms = acked_rtt_ms[i];
 		takion->cb(&event, takion->cb_user);
 	}
 }

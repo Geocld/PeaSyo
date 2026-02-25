@@ -76,6 +76,7 @@ typedef struct chiaki_stream_connection_t
 	bool remote_disconnected;
 	char *remote_disconnect_reason;
 
+	double rtt;
 	double measured_bitrate;
 } ChiakiStreamConnection;
 

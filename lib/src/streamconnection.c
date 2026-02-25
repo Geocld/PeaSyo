@@ -60,6 +60,7 @@ static void stream_connection_takion_data_expect_streaminfo(ChiakiStreamConnecti
 static ChiakiErrorCode stream_connection_send_streaminfo_ack(ChiakiStreamConnection *stream_connection);
 static void stream_connection_takion_av(ChiakiStreamConnection *stream_connection, ChiakiTakionAVPacket *packet);
 static ChiakiErrorCode stream_connection_send_heartbeat(ChiakiStreamConnection *stream_connection);
+static void stream_connection_handle_data_ack(ChiakiStreamConnection *stream_connection, uint64_t rtt_ms);
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_stream_connection_init(ChiakiStreamConnection *stream_connection, ChiakiSession *session, double packet_loss_max)
 {
@@ -104,6 +105,8 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_stream_connection_init(ChiakiStreamConnecti
 	stream_connection->should_stop = false;
 	stream_connection->remote_disconnected = false;
 	stream_connection->remote_disconnect_reason = NULL;
+	stream_connection->rtt = 0.0;
+	stream_connection->measured_bitrate = 0.0;
 
 	return CHIAKI_ERR_SUCCESS;
 
@@ -393,6 +396,22 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_stream_connection_stop(ChiakiStreamConnecti
 	return err == CHIAKI_ERR_SUCCESS ? unlock_err : err;
 }
 
+static void stream_connection_handle_data_ack(ChiakiStreamConnection *stream_connection, uint64_t rtt_ms)
+{
+	if(rtt_ms == 0)
+		return;
+
+	// 过滤异常值，避免 retransmit 拉高网络延迟数据
+	const double sample = (double)rtt_ms;
+	if(sample < 1.0 || sample > 2000.0)
+		return;
+
+	if(stream_connection->rtt <= 0.0)
+		stream_connection->rtt = sample;
+	else
+		stream_connection->rtt = stream_connection->rtt * 0.8 + sample * 0.2;
+}
+
 static void stream_connection_takion_cb(ChiakiTakionEvent *event, void *user)
 {
 	ChiakiStreamConnection *stream_connection = user;
@@ -411,6 +430,9 @@ static void stream_connection_takion_cb(ChiakiTakionEvent *event, void *user)
 			break;
 		case CHIAKI_TAKION_EVENT_TYPE_DATA:
 			stream_connection_takion_data(stream_connection, event->data.data_type, event->data.buf, event->data.buf_size);
+			break;
+		case CHIAKI_TAKION_EVENT_TYPE_DATA_ACK:
+			stream_connection_handle_data_ack(stream_connection, event->data_ack.rtt_ms);
 			break;
 		case CHIAKI_TAKION_EVENT_TYPE_AV:
 			stream_connection_takion_av(stream_connection, event->av);
@@ -727,6 +749,8 @@ static void stream_connection_takion_data_idle(ChiakiStreamConnection *stream_co
 			 q.target_bitrate, q.upstream_bitrate,
 			 q.upstream_loss,
 			 q.disable_upstream_audio, q.rtt, q.loss);
+		if(q.has_rtt && stream_connection->rtt <= 0.0)
+			stream_connection->rtt = q.rtt;
 		stream_connection->measured_bitrate = chiaki_stream_stats_bitrate(&stream_connection->video_receiver->frame_processor.stream_stats, stream_connection->session->connect_info.video_profile.max_fps) / 1000000.0;
 		CHIAKI_LOGV(stream_connection->log, "StreamConnection measured bitrate: %.4f MBit/s", stream_connection->measured_bitrate);
 		chiaki_stream_stats_reset(&stream_connection->video_receiver->frame_processor.stream_stats);

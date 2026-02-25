@@ -44,12 +44,12 @@ const PerfPanel: React.FC<Props> = ({resolution = '', performance = {}}) => {
   const isHorizon = settings.performance_style;
   const codec = settings.codec.indexOf('H265') > -1 ? 'HEVC' : 'AVC';
 
-  // const computedRtt = (value: number | undefined): string => {
-  //   if (value === undefined) {
-  //     return '-1';
-  //   }
-  //   return Math.round(value) + 'ms';
-  // };
+  const computedRtt = (value: number | undefined): string => {
+    if (value === undefined) {
+      return '-1';
+    }
+    return Math.round(value) + 'ms';
+  };
 
   const computedBitrate = (value: number | undefined): string => {
     if (value === undefined) {
@@ -103,11 +103,11 @@ const PerfPanel: React.FC<Props> = ({resolution = '', performance = {}}) => {
             {resolution || '-1'} {isHorizon ? '| ' : ''}{' '}
           </Text>
         </View>
-        {/* <View>
+        <View>
           <Text style={styles.text}>
             {t('RTT')}: {computedRtt(performance.rtt)} {isHorizon ? '| ' : ''}
           </Text>
-        </View> */}
+        </View>
         <View>
           <Text style={styles.text}>
             {t('BT')}: {computedBitrate(performance.bitrate)}{' '}

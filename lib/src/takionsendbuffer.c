@@ -127,7 +127,8 @@ beach:
 	return err;
 }
 
-CHIAKI_EXPORT ChiakiErrorCode chiaki_takion_send_buffer_ack(ChiakiTakionSendBuffer *send_buffer, ChiakiSeqNum32 seq_num, ChiakiSeqNum32 *acked_seq_nums, size_t *acked_seq_nums_count)
+CHIAKI_EXPORT ChiakiErrorCode chiaki_takion_send_buffer_ack(ChiakiTakionSendBuffer *send_buffer, ChiakiSeqNum32 seq_num,
+		ChiakiSeqNum32 *acked_seq_nums, size_t *acked_seq_nums_count, uint64_t *acked_rtt_ms)
 {
 	ChiakiErrorCode err = chiaki_mutex_lock(&send_buffer->mutex);
 	if(err != CHIAKI_ERR_SUCCESS)
@@ -135,6 +136,8 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_takion_send_buffer_ack(ChiakiTakionSendBuff
 
 	if(acked_seq_nums_count)
 		*acked_seq_nums_count = 0;
+
+	uint64_t now = chiaki_time_now_monotonic_ms();
 
 	size_t i;
 	size_t shift = 0; // amount to shift back
@@ -144,7 +147,11 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_takion_send_buffer_ack(ChiakiTakionSendBuff
 		if(send_buffer->packets[i].seq_num == seq_num || chiaki_seq_num_32_lt(send_buffer->packets[i].seq_num, seq_num))
 		{
 			if(acked_seq_nums && acked_seq_nums_count)
+			{
+				if(acked_rtt_ms)
+					acked_rtt_ms[*acked_seq_nums_count] = now > send_buffer->packets[i].last_send_ms ? now - send_buffer->packets[i].last_send_ms : 0;
 				acked_seq_nums[(*acked_seq_nums_count)++] = send_buffer->packets[i].seq_num;
+			}
 
 			free(send_buffer->packets[i].buf);
 			if(shift_start == SIZE_MAX)
@@ -249,7 +256,7 @@ static void takion_send_buffer_resend(ChiakiTakionSendBuffer *send_buffer)
 				ChiakiSeqNum32 ack_seq_nums[TAKION_SEND_BUFFER_SIZE];
 				size_t ack_seq_nums_count;
 				chiaki_mutex_unlock(&send_buffer->mutex);
-				chiaki_takion_send_buffer_ack(send_buffer, packet->seq_num, ack_seq_nums, &ack_seq_nums_count);
+				chiaki_takion_send_buffer_ack(send_buffer, packet->seq_num, ack_seq_nums, &ack_seq_nums_count, NULL);
 				chiaki_mutex_lock(&send_buffer->mutex);
 				if(i > 0)
 					i-= 1;

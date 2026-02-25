@@ -18,6 +18,8 @@
       android:icon="@mipmap/ic_launcher"
       android:logo="@mipmap/ic_launcher"
       android:roundIcon="@mipmap/ic_launcher"
+      android:isGame="true"
+      android:appCategory="game"
       android:allowBackup="false"
       android:hardwareAccelerated="true"
       android:requestLegacyExternalStorage="true"

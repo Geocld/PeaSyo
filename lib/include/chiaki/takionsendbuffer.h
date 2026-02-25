@@ -51,8 +51,10 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_takion_send_buffer_push(ChiakiTakionSendBuf
 
 /**
  * @param acked_seq_nums optional array of size of at least send_buffer->packets_size where acked seq nums will be stored
+ * @param acked_rtt optional array matching acked_seq_nums that will receive the elapsed milliseconds
+ *        between the last transmit and the corresponding ack
  */
-CHIAKI_EXPORT ChiakiErrorCode chiaki_takion_send_buffer_ack(ChiakiTakionSendBuffer *send_buffer, ChiakiSeqNum32 seq_num, ChiakiSeqNum32 *acked_seq_nums, size_t *acked_seq_nums_count);
+CHIAKI_EXPORT ChiakiErrorCode chiaki_takion_send_buffer_ack(ChiakiTakionSendBuffer *send_buffer, ChiakiSeqNum32 seq_num, ChiakiSeqNum32 *acked_seq_nums, size_t *acked_seq_nums_count, uint64_t *acked_rtt_ms);
 
 #ifdef __cplusplus
 }

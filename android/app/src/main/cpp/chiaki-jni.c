@@ -254,7 +254,10 @@ JNIEXPORT jdouble JNICALL JNI_FCN(getRtt)(JNIEnv *env, jobject obj, jlong ptr)
     AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;
     if(!session)
         return 0;
-    return 0;
+    double rtt = session->session.stream_connection.rtt;
+    if(rtt <= 0.0 && session->session.rtt_us > 0)
+        rtt = session->session.rtt_us / 1000.0;
+    return rtt;
 }
 
 // bitrate
