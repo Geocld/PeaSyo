@@ -410,11 +410,13 @@ function SettingsScreen({navigation}) {
             onPress={() => navigation.navigate('Thanks')}
           />
 
-          {/* <SettingItem
-            title={'DEBUG'}
-            description={'Enter debug.'}
-            onPress={() => handleItemPress('debug')}
-          /> */}
+          {__DEV__ && (
+            <SettingItem
+              title={'DEBUG'}
+              description={'Enter debug.'}
+              onPress={() => handleItemPress('debug')}
+            />
+          )}
 
           {token && token.account_id && (
             <SettingItem
@@ -432,7 +434,7 @@ PSN ID: ${token.user_id}
             {t('Version')}: v{pkg.version}
           </Text>
           <Text style={styles.versionText} variant="titleSmall">
-            © 2025 Geocld
+            © 2025-{new Date().getFullYear()} Geocld
           </Text>
         </View>
       </ScrollView>

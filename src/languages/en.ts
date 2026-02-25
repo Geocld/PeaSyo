@@ -365,5 +365,8 @@ export default {
     History: 'History',
     HistoryTitle: 'Update histories',
     HistoryDesc: 'View update histories of PeaSyo',
+    FSRTitle: 'Super Resolution (AMD FSR 1.0) (Experimental)',
+    FSRDesc:
+      'Enable AMD FSR 1.0 super resolution technology, which is an experimental feature that may have compatibility or stability issues. It is recommended for use on high-performance devices',
   },
 };

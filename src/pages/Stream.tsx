@@ -888,30 +888,31 @@ function StreamScreen({navigation, route}) {
     if (!streamInfo || !showStreamView) {
       return null;
     }
-    return (
-      <StreamFsrView
-        style={styles.sv}
-        ref={streamViewRef}
-        streamInfo={streamInfo}
-      />
-    );
-    // if (settings.useSurface) {
-    //   return (
-    //     <StreamView
-    //       style={styles.sv}
-    //       ref={streamViewRef}
-    //       streamInfo={streamInfo}
-    //     />
-    //   );
-    // } else {
-    //   return (
-    //     <StreamTextureView
-    //       style={styles.sv}
-    //       ref={streamViewRef}
-    //       streamInfo={streamInfo}
-    //     />
-    //   );
-    // }
+    if (settings.fsr) {
+      return (
+        <StreamFsrView
+          style={styles.sv}
+          ref={streamViewRef}
+          streamInfo={streamInfo}
+        />
+      );
+    } else if (settings.useSurface) {
+      return (
+        <StreamView
+          style={styles.sv}
+          ref={streamViewRef}
+          streamInfo={streamInfo}
+        />
+      );
+    } else {
+      return (
+        <StreamTextureView
+          style={styles.sv}
+          ref={streamViewRef}
+          streamInfo={streamInfo}
+        />
+      );
+    }
   };
 
   const renderVirtualGamepad = () => {

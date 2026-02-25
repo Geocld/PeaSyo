@@ -380,5 +380,8 @@ export default {
     History: '更新日志',
     HistoryTitle: '更新日志',
     HistoryDesc: '查看PeaSyo历史更新日志',
+    FSRTitle: '超解析度(AMD FSR 1.0)(實驗性)',
+    FSRDesc:
+      '啟用AMD FSR 1.0超解析度技術，該功能為實驗性功能可能會有相容性或穩定性問題，建議在高性能設備上使用',
   },
 };

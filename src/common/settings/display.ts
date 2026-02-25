@@ -24,8 +24,18 @@ const display = [
     title: t('Performance render'),
     description: t('PerformanceRenderDesc'),
     data: [
-      { value: true, text: t('Enable') },
-      { value: false, text: t('Disable') },
+      {value: true, text: t('Enable')},
+      {value: false, text: t('Disable')},
+    ],
+  },
+  {
+    name: 'fsr',
+    type: 'radio',
+    title: t('FSRTitle'),
+    description: t('FSRDesc'),
+    data: [
+      {value: false, text: t('Disable')},
+      {value: true, text: t('Enable')},
     ],
   },
   {
@@ -34,9 +44,9 @@ const display = [
     title: t('maximum operating rate'),
     description: t('MaxOperatingRateDesc'),
     data: [
-      { value: 0x7FFF, text: t('MaxRate') },
-      { value: 120, text: t('StandardRate') },
-      { value: 0, text: t('Disable') },
+      {value: 0x7fff, text: t('MaxRate')},
+      {value: 120, text: t('StandardRate')},
+      {value: 0, text: t('Disable')},
     ],
   },
   {

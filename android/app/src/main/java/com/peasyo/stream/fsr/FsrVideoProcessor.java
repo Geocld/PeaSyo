@@ -35,8 +35,7 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         // 在多数 Android 设备上，OpenGL context 实际运行在 GLES 2/3 的兼容模式，
         // 使用 3.x shader 会因为 #version 310 / textureGather 等特性报错。
         // 因此默认强制使用 2.0 版本的 FSR shader，兼容性最佳。
-        String shaderDir = "shaders/fsr/mobile/2.0/";
-        needInputSize = true;
+        String shaderDir = "fsr/2.0/";
         Log.i(TAG, "FSR shader dir: " + shaderDir);
         Log.i(TAG, "OpenGL extensions: " + extensions);
 
