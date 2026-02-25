@@ -1090,40 +1090,21 @@ public class StreamView extends FrameLayout {
         }
 
         // DPAD
-        Dpad dpad = new Dpad();
         if (Dpad.isDpadDevice(event)) {
-            int dpadIdx = dpad.getDirectionPressed(event);
-            if (dpadIdx != -1) { // Dpad down
+            if (event instanceof MotionEvent) {
+                MotionEvent motionEvent = (MotionEvent) event;
+                float hatX = motionEvent.getAxisValue(MotionEvent.AXIS_HAT_X);
+                float hatY = motionEvent.getAxisValue(MotionEvent.AXIS_HAT_Y);
+                boolean left = Float.compare(hatX, -1.0f) == 0;
+                boolean right = Float.compare(hatX, 1.0f) == 0;
+                boolean up = Float.compare(hatY, -1.0f) == 0;
+                boolean down = Float.compare(hatY, 1.0f) == 0;
+
                 if (this.swapDpad) {
-                    int buttonMask = getButtonMask(dpadIdx);
-                    if (buttonMask == BUTTON_DPAD_UP) {
-                        controllerState.setLeftY(signedAxis(-1));
-                    }
-                    if (buttonMask == BUTTON_DPAD_DOWN) {
-                        controllerState.setLeftY(signedAxis(1));
-                    }
-
-                    if (buttonMask == BUTTON_DPAD_LEFT) {
-                        controllerState.setLeftX(signedAxis(-1));
-                    }
-                    if (buttonMask == BUTTON_DPAD_RIGHT) {
-                        controllerState.setLeftX(signedAxis(1));
-                    }
-                    setControllerState(controllerState);
-                } else {
-                    Log.d(TAG, "DPAD press:" + dpadIdx);
-                    int buttonMask = getButtonMask(dpadIdx);
-
-                    int buttons = controllerState.getButtons();
-                    buttons |= buttonMask;
-
-                    controllerState.setButtons(buttons);
-                }
-
-            } else { // Dpad up
-                if (this.swapDpad) {
-                    controllerState.setLeftX(signedAxis(0));
-                    controllerState.setLeftY(signedAxis(0));
+                    int translatedX = left ? -1 : (right ? 1 : 0);
+                    int translatedY = up ? -1 : (down ? 1 : 0);
+                    controllerState.setLeftX(signedAxis(translatedX));
+                    controllerState.setLeftY(signedAxis(translatedY));
                     setControllerState(controllerState);
                 } else {
                     int buttons = controllerState.getButtons();
@@ -1131,8 +1112,64 @@ public class StreamView extends FrameLayout {
                     buttons &= ~BUTTON_DPAD_RIGHT;
                     buttons &= ~BUTTON_DPAD_UP;
                     buttons &= ~BUTTON_DPAD_DOWN;
-
+                    if (left) {
+                        buttons |= BUTTON_DPAD_LEFT;
+                    }
+                    if (right) {
+                        buttons |= BUTTON_DPAD_RIGHT;
+                    }
+                    if (up) {
+                        buttons |= BUTTON_DPAD_UP;
+                    }
+                    if (down) {
+                        buttons |= BUTTON_DPAD_DOWN;
+                    }
                     controllerState.setButtons(buttons);
+                }
+            } else {
+                Dpad dpad = new Dpad();
+                int dpadIdx = dpad.getDirectionPressed(event);
+                if (dpadIdx != -1) { // Dpad down
+                    if (this.swapDpad) {
+                        int buttonMask = getButtonMask(dpadIdx);
+                        if (buttonMask == BUTTON_DPAD_UP) {
+                            controllerState.setLeftY(signedAxis(-1));
+                        }
+                        if (buttonMask == BUTTON_DPAD_DOWN) {
+                            controllerState.setLeftY(signedAxis(1));
+                        }
+
+                        if (buttonMask == BUTTON_DPAD_LEFT) {
+                            controllerState.setLeftX(signedAxis(-1));
+                        }
+                        if (buttonMask == BUTTON_DPAD_RIGHT) {
+                            controllerState.setLeftX(signedAxis(1));
+                        }
+                        setControllerState(controllerState);
+                    } else {
+                        Log.d(TAG, "DPAD press:" + dpadIdx);
+                        int buttonMask = getButtonMask(dpadIdx);
+
+                        int buttons = controllerState.getButtons();
+                        buttons |= buttonMask;
+
+                        controllerState.setButtons(buttons);
+                    }
+
+                } else { // Dpad up
+                    if (this.swapDpad) {
+                        controllerState.setLeftX(signedAxis(0));
+                        controllerState.setLeftY(signedAxis(0));
+                        setControllerState(controllerState);
+                    } else {
+                        int buttons = controllerState.getButtons();
+                        buttons &= ~BUTTON_DPAD_LEFT;
+                        buttons &= ~BUTTON_DPAD_RIGHT;
+                        buttons &= ~BUTTON_DPAD_UP;
+                        buttons &= ~BUTTON_DPAD_DOWN;
+
+                        controllerState.setButtons(buttons);
+                    }
                 }
             }
         }
