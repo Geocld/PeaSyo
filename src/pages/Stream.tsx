@@ -24,6 +24,7 @@ import Spinner from '../components/Spinner';
 import Orientation from 'react-native-orientation-locker';
 import StreamView from '../components/StreamView';
 import StreamTextureView from '../components/StreamTextureView';
+import StreamFsrView from '../components/StreamFsrView';
 import {CONTROLLERS} from '../common/controller';
 import VirtualGamepad from '../components/VirtualGamepad';
 import CustomVirtualGamepad from '../components/CustomVirtualGamepad';
@@ -887,6 +888,13 @@ function StreamScreen({navigation, route}) {
     if (!streamInfo || !showStreamView) {
       return null;
     }
+    // return (
+    //   <StreamFsrView
+    //     style={styles.sv}
+    //     ref={streamViewRef}
+    //     streamInfo={streamInfo}
+    //   />
+    // );
     if (settings.useSurface) {
       return (
         <StreamView

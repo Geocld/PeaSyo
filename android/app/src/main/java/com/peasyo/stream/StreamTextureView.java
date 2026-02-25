@@ -72,9 +72,9 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
     static final int BUTTON_TOUCHPAD = (1 << 14);
     static final int BUTTON_PS = (1 << 15);
 
-    private TextureView textureView;
-    private SurfaceTexture surfaceTexture;
-    private SensorManager sensorManager;
+    protected TextureView textureView;
+    protected SurfaceTexture surfaceTexture;
+    protected SensorManager sensorManager;
 
     public StreamSession session;
     private ConnectInfo connectInfo;
@@ -163,7 +163,7 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         releasePointerCapture();
     }
 
-    private void initView(Context context) {
+    protected void initView(Context context) {
         // Inflate your layout or create SurfaceView programmatically
         Log.d(TAG, "Init and add surfaceView");
 
@@ -329,7 +329,7 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         initView(reactContext);
     }
 
-    private void initSession(Context context) {
+    protected void initSession(Context context) {
         Application application = (Application) context.getApplicationContext();
 
         LogManager logManager = new LogManager(application);

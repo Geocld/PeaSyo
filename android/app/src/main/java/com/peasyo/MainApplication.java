@@ -11,6 +11,7 @@ import com.facebook.soloader.SoLoader;
 import com.peasyo.session.HolepunchPackage;
 import com.peasyo.stream.StreamTextureViewPackage;
 import com.peasyo.stream.StreamViewPackage;
+import com.peasyo.stream.StreamFsrViewPackage;
 import com.umeng.commonsdk.UMConfigure;
 
 import com.peasyo.touchcontrols.AnalogStickPackage;
@@ -18,11 +19,13 @@ import com.peasyo.touchcontrols.ButtonViewPackage;
 
 import android.util.Log;
 
+import androidx.media3.common.util.UnstableApi;
+
 import com.peasyo.registry.RegistryPackage;
 
 import java.util.HashMap;
 import java.util.List;
-
+@UnstableApi
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost =
@@ -53,6 +56,7 @@ public class MainApplication extends Application implements ReactApplication {
             packages.add(new AnalogStickPackage());
             packages.add(new ButtonViewPackage());
             packages.add(new HapticPackage());
+            packages.add(new StreamFsrViewPackage());
           return packages;
         }
 
