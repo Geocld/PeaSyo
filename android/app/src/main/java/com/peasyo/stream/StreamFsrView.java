@@ -12,6 +12,7 @@ import androidx.media3.common.util.UnstableApi;
 import com.facebook.react.bridge.ReadableMap;
 import com.peasyo.lib.ConnectInfo;
 import com.peasyo.lib.ConnectVideoProfile;
+import com.peasyo.lib.ControllerState;
 import com.peasyo.stream.fsr.FsrVideoProcessor;
 import com.peasyo.stream.fsr.VideoProcessingGLSurfaceView;
 
@@ -70,7 +71,7 @@ import com.peasyo.stream.fsr.VideoProcessingGLSurfaceView;
         setFocusableInTouchMode(true);
 
         sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
-//        controllerState = ControllerState.init();
+        controllerState = ControllerState.init();
     }
 
     @Override
