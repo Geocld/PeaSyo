@@ -20,6 +20,7 @@ struct chiaki_takion_send_buffer_packet_t
 {
 	ChiakiSeqNum32 seq_num;
 	uint64_t tries;
+	uint64_t first_send_ms;
 	uint64_t last_send_ms; // chiaki_time_now_monotonic_ms()
 	uint8_t *buf;
 	size_t buf_size;
@@ -105,10 +106,12 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_takion_send_buffer_push(ChiakiTakionSendBuf
 		}
 	}
 
+	uint64_t now_ms = chiaki_time_now_monotonic_ms();
 	ChiakiTakionSendBufferPacket *packet = &send_buffer->packets[send_buffer->packets_count++];
 	packet->seq_num = seq_num;
 	packet->tries = 0;
-	packet->last_send_ms = chiaki_time_now_monotonic_ms();
+	packet->first_send_ms = now_ms;
+	packet->last_send_ms = now_ms;
 	packet->buf = buf;
 	packet->buf_size = buf_size;
 
@@ -148,8 +151,8 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_takion_send_buffer_ack(ChiakiTakionSendBuff
 		{
 			if(acked_seq_nums && acked_seq_nums_count)
 			{
-				if(acked_rtt_ms)
-					acked_rtt_ms[*acked_seq_nums_count] = now > send_buffer->packets[i].last_send_ms ? now - send_buffer->packets[i].last_send_ms : 0;
+					if(acked_rtt_ms)
+						acked_rtt_ms[*acked_seq_nums_count] = now > send_buffer->packets[i].first_send_ms ? now - send_buffer->packets[i].first_send_ms : 0;
 				acked_seq_nums[(*acked_seq_nums_count)++] = send_buffer->packets[i].seq_num;
 			}
 

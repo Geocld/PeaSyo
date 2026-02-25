@@ -13,10 +13,13 @@
 #include "congestioncontrol.h"
 
 #include <stdbool.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define CHIAKI_STREAM_CONNECTION_RTT_WINDOW 8
 
 typedef struct chiaki_session_t ChiakiSession;
 
@@ -78,6 +81,8 @@ typedef struct chiaki_stream_connection_t
 
 	double rtt;
 	double measured_bitrate;
+	double rtt_samples[CHIAKI_STREAM_CONNECTION_RTT_WINDOW];
+	size_t rtt_sample_count;
 } ChiakiStreamConnection;
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_stream_connection_init(ChiakiStreamConnection *stream_connection, ChiakiSession *session, double packet_loss_max);

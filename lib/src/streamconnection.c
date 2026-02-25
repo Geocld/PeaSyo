@@ -107,6 +107,8 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_stream_connection_init(ChiakiStreamConnecti
 	stream_connection->remote_disconnect_reason = NULL;
 	stream_connection->rtt = 0.0;
 	stream_connection->measured_bitrate = 0.0;
+	stream_connection->rtt_sample_count = 0;
+	memset(stream_connection->rtt_samples, 0, sizeof(stream_connection->rtt_samples));
 
 	return CHIAKI_ERR_SUCCESS;
 
@@ -401,15 +403,31 @@ static void stream_connection_handle_data_ack(ChiakiStreamConnection *stream_con
 	if(rtt_ms == 0)
 		return;
 
-	// 过滤异常值，避免 retransmit 拉高网络延迟数据
-	const double sample = (double)rtt_ms;
-	if(sample < 1.0 || sample > 2000.0)
+	double sample = (double)rtt_ms;
+	if(sample > 2000.0)
 		return;
 
-	if(stream_connection->rtt <= 0.0)
-		stream_connection->rtt = sample;
+	if(sample < 0.5)
+		sample = 0.5;
+
+	if(stream_connection->rtt_sample_count < CHIAKI_STREAM_CONNECTION_RTT_WINDOW)
+	{
+		stream_connection->rtt_samples[stream_connection->rtt_sample_count++] = sample;
+	}
 	else
-		stream_connection->rtt = stream_connection->rtt * 0.8 + sample * 0.2;
+	{
+		memmove(stream_connection->rtt_samples, stream_connection->rtt_samples + 1,
+				(CHIAKI_STREAM_CONNECTION_RTT_WINDOW - 1) * sizeof(double));
+		stream_connection->rtt_samples[CHIAKI_STREAM_CONNECTION_RTT_WINDOW - 1] = sample;
+	}
+
+	double min_sample = stream_connection->rtt_samples[0];
+	for(size_t i = 1; i < stream_connection->rtt_sample_count; ++i)
+	{
+		if(stream_connection->rtt_samples[i] < min_sample)
+			min_sample = stream_connection->rtt_samples[i];
+	}
+	stream_connection->rtt = min_sample;
 }
 
 static void stream_connection_takion_cb(ChiakiTakionEvent *event, void *user)
