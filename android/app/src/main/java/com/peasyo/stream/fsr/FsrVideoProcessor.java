@@ -88,7 +88,7 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         float[] inputTextureSize = null;
         if (needInputSize) {
             if (frameWidth > 0 && frameHeight > 0) {
-                inputTextureSize = new float[]{frameWidth, frameHeight};
+                inputTextureSize = new float[]{frameWidth * 4, frameHeight * 4};
             } else {
                 inputTextureSize = new float[]{0f, 0f};
             }
