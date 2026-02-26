@@ -100,7 +100,8 @@ const PerfPanel: React.FC<Props> = ({resolution = '', performance = {}}) => {
       <View style={isHorizon ? styles.wrapperH : styles.wrapperV}>
         <View>
           <Text style={styles.text}>
-            {resolution || '-1'} {isHorizon ? '| ' : ''}{' '}
+            {resolution || '-1'} {settings.fsr ? '(FSR)' : ''}{' '}
+            {isHorizon ? '| ' : ''}{' '}
           </Text>
         </View>
         <View>
