@@ -3,6 +3,7 @@ package com.peasyo.stream;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
@@ -150,17 +151,23 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         Log.d(TAG, "onAttachedToWindow");
-        requestPointerCapture();
-        setOnCapturedPointerListener((v, event) -> {
-            return true;
-        });
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            requestPointerCapture();
+            setOnCapturedPointerListener((v, event) -> {
+                return true;
+            });
+        }
+
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         Log.d(TAG, "onDetachedFromWindow");
-        releasePointerCapture();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            releasePointerCapture();
+        }
+
     }
 
     protected void initView(Context context) {

@@ -13,6 +13,7 @@ precision mediump float;
 uniform samplerExternalOES inputTexture; // 纹理
 uniform vec2 inputTextureSize; // 输入纹理大小
 uniform vec2 outputTextureSize; // 输出纹理大小
+uniform float uHdrToneMap; // 是否启用 HDR 色调映射
 
 varying vec2 vTexCoord; // 从顶点着色器传过来的纹理坐标
 //------------------------------------------------------------------------------------------------------------------------------
@@ -34,6 +35,35 @@ float ARsqH1(float x) {
 
 float ASatH1(float x) {
     return clamp(x, 0.0, 1.0);
+}
+
+vec3 toLinear(vec3 srgbColor) {
+    return pow(max(srgbColor, vec3(0.0)), vec3(2.2));
+}
+
+vec3 toGamma(vec3 linearColor) {
+    return pow(max(linearColor, vec3(0.0)), vec3(1.0 / 2.2));
+}
+
+vec3 toneMapSimple(vec3 color) {
+    vec3 mapped = color / (color + vec3(1.0));
+    return mapped;
+}
+
+vec3 applyHdrToneMap(vec3 color) {
+    if (uHdrToneMap < 0.5) {
+        return color;
+    }
+    vec3 linear = pow(max(color, vec3(0.0)), vec3(2.0));
+    linear *= 1.0;              // 默认 1.0，可拉高/压低明度
+    vec3 mapped = linear / (linear + vec3(1.0));
+    vec3 srgb = pow(mapped, vec3(0.5));  // 回到伽马
+    return mix(color, srgb, clamp(0.5, 0.0, 1.0));
+}
+
+vec3 sampleInput(vec2 uv) {
+    vec3 color = texture2D(inputTexture, uv).rgb;
+    return applyHdrToneMap(color);
 }
 
 #define FSR_RCAS_LIMIT (0.25 - (1.0 / 16.0))
@@ -121,17 +151,17 @@ void FsrMobile(
     //    E
     vec2 pp = ip * con0.xy + con0.zw;
     vec2 tc = (pp + vec2(0.5)) * con1.xy;
-    vec3 sC = texture2D(inputTexture, tc).rgb;
+    vec3 sC = sampleInput(tc);
 #if 0  // Set to 1 to make FSR only affect the screen's central region.
     if (any(abs(tc - 0.5) > float(0.75 / 2.0))) {
         pix = sC;
         return;
     }
 #endif
-    vec3 sA = texture2D(inputTexture, tc - vec2(0, con1.y)).rgb;
-    vec3 sB = texture2D(inputTexture, tc - vec2(con1.x, 0)).rgb;
-    vec3 sD = texture2D(inputTexture, tc + vec2(con1.x, 0)).rgb;
-    vec3 sE = texture2D(inputTexture, tc + vec2(0, con1.y)).rgb;
+    vec3 sA = sampleInput(tc - vec2(0, con1.y));
+    vec3 sB = sampleInput(tc - vec2(con1.x, 0));
+    vec3 sD = sampleInput(tc + vec2(con1.x, 0));
+    vec3 sE = sampleInput(tc + vec2(0, con1.y));
 //------------------------------------------------------------------------------------------------------------------------------ 
     // Combined RCAS: Min and max of ring.
     float mn4R = min(AMin3H1(sA.r, sB.r, sD.r), sE.r);
@@ -220,18 +250,18 @@ void FsrMobile(
     // vec4 nokjB = FsrEasuBH(p3);
 
     // 由于 textureGather 仅在3.1版本中可用，所以这里(OpenGL ES 2.0)使用 texture2D 代替
-    vec3 b = texture2D(inputTexture, (fp + vec2( 0.5, -0.5)) * con1.xy).rgb;
-    vec3 c = texture2D(inputTexture, (fp + vec2( 1.5, -0.5)) * con1.xy).rgb;
-    vec3 e = texture2D(inputTexture, (fp + vec2(-0.5,  0.5)) * con1.xy).rgb;
-    vec3 f = texture2D(inputTexture, (fp + vec2( 0.5,  0.5)) * con1.xy).rgb;
-    vec3 g = texture2D(inputTexture, (fp + vec2( 1.5,  0.5)) * con1.xy).rgb;
-    vec3 h = texture2D(inputTexture, (fp + vec2( 2.5,  0.5)) * con1.xy).rgb;
-    vec3 i = texture2D(inputTexture, (fp + vec2(-0.5,  1.5)) * con1.xy).rgb;
-    vec3 j = texture2D(inputTexture, (fp + vec2( 0.5,  1.5)) * con1.xy).rgb;
-    vec3 k = texture2D(inputTexture, (fp + vec2( 1.5,  1.5)) * con1.xy).rgb;
-    vec3 l = texture2D(inputTexture, (fp + vec2( 2.5,  1.5)) * con1.xy).rgb;
-    vec3 n = texture2D(inputTexture, (fp + vec2( 0.5,  2.5)) * con1.xy).rgb;
-    vec3 o = texture2D(inputTexture, (fp + vec2( 1.5,  2.5)) * con1.xy).rgb;
+    vec3 b = sampleInput((fp + vec2( 0.5, -0.5)) * con1.xy);
+    vec3 c = sampleInput((fp + vec2( 1.5, -0.5)) * con1.xy);
+    vec3 e = sampleInput((fp + vec2(-0.5,  0.5)) * con1.xy);
+    vec3 f = sampleInput((fp + vec2( 0.5,  0.5)) * con1.xy);
+    vec3 g = sampleInput((fp + vec2( 1.5,  0.5)) * con1.xy);
+    vec3 h = sampleInput((fp + vec2( 2.5,  0.5)) * con1.xy);
+    vec3 i = sampleInput((fp + vec2(-0.5,  1.5)) * con1.xy);
+    vec3 j = sampleInput((fp + vec2( 0.5,  1.5)) * con1.xy);
+    vec3 k = sampleInput((fp + vec2( 1.5,  1.5)) * con1.xy);
+    vec3 l = sampleInput((fp + vec2( 2.5,  1.5)) * con1.xy);
+    vec3 n = sampleInput((fp + vec2( 0.5,  2.5)) * con1.xy);
+    vec3 o = sampleInput((fp + vec2( 1.5,  2.5)) * con1.xy);
 
     vec4 fgcbR = vec4(f.r, g.r, c.r, b.r);
     vec4 fgcbG = vec4(f.g, g.g, c.g, b.g);
@@ -272,7 +302,7 @@ void main() {
         outputTextureSize.x, outputTextureSize.y
     );
     if (con0.x > 1.0 || con0.y > 1.0) {
-        gl_FragColor = texture2D(inputTexture, vTexCoord);
+        gl_FragColor = vec4(sampleInput(vTexCoord), 1.0);
     } else {
         vec3 pix;
         vec2 ip = vTexCoord * outputTextureSize;

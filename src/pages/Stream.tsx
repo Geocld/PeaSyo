@@ -392,6 +392,12 @@ function StreamScreen({navigation, route}) {
     setIsTouchpadFull(_isTouchpadFull);
     setIsTouchpadDual(_isTouchpadDual);
 
+    let _codec = isRemote ? remote_codec : codec;
+    // FIXME: FSR + HDR is working incorrectly, so force it to H265 codec
+    if (_settings.fsr && _codec.indexOf('HDR') > -1) {
+      _codec = 'H265';
+    }
+
     const _streamInfo = {
       ps5: _consoleInfo.apName.indexOf('PS5') > -1,
       host: route.params?.isRemote
@@ -408,7 +414,7 @@ function StreamScreen({navigation, route}) {
       height: isRemote ? remote_height : height,
       fps: isRemote ? remote_fps : fps,
       bitrate: isRemote ? remote_bitrate : bitrate,
-      codec: isRemote ? remote_codec : codec,
+      codec: _codec,
       rumble,
       rumbleIntensity: rumble_intensity,
       usbMode: route.params?.isUsbMode || false,

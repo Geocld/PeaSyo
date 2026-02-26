@@ -13,6 +13,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.peasyo.lib.ConnectInfo;
 import com.peasyo.lib.ConnectVideoProfile;
 import com.peasyo.lib.ControllerState;
+import com.peasyo.lib.Codec;
 import com.peasyo.stream.fsr.FsrVideoProcessor;
 import com.peasyo.stream.fsr.VideoProcessingGLSurfaceView;
 
@@ -110,6 +111,9 @@ import com.peasyo.stream.fsr.VideoProcessingGLSurfaceView;
             ConnectVideoProfile profile = connectInfo.getVideoProfile();
             if (profile != null) {
                 fsrSurfaceView.setFrameInputSize(profile.getWidth(), profile.getHeight());
+                if (fsrVideoProcessor != null) {
+                    fsrVideoProcessor.setHdrToneMappingEnabled(profile.getCodec() == Codec.CODEC_H265_HDR);
+                }
             }
         }
     }

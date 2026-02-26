@@ -25,6 +25,9 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
     @Nullable
     private GlProgram program;
     private final float[] outputSize = new float[2];
+    private final float[] inputSize = new float[2];
+    private boolean lastInputLogged;
+    private boolean hdrToneMapping;
 
     public FsrVideoProcessor(Context context) {
         this.context = context.getApplicationContext();
@@ -86,11 +89,7 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         }
         float[] inputTextureSize = null;
         if (needInputSize) {
-            if (frameWidth > 0 && frameHeight > 0) {
-                inputTextureSize = new float[]{frameWidth * 4, frameHeight * 4};
-            } else {
-                inputTextureSize = new float[]{0f, 0f};
-            }
+            inputTextureSize = updateInputSize(frameWidth * 4, frameHeight * 4, transformMatrix);
         }
 
         try {
@@ -100,6 +99,7 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
             }
             currentProgram.setFloatsUniform("outputTextureSize", outputSize);
             currentProgram.setFloatsUniform("uTexTransform", transformMatrix);
+            currentProgram.setFloatUniform("uHdrToneMap", hdrToneMapping ? 1f : 0f);
             currentProgram.bindAttributesAndUniforms();
             Log.v(TAG, "FSR draw frame tex=" + frameTexture + " size=" + frameWidth + "x" + frameHeight);
         } catch (GlException e) {
@@ -129,5 +129,37 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         } catch (GlException e) {
             Log.e(TAG, message, e);
         }
+    }
+
+    public void setHdrToneMappingEnabled(boolean enabled) {
+        hdrToneMapping = enabled;
+    }
+
+    private float[] updateInputSize(int frameWidth, int frameHeight, float[] transformMatrix) {
+        if (frameWidth <= 0 || frameHeight <= 0) {
+            inputSize[0] = 0f;
+            inputSize[1] = 0f;
+            return inputSize;
+        }
+        float scaleX = 1f;
+        float scaleY = 1f;
+        if (transformMatrix != null && transformMatrix.length >= 16) {
+            scaleX = (float) Math.hypot(transformMatrix[0], transformMatrix[1]);
+            scaleY = (float) Math.hypot(transformMatrix[4], transformMatrix[5]);
+            if (scaleX == 0f) {
+                scaleX = 1f;
+            }
+            if (scaleY == 0f) {
+                scaleY = 1f;
+            }
+        }
+        inputSize[0] = frameWidth / scaleX;
+        inputSize[1] = frameHeight / scaleY;
+        if (!lastInputLogged && (scaleX != 1f || scaleY != 1f)) {
+            Log.i(TAG, "SurfaceTexture transform scale -> x:" + scaleX + " y:" + scaleY +
+                    ", effective input size:" + inputSize[0] + "x" + inputSize[1]);
+            lastInputLogged = true;
+        }
+        return inputSize;
     }
 }
