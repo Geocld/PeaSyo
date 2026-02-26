@@ -163,6 +163,21 @@ void FsrMobile(
     vec3 sB = sampleInput(tc - vec2(con1.x, 0));
     vec3 sD = sampleInput(tc + vec2(con1.x, 0));
     vec3 sE = sampleInput(tc + vec2(0, con1.y));
+    float lA = sA.r * 0.5 + sA.g;
+    float lB = sB.r * 0.5 + sB.g;
+    float lC = sC.r * 0.5 + sC.g;
+    float lD = sD.r * 0.5 + sD.g;
+    float lE = sE.r * 0.5 + sE.g;
+    float localVariance = max(max(abs(lC - lA), abs(lC - lB)), max(abs(lC - lD), abs(lC - lE)));
+    float detailStrength = smoothstep(0.02, 0.32, localVariance);
+    float edgeGuard = smoothstep(0.28, 0.75, localVariance);
+    float clampedSharpness = clamp(sharpness, 0.0, 2.0);
+    // Adaptive sharpness keeps text crisp while damping halos on smooth skin tones.
+    float adaptiveSharpness = mix(0.6, 1.0, detailStrength);
+    adaptiveSharpness = mix(adaptiveSharpness, adaptiveSharpness * 0.75, edgeGuard);
+    float detailBlend = mix(0.35, 0.95, detailStrength);
+    detailBlend *= mix(1.0, 0.7, edgeGuard);
+    float ringingLimiter = mix(0.08, 0.2, detailStrength);
 //------------------------------------------------------------------------------------------------------------------------------ 
     // Combined RCAS: Min and max of ring.
     float mn4R = min(AMin3H1(sA.r, sB.r, sD.r), sE.r);
@@ -183,16 +198,11 @@ void FsrMobile(
     float lobeR = max(-hitMinR, hitMaxR);
     float lobeG = max(-hitMinG, hitMaxG);
     float lobeB = max(-hitMinB, hitMaxB);
-    float lobe = max(-FSR_RCAS_LIMIT, min(AMax3H1(lobeR, lobeG, lobeB), 0.0)) * con0.x * sharpness;
+    float lobe = max(-FSR_RCAS_LIMIT, min(AMax3H1(lobeR, lobeG, lobeB), 0.0)) * con0.x * clampedSharpness * adaptiveSharpness;
     // Resolve, which needs the medium precision rcp approximation to avoid visible tonality changes.
     float rcpL = ARcpH1(4.0 * lobe + 1.0);
     vec3 contrast = (lobe * sA+ lobe * sB + lobe * sD + lobe * sE) * rcpL;
 //------------------------------------------------------------------------------------------------------------------------------
-    float lA = sA.r * 0.5 + sA.g;
-    float lB = sB.r * 0.5 + sB.g;
-    float lC = sC.r * 0.5 + sC.g;
-    float lD = sD.r * 0.5 + sD.g;
-    float lE = sE.r * 0.5 + sE.g;
     // Then takes magnitude from abs average of both sides of 'C'.
     // Length converts gradient reversal to 0, smoothly to non-reversal at 1, shaped, then adding horz and vert terms.
     float dc = lD - lC;
@@ -214,18 +224,15 @@ void FsrMobile(
     //------------------------------------------------------------------------------------------------------------------------------ 
     vec2 dir2 = dir * dir;
     float dirR = dir2.x + dir2.y;
-    if (dirR < float(1.0 / 64.0)) {
-        pix = contrast + sC * rcpL;
-        return;
-    }
-    dirR = ARsqH1(dirR);
-    dir *= vec2(dirR);
-    len = len * 0.5;
-    len *= len;
-    float stretch = (dir.x * dir.x + dir.y * dir.y) * ARcpH1(max(abs(dir.x), abs(dir.y)));
-    vec2 len2 = vec2(1.0 + (stretch - 1.0) * len, 1.0 + (-0.5 * len));
-    float lob = float(0.5) + ((1.0 / 4.0- 0.04) -0.5) * len;
-    float clp = ARcpH1(lob);
+    float invDirR = dirR > 1e-6 ? ARsqH1(dirR) : 0.0;
+    dir *= vec2(invDirR);
+    float lenShape = len * 0.5;
+    lenShape *= lenShape;
+    float dirMax = max(abs(dir.x), abs(dir.y));
+    float stretch = (dir.x * dir.x + dir.y * dir.y) * (dirMax > 1e-6 ? ARcpH1(dirMax) : 0.0);
+    vec2 len2 = vec2(1.0 + (stretch - 1.0) * lenShape, 1.0 + (-0.5 * lenShape));
+    float lob = float(0.5) + ((1.0 / 4.0- 0.04) -0.5) * lenShape;
+    float clp = ARcpH1(max(lob, 1e-4));
 //------------------------------------------------------------------------------------------------------------------------------
     vec2 fp = floor(pp);
     pp -= fp;
@@ -292,7 +299,15 @@ void FsrMobile(
     vec3 aC = vec3(pR.x + pR.y, pG.x + pG.y, pB.x + pB.y);
     float aW =  pW.x + pW.y;
 //------------------------------------------------------------------------------------------------------------------------------
-    pix = contrast + aC * vec3(ARcpH1(aW) * rcpL);
+    float invW = ARcpH1(max(aW, 1e-4));
+    vec3 upscaled = aC * vec3(invW);
+    vec3 fsrResult = contrast + upscaled * rcpL;
+    vec3 ringMin = vec3(mn4R, mn4G, mn4B);
+    vec3 ringMax = vec3(mx4R, mx4G, mx4B);
+    vec3 ringRange = max(ringMax - ringMin, vec3(1e-3));
+    vec3 ringPad = ringRange * vec3(ringingLimiter);
+    vec3 clamped = clamp(fsrResult, ringMin - ringPad, ringMax + ringPad);
+    pix = mix(upscaled, clamped, detailBlend);
 }
 
 void main() {
