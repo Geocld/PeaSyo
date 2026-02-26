@@ -14,6 +14,7 @@ uniform samplerExternalOES inputTexture; // 纹理
 uniform vec2 inputTextureSize; // 输入纹理大小
 uniform vec2 outputTextureSize; // 输出纹理大小
 uniform float uHdrToneMap; // 是否启用 HDR 色调映射
+uniform float sharpness; // 锐化强度，1.0 表示默认
 
 varying vec2 vTexCoord; // 从顶点着色器传过来的纹理坐标
 //------------------------------------------------------------------------------------------------------------------------------
@@ -182,7 +183,7 @@ void FsrMobile(
     float lobeR = max(-hitMinR, hitMaxR);
     float lobeG = max(-hitMinG, hitMaxG);
     float lobeB = max(-hitMinB, hitMaxB);
-    float lobe = max(-FSR_RCAS_LIMIT, min(AMax3H1(lobeR, lobeG, lobeB), 0.0)) * con0.x;
+    float lobe = max(-FSR_RCAS_LIMIT, min(AMax3H1(lobeR, lobeG, lobeB), 0.0)) * con0.x * sharpness;
     // Resolve, which needs the medium precision rcp approximation to avoid visible tonality changes.
     float rcpL = ARcpH1(4.0 * lobe + 1.0);
     vec3 contrast = (lobe * sA+ lobe * sB + lobe * sD + lobe * sE) * rcpL;

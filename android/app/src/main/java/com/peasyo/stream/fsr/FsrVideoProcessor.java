@@ -28,6 +28,7 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
     private final float[] inputSize = new float[2];
     private boolean lastInputLogged;
     private boolean hdrToneMapping;
+    private float sharpness = 0.0f;
 
     public FsrVideoProcessor(Context context) {
         this.context = context.getApplicationContext();
@@ -100,6 +101,7 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
             currentProgram.setFloatsUniform("outputTextureSize", outputSize);
             currentProgram.setFloatsUniform("uTexTransform", transformMatrix);
             currentProgram.setFloatUniform("uHdrToneMap", hdrToneMapping ? 1f : 0f);
+            currentProgram.setFloatUniform("sharpness", sharpness);
             currentProgram.bindAttributesAndUniforms();
             Log.v(TAG, "FSR draw frame tex=" + frameTexture + " size=" + frameWidth + "x" + frameHeight);
         } catch (GlException e) {
@@ -133,6 +135,10 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
 
     public void setHdrToneMappingEnabled(boolean enabled) {
         hdrToneMapping = enabled;
+    }
+
+    public void setSharpness(float value) {
+        sharpness = Math.max(0f, Math.min(2f, value));
     }
 
     private float[] updateInputSize(int frameWidth, int frameHeight, float[] transformMatrix) {
