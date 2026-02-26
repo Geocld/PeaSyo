@@ -66,12 +66,12 @@ const PerfPanel: React.FC<Props> = ({resolution = '', performance = {}}) => {
     return (value * 100).toFixed(2) + '%';
   };
 
-  const computedFps = (value: number | undefined): string => {
-    if (value === undefined) {
-      return '-1';
-    }
-    return value.toFixed(1);
-  };
+  // const computedFps = (value: number | undefined): string => {
+  //   if (value === undefined) {
+  //     return '-1';
+  //   }
+  //   return value.toFixed(1);
+  // };
 
   const computedDt = (value: number | undefined): string => {
     if (value === undefined) {
@@ -80,12 +80,12 @@ const PerfPanel: React.FC<Props> = ({resolution = '', performance = {}}) => {
     return value.toFixed(2) + 'ms';
   };
 
-  const computedFl = (value: number | undefined): number | string => {
-    if (value === undefined) {
-      return '-1';
-    }
-    return value;
-  };
+  // const computedFl = (value: number | undefined): number | string => {
+  //   if (value === undefined) {
+  //     return '-1';
+  //   }
+  //   return value;
+  // };
 
   const renderBattery = (level: number) => {
     if (level < 20) {

@@ -9,6 +9,7 @@ import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.SurfaceHolder;
 
 import androidx.annotation.NonNull;
 import androidx.media3.common.util.GlUtil;
@@ -40,6 +41,12 @@ public class VideoProcessingGLSurfaceView extends GLSurfaceView {
     private final SurfaceListener surfaceListener;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final VideoRenderer renderer = new VideoRenderer();
+    private int measuredWidthPx;
+    private int measuredHeightPx;
+    private float surfacePixelScale = 2f;
+    private boolean fixedSurfaceSizeEnabled = false;
+    private int fixedSurfaceWidth;
+    private int fixedSurfaceHeight;
 
     public VideoProcessingGLSurfaceView(
             Context context,
@@ -63,10 +70,46 @@ public class VideoProcessingGLSurfaceView extends GLSurfaceView {
     }
 
     /**
+     * 设置 Surface 实际像素与 View 尺寸的比例，例如传入 1.5 表示强制以 1.5x 像素渲染。
+     */
+    public void setSurfacePixelScale(float scale) {
+        float safeScale = Math.max(1f, scale);
+        if (Math.abs(surfacePixelScale - safeScale) < 0.01f) {
+            return;
+        }
+        surfacePixelScale = safeScale;
+        fixedSurfaceSizeEnabled = false;
+        applyPreferredSurfaceSize();
+    }
+
+    /**
+     * 固定底层 Surface 的像素尺寸，如果传入 <=0 则恢复跟随布局。
+     */
+    public void setFixedSurfacePixelSize(int width, int height) {
+        if (width > 0 && height > 0) {
+            fixedSurfaceSizeEnabled = true;
+            fixedSurfaceWidth = width;
+            fixedSurfaceHeight = height;
+        } else {
+            fixedSurfaceSizeEnabled = false;
+        }
+        applyPreferredSurfaceSize();
+    }
+
+    /**
      * 提供给上层设置当前视频帧原始输入尺寸，供 FSR 计算使用。
      */
     public void setFrameInputSize(int width, int height) {
         renderer.setFrameSize(width, height);
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        Log.v(TAG, "onSizeChanged...");
+        measuredWidthPx = w;
+        measuredHeightPx = h;
+        applyPreferredSurfaceSize();
     }
 
     @Override
@@ -78,9 +121,32 @@ public class VideoProcessingGLSurfaceView extends GLSurfaceView {
         });
     }
 
+    private void applyPreferredSurfaceSize() {
+        Log.v(TAG, "applyPreferredSurfaceSize...");
+        SurfaceHolder holder = getHolder();
+        Log.v(TAG, "applyPreferredSurfaceSize holder..." + holder);
+        if (holder == null) {
+            return;
+        }
+        if (fixedSurfaceSizeEnabled && fixedSurfaceWidth > 0 && fixedSurfaceHeight > 0) {
+            holder.setFixedSize(fixedSurfaceWidth, fixedSurfaceHeight);
+            Log.i(TAG, "Apply fixed surface size: " + fixedSurfaceWidth + "x" + fixedSurfaceHeight);
+            return;
+        }
+        if (surfacePixelScale > 1f && measuredWidthPx > 0 && measuredHeightPx > 0) {
+            int scaledWidth = Math.round(measuredWidthPx * surfacePixelScale);
+            int scaledHeight = Math.round(measuredHeightPx * surfacePixelScale);
+            holder.setFixedSize(scaledWidth, scaledHeight);
+            Log.i(TAG, "Apply pixel scale " + surfacePixelScale + " -> " + scaledWidth + "x" + scaledHeight);
+        } else {
+            holder.setSizeFromLayout();
+        }
+    }
+
     private final class VideoRenderer implements Renderer {
 
         private final AtomicBoolean frameAvailable = new AtomicBoolean(false);
+        private final AtomicBoolean pendingBufferSizeUpdate = new AtomicBoolean(false);
         private final float[] transformMatrix = new float[16];
 
         private SurfaceTexture inputSurfaceTexture;
@@ -93,6 +159,8 @@ public class VideoProcessingGLSurfaceView extends GLSurfaceView {
         void setFrameSize(int width, int height) {
             frameWidth = width;
             frameHeight = height;
+            pendingBufferSizeUpdate.set(true);
+            VideoProcessingGLSurfaceView.this.requestRender();
         }
 
         @Override
@@ -105,6 +173,8 @@ public class VideoProcessingGLSurfaceView extends GLSurfaceView {
             }
             Log.d(TAG, "GL surface created, textureId=" + textureId);
             inputSurfaceTexture = new SurfaceTexture(textureId);
+            pendingBufferSizeUpdate.set(true);
+            maybeUpdateInputSurfaceDefaultSize();
             inputSurfaceTexture.setOnFrameAvailableListener(surfaceTexture -> {
                 frameAvailable.set(true);
                 requestRender();
@@ -123,6 +193,7 @@ public class VideoProcessingGLSurfaceView extends GLSurfaceView {
             if (!initialized) {
                 initializeProcessor(gl);
             }
+            maybeUpdateInputSurfaceDefaultSize();
 
             if (frameAvailable.compareAndSet(true, false)) {
                 SurfaceTexture surfaceTexture = inputSurfaceTexture;
@@ -171,6 +242,19 @@ public class VideoProcessingGLSurfaceView extends GLSurfaceView {
 
         void release() {
             destroyInputSurfaceTexture(true);
+        }
+
+        private void maybeUpdateInputSurfaceDefaultSize() {
+            if (!pendingBufferSizeUpdate.get()) {
+                return;
+            }
+            SurfaceTexture surfaceTexture = inputSurfaceTexture;
+            if (surfaceTexture == null || frameWidth <= 0 || frameHeight <= 0) {
+                return;
+            }
+            surfaceTexture.setDefaultBufferSize(frameWidth, frameHeight);
+            pendingBufferSizeUpdate.set(false);
+            Log.i(TAG, "Input SurfaceTexture default size -> " + frameWidth + "x" + frameHeight);
         }
 
         private void notifySurfaceAvailable(SurfaceTexture surfaceTexture) {

@@ -26,10 +26,12 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
     private GlProgram program;
     private final float[] outputSize = new float[2];
     private final float[] inputSize = new float[2];
+    private final float[] overriddenOutputSize = new float[2];
     private boolean lastInputLogged;
     private boolean hdrToneMapping;
     private boolean manualSharpness;
     private float manualSharpnessValue = 1.2f;
+    private boolean outputSizeOverridden;
 
     public FsrVideoProcessor(Context context) {
         this.context = context.getApplicationContext();
@@ -93,16 +95,17 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         if (needInputSize) {
             inputTextureSize = updateInputSize(frameWidth, frameHeight, transformMatrix);
         }
+        float[] resolvedOutputSize = resolveOutputSize();
 
         try {
             currentProgram.setSamplerTexIdUniform("inputTexture", frameTexture, 0);
             if (inputTextureSize != null) {
                 currentProgram.setFloatsUniform("inputTextureSize", inputTextureSize);
             }
-            currentProgram.setFloatsUniform("outputTextureSize", outputSize);
+            currentProgram.setFloatsUniform("outputTextureSize", resolvedOutputSize);
             currentProgram.setFloatsUniform("uTexTransform", transformMatrix);
             currentProgram.setFloatUniform("uHdrToneMap", hdrToneMapping ? 1f : 0f);
-            currentProgram.setFloatUniform("sharpness", resolveSharpness(inputTextureSize));
+            currentProgram.setFloatUniform("sharpness", resolveSharpness(inputTextureSize, resolvedOutputSize));
             currentProgram.bindAttributesAndUniforms();
             Log.v(TAG, "FSR draw frame tex=" + frameTexture + " size=" + frameWidth + "x" + frameHeight);
         } catch (GlException e) {
@@ -147,6 +150,26 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         manualSharpness = false;
     }
 
+    /**
+     * 手动覆盖输出纹理尺寸（单位：像素），用于强制 shader 按目标分辨率进行采样。
+     * 传入 <=0 会恢复跟随 Surface 大小。
+     */
+    public void setOutputSizeOverride(int width, int height) {
+        if (width > 0 && height > 0) {
+            outputSizeOverridden = true;
+            overriddenOutputSize[0] = width;
+            overriddenOutputSize[1] = height;
+            Log.i(TAG, "Override FSR output size -> " + width + "x" + height);
+        } else {
+            outputSizeOverridden = false;
+            Log.i(TAG, "Reset FSR output size override");
+        }
+    }
+
+    private float[] resolveOutputSize() {
+        return outputSizeOverridden ? overriddenOutputSize : outputSize;
+    }
+
     private float[] updateInputSize(int frameWidth, int frameHeight, float[] transformMatrix) {
         if (frameWidth <= 0 || frameHeight <= 0) {
             inputSize[0] = 0f;
@@ -175,15 +198,15 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         return inputSize;
     }
 
-    private float resolveSharpness(@Nullable float[] sourceSize) {
+    private float resolveSharpness(@Nullable float[] sourceSize, float[] resolvedOutputSize) {
         if (manualSharpness) {
             return manualSharpnessValue;
         }
         if (sourceSize == null || sourceSize[0] <= 0f || sourceSize[1] <= 0f) {
             return 1.2f;
         }
-        float scaleX = outputSize[0] > 0 ? outputSize[0] / sourceSize[0] : 1f;
-        float scaleY = outputSize[1] > 0 ? outputSize[1] / sourceSize[1] : 1f;
+        float scaleX = resolvedOutputSize[0] > 0 ? resolvedOutputSize[0] / sourceSize[0] : 1f;
+        float scaleY = resolvedOutputSize[1] > 0 ? resolvedOutputSize[1] / sourceSize[1] : 1f;
         float scale = Math.max(scaleX, scaleY);
         float boost = Math.min(Math.max(scale - 1f, 0f), 1.5f);
         return Math.min(2f, 1.0f + boost * 0.6f);
