@@ -24,6 +24,9 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
     private boolean needInputSize = true;
     @Nullable
     private GlProgram program;
+    @Nullable
+    private GlProgram passthroughProgram;
+    private final String shaderDir = "fsr/2.0/";
     private final float[] outputSize = new float[2];
     private final float[] inputSize = new float[2];
     private final float[] overriddenOutputSize = new float[2];
@@ -32,6 +35,9 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
     private boolean manualSharpness;
     private float manualSharpnessValue = 1.2f;
     private boolean outputSizeOverridden;
+    private boolean fsrEnabled = true;
+    private float bypassScaleThreshold = 1.1f;
+    private int maxFsrPixels = 1920 * 1080;
 
     public FsrVideoProcessor(Context context) {
         this.context = context.getApplicationContext();
@@ -42,7 +48,6 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         // 在多数 Android 设备上，OpenGL context 实际运行在 GLES 2/3 的兼容模式，
         // 使用 3.x shader 会因为 #version 310 / textureGather 等特性报错。
         // 因此默认强制使用 2.0 版本的 FSR shader，兼容性最佳。
-        String shaderDir = "fsr/2.0/";
         Log.i(TAG, "FSR shader dir: " + shaderDir);
         Log.i(TAG, "OpenGL extensions: " + extensions);
 
@@ -97,6 +102,11 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         }
         float[] resolvedOutputSize = resolveOutputSize();
 
+        if (!shouldUseFsr(inputTextureSize, resolvedOutputSize, frameWidth, frameHeight)) {
+            drawPassthrough(frameTexture, transformMatrix);
+            return;
+        }
+
         try {
             currentProgram.setSamplerTexIdUniform("inputTexture", frameTexture, 0);
             if (inputTextureSize != null) {
@@ -107,7 +117,9 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
             currentProgram.setFloatUniform("uHdrToneMap", hdrToneMapping ? 1f : 0f);
             currentProgram.setFloatUniform("sharpness", resolveSharpness(inputTextureSize, resolvedOutputSize));
             currentProgram.bindAttributesAndUniforms();
-            Log.v(TAG, "FSR draw frame tex=" + frameTexture + " size=" + frameWidth + "x" + frameHeight);
+            if (Log.isLoggable(TAG, Log.VERBOSE)) {
+                Log.v(TAG, "FSR draw frame tex=" + frameTexture + " size=" + frameWidth + "x" + frameHeight);
+            }
         } catch (GlException e) {
             Log.e(TAG, "Failed to bind fsr shader program", e);
         }
@@ -126,6 +138,14 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
                 Log.e(TAG, "Failed to delete FSR shader program", e);
             }
             program = null;
+        }
+        if (passthroughProgram != null) {
+            try {
+                passthroughProgram.delete();
+            } catch (GlException e) {
+                Log.e(TAG, "Failed to delete passthrough shader program", e);
+            }
+            passthroughProgram = null;
         }
     }
 
@@ -148,6 +168,24 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
 
     public void resetSharpness() {
         manualSharpness = false;
+    }
+
+    public void setFsrEnabled(boolean enabled) {
+        fsrEnabled = enabled;
+    }
+
+    /**
+     * 低于此缩放倍数时跳过 FSR，直接复制原始纹理。
+     */
+    public void setBypassScaleThreshold(float threshold) {
+        bypassScaleThreshold = Math.max(1f, threshold);
+    }
+
+    /**
+     * 超过指定像素数时跳过 FSR 以降低 GPU 负载，传入 <=0 可禁用此限制。
+     */
+    public void setMaxFsrPixels(int maxPixels) {
+        maxFsrPixels = maxPixels;
     }
 
     /**
@@ -210,5 +248,76 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         float scale = Math.max(scaleX, scaleY);
         float boost = Math.min(Math.max(scale - 1f, 0f), 1.5f);
         return Math.min(2f, 1.0f + boost * 0.6f);
+    }
+
+    private boolean shouldUseFsr(@Nullable float[] sourceSize,
+                                 float[] resolvedOutputSize,
+                                 int frameWidth,
+                                 int frameHeight) {
+        if (!fsrEnabled) {
+            return false;
+        }
+        float srcWidth;
+        float srcHeight;
+        if (sourceSize != null && sourceSize[0] > 0f && sourceSize[1] > 0f) {
+            srcWidth = sourceSize[0];
+            srcHeight = sourceSize[1];
+        } else {
+            srcWidth = frameWidth;
+            srcHeight = frameHeight;
+        }
+        if (srcWidth <= 0f || srcHeight <= 0f) {
+            return true;
+        }
+        float scaleX = resolvedOutputSize[0] > 0 ? resolvedOutputSize[0] / srcWidth : 1f;
+        float scaleY = resolvedOutputSize[1] > 0 ? resolvedOutputSize[1] / srcHeight : 1f;
+        float scale = Math.max(scaleX, scaleY);
+        if (scale < bypassScaleThreshold) {
+            return false;
+        }
+        if (maxFsrPixels > 0) {
+            float totalPixels = resolvedOutputSize[0] * resolvedOutputSize[1];
+            if (totalPixels > maxFsrPixels) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void drawPassthrough(int frameTexture, float[] transformMatrix) {
+        try {
+            GlProgram copyProgram = ensurePassthroughProgram();
+            copyProgram.setSamplerTexIdUniform("inputTexture", frameTexture, 0);
+            copyProgram.setFloatsUniform("uTexTransform", transformMatrix);
+            copyProgram.setFloatUniform("uHdrToneMap", hdrToneMapping ? 1f : 0f);
+            copyProgram.bindAttributesAndUniforms();
+        } catch (GlException | IOException e) {
+            Log.e(TAG, "Failed to bind passthrough shader program", e);
+            return;
+        }
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+        checkGlError("FSR passthrough draw failed");
+    }
+
+    private GlProgram ensurePassthroughProgram() throws GlException, IOException {
+        if (passthroughProgram == null) {
+            passthroughProgram = new GlProgram(
+                    context,
+                    shaderDir + "opt_fsr_vertex.glsl",
+                    shaderDir + "passthrough_fragment.glsl"
+            );
+            passthroughProgram.setBufferAttribute(
+                    "aPosition",
+                    GlUtil.getNormalizedCoordinateBounds(),
+                    GlUtil.HOMOGENEOUS_COORDINATE_VECTOR_SIZE
+            );
+            passthroughProgram.setBufferAttribute(
+                    "aTexCoords",
+                    GlUtil.getTextureCoordinateBounds(),
+                    GlUtil.HOMOGENEOUS_COORDINATE_VECTOR_SIZE
+            );
+        }
+        return passthroughProgram;
     }
 }
