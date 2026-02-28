@@ -93,6 +93,7 @@ function StreamScreen({navigation, route}) {
   const [showStreamView, setShowStreamView] = React.useState(false);
   const [avgPerformance, setAvgPerformance] = React.useState({});
   const [showPerformance, setShowPerformance] = React.useState(false);
+  const [hapticsActive, setHapticsActive] = React.useState(false);
   const [showInitOverlay, setShowInitOverlay] = React.useState(false);
   const [settings, setSettings] = React.useState<any>({});
   const [streamInfo, setStreamInfo] = React.useState<any>(null);
@@ -593,6 +594,10 @@ function StreamScreen({navigation, route}) {
       'performance',
       states => {
         // console.log('Performance:', states);
+        // 原生层每次会带上 hapticsActive，前端据此决定是否显示“触觉反馈”
+        if (typeof states?.hapticsActive === 'boolean') {
+          setHapticsActive(states.hapticsActive);
+        }
         if (performances.current.length < 5) {
           performances.current.push(states);
         } else {
@@ -1126,7 +1131,11 @@ function StreamScreen({navigation, route}) {
       {loading && <Spinner text={loadingText} />}
 
       {showPerformance && (
-        <PerfPanel resolution={resolution} performance={avgPerformance} />
+        <PerfPanel
+          resolution={resolution}
+          performance={avgPerformance}
+          hapticsActive={hapticsActive}
+        />
       )}
 
       {renderVirtualGamepad()}

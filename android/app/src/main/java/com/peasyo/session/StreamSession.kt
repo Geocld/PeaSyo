@@ -472,6 +472,15 @@ class StreamSession(
 					putDouble("decodeTime", event.decodeTime)
 					putDouble("fps", event.fps)
 					putDouble("frameLost", event.frameLost)
+					// 给前端性能条附带触觉状态：仅 DualSense 触觉真正激活时为 true
+					putBoolean(
+						"hapticsActive",
+						if (usbMode && usbController == DSCONTROLLER_NAME) {
+							getMainActivity()?.isDualSenseHapticsActive() ?: false
+						} else {
+							false
+						}
+					)
 				}
 				sendEvent("performance", params)
 			}
