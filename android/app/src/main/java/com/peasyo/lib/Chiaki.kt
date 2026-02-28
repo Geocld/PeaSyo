@@ -376,6 +376,8 @@ data class LoginPinRequestEvent(val pinIncorrect: Boolean): Event()
 data class QuitEvent(val reason: QuitReason, val reasonString: String?): Event()
 data class RumbleEvent(val left: Int, val right: Int): Event()
 data class TriggerRumbleEvent(val typeLeft: Int, val left: Int, val typeRight: Int, val right: Int): Event()
+// PS5 原始触觉音频事件：把一帧 PCM 字节直接传到上层
+data class HapticAudioEvent(val pcmData: ByteArray): Event()
 data class PerformanceEvent(val rtt: Double, val bitrate: Double, val packetLoss: Double, val decodeTime: Double, val fps: Double, val frameLost: Double): Event()
 class CreateError(val errorCode: ErrorCode): Exception("Failed to create a native object: $errorCode")
 
@@ -453,6 +455,12 @@ class Session(connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean)
 	private fun eventRumbleTigger(typeLeft: Int, left: Int, typeRight: Int, right: Int)
 	{
 		event(TriggerRumbleEvent(typeLeft, left, typeRight, right))
+	}
+
+	// JNI 回调：接收 C 层透传上来的原始触觉音频帧
+	private fun eventHapticAudio(pcmData: ByteArray)
+	{
+		event(HapticAudioEvent(pcmData))
 	}
 
 	fun getPerformance()

@@ -107,6 +107,36 @@ public class MainActivity extends ReactActivity implements UsbDriverService.UsbD
     this.controllerHandler.handleSendCommand(data);
   }
 
+  // ===== DualSense 触觉反馈入口 =====
+
+  /**
+   * 转发一帧触觉音频到控制器层
+   */
+  public void handleHapticAudio(byte[] pcmData) {
+    this.controllerHandler.handleHapticAudio(pcmData);
+  }
+
+  /**
+   * 启动触觉模式
+   */
+  public boolean startHaptics() {
+    return this.controllerHandler.startHaptics();
+  }
+
+  /**
+   * 停止触觉模式
+   */
+  public void stopHaptics() {
+    this.controllerHandler.stopHaptics();
+  }
+
+  /**
+   * 当前是否有 DualSense 处于触觉模式
+   */
+  public boolean isDualSenseHapticsActive() {
+    return this.controllerHandler.isAnyDualSenseHapticsActive();
+  }
+
   public void sendEvent(String eventName, WritableMap params) {
     ReactContext reactContext = getReactInstanceManager().getCurrentReactContext();
 

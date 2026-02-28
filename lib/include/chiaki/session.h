@@ -162,6 +162,8 @@ typedef enum {
     CHIAKI_EVENT_LED_COLOR,
     CHIAKI_EVENT_HAPTIC_INTENSITY,
     CHIAKI_EVENT_TRIGGER_INTENSITY,
+    // 触觉音频：用于把 PS5 原始 PCM 触觉帧从 C 层透传到上层
+    CHIAKI_EVENT_HAPTIC_AUDIO,
 } ChiakiEventType;
 
 typedef struct chiaki_event_t
@@ -189,6 +191,12 @@ typedef struct chiaki_event_t
         } data_motion;
         ChiakiDualSenseEffectIntensity intensity;
         char server_nickname[0x20];
+        // 注意：buf 只在回调调用期间有效，上层需要立刻拷贝
+        struct
+        {
+            uint8_t *buf;
+            size_t buf_size;
+        } haptic_audio;
     };
 } ChiakiEvent;
 
