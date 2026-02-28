@@ -23,6 +23,7 @@ import com.peasyo.lib.LoginPinRequestEvent
 import com.peasyo.lib.PerformanceEvent
 import com.peasyo.lib.QuitEvent
 import com.peasyo.lib.QuitReason
+import com.peasyo.lib.HapticAudioEvent
 import com.peasyo.lib.RumbleEvent
 import com.peasyo.lib.Session
 import com.peasyo.lib.TriggerRumbleEvent
@@ -147,6 +148,11 @@ class StreamSession(
 		_state.value = StreamStateIdle
 		//surfaceTexture?.release()
 
+		// 断流时关闭触觉模式，避免控制器停在异常状态
+		if (usbMode && usbController == DSCONTROLLER_NAME) {
+			getMainActivity()?.stopHaptics()
+		}
+
 		// Stop rumble
 		if (rumble) {
 			if (usbMode) {
@@ -249,6 +255,11 @@ class StreamSession(
 					putString("type", "connected")
 				}
 				sendEvent("streamStateChange", params)
+
+				// 连接成功后尝试打开 DualSense 触觉模式
+				if (usbMode && usbController == DSCONTROLLER_NAME) {
+					getMainActivity()?.startHaptics()
+				}
 			}
 			is HolepunchFinishedEvent -> {
 				val params = Arguments.createMap().apply {
@@ -273,6 +284,13 @@ class StreamSession(
 				// TODO: Make rumble more precise
 //				Log.d("StreamView", "RumbleEvent: $event")
 				if (rumble) {
+					// 若 DualSense 触觉已激活，跳过 rumble 降级逻辑，避免叠加振动
+					if (usbMode && usbController == DSCONTROLLER_NAME) {
+						val hapticsActive = getMainActivity()?.isDualSenseHapticsActive() ?: false
+						if (hapticsActive) {
+							return
+						}
+					}
 
 					val currentTime = System.currentTimeMillis()
 					var shouldVibrate = false
@@ -421,6 +439,12 @@ class StreamSession(
 					}
 				}
 			}
+			is HapticAudioEvent -> {
+				// 仅在 USB DualSense 模式下转发原始触觉音频
+				if (usbMode && usbController == DSCONTROLLER_NAME) {
+					getMainActivity()?.handleHapticAudio(event.pcmData)
+				}
+			}
 			is TriggerRumbleEvent -> { // Adaptive trigger
 //				Log.d("StreamView", "TriggerRumbleEvent: $event")
 
@@ -448,6 +472,15 @@ class StreamSession(
 					putDouble("decodeTime", event.decodeTime)
 					putDouble("fps", event.fps)
 					putDouble("frameLost", event.frameLost)
+					// 给前端性能条附带触觉状态：仅 DualSense 触觉真正激活时为 true
+					putBoolean(
+						"hapticsActive",
+						if (usbMode && usbController == DSCONTROLLER_NAME) {
+							getMainActivity()?.isDualSenseHapticsActive() ?: false
+						} else {
+							false
+						}
+					)
 				}
 				sendEvent("performance", params)
 			}

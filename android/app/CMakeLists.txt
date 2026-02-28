@@ -15,7 +15,9 @@ add_library(chiaki-jni SHARED
         src/main/cpp/audio-output.cpp
         src/main/cpp/controller.h
         src/main/cpp/controller.c
-        src/main/cpp/circular-fifo.hpp)
+        src/main/cpp/circular-fifo.hpp
+        # DualSense 触觉发送（ioctl + USBDEVFS_URB）
+        src/main/cpp/haptic/haptic_usb.cpp)
 target_link_libraries(chiaki-jni chiaki-lib)
 
 find_library(ANDROID_LIB_LOG log)

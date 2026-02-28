@@ -7,11 +7,16 @@ import {getSettings} from '../store/settingStore';
 type Props = {
   resolution: string;
   performance: any;
+  hapticsActive?: boolean;
 };
 
 const {BatteryModule} = NativeModules;
 
-const PerfPanel: React.FC<Props> = ({resolution = '', performance = {}}) => {
+const PerfPanel: React.FC<Props> = ({
+  resolution = '',
+  performance = {},
+  hapticsActive = false,
+}) => {
   const {t} = useTranslation();
   const settings = getSettings();
   const [battery, setBattery] = React.useState(100);
@@ -141,6 +146,13 @@ const PerfPanel: React.FC<Props> = ({resolution = '', performance = {}}) => {
         <View>
           <Text style={styles.text}>{renderBattery(battery)}</Text>
         </View>
+        {hapticsActive && (
+          <View>
+            <Text style={styles.text}>
+              {isHorizon ? '| 触觉反馈' : '触觉反馈'}
+            </Text>
+          </View>
+        )}
       </View>
     </View>
   );

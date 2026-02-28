@@ -226,17 +226,26 @@ static uint64_t get_current_time_ms() {
 }
 
 static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_size, void *user) {
-    if (buf_size < 25) {
+    if (buf_size < 4) {
         return;
     }
 
     ChiakiSession *session = user;
+    // 1) 先透传原始 PCM 触觉帧，给 DualSense 触觉链路使用
+    ChiakiEvent haptic_event = { 0 };
+    haptic_event.type = CHIAKI_EVENT_HAPTIC_AUDIO;
+    haptic_event.haptic_audio.buf = buf;
+    haptic_event.haptic_audio.buf_size = buf_size;
+    session->event_cb(&haptic_event, session->event_cb_user);
 
     int16_t amplitudel = 0, amplituder = 0;
     int32_t suml = 0, sumr = 0;
     const size_t sample_size = 2 * sizeof(int16_t); // stereo samples
 
     size_t buf_count = buf_size / sample_size;
+    if (buf_count == 0) {
+        return;
+    }
     for (size_t i = 0; i < buf_count; i++){
         size_t cur = i * sample_size;
 
@@ -252,6 +261,7 @@ static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_
     uint16_t left8 = left >> 8;
     uint16_t right8 = right >> 8;
 
+    // 2) 同时保留 rumble 降级事件，给非 DualSense 设备继续使用
     ChiakiEvent event = { 0 };
     event.type = CHIAKI_EVENT_RUMBLE;
     event.rumble.unknown = buf[0];

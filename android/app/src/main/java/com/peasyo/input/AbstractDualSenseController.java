@@ -12,6 +12,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public abstract class AbstractDualSenseController extends AbstractController {
+    private static final String TAG = "PS5HAPTIC";
+    // DualSense 触觉音频端点特征：等时 OUT 且 maxPacketSize = 0x188(392)
+    private static final int ISO_EP_MAX_PACKET = 0x188;
+
     protected final UsbDevice device;
     protected final UsbDeviceConnection connection;
 
@@ -19,6 +23,16 @@ public abstract class AbstractDualSenseController extends AbstractController {
     private boolean stopped;
 
     protected UsbEndpoint inEndpt, outEndpt;
+
+    // 触觉端点信息（由 start() 扫描得到）
+    private int hapticInterfaceId = -1;
+    private int hapticAltSetting = -1;
+    private byte hapticEndpointAddr = 0;
+
+    private DualSenseHapticSender hapticSender;
+    private volatile boolean hapticEnabled = false;
+    // 首次真正发送前先下发 0x02 0x0c 0x40 的初始化包
+    private boolean hapticPrimed = false;
 
     public AbstractDualSenseController(UsbDevice device, UsbDeviceConnection connection, int deviceId, UsbDriverListener listener) {
         super(deviceId, listener, device.getVendorId(), device.getProductId());
@@ -136,6 +150,9 @@ public abstract class AbstractDualSenseController extends AbstractController {
 
         Log.d("UsbDriverService AbstractDualSenseController.java", "getInterfaceCount:" + device.getInterfaceCount());
 
+        // 扫描音频接口里的等时 OUT 端点，用于后续触觉音频发送
+        detectHapticEndpoint();
+
         // Find the endpoints
         UsbInterface iface = findInterface(device);
 
@@ -190,6 +207,7 @@ public abstract class AbstractDualSenseController extends AbstractController {
         }
 
         stopped = true;
+        stopHaptics();
 
         // Cancel any rumble effects
         rumble((short)0, (short)0);
@@ -205,6 +223,114 @@ public abstract class AbstractDualSenseController extends AbstractController {
 
         // Report the device removed
         notifyDeviceRemoved();
+    }
+
+    private void detectHapticEndpoint() {
+        hapticInterfaceId = -1;
+        hapticAltSetting = -1;
+        hapticEndpointAddr = 0;
+
+        for (int i = 0; i < device.getInterfaceCount(); i++) {
+            UsbInterface iface = device.getInterface(i);
+            if (iface.getInterfaceClass() != UsbConstants.USB_CLASS_AUDIO) {
+                continue;
+            }
+            for (int j = 0; j < iface.getEndpointCount(); j++) {
+                UsbEndpoint ep = iface.getEndpoint(j);
+                if (ep.getType() == UsbConstants.USB_ENDPOINT_XFER_ISOC
+                        && ep.getDirection() == UsbConstants.USB_DIR_OUT
+                        && ep.getMaxPacketSize() == ISO_EP_MAX_PACKET) {
+                    hapticInterfaceId = iface.getId();
+                    hapticAltSetting = iface.getAlternateSetting();
+                    hapticEndpointAddr = (byte) ep.getAddress();
+                    Log.i(TAG, "发现 DualSense 触觉端点: iface=" + hapticInterfaceId
+                            + ", alt=" + hapticAltSetting
+                            + ", ep=0x" + String.format("%02X", ep.getAddress()));
+                    return;
+                }
+            }
+        }
+    }
+
+    /**
+     * 启动 DualSense 触觉模式（ioctl + URB）
+     */
+    public synchronized boolean startHaptics() {
+        if (hapticEnabled) {
+            return true;
+        }
+        if (hapticInterfaceId < 0) {
+            Log.w(TAG, "未检测到触觉端点，无法启动触觉反馈");
+            return false;
+        }
+
+        final int fd = connection.getFileDescriptor();
+        if (fd < 0) {
+            Log.w(TAG, "UsbDeviceConnection fd 无效");
+            return false;
+        }
+
+        if (!HapticNative.nativeConnectHaptics(fd, hapticInterfaceId, hapticAltSetting, hapticEndpointAddr)) {
+            return false;
+        }
+        if (!HapticNative.nativeEnableHaptics()) {
+            HapticNative.nativeCleanupHaptics();
+            return false;
+        }
+
+        hapticSender = new DualSenseHapticSender();
+        hapticSender.start();
+        hapticPrimed = false;
+        hapticEnabled = true;
+        return true;
+    }
+
+    /**
+     * 停止触觉模式并释放 native 资源
+     */
+    public synchronized void stopHaptics() {
+        hapticEnabled = false;
+        hapticPrimed = false;
+
+        if (hapticSender != null) {
+            hapticSender.stop();
+            hapticSender = null;
+        }
+
+        HapticNative.nativeCleanupHaptics();
+    }
+
+    /**
+     * 入队一帧触觉音频数据
+     */
+    public void enqueueHapticData(byte[] frame) {
+        if (!hapticEnabled || frame == null || frame.length == 0) {
+            return;
+        }
+        final DualSenseHapticSender sender = hapticSender;
+        if (sender == null) {
+            return;
+        }
+
+        if (!hapticPrimed) {
+            // 首次发送前先发初始化输出报告
+            byte[] initReport = new byte[48];
+            initReport[0] = 0x02;
+            initReport[1] = 0x0C;
+            initReport[2] = 0x40;
+            sendCommand(initReport);
+            hapticPrimed = true;
+        }
+
+        sender.enqueue(frame);
+    }
+
+    public boolean isHapticEnabled() {
+        return hapticEnabled;
+    }
+
+    public boolean hasHapticEndpoint() {
+        return hapticInterfaceId >= 0;
     }
 
     protected abstract boolean handleRead(ByteBuffer buffer);

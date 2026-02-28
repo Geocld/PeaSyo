@@ -193,6 +193,65 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
         }
     }
 
+    /**
+     * 把一帧 PS5 触觉音频数据分发给已连接的 DualSense 控制器
+     */
+    public void handleHapticAudio(byte[] pcmData) {
+        if (pcmData == null || pcmData.length == 0) {
+            return;
+        }
+        for (int i = 0; i < usbDeviceContexts.size(); i++) {
+            UsbDeviceContext deviceContext = usbDeviceContexts.valueAt(i);
+            if (deviceContext.device instanceof AbstractDualSenseController) {
+                ((AbstractDualSenseController) deviceContext.device).enqueueHapticData(pcmData);
+            }
+        }
+    }
+
+    /**
+     * 启动所有 DualSense 的触觉模式，至少一个成功就返回 true
+     */
+    public boolean startHaptics() {
+        boolean anyStarted = false;
+        for (int i = 0; i < usbDeviceContexts.size(); i++) {
+            UsbDeviceContext deviceContext = usbDeviceContexts.valueAt(i);
+            if (deviceContext.device instanceof AbstractDualSenseController) {
+                AbstractDualSenseController ds = (AbstractDualSenseController) deviceContext.device;
+                if (ds.hasHapticEndpoint() && ds.startHaptics()) {
+                    anyStarted = true;
+                }
+            }
+        }
+        return anyStarted;
+    }
+
+    /**
+     * 停止所有 DualSense 的触觉模式
+     */
+    public void stopHaptics() {
+        for (int i = 0; i < usbDeviceContexts.size(); i++) {
+            UsbDeviceContext deviceContext = usbDeviceContexts.valueAt(i);
+            if (deviceContext.device instanceof AbstractDualSenseController) {
+                ((AbstractDualSenseController) deviceContext.device).stopHaptics();
+            }
+        }
+    }
+
+    /**
+     * 是否存在处于触觉模式的 DualSense
+     */
+    public boolean isAnyDualSenseHapticsActive() {
+        for (int i = 0; i < usbDeviceContexts.size(); i++) {
+            UsbDeviceContext deviceContext = usbDeviceContexts.valueAt(i);
+            if (deviceContext.device instanceof AbstractDualSenseController) {
+                if (((AbstractDualSenseController) deviceContext.device).isHapticEnabled()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public void stop() {
         if (stopped) {
             return;
