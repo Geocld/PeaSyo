@@ -31,7 +31,7 @@ public abstract class AbstractDualSenseController extends AbstractController {
 
     private DualSenseHapticSender hapticSender;
     private volatile boolean hapticEnabled = false;
-    // 与 pxplay 对齐：首次真正发送前先下发 0x02 0x0c 0x40 的初始化包
+    // 首次真正发送前先下发 0x02 0x0c 0x40 的初始化包
     private boolean hapticPrimed = false;
 
     public AbstractDualSenseController(UsbDevice device, UsbDeviceConnection connection, int deviceId, UsbDriverListener listener) {
@@ -313,7 +313,7 @@ public abstract class AbstractDualSenseController extends AbstractController {
         }
 
         if (!hapticPrimed) {
-            // 与 pxplay 行为对齐：首次发送前先发初始化输出报告
+            // 首次发送前先发初始化输出报告
             byte[] initReport = new byte[48];
             initReport[0] = 0x02;
             initReport[1] = 0x0C;

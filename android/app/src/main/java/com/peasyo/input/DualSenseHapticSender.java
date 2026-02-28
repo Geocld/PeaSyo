@@ -12,9 +12,9 @@ import java.util.concurrent.BlockingQueue;
  */
 public final class DualSenseHapticSender {
 
-    // 与 pxplay 逻辑保持一致：最多缓存 1000 帧
+    // 最多缓存 1000 帧
     private static final int QUEUE_CAPACITY = 1000;
-    // pxplay 发送线程使用 0x400 大小的 direct buffer
+    // 发送线程使用 0x400 大小的 direct buffer
     private static final int DIRECT_BUFFER_SIZE = 1024;
 
     private final BlockingQueue<byte[]> queue = new ArrayBlockingQueue<>(QUEUE_CAPACITY, false);

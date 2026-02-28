@@ -34,7 +34,7 @@ int g_haptic_alt_setting = -1;
 uint8_t g_haptic_endpoint = 0;
 bool g_haptic_enabled = false;
 
-// 与 pxplay 一样，enable 时一次性分配 4096 字节输出缓冲区
+// enable 时一次性分配 4096 字节输出缓冲区
 int16_t *g_upsampled_buffer = nullptr;
 
 inline int16_t clamp_i16(int value)
@@ -199,7 +199,7 @@ Java_com_peasyo_input_HapticNative_nativeSendHapticFeedback(
         return JNI_FALSE;
     }
 
-    // 与 pxplay 行为对齐：如果回收到的不是本次 URB，额外释放该指针
+    // 如果回收到的不是本次 URB，额外释放该指针
     if (reaped_urb && reaped_urb != urb) {
         free(reaped_urb);
     }
