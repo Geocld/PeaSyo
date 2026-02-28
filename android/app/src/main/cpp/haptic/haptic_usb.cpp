@@ -18,7 +18,7 @@
 namespace {
 
 constexpr int kInputChannels = 2; // L/R
-constexpr int kOutputChannels = 4; // [0, 0, L, R]
+constexpr int kOutputChannels = 4; // [0, L, L, R]
 constexpr int kBytesPerInputFrame = kInputChannels * static_cast<int>(sizeof(int16_t)); // 4
 constexpr int kUpsampleFactor = 16; // 3kHz -> 48kHz
 
@@ -44,14 +44,14 @@ inline int16_t clamp_i16(int value)
     return static_cast<int16_t>(value);
 }
 
-// 双声道输入映射到四声道输出：[0, 0, L, R]
+// 双声道输入映射到四声道输出：[0, L, L, R]
 void expand_stereo_to_quad(const int16_t *input, int input_frames, int16_t *output)
 {
     for (int i = 0; i < input_frames; i++) {
         const int16_t left = input[i * 2];
         const int16_t right = input[i * 2 + 1];
         output[i * 4] = 0;
-        output[i * 4 + 1] = 0;
+        output[i * 4 + 1] = left;
         output[i * 4 + 2] = left;
         output[i * 4 + 3] = right;
     }
