@@ -318,7 +318,7 @@ public abstract class AbstractDualSenseController extends AbstractController {
         }
 
         if (!hapticPrimed) {
-            // 与 PXPlay 一致：仅在初始化包真实下发成功后才进入触觉帧发送
+            // 仅在初始化包真实下发成功后才进入触觉帧发送
             if (!tryPrimeHaptics()) {
                 return;
             }
