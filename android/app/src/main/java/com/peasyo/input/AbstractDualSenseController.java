@@ -15,6 +15,8 @@ public abstract class AbstractDualSenseController extends AbstractController {
     private static final String TAG = "PS5HAPTIC";
     // DualSense 触觉音频端点特征：等时 OUT 且 maxPacketSize = 0x188(392)
     private static final int ISO_EP_MAX_PACKET = 0x188;
+    private static final int HAPTIC_INIT_REPORT_SIZE = 48;
+    private static final int HAPTIC_INIT_TIMEOUT_MS = 100;
 
     protected final UsbDevice device;
     protected final UsbDeviceConnection connection;
@@ -33,6 +35,7 @@ public abstract class AbstractDualSenseController extends AbstractController {
     private volatile boolean hapticEnabled = false;
     // 首次真正发送前先下发 0x02 0x0c 0x40 的初始化包
     private boolean hapticPrimed = false;
+    private int hapticPrimeRetryCount = 0;
 
     public AbstractDualSenseController(UsbDevice device, UsbDeviceConnection connection, int deviceId, UsbDriverListener listener) {
         super(deviceId, listener, device.getVendorId(), device.getProductId());
@@ -281,6 +284,7 @@ public abstract class AbstractDualSenseController extends AbstractController {
         hapticSender = new DualSenseHapticSender();
         hapticSender.start();
         hapticPrimed = false;
+        hapticPrimeRetryCount = 0;
         hapticEnabled = true;
         return true;
     }
@@ -291,6 +295,7 @@ public abstract class AbstractDualSenseController extends AbstractController {
     public synchronized void stopHaptics() {
         hapticEnabled = false;
         hapticPrimed = false;
+        hapticPrimeRetryCount = 0;
 
         if (hapticSender != null) {
             hapticSender.stop();
@@ -313,20 +318,18 @@ public abstract class AbstractDualSenseController extends AbstractController {
         }
 
         if (!hapticPrimed) {
-            // 首次发送前先发初始化输出报告
-            byte[] initReport = new byte[48];
-            initReport[0] = 0x02;
-            initReport[1] = 0x0C;
-            initReport[2] = 0x40;
-            sendCommand(initReport);
-            hapticPrimed = true;
+            // 仅在初始化包真实下发成功后才进入触觉帧发送
+            if (!tryPrimeHaptics()) {
+                return;
+            }
         }
 
         sender.enqueue(frame);
     }
 
     public boolean isHapticEnabled() {
-        return hapticEnabled;
+        // 避免 connect 成功但初始化包未生效时的“假激活”
+        return hapticEnabled && hapticPrimed;
     }
 
     public boolean hasHapticEndpoint() {
@@ -335,4 +338,28 @@ public abstract class AbstractDualSenseController extends AbstractController {
 
     protected abstract boolean handleRead(ByteBuffer buffer);
     protected abstract boolean doInit();
+
+    private boolean tryPrimeHaptics() {
+        if (outEndpt == null) {
+            return false;
+        }
+
+        byte[] initReport = new byte[HAPTIC_INIT_REPORT_SIZE];
+        initReport[0] = 0x02;
+        initReport[1] = 0x0C;
+        initReport[2] = 0x40;
+
+        final int res = connection.bulkTransfer(outEndpt, initReport, initReport.length, HAPTIC_INIT_TIMEOUT_MS);
+        if (res == initReport.length) {
+            hapticPrimed = true;
+            hapticPrimeRetryCount = 0;
+            return true;
+        }
+
+        hapticPrimeRetryCount++;
+        if (hapticPrimeRetryCount == 1 || hapticPrimeRetryCount % 50 == 0) {
+            Log.w(TAG, "触觉初始化包发送失败: res=" + res + ", retries=" + hapticPrimeRetryCount);
+        }
+        return false;
+    }
 }
