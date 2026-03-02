@@ -148,9 +148,7 @@ const PerfPanel: React.FC<Props> = ({
         </View>
         {hapticsActive && (
           <View>
-            <Text style={styles.text}>
-              {isHorizon ? '| 触觉反馈' : '触觉反馈'}
-            </Text>
+            <Text style={styles.text}>{isHorizon ? '| 🎮' : ''}</Text>
           </View>
         )}
       </View>

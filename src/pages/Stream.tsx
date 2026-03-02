@@ -682,6 +682,7 @@ function StreamScreen({navigation, route}) {
       },
     );
 
+    // Adaptive trigger
     triggerEventListener.current = eventEmitter.addListener(
       'trigger',
       states => {
