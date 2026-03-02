@@ -321,7 +321,7 @@ function SettingsScreen({navigation}) {
           })}
         </View>
 
-        <View>
+        {/* <View>
           <View style={styles.contentTitle}>
             <Text variant="titleLarge" style={styles.titleText}>
               {t('AdvanceSettings')}
@@ -341,7 +341,7 @@ function SettingsScreen({navigation}) {
               />
             );
           })}
-        </View>
+        </View> */}
 
         <View>
           <View style={styles.contentTitle}>
