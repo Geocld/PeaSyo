@@ -153,8 +153,10 @@ public class VideoProcessingGLSurfaceView extends GLSurfaceView {
         private int textureId;
         private boolean initialized = false;
         private long frameTimestampUs;
-        private int frameWidth;
-        private int frameHeight;
+        private int frameWidth = -1;
+        private int frameHeight = -1;
+        private int surfaceWidth = -1;
+        private int surfaceHeight = -1;
 
         void setFrameSize(int width, int height) {
             frameWidth = width;
@@ -185,13 +187,19 @@ public class VideoProcessingGLSurfaceView extends GLSurfaceView {
         @Override
         public void onSurfaceChanged(GL10 gl, int width, int height) {
             GLES20.glViewport(0, 0, width, height);
-            videoProcessor.setSurfaceSize(width, height);
+            surfaceWidth = width;
+            surfaceHeight = height;
         }
 
         @Override
         public void onDrawFrame(GL10 gl) {
             if (!initialized) {
                 initializeProcessor(gl);
+            }
+            if (surfaceWidth > 0 && surfaceHeight > 0) {
+                videoProcessor.setSurfaceSize(surfaceWidth, surfaceHeight);
+                surfaceWidth = -1;
+                surfaceHeight = -1;
             }
             maybeUpdateInputSurfaceDefaultSize();
 
