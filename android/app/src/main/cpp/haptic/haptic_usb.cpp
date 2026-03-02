@@ -44,7 +44,7 @@ inline int16_t clamp_i16(int value)
     return static_cast<int16_t>(value);
 }
 
-// 双声道输入映射到四声道输出：[0, L, L, R]
+// 双声道输入映射到四声道输出：[0, L, L, R] // 未开启音频直通功能  前两个通道传递数据在此处没啥用
 void expand_stereo_to_quad(const int16_t *input, int input_frames, int16_t *output)
 {
     for (int i = 0; i < input_frames; i++) {
