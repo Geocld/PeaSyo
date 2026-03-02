@@ -8,8 +8,6 @@
 // -- FsrEasuSampleH should be implemented by calling shader, like following:
 //    AH3 FsrEasuSampleH(AF2 p) { return MyTex.SampleLevel(LinearSampler, p, 0).xyz; }
 //==============================================================================================================================
-// 尝试修改为GLSL ES 3.1版本
-//==============================================================================================================================
 #extension GL_OES_EGL_image_external_essl3 : require
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
@@ -42,16 +40,6 @@ float ARsqH1(float x) {
 
 float ASatH1(float x) {
     return clamp(x, 0.0, 1.0);
-}
-
-vec4 FsrEasuRH(vec2 p) {
-    return textureGather(inputTexture, p, 0);
-}
-vec4 FsrEasuGH(vec2 p) {
-    return textureGather(inputTexture, p, 1);
-}
-vec4 FsrEasuBH(vec2 p) {
-    return textureGather(inputTexture, p, 2);
 }
 
 #define FSR_RCAS_LIMIT (0.25 - (1.0 / 16.0))
@@ -139,17 +127,17 @@ void FsrMobile(
     //    E
     vec2 pp = ip * con0.xy + con0.zw;
     vec2 tc = (pp + vec2(0.5)) * con1.xy;
-    vec3 sC = textureLod(inputTexture, tc, 0.0).rgb;
+    vec3 sC = texture(inputTexture, tc).rgb;
 #if 0  // Set to 1 to make FSR only affect the screen's central region.
     if (any(abs(tc - 0.5) > float(0.75 / 2.0))) {
         pix = sC;
         return;
     }
 #endif
-    vec3 sA = textureLod(inputTexture, tc - vec2(0, con1.y), 0.0).rgb;
-    vec3 sB = textureLod(inputTexture, tc - vec2(con1.x, 0), 0.0).rgb;
-    vec3 sD = textureLod(inputTexture, tc + vec2(con1.x, 0), 0.0).rgb;
-    vec3 sE = textureLod(inputTexture, tc + vec2(0, con1.y), 0.0).rgb;
+    vec3 sA = texture(inputTexture, tc - vec2(0, con1.y)).rgb;
+    vec3 sB = texture(inputTexture, tc - vec2(con1.x, 0)).rgb;
+    vec3 sD = texture(inputTexture, tc + vec2(con1.x, 0)).rgb;
+    vec3 sE = texture(inputTexture, tc + vec2(0, con1.y)).rgb;
 //------------------------------------------------------------------------------------------------------------------------------ 
     // Combined RCAS: Min and max of ring.
     float mn4R = min(AMin3H1(sA.r, sB.r, sD.r), sE.r);
@@ -214,40 +202,52 @@ void FsrMobile(
     float lob = float(0.5) + ((1.0 / 4.0- 0.04) -0.5) * len;
     float clp = ARcpH1(lob);
 //------------------------------------------------------------------------------------------------------------------------------
-    //      +---+---+
-    //      |   |   |
-    //      +--(0)--+
-    //      | b | c |
-    //  +---F---+---+---+
-    //  | e | f | g | h |
-    //  +--(1)--+--(2)--+
-    //  | i | j | k | l |
-    //  +---+---+---+---+
-    //      | n | o |
-    //      +--(3)--+
-    //      |   |   |
-    //      +---+---+
     vec2 fp = floor(pp);
     pp -= fp;
     vec2 ppp = vec2(pp);
-    vec2 p0 = fp * con1.xy + con1.zw;
-    vec2 p1 = p0 + con2.xy;
-    vec2 p2 = p0 + con2.zw;
-    vec2 p3 = p0 + con3.xy;
-    p0.y -= con1.w;
-    p3.y += con1.w;
-    vec4 fgcbR = FsrEasuRH(p0);
-    vec4 fgcbG = FsrEasuGH(p0);
-    vec4 fgcbB = FsrEasuBH(p0);
-    vec4 ijfeR = FsrEasuRH(p1);
-    vec4 ijfeG = FsrEasuGH(p1);
-    vec4 ijfeB = FsrEasuBH(p1);
-    vec4 klhgR = FsrEasuRH(p2);
-    vec4 klhgG = FsrEasuGH(p2);
-    vec4 klhgB = FsrEasuBH(p2);
-    vec4 nokjR = FsrEasuRH(p3);
-    vec4 nokjG = FsrEasuGH(p3);
-    vec4 nokjB = FsrEasuBH(p3);
+    // vec2 p0 = fp * con1.xy + con1.zw;
+    // vec2 p1 = p0 + con2.xy;
+    // vec2 p2 = p0 + con2.zw;
+    // vec2 p3 = p0 + con3.xy;
+    // p0.y -= con1.w;
+    // p3.y += con1.w;
+    // vec4 fgcbR = FsrEasuRH(p0);
+    // vec4 fgcbG = FsrEasuGH(p0);
+    // vec4 fgcbB = FsrEasuBH(p0);
+    // vec4 ijfeR = FsrEasuRH(p1);
+    // vec4 ijfeG = FsrEasuGH(p1);
+    // vec4 ijfeB = FsrEasuBH(p1);
+    // vec4 klhgR = FsrEasuRH(p2);
+    // vec4 klhgG = FsrEasuGH(p2);
+    // vec4 klhgB = FsrEasuBH(p2);
+    // vec4 nokjR = FsrEasuRH(p3);
+    // vec4 nokjG = FsrEasuGH(p3);
+    // vec4 nokjB = FsrEasuBH(p3);
+    // Driver compatibility path: use texture() sampling to avoid external texture overload issues.
+    vec3 b = texture(inputTexture, (fp + vec2( 0.5, -0.5)) * con1.xy).rgb;
+    vec3 c = texture(inputTexture, (fp + vec2( 1.5, -0.5)) * con1.xy).rgb;
+    vec3 e = texture(inputTexture, (fp + vec2(-0.5,  0.5)) * con1.xy).rgb;
+    vec3 f = texture(inputTexture, (fp + vec2( 0.5,  0.5)) * con1.xy).rgb;
+    vec3 g = texture(inputTexture, (fp + vec2( 1.5,  0.5)) * con1.xy).rgb;
+    vec3 h = texture(inputTexture, (fp + vec2( 2.5,  0.5)) * con1.xy).rgb;
+    vec3 i = texture(inputTexture, (fp + vec2(-0.5,  1.5)) * con1.xy).rgb;
+    vec3 j = texture(inputTexture, (fp + vec2( 0.5,  1.5)) * con1.xy).rgb;
+    vec3 k = texture(inputTexture, (fp + vec2( 1.5,  1.5)) * con1.xy).rgb;
+    vec3 l = texture(inputTexture, (fp + vec2( 2.5,  1.5)) * con1.xy).rgb;
+    vec3 n = texture(inputTexture, (fp + vec2( 0.5,  2.5)) * con1.xy).rgb;
+    vec3 o = texture(inputTexture, (fp + vec2( 1.5,  2.5)) * con1.xy).rgb;
+    vec4 fgcbR = vec4(f.r, g.r, c.r, b.r);
+    vec4 fgcbG = vec4(f.g, g.g, c.g, b.g);
+    vec4 fgcbB = vec4(f.b, g.b, c.b, b.b);
+    vec4 ijfeR = vec4(i.r, j.r, f.r, e.r);
+    vec4 ijfeG = vec4(i.g, j.g, f.g, e.g);
+    vec4 ijfeB = vec4(i.b, j.b, f.b, e.b);
+    vec4 klhgR = vec4(k.r, l.r, h.r, g.r);
+    vec4 klhgG = vec4(k.g, l.g, h.g, g.g);
+    vec4 klhgB = vec4(k.b, l.b, h.b, g.b);
+    vec4 nokjR = vec4(n.r, o.r, k.r, j.r);
+    vec4 nokjG = vec4(n.g, o.g, k.g, j.g);
+    vec4 nokjB = vec4(n.b, o.b, k.b, j.b);
 //------------------------------------------------------------------------------------------------------------------------------
     // This part is different for FP16, working pairs of taps at a time.
     vec2 pR = vec2(0.0);

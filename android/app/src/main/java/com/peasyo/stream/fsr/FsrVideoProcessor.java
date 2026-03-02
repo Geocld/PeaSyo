@@ -16,8 +16,10 @@ import java.io.IOException;
 public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProcessor {
 
     private static final String TAG = "FsrVideoProcessor";
-    // Two-pass FSR has poor cross-device GL driver stability; keep disabled by default.
-    private static final boolean ENABLE_TWO_PASS_PIPELINE = false;
+    // Keep two-pass pipeline enabled; runtime failures will fallback automatically.
+    private static final boolean ENABLE_TWO_PASS_PIPELINE = true;
+    // Some drivers fail with invalid operation on 3.1 two-pass uniforms; prefer 3.1 mobile instead.
+    private static final boolean ENABLE_TWO_PASS_FOR_31 = false;
 
     private static final int PIPELINE_NONE = 0;
     private static final int PIPELINE_TWO_PASS = 1;
@@ -86,17 +88,17 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         Log.i(TAG, "FSR preferred shader dir: " + preferredDir);
         Log.i(TAG, "OpenGL extensions: " + extensions);
 
-        boolean skipTwoPassForDriverStability = !ENABLE_TWO_PASS_PIPELINE
-                || (extensions != null && extensions.contains("GL_QCOM_"));
+        boolean skipTwoPassForDriverStability = !ENABLE_TWO_PASS_PIPELINE;
         if (skipTwoPassForDriverStability) {
-            if (!ENABLE_TWO_PASS_PIPELINE) {
-                Log.w(TAG, "Skip two-pass FSR globally, use mobile pipeline for stability");
-            } else {
-                Log.w(TAG, "Skip two-pass FSR on current QCOM driver, use mobile pipeline for stability");
-            }
+            Log.w(TAG, "Skip two-pass FSR globally, use mobile pipeline for stability");
         }
 
-        if (!skipTwoPassForDriverStability
+        boolean tryTwoPassPreferred = !skipTwoPassForDriverStability
+                && (!"fsr/3.1/".equals(preferredDir) || ENABLE_TWO_PASS_FOR_31);
+        if ("fsr/3.1/".equals(preferredDir) && !ENABLE_TWO_PASS_FOR_31) {
+            Log.w(TAG, "Skip two-pass for fsr/3.1 and use 3.1 mobile path to avoid driver invalid-operation");
+        }
+        if (tryTwoPassPreferred
                 && (tryInitTwoPass(preferredDir, preferredNeedInputSize)
                 || (!"fsr/2.0/".equals(preferredDir) && tryInitTwoPass("fsr/2.0/", true)))) {
             // Keep texture parameters aligned with TvBox FsrVideoProcessor implementation.
@@ -108,9 +110,15 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         }
 
         // If two-pass FSR hits driver compiler bugs, fallback to mobile single-pass FSR (still has sharpening).
-        if (tryInitMobileSinglePass("fsr/2.0/", true, true, true)
+        boolean preferredHasMobileExtras = "fsr/2.0/".equals(preferredDir);
+        if (tryInitMobileSinglePass(
+                preferredDir,
+                preferredNeedInputSize,
+                preferredHasMobileExtras,
+                preferredHasMobileExtras
+        )
                 || (!"fsr/2.0/".equals(preferredDir)
-                && tryInitMobileSinglePass(preferredDir, preferredNeedInputSize, false, false))) {
+                && tryInitMobileSinglePass("fsr/2.0/", true, true, true))) {
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
@@ -558,11 +566,17 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         pipelineMode = PIPELINE_NONE;
         activeShaderDir = "none";
 
-        if (tryInitMobileSinglePass("fsr/2.0/", true, true, true)) {
+        boolean failedHasMobileExtras = "fsr/2.0/".equals(failedShaderDir);
+        if (tryInitMobileSinglePass(
+                failedShaderDir,
+                failedNeedInputSize,
+                failedHasMobileExtras,
+                failedHasMobileExtras
+        )) {
             return;
         }
         if (!"fsr/2.0/".equals(failedShaderDir)) {
-            tryInitMobileSinglePass(failedShaderDir, failedNeedInputSize, false, false);
+            tryInitMobileSinglePass("fsr/2.0/", true, true, true);
         }
     }
 
