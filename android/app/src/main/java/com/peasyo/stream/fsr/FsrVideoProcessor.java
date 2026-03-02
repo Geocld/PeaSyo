@@ -83,8 +83,14 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         Log.i(TAG, "FSR preferred shader dir: " + preferredDir);
         Log.i(TAG, "OpenGL extensions: " + extensions);
 
-        if (tryInitTwoPass(preferredDir, preferredNeedInputSize)
-                || (!"fsr/2.0/".equals(preferredDir) && tryInitTwoPass("fsr/2.0/", true))) {
+        boolean skipTwoPassForDriverStability = extensions != null && extensions.contains("GL_QCOM_");
+        if (skipTwoPassForDriverStability) {
+            Log.w(TAG, "Skip two-pass FSR on current QCOM driver, use mobile pipeline for stability");
+        }
+
+        if (!skipTwoPassForDriverStability
+                && (tryInitTwoPass(preferredDir, preferredNeedInputSize)
+                || (!"fsr/2.0/".equals(preferredDir) && tryInitTwoPass("fsr/2.0/", true)))) {
             // Keep texture parameters aligned with TvBox FsrVideoProcessor implementation.
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
@@ -324,7 +330,12 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         } catch (GlException e) {
             Log.e(TAG, "Failed to bind EASU shader program (" + activeShaderDir + ")", e);
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
-            drawPassthrough(frameTexture, transformMatrix);
+            fallbackToMobileSinglePass("bind-easu");
+            if (pipelineMode == PIPELINE_MOBILE_SINGLE_PASS) {
+                drawMobileSinglePass(frameTexture, frameWidth, frameHeight, transformMatrix);
+            } else {
+                drawPassthrough(frameTexture, transformMatrix);
+            }
             return;
         }
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
@@ -341,7 +352,12 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
             rcas.bindAttributesAndUniforms();
         } catch (GlException e) {
             Log.e(TAG, "Failed to bind RCAS shader program (" + activeShaderDir + ")", e);
-            drawPassthrough(frameTexture, transformMatrix);
+            fallbackToMobileSinglePass("bind-rcas");
+            if (pipelineMode == PIPELINE_MOBILE_SINGLE_PASS) {
+                drawMobileSinglePass(frameTexture, frameWidth, frameHeight, transformMatrix);
+            } else {
+                drawPassthrough(frameTexture, transformMatrix);
+            }
             return;
         }
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
@@ -502,6 +518,30 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         needInputSize = true;
         mobileHasSharpness = false;
         mobileHasHdrToneMap = false;
+    }
+
+    private void fallbackToMobileSinglePass(String reason) {
+        if (pipelineMode != PIPELINE_TWO_PASS) {
+            return;
+        }
+        String failedShaderDir = activeShaderDir;
+        boolean failedNeedInputSize = needInputSize;
+        Log.w(TAG, "Switching pipeline from two-pass to mobile single-pass, reason=" + reason
+                + ", shaderDir=" + activeShaderDir);
+        safeDeleteProgram(easuProgram);
+        easuProgram = null;
+        safeDeleteProgram(rcasProgram);
+        rcasProgram = null;
+        deleteFramebuffer();
+        pipelineMode = PIPELINE_NONE;
+        activeShaderDir = "none";
+
+        if (tryInitMobileSinglePass("fsr/2.0/", true, true, true)) {
+            return;
+        }
+        if (!"fsr/2.0/".equals(failedShaderDir)) {
+            tryInitMobileSinglePass(failedShaderDir, failedNeedInputSize, false, false);
+        }
     }
 
     private void checkGlError(String message) {
