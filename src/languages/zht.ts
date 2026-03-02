@@ -383,5 +383,11 @@ export default {
     FSRTitle: '超解析度(AMD FSR 1.0)(實驗性)',
     FSRDesc:
       '啟用AMD FSR 1.0超解析度技術，該功能為實驗性功能可能會有相容性或穩定性問題，建議在高性能設備上使用(无法使用HDR)',
+    frame_pacing_title: '視訊影格調步',
+    frame_pacing_desc: '指定如何平衡視訊延遲和平滑度',
+    latency: '偏好低延遲',
+    balanced: '平衡',
+    'cap-fps': 'FPS 上限平衡',
+    smoothness: '偏好平滑視訊 (可能顯著提高延遲)',
   },
 };

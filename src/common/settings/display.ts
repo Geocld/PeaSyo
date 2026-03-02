@@ -4,6 +4,18 @@ const {t} = i18next;
 
 const display = [
   {
+    name: 'frame_pacing',
+    type: 'radio',
+    title: t('frame_pacing_title'),
+    description: t('frame_pacing_desc'),
+    data: [
+      {value: '0', text: t('latency')},
+      {value: '1', text: t('balanced')},
+      {value: '2', text: t('cap-fps')},
+      {value: '3', text: t('smoothness')},
+    ],
+  },
+  {
     name: 'video_format',
     type: 'radio',
     title: t('Video stream format'),

@@ -379,5 +379,13 @@ export default {
     FSRTitle: 'Super Resolución (AMD FSR 1.0) (Experimental)',
     FSRDesc:
       'Habilitar la tecnología de super resolución AMD FSR 1.0, que es una función experimental que puede tener problemas de compatibilidad o estabilidad. Se recomienda usar en dispositivos de alto rendimiento (HDR no funciona)',
+    frame_pacing_title: 'Ritmo de cuadros por segundo en video',
+    frame_pacing_desc:
+      'Especificar como balancear la latencia de video y la fluidez',
+    latency: 'Preferir la menor latencia posible',
+    balanced: 'Equilibrado',
+    'cap-fps': 'Equilibrado con limitador de FPS (Cuadros por Segundo)',
+    smoothness:
+      'Preferir mayor fluidez de video (puede incrementar significativamente la latencia)',
   },
 };

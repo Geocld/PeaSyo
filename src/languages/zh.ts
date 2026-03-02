@@ -395,5 +395,11 @@ export default {
     FSRTitle: '超分辨率(AMD FSR 1.0)(实验性)',
     FSRDesc:
       '启用AMD FSR 1.0超分辨率技术，该功能为实验性功能可能会有兼容性或稳定性问题，建议在高性能设备上使用(注意无法使用HDR)',
+    frame_pacing_title: '视频帧速调节',
+    frame_pacing_desc: '指定如何平衡视频延迟和流畅度',
+    latency: '优先最低延迟',
+    balanced: '平衡',
+    'cap-fps': '有FPS限制的平衡',
+    smoothness: '优先视频流畅度(可能会显著增加最大延迟)',
   },
 };

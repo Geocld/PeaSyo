@@ -620,7 +620,8 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
     memset(session, 0, sizeof(AndroidChiakiSession));
     session->log = log;
     err = android_chiaki_video_decoder_init(&session->video_decoder, log, connect_info.video_profile.width, connect_info.video_profile.height,
-                                            connect_info.ps5 ? connect_info.video_profile.codec : CHIAKI_CODEC_H264, is_remote);
+                                            connect_info.ps5 ? connect_info.video_profile.codec : CHIAKI_CODEC_H264, is_remote,
+                                            connect_info.video_profile.max_fps);
     if(err != CHIAKI_ERR_SUCCESS)
     {
         free(session);
@@ -911,10 +912,10 @@ JNIEXPORT jint JNICALL JNI_FCN(sessionJoin)(JNIEnv *env, jobject obj, jlong ptr)
     return chiaki_session_join(&session->session);
 }
 
-JNIEXPORT void JNICALL JNI_FCN(sessionSetSurface)(JNIEnv *env, jobject obj, jlong ptr, jobject surface, jint maxOperatingRate)
+JNIEXPORT void JNICALL JNI_FCN(sessionSetSurface)(JNIEnv *env, jobject obj, jlong ptr, jobject surface, jint maxOperatingRate, jint framePacing)
 {
     AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;
-    android_chiaki_video_decoder_set_surface(&session->video_decoder, env, surface, maxOperatingRate);
+    android_chiaki_video_decoder_set_surface(&session->video_decoder, env, surface, maxOperatingRate, framePacing);
 }
 
 JNIEXPORT void JNICALL JNI_FCN(sessionSetControllerState)(JNIEnv *env, jobject obj, jlong ptr, jobject controller_state_java)

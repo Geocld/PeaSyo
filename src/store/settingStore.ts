@@ -36,6 +36,7 @@ export type Settings = {
   dead_zone: number;
   edge_compensation: number;
   short_trigger: boolean;
+  frame_pacing: string;
   video_format: string;
   show_virtual_gamead: boolean;
   show_touchpad: boolean;
@@ -94,6 +95,7 @@ const defaultSettings: Settings = {
   dead_zone: 0.2,
   edge_compensation: 0,
   short_trigger: false,
+  frame_pacing: '0',
   video_format: '',
   show_virtual_gamead: false,
   show_touchpad: true,
