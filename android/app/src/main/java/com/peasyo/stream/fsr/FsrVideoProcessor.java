@@ -16,6 +16,8 @@ import java.io.IOException;
 public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProcessor {
 
     private static final String TAG = "FsrVideoProcessor";
+    // Two-pass FSR has poor cross-device GL driver stability; keep disabled by default.
+    private static final boolean ENABLE_TWO_PASS_PIPELINE = false;
 
     private static final int PIPELINE_NONE = 0;
     private static final int PIPELINE_TWO_PASS = 1;
@@ -42,10 +44,11 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
     // RCAS sharpness is inverse (0 = strongest, bigger = weaker).
     private float rcasSharpness = 0.1f;
     // Mobile single-pass shader uses 1.0 as normal strength.
-    private float mobileSharpness = 1.3f;
+    private float mobileSharpness = 1.5f;
 
     private boolean mobileHasSharpness;
     private boolean mobileHasHdrToneMap;
+    private boolean twoPassFailureLogged;
 
     private boolean fsrEnabled = true;
     private boolean hdrToneMappingEnabled;
@@ -83,9 +86,14 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         Log.i(TAG, "FSR preferred shader dir: " + preferredDir);
         Log.i(TAG, "OpenGL extensions: " + extensions);
 
-        boolean skipTwoPassForDriverStability = extensions != null && extensions.contains("GL_QCOM_");
+        boolean skipTwoPassForDriverStability = !ENABLE_TWO_PASS_PIPELINE
+                || (extensions != null && extensions.contains("GL_QCOM_"));
         if (skipTwoPassForDriverStability) {
-            Log.w(TAG, "Skip two-pass FSR on current QCOM driver, use mobile pipeline for stability");
+            if (!ENABLE_TWO_PASS_PIPELINE) {
+                Log.w(TAG, "Skip two-pass FSR globally, use mobile pipeline for stability");
+            } else {
+                Log.w(TAG, "Skip two-pass FSR on current QCOM driver, use mobile pipeline for stability");
+            }
         }
 
         if (!skipTwoPassForDriverStability
@@ -528,6 +536,7 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         needInputSize = true;
         mobileHasSharpness = false;
         mobileHasHdrToneMap = false;
+        twoPassFailureLogged = false;
     }
 
     private void fallbackToMobileSinglePass(String reason) {
@@ -536,8 +545,11 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         }
         String failedShaderDir = activeShaderDir;
         boolean failedNeedInputSize = needInputSize;
-        Log.w(TAG, "Switching pipeline from two-pass to mobile single-pass, reason=" + reason
-                + ", shaderDir=" + activeShaderDir);
+        if (!twoPassFailureLogged) {
+            Log.w(TAG, "Switching pipeline from two-pass to mobile single-pass, reason=" + reason
+                    + ", shaderDir=" + activeShaderDir);
+            twoPassFailureLogged = true;
+        }
         safeDeleteProgram(easuProgram);
         easuProgram = null;
         safeDeleteProgram(rcasProgram);
