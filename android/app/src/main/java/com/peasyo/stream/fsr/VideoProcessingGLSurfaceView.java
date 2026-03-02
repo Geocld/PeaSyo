@@ -43,7 +43,7 @@ public class VideoProcessingGLSurfaceView extends GLSurfaceView {
     private final VideoRenderer renderer = new VideoRenderer();
     private int measuredWidthPx;
     private int measuredHeightPx;
-    private float surfacePixelScale = 2f;
+    private float surfacePixelScale = 1f;
     private boolean fixedSurfaceSizeEnabled = false;
     private int fixedSurfaceWidth;
     private int fixedSurfaceHeight;

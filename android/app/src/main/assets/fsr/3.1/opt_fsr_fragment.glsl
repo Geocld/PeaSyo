@@ -11,7 +11,11 @@
 // 尝试修改为GLSL ES 3.1版本
 //==============================================================================================================================
 #extension GL_OES_EGL_image_external_essl3 : require
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
 precision mediump float;
+#endif
 
 uniform samplerExternalOES inputTexture; // 纹理
 // uniform vec2 inputTextureSize; // 输入纹理大小

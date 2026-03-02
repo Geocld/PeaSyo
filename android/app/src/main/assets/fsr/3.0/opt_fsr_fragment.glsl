@@ -9,7 +9,11 @@
 //    AH3 FsrEasuSampleH(AF2 p) { return MyTex.SampleLevel(LinearSampler, p, 0).xyz; }
 //==============================================================================================================================
 #extension GL_OES_EGL_image_external_essl3 : require
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
 precision mediump float;
+#endif
 
 uniform samplerExternalOES inputTexture; // 纹理
 // uniform vec2 inputTextureSize; // 输入纹理大小
