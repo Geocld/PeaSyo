@@ -42,7 +42,7 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
     // RCAS sharpness is inverse (0 = strongest, bigger = weaker).
     private float rcasSharpness = 0.1f;
     // Mobile single-pass shader uses 1.0 as normal strength.
-    private float mobileSharpness = 1.5f;
+    private float mobileSharpness = 3.0f;
 
     private boolean mobileHasSharpness;
     private boolean mobileHasHdrToneMap;
@@ -174,12 +174,18 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         mobileSharpness = clamped;
         // Map [0..2] (stronger as larger) to RCAS stop domain [2..0].
         rcasSharpness = 2f - clamped;
+        Log.i(
+                TAG,
+                "Sharpness request=" + value + ", clamped=" + clamped
+                        + ", mobileApplied=" + mobileSharpness
+                        + ", rcasApplied=" + rcasSharpness
+        );
         logEffectiveSharpness("setSharpness");
     }
 
     public void resetSharpness() {
         rcasSharpness = 0.2f;
-        mobileSharpness = 1.2f;
+        mobileSharpness = 1.4f;
         logEffectiveSharpness("resetSharpness");
     }
 

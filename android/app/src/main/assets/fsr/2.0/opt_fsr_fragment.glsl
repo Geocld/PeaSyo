@@ -177,11 +177,11 @@ void FsrMobile(
     float edgeGuard = smoothstep(0.28, 0.75, localVariance);
     float clampedSharpness = clamp(sharpness, 0.0, 2.0);
     // Adaptive sharpness keeps text crisp while damping halos on smooth skin tones.
-    float adaptiveSharpness = mix(0.6, 1.0, detailStrength);
-    adaptiveSharpness = mix(adaptiveSharpness, adaptiveSharpness * 0.75, edgeGuard);
-    float detailBlend = mix(0.35, 0.95, detailStrength);
-    detailBlend *= mix(1.0, 0.7, edgeGuard);
-    float ringingLimiter = mix(0.08, 0.2, detailStrength);
+    float adaptiveSharpness = mix(0.68, 1.05, detailStrength);
+    adaptiveSharpness = mix(adaptiveSharpness, adaptiveSharpness * 0.82, edgeGuard);
+    float detailBlend = mix(0.40, 0.99, detailStrength);
+    detailBlend *= mix(1.0, 0.78, edgeGuard);
+    float ringingLimiter = mix(0.07, 0.18, detailStrength);
 //------------------------------------------------------------------------------------------------------------------------------ 
     // Combined RCAS: Min and max of ring.
     float mn4R = min(AMin3H1(sA.r, sB.r, sD.r), sE.r);
