@@ -33,7 +33,9 @@ PeaSyo, also known as Pixiu, is a PS4/5 streaming application for Android that s
 - Support for button mapping
 - Streaming performance monitoring
 - Remote wakeup and standby
-- DualSense 5 adaptive triggers (requires custom Android driver + OTG wired connection)
+- DualSense 5 adaptive triggers (requires Override native gamepad support + OTG wired connect Dualsense5 controller)
+- Native haptic feedback (requires Override native gamepad support + OTG wired connect Dualsense5 controller)
+- AMD FidelityFX SUPER RESOLUTION v1 [FSR 1]
 - Complete DualSense 5 controller testing(Great inspired by [daidr/dualsense-tester](https://github.com/daidr/dualsense-tester))
 
 <img src="https://raw.githubusercontent.com/Geocld/PeaSyo/main/images/game.jpg" width="400" />
@@ -49,14 +51,10 @@ Due to limitations in the Android kernel drivers, not all Android devices suppor
 
 > Notice: You must connect controller before streaming, or PeaSyo can not recognize controller.
 
-
-## Next plans
-PeaSyo is undergoing a major refactoring based on [Chiaki](https://git.sr.ht/~thestr4ng3r/chiaki)'s connection protocol, with the next phase planning to rewrite [Chiaki](https://git.sr.ht/~thestr4ng3r/chiaki)'s original C implementation in Rust.
-
 ## Local Development
 
 ### Requirements
-- [React Native](https://reactnative.dev/) >= 0.74
+- [React Native](https://reactnative.dev/) = 0.74
 - [NodeJs](https://nodejs.org/) >= 20
 - [Yarn](https://yarnpkg.com/) >= 1.22
 

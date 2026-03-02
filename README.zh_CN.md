@@ -32,7 +32,9 @@ PeaSyo，也称貔貅（pixiu），使用中国古代神兽命名，是一款PS4
 - 支持串流性能查看
 - 支持快捷菜单
 - 远程唤醒及休眠
-- DualSense5自适应扳机(需要覆盖安卓驱动+OTG有线连接)
+- DualSense5自适应扳机(需要覆盖安卓驱动+OTG有线连接Dualsense5控制器)
+- DualSense5原生触觉反馈(需要覆盖安卓驱动+OTG有线连接Dualsense5控制器)
+- AMD FidelityFX SUPER RESOLUTION v1 [FSR 1]
 - 完整的DualSense 5手柄测试((感谢 [daidr/dualsense-tester](https://github.com/daidr/dualsense-tester)))
 
 <img src="https://raw.githubusercontent.com/Geocld/PeaSyo/main/images/game.jpg" width="400" />
@@ -48,13 +50,10 @@ PeaSyo，也称貔貅（pixiu），使用中国古代神兽命名，是一款PS4
 
 > 注意需要在进入游戏前连接手柄，否则PeaSyo将无法识别手柄。
 
-## 接下来的计划
-PeaSyo基于[Chiaki](https://git.sr.ht/~thestr4ng3r/chiaki)连接协议，其他功能均重新实现，接下来的计划是使用Rust将原chiaki的协议部分进行全部重构。
-
 ## 本地开发
 
 ### 环境要求
-- [React Native](https://reactnative.dev/) >= 0.74
+- [React Native](https://reactnative.dev/) = 0.74
 - [NodeJs](https://nodejs.org/) >= 20
 - [Yarn](https://yarnpkg.com/) >= 1.22
 
