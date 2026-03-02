@@ -10,7 +10,7 @@
 //==============================================================================================================================
 // 尝试修改为GLSL ES 3.1版本
 //==============================================================================================================================
-#extension GL_OES_EGL_image_external : require
+#extension GL_OES_EGL_image_external_essl3 : require
 precision mediump float;
 
 uniform samplerExternalOES inputTexture; // 纹理

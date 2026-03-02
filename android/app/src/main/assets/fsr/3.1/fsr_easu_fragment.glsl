@@ -22,7 +22,7 @@
 // FidelityFX FSR v1.0.2 by AMD
 // Reference https://github.com/GPUOpen-Effects/FidelityFX-FSR/tree/master/ffx-fsr
 
-#extension GL_OES_EGL_image_external : require
+#extension GL_OES_EGL_image_external_essl3 : require
 precision mediump float;
 
 uniform samplerExternalOES inputTexture; // 纹理

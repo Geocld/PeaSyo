@@ -8,7 +8,7 @@
 // -- FsrEasuSampleH should be implemented by calling shader, like following:
 //    AH3 FsrEasuSampleH(AF2 p) { return MyTex.SampleLevel(LinearSampler, p, 0).xyz; }
 //==============================================================================================================================
-#extension GL_OES_EGL_image_external : require
+#extension GL_OES_EGL_image_external_essl3 : require
 precision mediump float;
 
 uniform samplerExternalOES inputTexture; // 纹理
