@@ -40,9 +40,9 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
     private GlProgram passthroughProgram;
 
     // RCAS sharpness is inverse (0 = strongest, bigger = weaker).
-    private float rcasSharpness = 0.2f;
+    private float rcasSharpness = 0.1f;
     // Mobile single-pass shader uses 1.0 as normal strength.
-    private float mobileSharpness = 1.2f;
+    private float mobileSharpness = 1.5f;
 
     private boolean mobileHasSharpness;
     private boolean mobileHasHdrToneMap;
@@ -174,11 +174,13 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         mobileSharpness = clamped;
         // Map [0..2] (stronger as larger) to RCAS stop domain [2..0].
         rcasSharpness = 2f - clamped;
+        logEffectiveSharpness("setSharpness");
     }
 
     public void resetSharpness() {
         rcasSharpness = 0.2f;
         mobileSharpness = 1.2f;
+        logEffectiveSharpness("resetSharpness");
     }
 
     public void setFsrEnabled(boolean enabled) {
@@ -240,6 +242,7 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
                 createFramebuffer();
             }
             Log.i(TAG, "FSR pipeline active: two-pass, shaderDir=" + shaderDir);
+            logEffectiveSharpness("init-two-pass");
             return true;
         } catch (GlException | IOException e) {
             Log.e(TAG, "Failed to initialize two-pass FSR from " + shaderDir, e);
@@ -280,6 +283,7 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
             activeShaderDir = shaderDir;
             deleteFramebuffer();
             Log.w(TAG, "FSR pipeline fallback: mobile single-pass, shaderDir=" + shaderDir);
+            logEffectiveSharpness("init-mobile-single-pass");
             return true;
         } catch (GlException | IOException e) {
             Log.e(TAG, "Failed to initialize mobile single-pass FSR from " + shaderDir, e);
@@ -550,6 +554,26 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         } catch (GlException e) {
             Log.e(TAG, message, e);
         }
+    }
+
+    private void logEffectiveSharpness(String reason) {
+        if (pipelineMode == PIPELINE_TWO_PASS) {
+            Log.i(
+                    TAG,
+                    "Effective sharpness [" + reason + "]: pipeline=two-pass, using rcasSharpness="
+                            + rcasSharpness + " (smaller is sharper)"
+            );
+            return;
+        }
+        if (pipelineMode == PIPELINE_MOBILE_SINGLE_PASS) {
+            Log.i(
+                    TAG,
+                    "Effective sharpness [" + reason + "]: pipeline=mobile-single-pass, using mobileSharpness="
+                            + mobileSharpness + " (larger is sharper)"
+            );
+            return;
+        }
+        Log.i(TAG, "Effective sharpness [" + reason + "]: pipeline=none");
     }
 
     private void safeDeleteProgram(@Nullable GlProgram program) {
