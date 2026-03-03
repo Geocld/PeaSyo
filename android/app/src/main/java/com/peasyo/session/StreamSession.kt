@@ -244,6 +244,21 @@ class StreamSession(
 		return reactContext?.currentActivity as? MainActivity
 	}
 
+	// 判断触发器参数是否全 0（用于右侧缺省数据回退）
+	private fun isZeroTriggerData(data: ByteArray): Boolean {
+		for (b in data) {
+			if ((b.toInt() and 0xFF) != 0) {
+				return false
+			}
+		}
+		return true
+	}
+
+	// ByteArray 转 JS 可读数组，按无符号字节上报
+	private fun triggerDataToWritableArray(data: ByteArray) = Arguments.createArray().apply {
+		data.forEach { pushInt(it.toInt() and 0xFF) }
+	}
+
 	private fun eventCallback(event: Event)
 	{
 		when(event)
@@ -451,18 +466,18 @@ class StreamSession(
 				if (usbMode) {
 					val left_type = event.typeLeft
 					val left_data = event.left
-					// Some backends report only left trigger effect data.
-					// Fallback keeps adaptive trigger functional instead of dropping effects.
+					val right_is_empty = isZeroTriggerData(event.right)
+					// 部分后端只给左侧参数；右侧为空时回退左侧，避免触发器效果丢失
 					val right_type =
-						if (event.typeRight == 0 && event.right == 0) event.typeLeft else event.typeRight
+						if (event.typeRight == 0 && right_is_empty) event.typeLeft else event.typeRight
 					val right_data =
-						if (event.typeRight == 0 && event.right == 0) event.left else event.right
+						if (event.typeRight == 0 && right_is_empty) event.left else event.right
 
 					val params = Arguments.createMap().apply {
 						putInt("leftType", left_type)
-						putInt("leftData", left_data)
+						putArray("leftData", triggerDataToWritableArray(left_data))
 						putInt("rightType", right_type)
-						putInt("rightData", right_data)
+						putArray("rightData", triggerDataToWritableArray(right_data))
 					}
 					sendEvent("trigger", params);
 				}

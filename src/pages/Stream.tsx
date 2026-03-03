@@ -654,6 +654,24 @@ function StreamScreen({navigation, route}) {
       return byteArray;
     }
 
+    function normalizeTriggerArray(data) {
+      if (Array.isArray(data)) {
+        // 新格式：原生直接上报 10 字节触发器参数数组
+        const arr = data
+          .slice(0, 10)
+          .map(v => (Number(v) || 0) & 0xff);
+        while (arr.length < 10) {
+          arr.push(0);
+        }
+        return arr;
+      }
+      if (typeof data === 'number') {
+        // 兼容旧格式：原生仅上报一个 Int，需要拆成字节数组
+        return intToByteArray(data);
+      }
+      return new Array(10).fill(0);
+    }
+
     rumbleEventListener.current = eventEmitter.addListener(
       'dsRumble',
       states => {
@@ -690,8 +708,8 @@ function StreamScreen({navigation, route}) {
         }
         const {leftType, leftData, rightType, rightData} = states;
 
-        const leftArr = intToByteArray(leftData);
-        const rightArr = intToByteArray(rightData);
+        const leftArr = normalizeTriggerArray(leftData);
+        const rightArr = normalizeTriggerArray(rightData);
 
         leftTriggerType.current = leftType;
         leftTriggerData.current = leftArr;

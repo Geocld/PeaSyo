@@ -92,13 +92,13 @@ public class UsbRumbleManager extends ReactContextBaseJavaModule {
 
             int left_size = left_trigger_data.size();
             int[] left_data = new int[10];
-            for (int i = 0; i < left_size; i++) {
+            for (int i = 0; i < Math.min(left_size, left_data.length); i++) {
                 left_data[i] = left_trigger_data.getInt(i);
             }
 
             int right_size = right_trigger_data.size();
             int[] right_data = new int[10];
-            for (int i = 0; i < right_size; i++) {
+            for (int i = 0; i < Math.min(right_size, right_data.length); i++) {
                 right_data[i] = right_trigger_data.getInt(i);
             }
 
@@ -122,7 +122,9 @@ public class UsbRumbleManager extends ReactContextBaseJavaModule {
                     (byte) right_data[4],       // R2 trigger effect parameter 5
                     (byte) right_data[5],       // R2 trigger effect parameter 6
                     (byte) right_data[6],       // R2 trigger effect parameter 7
-                    0x00, 0x00, 0x00,
+                    (byte) right_data[7],       // R2 trigger effect parameter 8
+                    (byte) right_data[8],       // R2 trigger effect parameter 9
+                    (byte) right_data[9],       // R2 trigger effect parameter 10
                     (byte) left_trigger_type,       // L2 trigger effect mode
                     (byte) left_data[0],       // L2 trigger effect parameter 1
                     (byte) left_data[1], // L2 trigger effect parameter 2
@@ -131,7 +133,9 @@ public class UsbRumbleManager extends ReactContextBaseJavaModule {
                     (byte) left_data[4],       // L2 trigger effect parameter 5
                     (byte) left_data[5],       // L2 trigger effect parameter 6
                     (byte) left_data[6],       // L2 trigger effect parameter 7
-                    0x00, 0x00, 0x00,
+                    (byte) left_data[7],       // L2 trigger effect parameter 8
+                    (byte) left_data[8],       // L2 trigger effect parameter 9
+                    (byte) left_data[9],       // L2 trigger effect parameter 10
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x04, // valid_flag2
                     0x02,
