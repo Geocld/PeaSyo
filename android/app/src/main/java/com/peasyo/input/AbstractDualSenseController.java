@@ -339,6 +339,16 @@ public abstract class AbstractDualSenseController extends AbstractController {
     protected abstract boolean handleRead(ByteBuffer buffer);
     protected abstract boolean doInit();
 
+    /**
+     * 发送普通 HID 输出报告（灯光/扳机/rumble）后，触觉链路可能需要重新 prime。
+     * 该标志置回 false 后，下一帧触觉会自动触发 init 包重试。
+     */
+    protected synchronized void invalidateHapticPrime() {
+        if (hapticEnabled && hapticPrimed) {
+            hapticPrimed = false;
+        }
+    }
+
     private boolean tryPrimeHaptics() {
         if (outEndpt == null) {
             return false;

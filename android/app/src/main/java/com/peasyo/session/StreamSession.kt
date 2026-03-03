@@ -451,8 +451,8 @@ class StreamSession(
 				if (usbMode) {
 					val left_type = event.typeLeft
 					val left_data = event.left
-					val right_type = event.typeLeft
-					val right_data = event.left
+					val right_type = event.typeRight
+					val right_data = event.right
 
 					val params = Arguments.createMap().apply {
 						putInt("leftType", left_type)
