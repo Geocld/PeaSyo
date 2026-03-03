@@ -217,6 +217,13 @@ public class DualSenseController extends AbstractDualSenseController {
         Log.e("UsbDriverService DualController.java", "Command transfer result: " + res);
         if (res != data.length) {
             Log.d("UsbDriverService DualController.java", "Command set transfer failed: " + res);
+            return;
+        }
+
+        // Unified HID output reports can interrupt the haptics path.
+        // Re-prime on next haptics frame when a DS output report was accepted.
+        if (data != null && data.length > 0 && data[0] == 0x02) {
+            invalidateHapticPrime();
         }
     }
 }
