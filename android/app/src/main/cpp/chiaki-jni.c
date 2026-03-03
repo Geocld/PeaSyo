@@ -236,13 +236,26 @@ static void android_chiaki_event_cb(ChiakiEvent *event, void *user)
                               (jint)event->rumble.right);
             break;
         case CHIAKI_EVENT_TRIGGER_EFFECTS: // Trigger Rumble
+        {
+            // 透传完整 10 字节触发器参数，避免只取首字节导致效果失真
+            jbyteArray left_arr = jnibytearray_create(env,
+                                                      event->trigger_effects.left,
+                                                      sizeof(event->trigger_effects.left));
+            jbyteArray right_arr = jnibytearray_create(env,
+                                                       event->trigger_effects.right,
+                                                       sizeof(event->trigger_effects.right));
             E->CallVoidMethod(env, session->java_session,
                               session->java_session_event_rumble_tigger_meth,
                               (jint)event->trigger_effects.type_left,
-                              (jint)(*event->trigger_effects.left),
+                              left_arr,
                               (jint)event->trigger_effects.type_right,
-                              (jint)(*event->trigger_effects.right));
+                              right_arr);
+            if(left_arr)
+                E->DeleteLocalRef(env, left_arr);
+            if(right_arr)
+                E->DeleteLocalRef(env, right_arr);
             break;
+        }
         case CHIAKI_EVENT_HAPTIC_AUDIO:
         {
             // C 指针生命周期很短，这里立刻拷贝到 Java byte[] 再回调
@@ -701,7 +714,8 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
     session->java_session_event_login_pin_request_meth = E->GetMethodID(env, session->java_session_class, "eventLoginPinRequest", "(Z)V");
     session->java_session_event_quit_meth = E->GetMethodID(env, session->java_session_class, "eventQuit", "(ILjava/lang/String;)V");
     session->java_session_event_rumble_meth = E->GetMethodID(env, session->java_session_class, "eventRumble", "(II)V");
-    session->java_session_event_rumble_tigger_meth = E->GetMethodID(env, session->java_session_class, "eventRumbleTigger", "(IIII)V");
+    // eventRumbleTigger(int, byte[], int, byte[])
+    session->java_session_event_rumble_tigger_meth = E->GetMethodID(env, session->java_session_class, "eventRumbleTigger", "(I[BI[B)V");
     session->java_session_event_haptic_audio_meth = E->GetMethodID(env, session->java_session_class, "eventHapticAudio", "([B)V");
 
     jclass controller_state_class = E->FindClass(env, BASE_PACKAGE"/ControllerState");

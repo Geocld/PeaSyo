@@ -383,7 +383,13 @@ object HolepunchFinishedEvent: Event()
 data class LoginPinRequestEvent(val pinIncorrect: Boolean): Event()
 data class QuitEvent(val reason: QuitReason, val reasonString: String?): Event()
 data class RumbleEvent(val left: Int, val right: Int): Event()
-data class TriggerRumbleEvent(val typeLeft: Int, val left: Int, val typeRight: Int, val right: Int): Event()
+// 左右触发器参数均为完整 10 字节数据
+data class TriggerRumbleEvent(
+	val typeLeft: Int,
+	val left: ByteArray,
+	val typeRight: Int,
+	val right: ByteArray
+): Event()
 // PS5 原始触觉音频事件：把一帧 PCM 字节直接传到上层
 data class HapticAudioEvent(val pcmData: ByteArray): Event()
 data class PerformanceEvent(val rtt: Double, val bitrate: Double, val packetLoss: Double, val decodeTime: Double, val fps: Double, val frameLost: Double): Event()
@@ -460,7 +466,8 @@ class Session(connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean)
 	}
 
 	// Adaptive trigger
-	private fun eventRumbleTigger(typeLeft: Int, left: Int, typeRight: Int, right: Int)
+	// JNI 侧直接回调完整触发器参数数组
+	private fun eventRumbleTigger(typeLeft: Int, left: ByteArray, typeRight: Int, right: ByteArray)
 	{
 		event(TriggerRumbleEvent(typeLeft, left, typeRight, right))
 	}
