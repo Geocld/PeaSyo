@@ -212,6 +212,9 @@ public class DualSenseController extends AbstractDualSenseController {
     @Override
     public void sendCommand(byte[] data) {
         Log.d("UsbDriverService DualController.java", "sendCommand");
+        if (data == null || data.length == 0) {
+            return;
+        }
 
         int res = connection.bulkTransfer(outEndpt, data, data.length, 1000);
         Log.e("UsbDriverService DualController.java", "Command transfer result: " + res);
@@ -222,7 +225,8 @@ public class DualSenseController extends AbstractDualSenseController {
 
         // Unified HID output reports can interrupt the haptics path.
         // Re-prime on next haptics frame when a DS output report was accepted.
-        if (data != null && data.length > 0 && data[0] == 0x02) {
+        if (data[0] == 0x02) {
+            updateTriggerCacheFromReport(data);
             invalidateHapticPrime();
         }
     }

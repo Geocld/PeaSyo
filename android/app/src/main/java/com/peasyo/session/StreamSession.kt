@@ -452,8 +452,12 @@ class StreamSession(
 				if (usbMode) {
 					val left_type = event.typeLeft
 					val left_data = event.left
-					val right_type = event.typeRight
-					val right_data = event.right
+					// Some backends report only left trigger effect data.
+					// Fallback keeps adaptive trigger functional instead of dropping effects.
+					val right_type =
+						if (event.typeRight == 0 && event.right == 0) event.typeLeft else event.typeRight
+					val right_data =
+						if (event.typeRight == 0 && event.right == 0) event.left else event.right
 
 					val params = Arguments.createMap().apply {
 						putInt("leftType", left_type)

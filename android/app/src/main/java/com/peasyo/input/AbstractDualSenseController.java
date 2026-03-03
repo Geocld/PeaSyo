@@ -17,6 +17,14 @@ public abstract class AbstractDualSenseController extends AbstractController {
     private static final int ISO_EP_MAX_PACKET = 0x188;
     private static final int HAPTIC_INIT_REPORT_SIZE = 48;
     private static final int HAPTIC_INIT_TIMEOUT_MS = 100;
+    // Prime 瞬时失效后给一点宽限，避免误触发 rumble 降级
+    private static final long HAPTIC_ACTIVE_GRACE_MS = 600L;
+    private static final int TRIGGER_DATA_LEN = 7;
+    private static final int REPORT_RIGHT_TRIGGER_TYPE_IDX = 11;
+    private static final int REPORT_RIGHT_TRIGGER_DATA_IDX = 12;
+    private static final int REPORT_LEFT_TRIGGER_TYPE_IDX = 22;
+    private static final int REPORT_LEFT_TRIGGER_DATA_IDX = 23;
+    private static final int REPORT_MIN_TRIGGER_LEN = 30;
 
     protected final UsbDevice device;
     protected final UsbDeviceConnection connection;
@@ -36,6 +44,12 @@ public abstract class AbstractDualSenseController extends AbstractController {
     // 首次真正发送前先下发 0x02 0x0c 0x40 的初始化包
     private boolean hapticPrimed = false;
     private int hapticPrimeRetryCount = 0;
+    private volatile long lastPrimeSuccessAtMs = 0L;
+    // 缓存最近一次触发器参数，避免 prime 包把触发器效果清零
+    private byte cachedLeftTriggerType = 0x00;
+    private final byte[] cachedLeftTriggerData = new byte[TRIGGER_DATA_LEN];
+    private byte cachedRightTriggerType = 0x00;
+    private final byte[] cachedRightTriggerData = new byte[TRIGGER_DATA_LEN];
 
     public AbstractDualSenseController(UsbDevice device, UsbDeviceConnection connection, int deviceId, UsbDriverListener listener) {
         super(deviceId, listener, device.getVendorId(), device.getProductId());
@@ -285,6 +299,7 @@ public abstract class AbstractDualSenseController extends AbstractController {
         hapticSender.start();
         hapticPrimed = false;
         hapticPrimeRetryCount = 0;
+        lastPrimeSuccessAtMs = 0L;
         hapticEnabled = true;
         return true;
     }
@@ -296,6 +311,7 @@ public abstract class AbstractDualSenseController extends AbstractController {
         hapticEnabled = false;
         hapticPrimed = false;
         hapticPrimeRetryCount = 0;
+        lastPrimeSuccessAtMs = 0L;
 
         if (hapticSender != null) {
             hapticSender.stop();
@@ -328,8 +344,15 @@ public abstract class AbstractDualSenseController extends AbstractController {
     }
 
     public boolean isHapticEnabled() {
-        // 避免 connect 成功但初始化包未生效时的“假激活”
-        return hapticEnabled && hapticPrimed;
+        if (!hapticEnabled) {
+            return false;
+        }
+        if (hapticPrimed) {
+            return true;
+        }
+        // prime 被重置后给短暂宽限，避免瞬时 false 导致走 rumble 降级
+        final long lastOk = lastPrimeSuccessAtMs;
+        return lastOk > 0 && (SystemClock.uptimeMillis() - lastOk) <= HAPTIC_ACTIVE_GRACE_MS;
     }
 
     public boolean hasHapticEndpoint() {
@@ -349,6 +372,17 @@ public abstract class AbstractDualSenseController extends AbstractController {
         }
     }
 
+    protected synchronized void updateTriggerCacheFromReport(byte[] report) {
+        if (report == null || report.length < REPORT_MIN_TRIGGER_LEN || report[0] != 0x02) {
+            return;
+        }
+
+        cachedRightTriggerType = report[REPORT_RIGHT_TRIGGER_TYPE_IDX];
+        System.arraycopy(report, REPORT_RIGHT_TRIGGER_DATA_IDX, cachedRightTriggerData, 0, TRIGGER_DATA_LEN);
+        cachedLeftTriggerType = report[REPORT_LEFT_TRIGGER_TYPE_IDX];
+        System.arraycopy(report, REPORT_LEFT_TRIGGER_DATA_IDX, cachedLeftTriggerData, 0, TRIGGER_DATA_LEN);
+    }
+
     private boolean tryPrimeHaptics() {
         if (outEndpt == null) {
             return false;
@@ -358,11 +392,18 @@ public abstract class AbstractDualSenseController extends AbstractController {
         initReport[0] = 0x02;
         initReport[1] = 0x0C;
         initReport[2] = 0x40;
+        synchronized (this) {
+            initReport[REPORT_RIGHT_TRIGGER_TYPE_IDX] = cachedRightTriggerType;
+            System.arraycopy(cachedRightTriggerData, 0, initReport, REPORT_RIGHT_TRIGGER_DATA_IDX, TRIGGER_DATA_LEN);
+            initReport[REPORT_LEFT_TRIGGER_TYPE_IDX] = cachedLeftTriggerType;
+            System.arraycopy(cachedLeftTriggerData, 0, initReport, REPORT_LEFT_TRIGGER_DATA_IDX, TRIGGER_DATA_LEN);
+        }
 
         final int res = connection.bulkTransfer(outEndpt, initReport, initReport.length, HAPTIC_INIT_TIMEOUT_MS);
         if (res == initReport.length) {
             hapticPrimed = true;
             hapticPrimeRetryCount = 0;
+            lastPrimeSuccessAtMs = SystemClock.uptimeMillis();
             return true;
         }
 
