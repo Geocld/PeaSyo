@@ -296,6 +296,8 @@ function StreamScreen({navigation, route}) {
       remote_fps,
       remote_bitrate_mode,
       remote_bitrate,
+      audio_output_mode,
+      audio_sharing_mode,
       rumble,
       rumble_intensity,
       frame_pacing,
@@ -436,6 +438,8 @@ function StreamScreen({navigation, route}) {
       hapticChangeThreshold: haptic_change_threshold,
       hapticDiffThreshold: haptic_diff_threshold,
       maxOperatingRate: maxOperatingRate,
+      audioMode: audio_output_mode,
+      audioSharingMode: audio_sharing_mode,
     };
 
     log.info('_streamInfo:', _streamInfo);

@@ -14,6 +14,7 @@ import {getSettings, saveSettings} from '../store/settingStore';
 import bases from '../common/settings/bases';
 import local from '../common/settings/local';
 import remote from '../common/settings/remote';
+import audio from '../common/settings/audio';
 import display from '../common/settings/display';
 import gamepad from '../common/settings/gamepad';
 import vgamepad from '../common/settings/vgamepad';
@@ -44,6 +45,7 @@ function SettingDetailScreen({navigation, route}) {
         ...bases,
         ...local,
         ...remote,
+        ...audio,
         ...display,
         ...gamepad,
         ...vgamepad,

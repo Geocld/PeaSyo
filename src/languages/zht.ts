@@ -78,6 +78,20 @@ export default {
     FPSDesc: '設置串流幀數',
     RemoteFPS: '幀數',
     RemoteFPSDesc: '設置遠程串流幀數',
+    'Audio mode': '音訊模式',
+    AudioModeDesc:
+      '選擇 Android 端串流音訊輸出位置。自動模式會盡量避開控制器虛擬 USB 音訊設備。',
+    'System default': '系統預設',
+    Speaker: '揚聲器',
+    'Wired headset': '有線耳機',
+    'Bluetooth headset': '藍牙耳機',
+    'USB audio': 'USB 音訊',
+    'HDMI audio': 'HDMI 音訊',
+    'Audio sharing mode': '音訊共享模式',
+    AudioSharingModeDesc:
+      '選擇 Oboe 共享模式。Shared 相容性更好；Exclusive 在部分裝置上可能延遲更低。',
+    'Shared (Recommended)': '共享（推薦）',
+    'Exclusive (Low latency)': '獨占（低延遲）',
     'Performance render': '高性能渲染',
     PerformanceRenderDesc:
       '使用高性能視頻渲染，默認使用高性能渲染，但要注意應用退到後台會停止串流，如果需要頻繁切換後台並保持串流，請關閉高性能渲染模式',
@@ -300,6 +314,7 @@ export default {
     BasesSettings: '基礎',
     LocalSettings: '本地串流',
     RemoteSettings: '遠程串流',
+    AudioSettings: '音訊',
     DisplaySettings: '顯示',
     GamepadSettings: '手把及振動',
     vGamepadSettings: '虚拟按键',

@@ -19,6 +19,7 @@ import {debugFactory} from '../utils/debug';
 import bases from '../common/settings/bases';
 import local from '../common/settings/local';
 import remote from '../common/settings/remote';
+import audio from '../common/settings/audio';
 import display from '../common/settings/display';
 import gamepad from '../common/settings/gamepad';
 import vgamepad from '../common/settings/vgamepad';
@@ -185,6 +186,24 @@ function SettingsScreen({navigation}) {
             </Text>
           </View>
           {remote.map((meta, idx) => {
+            return (
+              <SettingItem
+                key={meta.name || idx}
+                title={meta.title}
+                description={meta.description}
+                onPress={() => handleItemPress(meta.name)}
+              />
+            );
+          })}
+        </View>
+
+        <View>
+          <View style={styles.contentTitle}>
+            <Text variant="titleLarge" style={styles.titleText}>
+              {t('AudioSettings')}
+            </Text>
+          </View>
+          {audio.map((meta, idx) => {
             return (
               <SettingItem
                 key={meta.name || idx}

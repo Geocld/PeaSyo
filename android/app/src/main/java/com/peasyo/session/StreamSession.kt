@@ -13,6 +13,7 @@ import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.peasyo.MainActivity
 import com.peasyo.UsbRumbleManager
+import com.peasyo.audio.AudioRouteResolver
 import com.peasyo.lib.ConnectInfo
 import com.peasyo.lib.ConnectedEvent
 import com.peasyo.lib.HolepunchFinishedEvent
@@ -56,6 +57,8 @@ class StreamSession(
 	val rumbleIntensity: Int,
 	val usbMode: Boolean,
 	val usbController: String,
+	val audioMode: String,
+	val audioSharingMode: String,
 	val haptic_stable_threshold: Int,
 	val haptic_change_threshold: Int,
 	val haptic_diff_threshold: Int,
@@ -195,6 +198,18 @@ class StreamSession(
 			val session = Session(connectInfo, logManager.createNewFile().file.absolutePath, logVerbose)
 			_state.value = StreamStateConnecting
 			session.eventCallback = this::eventCallback
+			val sharingMode = if (audioSharingMode.equals("EXCLUSIVE", ignoreCase = true)) 1 else 0
+			session.setAudioSharingMode(sharingMode)
+			val appContext = reactContext?.applicationContext
+			if (appContext != null) {
+				val outputDeviceId = AudioRouteResolver.resolveOutputDeviceId(
+					appContext,
+					audioMode,
+					usbMode,
+					usbController
+				)
+				session.setAudioOutputDevice(outputDeviceId)
+			}
 			session.start()
 			val surface = surface
 			if(surface != null) {

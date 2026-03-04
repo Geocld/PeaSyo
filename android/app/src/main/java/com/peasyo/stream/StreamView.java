@@ -87,6 +87,8 @@ public class StreamView extends FrameLayout {
     private int rumbleIntensity;
     private boolean usbMode;
     private String usbController;
+    private String audioMode;
+    private String audioSharingMode;
     private boolean useSensor;
     private boolean sensorInvert;
     private int gyroscopeType;
@@ -112,6 +114,8 @@ public class StreamView extends FrameLayout {
         this.rumbleIntensity = 3;
         this.usbMode = false;
         this.usbController = "Xbox360Controller";
+        this.audioMode = "AUTO";
+        this.audioSharingMode = "SHARED";
         this.useSensor = false;
         this.sensorInvert = false;
         this.gyroscopeType = 1;
@@ -291,6 +295,8 @@ public class StreamView extends FrameLayout {
         int rumbleIntensity = streamInfo.getInt("rumbleIntensity");
         boolean usbMode = streamInfo.getBoolean("usbMode");
         String usbController = streamInfo.getString("usbController");
+        String audioMode = streamInfo.hasKey("audioMode") ? streamInfo.getString("audioMode") : "AUTO";
+        String audioSharingMode = streamInfo.hasKey("audioSharingMode") ? streamInfo.getString("audioSharingMode") : "SHARED";
         String videoFormat = streamInfo.getString("videoFormat");
         boolean useSensor = streamInfo.getBoolean("useSensor");
         boolean sensorInvert = streamInfo.getBoolean("sensorInvert");
@@ -316,6 +322,8 @@ public class StreamView extends FrameLayout {
         this.rumbleIntensity = rumbleIntensity;
         this.usbMode = usbMode;
         this.usbController = usbController;
+        this.audioMode = audioMode == null ? "AUTO" : audioMode;
+        this.audioSharingMode = audioSharingMode == null ? "SHARED" : audioSharingMode;
         this.useSensor = useSensor;
         this.gyroscopeType = gyroscopeType;
         this.sensorInvert = sensorInvert;
@@ -370,6 +378,8 @@ public class StreamView extends FrameLayout {
                 this.rumbleIntensity,
                 this.usbMode,
                 this.usbController,
+                this.audioMode,
+                this.audioSharingMode,
                 this.haptic_stable_threshold,
                 this.haptic_change_threshold,
                 this.haptic_diff_threshold,

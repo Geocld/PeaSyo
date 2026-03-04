@@ -16,6 +16,8 @@ export type Settings = {
   remote_bitrate: number;
   remote_codec: string;
   remote_fps: number;
+  audio_output_mode: string;
+  audio_sharing_mode: string;
   useSurface: boolean;
   fsr: boolean;
   maxOperatingRate: number;
@@ -75,6 +77,8 @@ const defaultSettings: Settings = {
   remote_bitrate: 10000,
   remote_codec: 'H265',
   remote_fps: 30,
+  audio_output_mode: 'AUTO',
+  audio_sharing_mode: 'EXCLUSIVE',
   useSurface: true,
   fsr: false,
   maxOperatingRate: 0x7FFF,
