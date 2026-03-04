@@ -119,7 +119,7 @@ export default {
     RumbleDesc: '如果手柄支持振动，可以设置游戏中是否振动',
     'Override native gamepad support': '覆盖安卓手柄支持',
     bind_usb_device_description:
-      '强制PeaSyo的USB驱动接管所有受支持的Xbox/DualSense手柄',
+      '强制PeaSyo的USB驱动接管所有受支持的Xbox/DualSense手柄，如你正在使用DualSense5控制器，开启此选项后可获得原生触觉反馈',
     bind_usb_device_tips:
       '该设置只有支持xinput或dualsense协议的手柄有线连接(OTG)才生效',
     'Force Nexus/PS button to simulate touchpad': '强制西瓜键/音量键模拟触摸板',
@@ -435,9 +435,9 @@ export default {
     History: '更新日志',
     HistoryTitle: '更新日志',
     HistoryDesc: '查看PeaSyo历史更新日志',
-    FSRTitle: '超分辨率(AMD FSR 1.0)(实验性)',
+    FSRTitle: '超分辨率(AMD FSR 1.0)',
     FSRDesc:
-      '启用AMD FSR 1.0超分辨率技术，该功能为实验性功能可能会有兼容性或稳定性问题，建议在高性能设备上使用(注意无法使用HDR)',
+      '启用AMD FSR 1.0超分辨率技术，该功能为实验性功能可能会有兼容性或稳定性问题，建议在高性能设备上使用(注意暂无法开启HDR)',
     frame_pacing_title: '视频帧速调节',
     frame_pacing_desc: '指定如何平衡视频延迟和流畅度',
     latency: '优先最低延迟',

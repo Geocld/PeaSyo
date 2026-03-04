@@ -116,7 +116,7 @@ export default {
     'Override native Xbox gamepad support':
       'Anular soporte nativo del gamepad de Xbox',
     bind_usb_device_description:
-      'Forzar el controlador USB de Peasyo para tomar control de todos los controladores compatibles / DualSense (experimental)',
+      'Forzar que el controlador USB de PeaSyo tome el control de todos los mandos Xbox/DualSense compatibles. Si estás usando un controlador DualSense 5, habilitar esta opción proporcionará retroalimentación háptica nativa.',
     bind_usb_device_tips:
       'Esta configuración solo se aplica a controladores que admiten el protocolo XInput o DualSense cuando están conectados por cable (OTG).',
     'Force Nexus/PS button to simulate touchpad':
@@ -403,7 +403,8 @@ export default {
     WiFiPerformanceModeTitle: 'Modo de baja latencia WiFi (Experimental)',
     WiFiPerformanceModeDesc:
       'Habilitar este modo puede reducir la latencia de la conexión WiFi y mejorar la estabilidad, pero puede aumentar la latencia de la conexión Bluetooth.',
-    GamepadFeedbackIntervalTitle: 'Intervalo mínimo de entrada del gamepad (Tasa de refresco)',
+    GamepadFeedbackIntervalTitle:
+      'Intervalo mínimo de entrada del gamepad (Tasa de refresco)',
     GamepadFeedbackIntervalDesc:
       'Ajusta la frecuencia de envío de datos de entrada del gamepad. Mantiene el mecanismo adaptativo inteligente, solo configura el intervalo mínimo de actualización. Mayor frecuencia proporciona respuesta más rápida pero consume más recursos.',
     GamepadFeedbackIntervalUltra: 'Ultra (3ms)',
@@ -419,7 +420,7 @@ export default {
     History: 'History',
     HistoryTitle: 'Update histories',
     HistoryDesc: 'View update histories of PeaSyo',
-    FSRTitle: 'Super Resolución (AMD FSR 1.0) (Experimental)',
+    FSRTitle: 'Super Resolución (AMD FSR 1.0)',
     FSRDesc:
       'Habilitar la tecnología de super resolución AMD FSR 1.0, que es una función experimental que puede tener problemas de compatibilidad o estabilidad. Se recomienda usar en dispositivos de alto rendimiento (HDR no funciona)',
     frame_pacing_title: 'Ritmo de cuadros por segundo en video',

@@ -115,7 +115,7 @@ export default {
     'Override native Xbox gamepad support':
       'Override native Xbox gamepad support',
     bind_usb_device_description:
-      'Force Peasyo’s USB driver to take over all supported /DualSense controllers (experimental)',
+      "Force PeaSyo's USB driver to take over all supported Xbox/DualSense controllers. If you are using a DualSense 5 controller, enabling this option will provide native haptic feedback.",
     bind_usb_device_tips:
       'This setting only takes effect for controllers that support XInput or DualSense protocol when connected via wired (OTG).',
     'Force Nexus/PS button to simulate touchpad':
@@ -408,9 +408,9 @@ export default {
     History: 'History',
     HistoryTitle: 'Update histories',
     HistoryDesc: 'View update histories of PeaSyo',
-    FSRTitle: 'Super Resolution (AMD FSR 1.0) (Experimental)',
+    FSRTitle: 'Super Resolution (AMD FSR 1.0)',
     FSRDesc:
-      'Enable AMD FSR 1.0 super resolution technology, which is an experimental feature that may have compatibility or stability issues. It is recommended for use on high-performance devices(HDR is not working)',
+      'Enable AMD FSR 1.0 super resolution technology, which is an experimental feature that may have compatibility or stability issues. It is recommended for use on high-performance devices(HDR is not working temporarly)',
     frame_pacing_title: 'Video frame pacing',
     frame_pacing_desc: 'Specify how to balance video latency and smoothness',
     latency: 'Prefer lowest latency',
