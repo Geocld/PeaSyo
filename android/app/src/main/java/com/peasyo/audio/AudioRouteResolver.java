@@ -43,8 +43,20 @@ public final class AudioRouteResolver {
             return DEVICE_ID_UNSPECIFIED;
         }
 
+        Log.i(TAG, "=== Audio Route Resolver ===");
+        Log.i(TAG, "Mode: " + mode + ", USB Mode: " + usbMode);
+        Log.i(TAG, "Available output devices: " + devices.length);
+        for (AudioDeviceInfo device : devices) {
+            Log.i(TAG, String.format("  Device[%d]: %s (type=%d, product=%s)",
+                    device.getId(),
+                    getDeviceTypeName(device.getType()),
+                    device.getType(),
+                    device.getProductName()));
+        }
+
         String normalizedMode = normalizeMode(mode);
         if (MODE_STANDARD.equals(normalizedMode)) {
+            Log.i(TAG, "Using STANDARD mode, returning DEVICE_ID_UNSPECIFIED");
             return DEVICE_ID_UNSPECIFIED;
         }
 
@@ -229,10 +241,16 @@ public final class AudioRouteResolver {
 
     private static boolean isBluetoothType(AudioDeviceInfo device) {
         int type = device.getType();
-        if (type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP
-                || type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO) {
+        // 优先使用 A2DP（高质量音频），排除 SCO（语音通话用）
+        // SCO 不支持高采样率（48kHz），会导致音频缓冲区问题
+        if (type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP) {
             return true;
         }
+
+        // 不再使用 BLUETOOTH_SCO，因为它是为语音通话设计的
+        // if (type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO) {
+        //     return true;
+        // }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             return type == AudioDeviceInfo.TYPE_BLE_HEADSET
@@ -255,6 +273,31 @@ public final class AudioRouteResolver {
         return type == AudioDeviceInfo.TYPE_HDMI
                 || type == AudioDeviceInfo.TYPE_HDMI_ARC
                 || type == AudioDeviceInfo.TYPE_HDMI_EARC;
+    }
+
+    private static String getDeviceTypeName(int type) {
+        switch (type) {
+            case AudioDeviceInfo.TYPE_BUILTIN_SPEAKER: return "BUILTIN_SPEAKER";
+            case AudioDeviceInfo.TYPE_WIRED_HEADSET: return "WIRED_HEADSET";
+            case AudioDeviceInfo.TYPE_WIRED_HEADPHONES: return "WIRED_HEADPHONES";
+            case AudioDeviceInfo.TYPE_BLUETOOTH_A2DP: return "BLUETOOTH_A2DP";
+            case AudioDeviceInfo.TYPE_BLUETOOTH_SCO: return "BLUETOOTH_SCO";
+            case AudioDeviceInfo.TYPE_USB_DEVICE: return "USB_DEVICE";
+            case AudioDeviceInfo.TYPE_USB_ACCESSORY: return "USB_ACCESSORY";
+            case AudioDeviceInfo.TYPE_USB_HEADSET: return "USB_HEADSET";
+            case AudioDeviceInfo.TYPE_HDMI: return "HDMI";
+            case AudioDeviceInfo.TYPE_HDMI_ARC: return "HDMI_ARC";
+            case AudioDeviceInfo.TYPE_LINE_ANALOG: return "LINE_ANALOG";
+            case AudioDeviceInfo.TYPE_LINE_DIGITAL: return "LINE_DIGITAL";
+            default:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    if (type == AudioDeviceInfo.TYPE_BLE_HEADSET) return "BLE_HEADSET";
+                    if (type == AudioDeviceInfo.TYPE_BLE_SPEAKER) return "BLE_SPEAKER";
+                    if (type == AudioDeviceInfo.TYPE_BLE_BROADCAST) return "BLE_BROADCAST";
+                    if (type == AudioDeviceInfo.TYPE_HDMI_EARC) return "HDMI_EARC";
+                }
+                return "UNKNOWN(" + type + ")";
+        }
     }
 
     private interface DeviceMatcher {
