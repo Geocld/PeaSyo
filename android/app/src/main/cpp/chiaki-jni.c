@@ -948,22 +948,6 @@ JNIEXPORT void JNICALL JNI_FCN(sessionSetAudioSharingMode)(JNIEnv *env, jobject 
     android_chiaki_audio_output_set_sharing_mode((int32_t)sharing_mode, session->audio_output);
 }
 
-JNIEXPORT void JNICALL JNI_FCN(sessionSetAudioOutputDevice)(JNIEnv *env, jobject obj, jlong ptr, jint device_id)
-{
-    AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;
-    if(!session || !session->audio_output)
-        return;
-    android_chiaki_audio_output_set_device_id((int32_t)device_id, session->audio_output);
-}
-
-JNIEXPORT void JNICALL JNI_FCN(sessionSetAudioSharingMode)(JNIEnv *env, jobject obj, jlong ptr, jint sharing_mode)
-{
-    AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;
-    if(!session || !session->audio_output)
-        return;
-    android_chiaki_audio_output_set_sharing_mode((int32_t)sharing_mode, session->audio_output);
-}
-
 JNIEXPORT void JNICALL JNI_FCN(sessionSetControllerState)(JNIEnv *env, jobject obj, jlong ptr, jobject controller_state_java)
 {
     AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;
