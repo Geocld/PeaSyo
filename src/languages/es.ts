@@ -197,6 +197,19 @@ export default {
       'Si no puedes abrir la página de inicio de sesión de PSN, puedes optar por iniciar sesión directamente con tu nombre de usuario de PSN o ID de cuenta base64.',
     Login_with_username: 'Iniciar sesión con nombre de usuario',
     Login_with_account_id: 'Iniciar sesión con ID de cuenta base64',
+    Login_issue: 'PROBLEM?',
+    ManualLogin_issue_tips:
+      'Si encuentras problemas al iniciar sesión en PSN, como "No se puede conectar al servidor" u otros errores extraños, puedes usar las siguientes soluciones:',
+    ManualLogin_local_stream_tips:
+      'Si solo necesitas transmisión local, no necesitas la verificación de inicio de sesión de PSN. Vuelve a Inicio y usa tu ID de PSN o nombre de usuario Base64.',
+    ManualLogin_manual_steps:
+      'Usa el inicio de sesión manual: toca el texto de abajo para abrir la página de inicio de sesión, o copia el enlace. Ábrelo en el navegador y, tras iniciar sesión, se redirigirá a una página de redirección.',
+    ManualLogin_open_link: 'Tocar para abrir',
+    ManualLogin_redirect_tips:
+      'Pega el enlace de redirección en el cuadro de abajo y luego toca Confirmar.',
+    ManualLogin_redirect_url_label: 'URL de redirección',
+    CopyLink: 'Copiar enlace',
+    Copied: 'Copiado',
     NoRegistry: 'Host no registrado, por favor regístrate',
     EmptyRegistry: 'Eliminar hosts registrados',
     'Login Successful': 'Inicio de sesión exitoso',

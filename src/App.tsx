@@ -27,6 +27,7 @@ import OptionsScreen from './pages/Options';
 import LoginScreen from './pages/Login';
 import LoginUsernameScreen from './pages/LoginUsername';
 import LoginBase64IdScreen from './pages/LoginBase64Id';
+import ManualLoginScreen from './pages/ManualLogin';
 import RegistryScreen from './pages/Registry';
 import ConsolesScreen from './pages/Consoles';
 import ConsoleEditScreen from './pages/ConsoleEdit';
@@ -163,6 +164,11 @@ function App() {
                     name="LoginBase64Id"
                     component={LoginBase64IdScreen}
                     options={{title: t('Login')}}
+                  />
+                  <RootStack.Screen
+                    name="ManualLogin"
+                    component={ManualLoginScreen}
+                    options={{title: t('Manual Login')}}
                   />
                   <RootStack.Screen
                     name="Stream"

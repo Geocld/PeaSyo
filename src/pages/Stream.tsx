@@ -16,6 +16,7 @@ import {
   Text,
   IconButton,
   Button,
+  Switch,
   TextInput,
   HelperText,
 } from 'react-native-paper';
@@ -105,6 +106,7 @@ function StreamScreen({navigation, route}) {
   const [isTouchpadFull, setIsTouchpadFull] = React.useState(false);
   const [isTouchpadDual, setIsTouchpadDual] = React.useState(false);
   const [isUsbDs5, setIsUsbDs5] = React.useState(false);
+  const [isShutDown, setIsShutDown] = React.useState(false);
   const [message, setMessage] = React.useState('');
   const [showMessageModal, setShowMessageModal] = React.useState(false);
   const [loginPin, setLoginPin] = React.useState('');
@@ -671,9 +673,7 @@ function StreamScreen({navigation, route}) {
     function normalizeTriggerArray(data) {
       if (Array.isArray(data)) {
         // 新格式：原生直接上报 10 字节触发器参数数组
-        const arr = data
-          .slice(0, 10)
-          .map(v => (Number(v) || 0) & 0xff);
+        const arr = data.slice(0, 10).map(v => (Number(v) || 0) & 0xff);
         while (arr.length < 10) {
           arr.push(0);
         }
@@ -1192,105 +1192,123 @@ function StreamScreen({navigation, route}) {
       )}
 
       {showModal && (
-        <View style={styles.modal}>
-          <Card>
-            <Card.Content>
-              <ScrollView style={{maxHeight: modalMaxHeight}}>
-                <List.Section>
-                  {connectState === CONNECTED && (
-                    <List.Item
-                      title={t('Toggle Performance')}
-                      background={background}
-                      onPress={() => {
-                        setShowPerformance(!showPerformance);
-                        handleCloseModal();
-                      }}
-                    />
-                  )}
-                  {connectState === CONNECTED &&
-                    !isTouchpadFull &&
-                    !isTouchpadDual &&
-                    !isUsbDs5 && (
+        <View>
+          <View style={styles.shunDownModal}>
+            <Text variant="titleMedium">{t('Disconnect and sleep')}</Text>
+            <Switch
+              value={isShutDown}
+              onValueChange={() => setIsShutDown(!isShutDown)}
+            />
+          </View>
+          <View style={styles.modal}>
+            <Card>
+              <Card.Content>
+                <ScrollView style={{maxHeight: modalMaxHeight}}>
+                  <List.Section>
+                    {connectState === CONNECTED && (
                       <List.Item
-                        title={t('Toggle Virtual Gamepad')}
+                        title={t('Toggle Performance')}
                         background={background}
                         onPress={() => {
-                          setShowVirtualGamepad(!showVirtualGamepad);
+                          setShowPerformance(!showPerformance);
                           handleCloseModal();
                         }}
                       />
                     )}
-                  {connectState === CONNECTED && !isUsbDs5 && (
+                    {connectState === CONNECTED &&
+                      !isTouchpadFull &&
+                      !isTouchpadDual &&
+                      !isUsbDs5 && (
+                        <List.Item
+                          title={t('Toggle Virtual Gamepad')}
+                          background={background}
+                          onPress={() => {
+                            setShowVirtualGamepad(!showVirtualGamepad);
+                            handleCloseModal();
+                          }}
+                        />
+                      )}
+                    {connectState === CONNECTED && !isUsbDs5 && (
+                      <List.Item
+                        title={t('Toggle Touchpad')}
+                        background={background}
+                        onPress={() => {
+                          setShowTouchpad(!showTouchpad);
+                          handleCloseModal();
+                        }}
+                      />
+                    )}
+                    {connectState === CONNECTED && !isUsbDs5 && (
+                      <List.Item
+                        title={t('Long Press PS')}
+                        background={background}
+                        onPress={() => {
+                          handlePressIn('PS');
+                          setTimeout(() => handlePressOut('PS'), 2000);
+                          handleCloseModal();
+                        }}
+                      />
+                    )}
+                    {connectState === CONNECTED && !isUsbDs5 && (
+                      <List.Item
+                        title={t('Press PS')}
+                        background={background}
+                        onPress={() => {
+                          handlePressIn('PS');
+                          setTimeout(() => handlePressOut('PS'), 350);
+                          handleCloseModal();
+                        }}
+                      />
+                    )}
+                    {/* {connectState === CONNECTED && settings.keyboard && (
+                      <List.Item
+                        title={t('Send text')}
+                        background={background}
+                        onPress={() => {
+                          handleCloseModal();
+                          setShowMessageModal(true);
+                        }}
+                      />
+                    )} */}
+                    {/* {connectState === CONNECTED && (
+                      <List.Item
+                        title={t('Disconnect and sleep')}
+                        background={background}
+                        onPress={() => {
+                          streamViewRef.current?.sleep();
+                          handleCloseModal();
+                          setTimeout(() => {
+                            handleExit();
+                          }, 1000);
+                        }}
+                      />
+                    )} */}
                     <List.Item
-                      title={t('Toggle Touchpad')}
+                      title={t('Disconnect')}
                       background={background}
                       onPress={() => {
-                        setShowTouchpad(!showTouchpad);
-                        handleCloseModal();
-                      }}
-                    />
-                  )}
-                  {connectState === CONNECTED && !isUsbDs5 && (
-                    <List.Item
-                      title={t('Long Press PS')}
-                      background={background}
-                      onPress={() => {
-                        handlePressIn('PS');
-                        setTimeout(() => handlePressOut('PS'), 2000);
-                        handleCloseModal();
-                      }}
-                    />
-                  )}
-                  {connectState === CONNECTED && !isUsbDs5 && (
-                    <List.Item
-                      title={t('Press PS')}
-                      background={background}
-                      onPress={() => {
-                        handlePressIn('PS');
-                        setTimeout(() => handlePressOut('PS'), 350);
-                        handleCloseModal();
-                      }}
-                    />
-                  )}
-                  {/* {connectState === CONNECTED && settings.keyboard && (
-                    <List.Item
-                      title={t('Send text')}
-                      background={background}
-                      onPress={() => {
-                        handleCloseModal();
-                        setShowMessageModal(true);
-                      }}
-                    />
-                  )} */}
-                  {connectState === CONNECTED && (
-                    <List.Item
-                      title={t('Disconnect and sleep')}
-                      background={background}
-                      onPress={() => {
-                        streamViewRef.current?.sleep();
-                        handleCloseModal();
-                        setTimeout(() => {
+                        if (isShutDown) {
+                          streamViewRef.current?.sleep();
+                          handleCloseModal();
+                          setTimeout(() => {
+                            handleExit();
+                          }, 1000);
+                        } else {
                           handleExit();
-                        }, 1000);
+                          handleCloseModal();
+                        }
                       }}
                     />
-                  )}
-                  <List.Item
-                    title={t('Disconnect')}
-                    background={background}
-                    onPress={() => {
-                      handleExit();
-                    }}
-                  />
-                  <List.Item
-                    title={t('Cancel')}
-                    background={background}
-                    onPress={() => handleCloseModal()}
-                  />
-                </List.Section>
-              </ScrollView>
-            </Card.Content>
-          </Card>
+                    <List.Item
+                      title={t('Cancel')}
+                      background={background}
+                      onPress={() => handleCloseModal()}
+                    />
+                  </List.Section>
+                </ScrollView>
+              </Card.Content>
+            </Card>
+          </View>
         </View>
       )}
 
@@ -1317,6 +1335,14 @@ const styles = StyleSheet.create({
   card: {
     width: 300,
     padding: 5,
+  },
+  shunDownModal: {
+    position: 'absolute',
+    top: 10,
+    right: '10%',
+    zIndex: 998,
+    padding: 5,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modal: {
     // backgroundColor: 'rgba(0, 0, 0, 0.5)',

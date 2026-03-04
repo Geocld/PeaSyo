@@ -192,6 +192,19 @@ export default {
       'If you cannot open the PSN login page, you can choose to log in directly with your PSN username/account base64 ID below.',
     Login_with_username: 'Login with username',
     Login_with_account_id: 'Login with account base64 ID',
+    Login_issue: 'PROBLEM?',
+    ManualLogin_issue_tips:
+      'If you encounter login issues such as "Unable to connect to server" during PSN login, you can use the following solutions:',
+    ManualLogin_local_stream_tips:
+      'If you only need local streaming, PSN login verification is not required. Go back to Home and log in with your PSN ID or Base64 username.',
+    ManualLogin_manual_steps:
+      'Use manual login: tap the text below to open the login page, or copy the login link. Open it in your browser. After login, the browser will redirect to a redirect page.',
+    ManualLogin_open_link: 'Tap to open',
+    ManualLogin_redirect_tips:
+      'Paste the redirect link into the input box below, then tap Confirm.',
+    ManualLogin_redirect_url_label: 'Redirect URL',
+    CopyLink: 'Copy link',
+    Copied: 'Copied',
     NoRegistry: 'Host not registered, please register',
     EmptyRegistry: 'Clear registered hosts',
     'Login Successful': 'Login successful',
@@ -210,7 +223,7 @@ export default {
     RemoteHost: 'Remote address',
     WakeConsole: 'Wake up console',
     WakeDesc:
-      'If the console is in sleep mode, do you want to wake it up? Waking up takes about one minute.',
+      'If the console is in sleep mode, you want to wake it up. Waking up takes about one minute.',
     OnlyConnect: 'Connect only',
     WakeAndConnect: 'Wake and connect',
     Waking: 'Waking...',

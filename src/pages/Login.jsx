@@ -1,7 +1,9 @@
 import React from 'react';
 import {NativeModules} from 'react-native';
+import {Button} from 'react-native-paper';
 import {WebView} from 'react-native-webview';
 import Spinner from 'react-native-loading-spinner-overlay';
+import {useTranslation} from 'react-i18next';
 import {debugFactory} from '../utils/debug';
 
 const log = debugFactory('LoginScreen');
@@ -15,13 +17,29 @@ const LOGIN_URL = `https://auth.api.sonyentertainmentnetwork.com/2.0/oauth/autho
 
 const {HolepunchManager} = NativeModules;
 
-function LoginScreen({navigation, route}) {
+function LoginScreen({navigation}) {
+  const {t} = useTranslation();
   const [loginUrl, setLoginUrl] = React.useState('');
 
   React.useEffect(() => {
     const duid = HolepunchManager.getDeviceUid();
     setLoginUrl(`${LOGIN_URL}duid=${duid}&`);
-  }, []);
+
+    navigation.setOptions({
+      // eslint-disable-next-line react/no-unstable-nested-components
+      headerRight: () => (
+        <Button
+          mode="text"
+          onPress={() => {
+            navigation.navigate({
+              name: 'ManualLogin',
+            });
+          }}>
+          {t('Login_issue')}
+        </Button>
+      ),
+    });
+  }, [navigation, t]);
 
   console.log('loginUrl:', loginUrl);
 
