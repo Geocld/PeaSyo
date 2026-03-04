@@ -32,6 +32,7 @@ import Touchpad from '../components/Touchpad';
 import PerfPanel from '../components/PerfPanel';
 import {getSettings} from '../store/settingStore';
 import {debugFactory} from '../utils/debug';
+import {useWifiPerformanceMode} from '../hooks/useWifiPerformanceMode';
 
 const CONNECTED = 'connected';
 const HOLEPUNCHFINISHED = 'holepunchFinished';
@@ -80,6 +81,9 @@ const gpState = {
 
 function StreamScreen({navigation, route}) {
   const {t} = useTranslation();
+
+  // 启用 WiFi 性能模式（在组件挂载时启用，卸载时禁用）
+  useWifiPerformanceMode();
 
   const [loading, setLoading] = React.useState(false);
   const [loadingText, setLoadingText] = React.useState('');

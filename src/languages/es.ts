@@ -387,6 +387,9 @@ export default {
     LogVerboseTitle: 'Habilitar registro detallado',
     LogVerboseDesc:
       'Registra registros completos de transmisión. Esto puede aumentar significativamente el tamaño del archivo de registro y potencialmente afectar el rendimiento de la transmisión. No lo habilites durante el juego habitual.',
+    WiFiPerformanceModeTitle: 'Modo de baja latencia WiFi (Experimental)',
+    WiFiPerformanceModeDesc:
+      'Habilitar este modo puede reducir la latencia de la conexión WiFi y mejorar la estabilidad, pero puede aumentar la latencia de la conexión Bluetooth.',
     'Auto toggle hold buttons': 'Botones de retención automática',
     'Select what buttons become toggle holdable':
       'Selecciona qué botones se pueden mantener presionados',

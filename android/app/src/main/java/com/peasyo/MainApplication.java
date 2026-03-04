@@ -57,6 +57,7 @@ public class MainApplication extends Application implements ReactApplication {
             packages.add(new ButtonViewPackage());
             packages.add(new HapticPackage());
             packages.add(new StreamFsrViewPackage());
+            packages.add(new WifiPerformancePackage());
           return packages;
         }
 

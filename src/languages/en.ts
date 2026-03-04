@@ -376,6 +376,9 @@ export default {
     LogVerboseTitle: 'Enable verbose logging',
     LogVerboseDesc:
       'Records complete streaming logs. This may significantly increase log file size and could potentially impact streaming performance. Do not enable during regular gameplay.',
+    WiFiPerformanceModeTitle: 'WiFi Low Latency Mode (Experimental)',
+    WiFiPerformanceModeDesc:
+      'Enabling this mode can reduce WiFi connection latency and improve stability, but may increase Bluetooth connection latency.',
     'Auto toggle hold buttons': 'Auto toggle hold buttons',
     'Select what buttons become toggle holdable':
       'Select what buttons become toggle holdable',

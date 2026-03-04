@@ -391,6 +391,9 @@ export default {
     LogVerboseTitle: '啟用詳細日誌',
     LogVerboseDesc:
       '記錄完整的串流日誌，這會導致日誌檔案體積劇增，同時也可能影響串流體驗，請勿在常規遊戲中啟用。',
+    WiFiPerformanceModeTitle: 'WIFI低延遲模式(實驗性)',
+    WiFiPerformanceModeDesc:
+      '開啟此模式可降低WIFI連接延遲同時提高穩定性，但是可能會加劇藍牙連接延遲。',
     'Auto toggle hold buttons': '自動保持按鍵',
     'Select what buttons become toggle holdable': '選擇哪些按鍵可以自動保持',
     HoldButtonsSettingsDesc:

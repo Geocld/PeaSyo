@@ -69,3 +69,6 @@ yarn-error.log
 
 # vcpkg
 /vcpkg_installed
+
+#claude
+.claude/
