@@ -22,6 +22,7 @@ import remote from '../common/settings/remote';
 import audio from '../common/settings/audio';
 import display from '../common/settings/display';
 import gamepad from '../common/settings/gamepad';
+import haptic from '../common/settings/haptic';
 import vgamepad from '../common/settings/vgamepad';
 import touchpad from '../common/settings/touchpad';
 import sensor from '../common/settings/sensor';
@@ -266,6 +267,25 @@ function SettingsScreen({navigation}) {
               navigation.navigate('RGB');
             }}
           />
+        </View>
+
+        <View>
+          <View style={styles.contentTitle}>
+            <Text variant="titleLarge" style={styles.titleText}>
+              {t('HapticSettings')}
+            </Text>
+          </View>
+
+          {haptic.map((meta, idx) => {
+            return (
+              <SettingItem
+                key={meta.name || idx}
+                title={meta.title}
+                description={meta.description}
+                onPress={() => handleItemPress(meta.name)}
+              />
+            );
+          })}
         </View>
 
         <View>

@@ -197,15 +197,36 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
      * 把一帧 PS5 触觉音频数据分发给已连接的 DualSense 控制器
      */
     public void handleHapticAudio(byte[] pcmData) {
+        handleHapticAudio(pcmData, 0.5f);
+    }
+
+    /**
+     * 把一帧 PS5 触觉音频数据分发给已连接的 DualSense 控制器，并附带强度倍率
+     */
+    public void handleHapticAudio(byte[] pcmData, float intensityGain) {
         if (pcmData == null || pcmData.length == 0) {
             return;
         }
+        final float gain = clampHapticIntensityGain(intensityGain);
         for (int i = 0; i < usbDeviceContexts.size(); i++) {
             UsbDeviceContext deviceContext = usbDeviceContexts.valueAt(i);
             if (deviceContext.device instanceof AbstractDualSenseController) {
-                ((AbstractDualSenseController) deviceContext.device).enqueueHapticData(pcmData);
+                ((AbstractDualSenseController) deviceContext.device).enqueueHapticData(pcmData, gain);
             }
         }
+    }
+
+    private float clampHapticIntensityGain(float gain) {
+        if (Float.isNaN(gain) || Float.isInfinite(gain)) {
+            return 0.5f;
+        }
+        if (gain < 0f) {
+            return 0f;
+        }
+        if (gain > 2f) {
+            return 2f;
+        }
+        return gain;
     }
 
     /**

@@ -44,6 +44,20 @@ inline int16_t clamp_i16(int value)
     return static_cast<int16_t>(value);
 }
 
+inline float sanitize_haptic_gain(float gain)
+{
+    if (gain != gain) {
+        return 0.5f;
+    }
+    if (gain < 0.0f) {
+        return 0.0f;
+    }
+    if (gain > 2.0f) {
+        return 2.0f;
+    }
+    return gain;
+}
+
 // 双声道输入映射到四声道输出：[0, L, L, R] // 未开启音频直通功能  前两个通道传递数据在此处没啥用
 void expand_stereo_to_quad(const int16_t *input, int input_frames, int16_t *output)
 {
@@ -54,6 +68,24 @@ void expand_stereo_to_quad(const int16_t *input, int input_frames, int16_t *outp
         output[i * 4 + 1] = left;
         output[i * 4 + 2] = left;
         output[i * 4 + 3] = right;
+    }
+}
+
+// 仅缩放有效触觉通道。按当前映射 [0, L, L, R]：
+// - ch1 (index 1) 按需求不处理
+// - 有效通道使用 ch2/ch3（index 2/3）
+void apply_haptic_gain_to_effective_channels(int16_t *quad, int input_frames, float gain)
+{
+    if (!quad || input_frames <= 0 || gain == 1.0f) {
+        return;
+    }
+
+    for (int i = 0; i < input_frames; i++) {
+        const int idx = i * 4;
+        const int scaled_left = static_cast<int>(quad[idx + 2] * gain);
+        const int scaled_right = static_cast<int>(quad[idx + 3] * gain);
+        quad[idx + 2] = clamp_i16(scaled_left);
+        quad[idx + 3] = clamp_i16(scaled_right);
     }
 }
 
@@ -135,7 +167,7 @@ Java_com_peasyo_input_HapticNative_nativeEnableHaptics(JNIEnv *, jclass)
 
 JNIEXPORT jboolean JNICALL
 Java_com_peasyo_input_HapticNative_nativeSendHapticFeedback(
-        JNIEnv *env, jclass, jobject buffer, jint length)
+        JNIEnv *env, jclass, jobject buffer, jint length, jfloat intensityGain)
 {
     std::lock_guard<std::mutex> lock(g_haptic_mutex);
 
@@ -155,6 +187,10 @@ Java_com_peasyo_input_HapticNative_nativeSendHapticFeedback(
 
     std::vector<int16_t> quad(static_cast<size_t>(input_frames) * kOutputChannels);
     expand_stereo_to_quad(input, input_frames, quad.data());
+    apply_haptic_gain_to_effective_channels(
+            quad.data(),
+            input_frames,
+            sanitize_haptic_gain(static_cast<float>(intensityGain)));
 
     const int upsampled_frames = input_frames * kUpsampleFactor;
     const int output_samples = upsampled_frames * kOutputChannels;

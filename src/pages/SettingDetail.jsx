@@ -17,6 +17,7 @@ import remote from '../common/settings/remote';
 import audio from '../common/settings/audio';
 import display from '../common/settings/display';
 import gamepad from '../common/settings/gamepad';
+import haptic from '../common/settings/haptic';
 import vgamepad from '../common/settings/vgamepad';
 import touchpad from '../common/settings/touchpad';
 import sensor from '../common/settings/sensor';
@@ -48,6 +49,7 @@ function SettingDetailScreen({navigation, route}) {
         ...audio,
         ...display,
         ...gamepad,
+        ...haptic,
         ...vgamepad,
         ...touchpad,
         ...sensor,

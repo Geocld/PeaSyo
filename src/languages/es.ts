@@ -126,6 +126,10 @@ export default {
     'Rumble intensity': 'Intensidad de vibración',
     RumbleIntensityDesc:
       'Establecer la intensidad de vibración del controlador',
+    'Haptic feedback intensity': 'Intensidad de retroalimentación háptica',
+    HapticFeedbackIntensityDesc:
+      'Ajustar la intensidad de la retroalimentación háptica (háptica de audio)',
+    HapticStandard: 'Estándar',
     'Joystick dead zone': 'Zona muerta del joystick',
     DeadZoneDesc:
       'Si el controlador tiene deriva, configurar una zona muerta del joystick puede proporcionar mejores resultados',
@@ -309,6 +313,7 @@ export default {
     RemoteSettings: 'Transmisión remota',
     AudioSettings: 'Audio',
     GamepadSettings: 'Gamepad y Vibración',
+    HapticSettings: 'Retroalimentación háptica',
     vGamepadSettings: 'Virtual controller',
     TouchpadSettings: 'Panel táctil',
     SensorSettings: 'Sensor',

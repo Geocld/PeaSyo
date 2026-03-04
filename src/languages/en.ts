@@ -124,6 +124,10 @@ export default {
       'After enabling Android controller support override, force Xbox controller Nexus button or DS controller volume button to simulate touchpad clicks',
     'Rumble intensity': 'Rumble intensity',
     RumbleIntensityDesc: 'Set the controller rumble intensity',
+    'Haptic feedback intensity': 'Haptic feedback intensity',
+    HapticFeedbackIntensityDesc:
+      'Set haptic feedback vibration intensity (audio haptics)',
+    HapticStandard: 'Standard',
     'Joystick dead zone': 'Joystick dead zone',
     DeadZoneDesc:
       'If the controller drifts, setting a joystick dead zone may provide better results',
@@ -299,6 +303,7 @@ export default {
     RemoteSettings: 'Remote stream',
     AudioSettings: 'Audio',
     GamepadSettings: 'Gamepad and Rumble',
+    HapticSettings: 'Haptic feedback',
     vGamepadSettings: 'Virtual controller',
     TouchpadSettings: 'Touchpad',
     SensorSettings: 'Sensor',

@@ -103,6 +103,7 @@ public class StreamView extends FrameLayout {
     private int haptic_stable_threshold; // 判定为稳定需要的次数
     private int haptic_change_threshold; // 数值变化阈值(百分比)
     private int haptic_diff_threshold; // 左右触觉反馈差值阈值
+    private double hapticFeedbackIntensity; // 触觉反馈强度倍率
     private final Vector2d inputVector = new Vector2d();
 
     private final ReactContext reactContext;
@@ -132,6 +133,7 @@ public class StreamView extends FrameLayout {
         this.haptic_stable_threshold = 3;
         this.haptic_change_threshold = 5;
         this.haptic_diff_threshold = 10;
+        this.hapticFeedbackIntensity = 0.5;
 
         tracker = new OrientationTracker();
     }
@@ -312,6 +314,9 @@ public class StreamView extends FrameLayout {
         int hapticStableThreshold = streamInfo.getInt("hapticStableThreshold");
         int hapticChangeThreshold = streamInfo.getInt("hapticChangeThreshold");
         int hapticDiffThreshold = streamInfo.getInt("hapticDiffThreshold");
+        double hapticFeedbackIntensity = streamInfo.hasKey("hapticFeedbackIntensity")
+                ? streamInfo.getDouble("hapticFeedbackIntensity")
+                : 0.5;
         int framePacing = parseFramePacing(streamInfo);
 
         if (gamepadMaping != null) {
@@ -335,6 +340,7 @@ public class StreamView extends FrameLayout {
         this.haptic_stable_threshold = hapticStableThreshold;
         this.haptic_change_threshold = hapticChangeThreshold;
         this.haptic_diff_threshold = hapticDiffThreshold;
+        this.hapticFeedbackIntensity = hapticFeedbackIntensity;
         this.framePacing = framePacing;
 
         if (videoFormat != null) {
@@ -383,6 +389,7 @@ public class StreamView extends FrameLayout {
                 this.haptic_stable_threshold,
                 this.haptic_change_threshold,
                 this.haptic_diff_threshold,
+                this.hapticFeedbackIntensity,
                 this.framePacing
         );
 

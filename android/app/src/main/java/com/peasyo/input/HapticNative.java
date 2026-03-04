@@ -36,8 +36,9 @@ public final class HapticNative {
      *
      * @param buffer DirectByteBuffer
      * @param length 有效字节长度
+     * @param intensityGain 触觉强度倍率
      */
-    public static native boolean nativeSendHapticFeedback(ByteBuffer buffer, int length);
+    public static native boolean nativeSendHapticFeedback(ByteBuffer buffer, int length, float intensityGain);
 
     /**
      * 清理 native 资源

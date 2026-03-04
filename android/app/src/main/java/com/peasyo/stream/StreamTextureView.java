@@ -100,6 +100,7 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
     private int haptic_stable_threshold;
     private int haptic_change_threshold;
     private int haptic_diff_threshold;
+    private double hapticFeedbackIntensity;
     private final Vector2d inputVector = new Vector2d();
 
     private final ReactContext reactContext;
@@ -129,6 +130,7 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         this.haptic_stable_threshold = 3;
         this.haptic_change_threshold = 5;
         this.haptic_diff_threshold = 10;
+        this.hapticFeedbackIntensity = 0.5;
 
         tracker = new OrientationTracker();
     }
@@ -329,6 +331,9 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         int hapticStableThreshold = streamInfo.getInt("hapticStableThreshold");
         int hapticChangeThreshold = streamInfo.getInt("hapticChangeThreshold");
         int hapticDiffThreshold = streamInfo.getInt("hapticDiffThreshold");
+        double hapticFeedbackIntensity = streamInfo.hasKey("hapticFeedbackIntensity")
+                ? streamInfo.getDouble("hapticFeedbackIntensity")
+                : 0.5;
         int framePacing = parseFramePacing(streamInfo);
 
         if (gamepadMaping != null) {
@@ -352,6 +357,7 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         this.haptic_stable_threshold = hapticStableThreshold;
         this.haptic_change_threshold = hapticChangeThreshold;
         this.haptic_diff_threshold = hapticDiffThreshold;
+        this.hapticFeedbackIntensity = hapticFeedbackIntensity;
         this.framePacing = framePacing;
 
         if (videoFormat != null) {
@@ -400,6 +406,7 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
                 this.haptic_stable_threshold,
                 this.haptic_change_threshold,
                 this.haptic_diff_threshold,
+                this.hapticFeedbackIntensity,
                 this.framePacing
         );
 

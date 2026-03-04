@@ -316,6 +316,7 @@ function StreamScreen({navigation, route}) {
       haptic_stable_threshold,
       haptic_change_threshold,
       haptic_diff_threshold,
+      haptic_feedback_intensity,
       maxOperatingRate,
     } = _settings;
 
@@ -437,6 +438,7 @@ function StreamScreen({navigation, route}) {
       hapticStableThreshold: haptic_stable_threshold,
       hapticChangeThreshold: haptic_change_threshold,
       hapticDiffThreshold: haptic_diff_threshold,
+      hapticFeedbackIntensity: haptic_feedback_intensity,
       maxOperatingRate: maxOperatingRate,
       audioMode: audio_output_mode,
       audioSharingMode: audio_sharing_mode,

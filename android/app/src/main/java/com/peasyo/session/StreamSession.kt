@@ -62,6 +62,7 @@ class StreamSession(
 	val haptic_stable_threshold: Int,
 	val haptic_change_threshold: Int,
 	val haptic_diff_threshold: Int,
+	val hapticFeedbackIntensity: Double,
 	val framePacing: Int,
 )
 {
@@ -473,7 +474,10 @@ class StreamSession(
 			is HapticAudioEvent -> {
 				// 仅在 USB DualSense 模式下转发原始触觉音频
 				if (usbMode && usbController == DSCONTROLLER_NAME) {
-					getMainActivity()?.handleHapticAudio(event.pcmData)
+					getMainActivity()?.handleHapticAudio(
+						event.pcmData,
+						hapticFeedbackIntensity.toFloat()
+					)
 				}
 			}
 			is TriggerRumbleEvent -> { // Adaptive trigger
