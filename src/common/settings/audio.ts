@@ -9,7 +9,7 @@ const audio = [
     title: t('Audio mode'),
     description: t('AudioModeDesc'),
     data: [
-      {value: 'AUTO', text: t('Auto')},
+      // {value: 'AUTO', text: t('Auto')}, // 暂时隐藏 AUTO 选项，因为会导致蓝牙耳机无声音输出
       {value: 'STANDARD', text: t('System default')},
       {value: 'SPEAKER', text: t('Speaker')},
       {value: 'WIRED', text: t('Wired headset')},

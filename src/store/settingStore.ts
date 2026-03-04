@@ -78,7 +78,7 @@ const defaultSettings: Settings = {
   remote_bitrate: 10000,
   remote_codec: 'H265',
   remote_fps: 30,
-  audio_output_mode: 'AUTO',
+  audio_output_mode: 'STANDARD', // 改为系统默认，避免蓝牙耳机无声音输出问题
   audio_sharing_mode: 'EXCLUSIVE',
   useSurface: true,
   fsr: false,
