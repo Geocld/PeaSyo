@@ -321,8 +321,8 @@ public class StreamView extends FrameLayout {
         int framePacing = parseFramePacing(streamInfo);
 
         // 手柄输入最小间隔（刷新率），默认 8ms
-        int gamepadFeedbackInterval = streamInfo.hasKey(\"gamepadFeedbackInterval\")
-                ? streamInfo.getInt(\"gamepadFeedbackInterval\")
+        int gamepadFeedbackInterval = streamInfo.hasKey("gamepadFeedbackInterval")
+                ? streamInfo.getInt("gamepadFeedbackInterval")
                 : 8;
 
         if (gamepadMaping != null) {
