@@ -29,11 +29,14 @@ typedef struct chiaki_feedback_sender_t
 	bool controller_state_changed;
 	ChiakiMutex state_mutex;
 	ChiakiCond state_cond;
+
+	uint64_t min_interval_ms;  // Configurable minimum feedback interval
 } ChiakiFeedbackSender;
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_feedback_sender_init(ChiakiFeedbackSender *feedback_sender, ChiakiTakion *takion);
 CHIAKI_EXPORT void chiaki_feedback_sender_fini(ChiakiFeedbackSender *feedback_sender);
 CHIAKI_EXPORT ChiakiErrorCode chiaki_feedback_sender_set_controller_state(ChiakiFeedbackSender *feedback_sender, ChiakiControllerState *state);
+CHIAKI_EXPORT void chiaki_feedback_sender_set_min_interval(ChiakiFeedbackSender *feedback_sender, uint64_t min_interval_ms);
 
 #ifdef __cplusplus
 }

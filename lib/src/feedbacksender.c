@@ -2,7 +2,7 @@
 
 #include <chiaki/feedbacksender.h>
 
-#define FEEDBACK_STATE_TIMEOUT_MIN_MS 8 // minimum time to wait between sending 2 packets
+#define FEEDBACK_STATE_TIMEOUT_MIN_MS_DEFAULT 8 // default minimum time to wait between sending 2 packets
 #define FEEDBACK_STATE_TIMEOUT_MAX_MS 200 // maximum time to wait between sending 2 packets
 
 #define FEEDBACK_HISTORY_BUFFER_SIZE 0x10
@@ -20,6 +20,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_feedback_sender_init(ChiakiFeedbackSender *
 	feedback_sender->state_seq_num = 0;
 
 	feedback_sender->history_seq_num = 0;
+	feedback_sender->min_interval_ms = FEEDBACK_STATE_TIMEOUT_MIN_MS_DEFAULT;  // Set default value
 	ChiakiErrorCode err = chiaki_feedback_history_buffer_init(&feedback_sender->history_buf, FEEDBACK_HISTORY_BUFFER_SIZE);
 	if(err != CHIAKI_ERR_SUCCESS)
 		return err;
@@ -79,6 +80,17 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_feedback_sender_set_controller_state(Chiaki
 	chiaki_cond_signal(&feedback_sender->state_cond);
 
 	return CHIAKI_ERR_SUCCESS;
+}
+
+CHIAKI_EXPORT void chiaki_feedback_sender_set_min_interval(ChiakiFeedbackSender *feedback_sender, uint64_t min_interval_ms)
+{
+	if(min_interval_ms < 1)
+		min_interval_ms = 1;  // Minimum 1ms to prevent excessive CPU usage
+	if(min_interval_ms > FEEDBACK_STATE_TIMEOUT_MAX_MS)
+		min_interval_ms = FEEDBACK_STATE_TIMEOUT_MAX_MS;
+
+	feedback_sender->min_interval_ms = min_interval_ms;
+	CHIAKI_LOGI(feedback_sender->log, "Feedback sender min interval set to %llu ms", (unsigned long long)min_interval_ms);
 }
 
 static bool controller_state_equals_for_feedback_state(ChiakiControllerState *a, ChiakiControllerState *b)
@@ -264,7 +276,8 @@ static void *feedback_sender_thread_func(void *user)
 
 		if(feedback_sender->controller_state_changed)
 		{
-			// TODO: FEEDBACK_STATE_TIMEOUT_MIN_MS
+			// Use configured minimum interval
+			next_timeout = feedback_sender->min_interval_ms;
 			feedback_sender->controller_state_changed = false;
 
 			// don't need to send feedback state if nothing relevant changed
@@ -272,7 +285,12 @@ static void *feedback_sender_thread_func(void *user)
 				send_feedback_state = false;
 
 			send_feedback_history = !controller_state_equals_for_feedback_history(&feedback_sender->controller_state, &feedback_sender->controller_state_prev);
-		} // else: timeout
+		}
+		else
+		{
+			// Timeout reached, reset to max timeout for next iteration
+			next_timeout = FEEDBACK_STATE_TIMEOUT_MAX_MS;
+		}
 
 		if(send_feedback_state)
 			feedback_sender_send_state(feedback_sender);

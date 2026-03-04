@@ -997,6 +997,15 @@ JNIEXPORT void JNICALL JNI_FCN(sessionSetSensorState)(JNIEnv *env, jobject obj, 
     AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;
 }
 
+// 设置手柄反馈最小刷新间隔（毫秒）
+// 保持智能自适应机制，但允许配置最小间隔
+// min_interval_ms: 最小刷新间隔，建议值：3ms(极速), 5ms(高速), 8ms(标准), 16ms(节能)
+JNIEXPORT void JNICALL JNI_FCN(sessionSetFeedbackMinInterval)(JNIEnv *env, jobject obj, jlong ptr, jint min_interval_ms)
+{
+    AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;
+    chiaki_session_set_feedback_min_interval(&session->session, (uint64_t)min_interval_ms);
+}
+
 JNIEXPORT void JNICALL JNI_FCN(sessionSetLoginPin)(JNIEnv *env, jobject obj, jlong ptr, jstring pin_java)
 {
     AndroidChiakiSession *session = (AndroidChiakiSession *)ptr;

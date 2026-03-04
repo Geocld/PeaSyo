@@ -406,6 +406,13 @@ export default {
     WiFiPerformanceModeTitle: 'WIFI低延迟模式(实验性)',
     WiFiPerformanceModeDesc:
       '开启此模式可降低WIFI连接延迟同时提高稳定性，但是可能会加剧蓝牙连接延迟。',
+    GamepadFeedbackIntervalTitle: '手柄输入最小间隔（刷新率）',
+    GamepadFeedbackIntervalDesc:
+      '调整手柄输入数据发送频率。保持智能自适应机制，仅配置最小刷新间隔。更高频率响应更快但消耗更多资源。',
+    GamepadFeedbackIntervalUltra: '极速 (3ms)',
+    GamepadFeedbackIntervalHigh: '高速 (5ms)',
+    GamepadFeedbackIntervalStandard: '标准 (8ms, 推荐)',
+    GamepadFeedbackIntervalEco: '节能 (16ms)',
     'Auto toggle hold buttons': '自动粘连按键',
     'Select what buttons become toggle holdable': '选择哪些按键可以自动保持',
     HoldButtonsSettingsDesc:

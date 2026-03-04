@@ -322,6 +322,7 @@ function StreamScreen({navigation, route}) {
       haptic_diff_threshold,
       haptic_feedback_intensity,
       maxOperatingRate,
+      gamepad_feedback_interval,
     } = _settings;
 
     // local
@@ -446,6 +447,7 @@ function StreamScreen({navigation, route}) {
       maxOperatingRate: maxOperatingRate,
       audioMode: audio_output_mode,
       audioSharingMode: audio_sharing_mode,
+      gamepadFeedbackInterval: gamepad_feedback_interval || 8, // 手柄输入最小间隔，默认 8ms
     };
 
     log.info('_streamInfo:', _streamInfo);
