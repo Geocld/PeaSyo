@@ -76,6 +76,20 @@ export default {
     FPSDesc: 'Set the streaming frame rate',
     RemoteFPS: 'FPS',
     RemoteFPSDesc: 'Set the remote streaming frame rate',
+    'Audio mode': 'Audio mode',
+    AudioModeDesc:
+      'Choose where stream audio is played on Android. Auto can avoid controller virtual USB audio devices.',
+    'System default': 'System default',
+    Speaker: 'Speaker',
+    'Wired headset': 'Wired headset',
+    'Bluetooth headset': 'Bluetooth headset',
+    'USB audio': 'USB audio',
+    'HDMI audio': 'HDMI audio',
+    'Audio sharing mode': 'Audio sharing mode',
+    AudioSharingModeDesc:
+      'Choose Oboe sharing mode. Shared is more compatible; Exclusive may have lower latency on some devices.',
+    'Shared (Recommended)': 'Shared (Recommended)',
+    'Exclusive (Low latency)': 'Exclusive (Low latency)',
     'Performance render': 'Performance Rendering',
     PerformanceRenderDesc:
       'Use high-performance video rendering. By default, high-performance rendering is used, but note that streaming will stop when the app is sent to the background. If you need to frequently switch to the background while maintaining streaming, please turn off high-performance rendering mode',
@@ -110,6 +124,10 @@ export default {
       'After enabling Android controller support override, force Xbox controller Nexus button or DS controller volume button to simulate touchpad clicks',
     'Rumble intensity': 'Rumble intensity',
     RumbleIntensityDesc: 'Set the controller rumble intensity',
+    'Haptic feedback intensity': 'Haptic feedback intensity',
+    HapticFeedbackIntensityDesc:
+      'Set haptic feedback vibration intensity (audio haptics)',
+    HapticStandard: 'Standard',
     'Joystick dead zone': 'Joystick dead zone',
     DeadZoneDesc:
       'If the controller drifts, setting a joystick dead zone may provide better results',
@@ -283,7 +301,9 @@ export default {
     DisplaySettings: 'Display',
     LocalSettings: 'Local stream',
     RemoteSettings: 'Remote stream',
+    AudioSettings: 'Audio',
     GamepadSettings: 'Gamepad and Rumble',
+    HapticSettings: 'Haptic feedback',
     vGamepadSettings: 'Virtual controller',
     TouchpadSettings: 'Touchpad',
     SensorSettings: 'Sensor',

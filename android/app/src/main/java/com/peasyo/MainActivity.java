@@ -113,7 +113,14 @@ public class MainActivity extends ReactActivity implements UsbDriverService.UsbD
    * 转发一帧触觉音频到控制器层
    */
   public void handleHapticAudio(byte[] pcmData) {
-    this.controllerHandler.handleHapticAudio(pcmData);
+    this.controllerHandler.handleHapticAudio(pcmData, 0.5f);
+  }
+
+  /**
+   * 转发一帧触觉音频到控制器层，并附带强度倍率
+   */
+  public void handleHapticAudio(byte[] pcmData, float intensityGain) {
+    this.controllerHandler.handleHapticAudio(pcmData, intensityGain);
   }
 
   /**

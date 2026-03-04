@@ -26,6 +26,7 @@ import java.util.ArrayList;
 public class UsbDriverService extends Service implements UsbDriverListener {
     private static final String ACTION_USB_PERMISSION =
             "com.peasyo.USB_PERMISSION";
+    private static final long ATTACH_DELAY_MS = 1000L;
     private UsbManager usbManager;
     private boolean started;
 
@@ -41,7 +42,7 @@ public class UsbDriverService extends Service implements UsbDriverListener {
     @Override
     public void reportControllerState(int controllerId, int buttonFlags, float leftStickX, float leftStickY,
                                       float rightStickX, float rightStickY, float leftTrigger, float rightTrigger) {
-        // Call through to the client's listener
+        // 透传给上层监听器
         if (listener != null) {
             listener.reportControllerState(controllerId, buttonFlags, leftStickX, leftStickY, rightStickX, rightStickY, leftTrigger, rightTrigger);
         }
@@ -54,7 +55,7 @@ public class UsbDriverService extends Service implements UsbDriverListener {
                                         boolean touch0active, boolean touch1active,
                                         int touch0id, int touch0x, int touch0y,
                                         int touch1id, int touch1x, int touch1y) {
-        // Call through to the client's listener
+        // 透传给上层监听器
         if (listener != null) {
             listener.reportDsControllerState(controllerId, buttonFlags, leftStickX, leftStickY, rightStickX, rightStickY, leftTrigger, rightTrigger,
                     gyrox, gyroy, gyroz, accelx, accely, accelz,
@@ -67,10 +68,10 @@ public class UsbDriverService extends Service implements UsbDriverListener {
     @Override
     public void deviceRemoved(AbstractController controller) {
         Log.d("UsbDriverService", "deviceRemoved");
-        // Remove the the controller from our list (if not removed already)
+        // 从列表中移除该控制器（若尚未移除）
         controllers.remove(controller);
 
-        // Call through to the client's listener
+        // 透传给上层监听器
         if (listener != null) {
             listener.deviceRemoved(controller);
             UsbRumbleManager.setHasValidUsbDevice(false);
@@ -80,7 +81,7 @@ public class UsbDriverService extends Service implements UsbDriverListener {
     @Override
     public void deviceAdded(AbstractController controller) {
         Log.d("UsbDriverService", "deviceAdded");
-        // Call through to the client's listener
+        // 透传给上层监听器
         if (listener != null) {
             listener.deviceAdded(controller);
             UsbRumbleManager.setHasValidUsbDevice(true);
@@ -92,35 +93,41 @@ public class UsbDriverService extends Service implements UsbDriverListener {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
-            // Initial attachment broadcast
+            // 设备首次插入广播
             if (action.equals(UsbManager.ACTION_USB_DEVICE_ATTACHED)) {
                 final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
 
-                // shouldClaimDevice() looks at the kernel's enumerated input
-                // devices to make its decision about whether to prompt to take
-                // control of the device. The kernel bringing up the input stack
-                // may race with this callback and cause us to prompt when the
-                // kernel is capable of running the device. Let's post a delayed
-                // message to process this state change to allow the kernel
-                // some time to bring up the stack.
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Continue the state machine
-                        handleUsbDeviceState(device);
-                    }
-                }, 1000);
+                final boolean bindAllUsb = UsbRumbleManager.getBindUsbDevice();
+                if (bindAllUsb) {
+                    // 覆盖模式优先响应速度，对齐 native gamepad 的行为。
+                    handleUsbDeviceState(device);
+                } else {
+                    // shouldClaimDevice() 依赖内核已枚举出的输入设备来决定是否接管。
+                    // 内核输入栈初始化与该回调存在竞态，若过早判断，可能在系统已可正常驱动
+                    // 设备时仍误触发接管。这里延迟处理一次，给内核输入栈留出就绪时间。
+                    // 该延迟仅在未开启覆盖模式时生效。
+                    // 处理延迟完成后继续状态机。
+                    // 这里使用延迟消息触发后续流程。
+                    // 以降低与系统输入设备枚举的竞态风险。
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            // 继续状态机流程
+                            handleUsbDeviceState(device);
+                        }
+                    }, ATTACH_DELAY_MS);
+                }
             }
-            // Subsequent permission dialog completion intent
+            // 权限弹窗结束后的回调
             else if (action.equals(ACTION_USB_PERMISSION)) {
                 UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
 
-                // Permission dialog is now closed
+                // 权限弹窗已关闭
                 if (stateListener != null) {
                     stateListener.onUsbPermissionPromptCompleted();
                 }
 
-                // If we got this far, we've already found we're able to handle this device
+                // 走到这里说明该设备类型我们可处理，授权通过后继续状态机
                 if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                     handleUsbDeviceState(device);
                 }
@@ -132,7 +139,7 @@ public class UsbDriverService extends Service implements UsbDriverListener {
         public void setListener(UsbDriverListener listener) {
             UsbDriverService.this.listener = listener;
 
-            // Report all controllerMap that already exist
+            // 回放当前已存在的控制器
             if (listener != null) {
                 for (AbstractController controller : controllers) {
                     listener.deviceAdded(controller);
@@ -154,37 +161,37 @@ public class UsbDriverService extends Service implements UsbDriverListener {
     }
 
     private void handleUsbDeviceState(UsbDevice device) {
-        // Are we able to operate it?
+        // 判断当前设备是否可由我们接管
 
-        // Open usb gamepad
+        // 读取覆盖安卓手柄支持开关
         boolean bindAllUsb = UsbRumbleManager.getBindUsbDevice();
         Log.d("UsbDriverService", "bindAllUsb: " + bindAllUsb);
 
         Log.d("UsbDriverService", "shouldClaimDevice: " + shouldClaimDevice(device, bindAllUsb));
         if (shouldClaimDevice(device, bindAllUsb)) {
-            // Do we have permission yet?
+            // 当前是否已具备 USB 访问权限
             if (!usbManager.hasPermission(device)) {
-                // Let's ask for permission
+                // 触发系统 USB 授权弹窗
                 try {
-                    // Tell the state listener that we're about to display a permission dialog
+                    // 通知状态监听器：即将展示权限弹窗
                     if (stateListener != null) {
                         stateListener.onUsbPermissionPromptStarting();
                     }
 
                     int intentFlags = 0;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        // This PendingIntent must be mutable to allow the framework to populate EXTRA_DEVICE and EXTRA_PERMISSION_GRANTED.
+                        // 该 PendingIntent 需要可变，系统才能填充 EXTRA_DEVICE 和 EXTRA_PERMISSION_GRANTED。
                         intentFlags |= PendingIntent.FLAG_MUTABLE;
                     }
 
-                    // This function is not documented as throwing any exceptions (denying access
-                    // is indicated by calling the PendingIntent with a false result). However,
-                    // Samsung Knox has some policies which block this request, but rather than
-                    // just returning a false result or returning 0 enumerated devices,
-                    // they throw an undocumented SecurityException from this call, crashing
-                    // the whole app. :(
+                    // 按文档该调用通常不会抛异常（拒绝授权会通过 PendingIntent 返回 false）。
+                    // 但在部分 Samsung Knox 策略下会直接抛出未文档化的 SecurityException，
+                    // 导致应用崩溃，因此这里做兜底捕获。
+                    // 该异常并不会以标准授权失败回调返回。
+                    // 所以需要主动捕获以保证流程可恢复。
+                    // 避免整应用崩溃。
 
-                    // Use an explicit intent to activate our unexported broadcast receiver, as required on Android 14+
+                    // Android 14+ 需要显式 Intent 才能触发未导出的广播接收器。
                     Intent i = new Intent(ACTION_USB_PERMISSION);
                     i.setPackage(getPackageName());
 
@@ -198,7 +205,7 @@ public class UsbDriverService extends Service implements UsbDriverListener {
                 return;
             }
 
-            // Open the device
+            // 打开 USB 设备
             UsbDeviceConnection connection = usbManager.openDevice(device);
             if (connection == null) {
                 Log.d("UsbDriverService", "Unable to open USB device: "+device.getDeviceName());
@@ -229,29 +236,29 @@ public class UsbDriverService extends Service implements UsbDriverListener {
                 controller = new DualSenseController(device, connection, nextDeviceId++, this);
             }
             else {
-                // Unreachable
+                // 理论不可达
                 return;
             }
 
-            // Start the controller
+            // 启动控制器
             if (!controller.start()) {
                 connection.close();
                 return;
             }
 
-            // Add this controller to the list
+            // 记录到已接管控制器列表
             UsbRumbleManager.setHasValidUsbDevice(true);
             controllers.add(controller);
         }
     }
 
     public static boolean isRecognizedInputDevice(UsbDevice device) {
-        // Determine if this VID and PID combo matches an existing input device
-        // and defer to the built-in controller support in that case.
+        // 判断该 VID/PID 是否已被系统识别为输入设备；
+        // 若已识别，则优先交给系统内置驱动处理。
         for (int id : InputDevice.getDeviceIds()) {
             InputDevice inputDev = InputDevice.getDevice(id);
             if (inputDev == null) {
-                // Device was removed while looping
+                // 遍历过程中设备被移除
                 continue;
             }
 
@@ -269,43 +276,43 @@ public class UsbDriverService extends Service implements UsbDriverListener {
         Log.d("UsbDriverService", "Kernel Version: " + kernelVersion);
 
         if (kernelVersion == null) {
-            // We'll assume this is some newer version of Android
-            // that doesn't let you read the kernel version this way.
+            // 读取不到内核版本时，按较新系统处理。
+            // 该情况下默认认为具备较新内核能力。
             return true;
         }
         else if (kernelVersion.startsWith("2.") || kernelVersion.startsWith("3.")) {
-            // These are old kernels that definitely don't support Xbox One controllers properly
+            // 旧内核基本不具备完整的 Xbox One 支持。
             return false;
         }
         else if (kernelVersion.startsWith("4.4.") || kernelVersion.startsWith("4.9.")) {
-            // These aren't guaranteed to have backported kernel patches for proper Xbox One
-            // support (though some devices will).
+            // 该区间内核不保证已回移 Xbox One 相关补丁（少数机型例外）。
+            // 因此这里按不支持处理。
             return false;
         }
         else {
-            // The next AOSP common kernel is 4.14 which has working Xbox One controller support
+            // 后续 AOSP 公共内核（如 4.14+）通常具备可用的 Xbox One 支持。
             return true;
         }
     }
 
     public static boolean kernelSupportsXbox360W() {
-        // Check if this kernel is 4.2+ to see if the xpad driver sets Xbox 360 wireless LEDs
+        // 检查内核是否至少 4.2+，用于判断 xpad 是否会设置 Xbox 360 无线 LED。
         // https://github.com/torvalds/linux/commit/75b7f05d2798ee3a1cc5bbdd54acd0e318a80396
         String kernelVersion = System.getProperty("os.version");
         if (kernelVersion != null) {
             if (kernelVersion.startsWith("2.") || kernelVersion.startsWith("3.") ||
                     kernelVersion.startsWith("4.0.") || kernelVersion.startsWith("4.1.")) {
-                // Even if LED devices are present, the driver won't set the initial LED state.
+                // 即使存在 LED 设备节点，驱动也不会设置初始 LED 状态。
                 return false;
             }
         }
 
-        // We know we have a kernel that should set Xbox 360 wireless LEDs, but we still don't
-        // know if CONFIG_JOYSTICK_XPAD_LEDS was enabled during the kernel build. Unfortunately
-        // it's not possible to detect this reliably due to Android's app sandboxing. Reading
-        // /proc/config.gz and enumerating /sys/class/leds are both blocked by SELinux on any
-        // relatively modern device. We will assume that CONFIG_JOYSTICK_XPAD_LEDS=y on these
-        // kernels and users can override by using the settings option to claim all devices.
+        // 这里基本可判断内核应支持 Xbox 360 无线 LED，但仍无法确认
+        // CONFIG_JOYSTICK_XPAD_LEDS 是否在内核编译时开启。
+        // 受 Android 沙箱限制，应用无法可靠检测该编译配置。
+        // 读取 /proc/config.gz 或枚举 /sys/class/leds 往往会被 SELinux 阻止。
+        // 这里默认这些内核已启用该能力，
+        // 用户可通过覆盖安卓手柄支持强制应用接管。
         return true;
     }
 
@@ -313,7 +320,7 @@ public class UsbDriverService extends Service implements UsbDriverListener {
         Log.d("UsbDriverService", "UsbDevice info: "+device.toString());
         return ((!kernelSupportsXboxOne() || !isRecognizedInputDevice(device) || claimAllAvailable) && XboxOneController.canClaimDevice(device)) ||
                 ((!isRecognizedInputDevice(device) || claimAllAvailable) && Xbox360Controller.canClaimDevice(device)) ||
-                // We must not call isRecognizedInputDevice() because wireless controllers don't share the same product ID as the dongle
+                // 无线控制器与接收器 PID 不同，这里不能依赖 isRecognizedInputDevice() 判断。
                 ((!kernelSupportsXbox360W() || claimAllAvailable) && Xbox360WirelessDongle.canClaimDevice(device)) ||
                 (DualSenseController.canClaimDevice((device)) && claimAllAvailable);
     }
@@ -326,7 +333,7 @@ public class UsbDriverService extends Service implements UsbDriverListener {
 
         started = true;
 
-        // Register for USB attach broadcasts and permission completions
+        // 注册 USB 插入与权限回调广播
         IntentFilter filter = new IntentFilter();
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         filter.addAction(ACTION_USB_PERMISSION);
@@ -337,15 +344,14 @@ public class UsbDriverService extends Service implements UsbDriverListener {
             registerReceiver(receiver, filter);
         }
 
-        // Open usb gamepad
-//        boolean bindAllUsb = false;
-        boolean bindAllUsb = true;
+        // 读取覆盖安卓手柄支持开关
+        boolean bindAllUsb = UsbRumbleManager.getBindUsbDevice();
 
-        // Enumerate existing devices
+        // 枚举当前已连接设备
         for (UsbDevice dev : usbManager.getDeviceList().values()) {
             Log.d("UsbDriverService", "shouldClaimDevice2: " + shouldClaimDevice(dev, bindAllUsb));
             if (shouldClaimDevice(dev, bindAllUsb)) {
-                // Start the process of claiming this device
+                // 启动该设备的接管流程
                 handleUsbDeviceState(dev);
             }
         }
@@ -358,12 +364,12 @@ public class UsbDriverService extends Service implements UsbDriverListener {
 
         started = false;
 
-        // Stop the attachment receiver
+        // 停止插入事件接收器
         unregisterReceiver(receiver);
 
-        // Stop all controllers
+        // 停止并清理所有控制器
         while (controllers.size() > 0) {
-            // Stop and remove the controller
+            // 停止并移除控制器
             controllers.remove(0).stop();
         }
     }
@@ -379,7 +385,7 @@ public class UsbDriverService extends Service implements UsbDriverListener {
     public void onDestroy() {
         stop();
 
-        // Remove listeners
+        // 清理监听器
         listener = null;
         stateListener = null;
     }
@@ -394,3 +400,4 @@ public class UsbDriverService extends Service implements UsbDriverListener {
         void onUsbPermissionPromptCompleted();
     }
 }
+

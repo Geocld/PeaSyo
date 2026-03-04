@@ -325,6 +325,13 @@ public abstract class AbstractDualSenseController extends AbstractController {
      * 入队一帧触觉音频数据
      */
     public void enqueueHapticData(byte[] frame) {
+        enqueueHapticData(frame, 0.5f);
+    }
+
+    /**
+     * 入队一帧触觉音频数据，并附带强度倍率
+     */
+    public void enqueueHapticData(byte[] frame, float intensityGain) {
         if (!hapticEnabled || frame == null || frame.length == 0) {
             return;
         }
@@ -340,7 +347,7 @@ public abstract class AbstractDualSenseController extends AbstractController {
             }
         }
 
-        sender.enqueue(frame);
+        sender.enqueue(frame, clampHapticIntensityGain(intensityGain));
     }
 
     public boolean isHapticEnabled() {
@@ -412,5 +419,18 @@ public abstract class AbstractDualSenseController extends AbstractController {
             Log.w(TAG, "触觉初始化包发送失败: res=" + res + ", retries=" + hapticPrimeRetryCount);
         }
         return false;
+    }
+
+    private float clampHapticIntensityGain(float gain) {
+        if (Float.isNaN(gain) || Float.isInfinite(gain)) {
+            return 0.5f;
+        }
+        if (gain < 0f) {
+            return 0f;
+        }
+        if (gain > 2f) {
+            return 2f;
+        }
+        return gain;
     }
 }

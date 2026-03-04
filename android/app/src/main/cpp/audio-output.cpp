@@ -34,8 +34,10 @@ struct AudioOutput
 	oboe::ManagedStream stream;
 	AudioOutputCallback stream_callback;
 	AudioBuffer buf;
+	int32_t preferred_device_id;
+	oboe::SharingMode sharing_mode;
 
-	AudioOutput() : stream_callback(this) {}
+	AudioOutput() : stream_callback(this), preferred_device_id(-1), sharing_mode(oboe::SharingMode::Shared) {}
 };
 
 extern "C" void *android_chiaki_audio_output_new(ChiakiLog *log)
@@ -54,17 +56,42 @@ extern "C" void android_chiaki_audio_output_free(void *audio_output)
 	delete ao;
 }
 
+extern "C" void android_chiaki_audio_output_set_device_id(int32_t device_id, void *audio_output)
+{
+	if(!audio_output)
+		return;
+	auto ao = reinterpret_cast<AudioOutput *>(audio_output);
+	ao->preferred_device_id = device_id;
+	CHIAKI_LOGI(ao->log, "Audio Output preferred device id set to %d", device_id);
+}
+
+extern "C" void android_chiaki_audio_output_set_sharing_mode(int32_t sharing_mode, void *audio_output)
+{
+	if(!audio_output)
+		return;
+	auto ao = reinterpret_cast<AudioOutput *>(audio_output);
+	if(sharing_mode == 1)
+		ao->sharing_mode = oboe::SharingMode::Exclusive;
+	else
+		ao->sharing_mode = oboe::SharingMode::Shared;
+
+	CHIAKI_LOGI(ao->log, "Audio Output sharing mode set to %s", sharing_mode == 1 ? "exclusive" : "shared");
+}
+
 extern "C" void android_chiaki_audio_output_settings(uint32_t channels, uint32_t rate, void *audio_output)
 {
 	auto ao = reinterpret_cast<AudioOutput *>(audio_output);
 
 	oboe::AudioStreamBuilder builder;
 	builder.setPerformanceMode(oboe::PerformanceMode::LowLatency)
-		->setSharingMode(oboe::SharingMode::Exclusive)
+		->setSharingMode(ao->sharing_mode)
 		->setFormat(oboe::AudioFormat::I16)
 		->setChannelCount(channels)
 		->setSampleRate(rate)
 		->setCallback(&ao->stream_callback);
+
+	if(ao->preferred_device_id >= 0)
+		builder.setDeviceId(ao->preferred_device_id);
 
 	auto result = builder.openManagedStream(ao->stream);
 	if(result == oboe::Result::OK)

@@ -121,6 +121,8 @@ private class ChiakiNative
 		@JvmStatic external fun sessionKeyboardReject(ptr: Long): Int
 		@JvmStatic external fun sessionJoin(ptr: Long): Int
 		@JvmStatic external fun sessionSetSurface(ptr: Long, surface: Surface?, maxOperatingRate: Int, framePacing: Int)
+		@JvmStatic external fun sessionSetAudioOutputDevice(ptr: Long, deviceId: Int)
+		@JvmStatic external fun sessionSetAudioSharingMode(ptr: Long, sharingMode: Int)
 		@JvmStatic external fun sessionSetControllerState(ptr: Long, controllerState: ControllerState)
 		@JvmStatic external fun sessionSetSensorState(ptr: Long)
 		@JvmStatic external fun sessionSetLoginPin(ptr: Long, pin: String)
@@ -493,6 +495,16 @@ class Session(connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean)
 	fun setSurface(surface: Surface?, maxOperatingRate: Int, framePacing: Int = FramePacing.FRAME_PACING_MIN_LATENCY)
 	{
 		ChiakiNative.sessionSetSurface(nativePtr, surface, maxOperatingRate, framePacing)
+	}
+
+	fun setAudioOutputDevice(deviceId: Int)
+	{
+		ChiakiNative.sessionSetAudioOutputDevice(nativePtr, deviceId)
+	}
+
+	fun setAudioSharingMode(sharingMode: Int)
+	{
+		ChiakiNative.sessionSetAudioSharingMode(nativePtr, sharingMode)
 	}
 
 	fun setControllerState(controllerState: ControllerState)
