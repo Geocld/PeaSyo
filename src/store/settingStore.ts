@@ -64,7 +64,7 @@ export type Settings = {
   haptic_diff_threshold: number;
   haptic_feedback_intensity: number;
   gamepad_feedback_interval: number;
-  wifi_low_latency: boolean;
+  wifi_performance_mode: boolean;
   debug: boolean;
 };
 
@@ -128,7 +128,7 @@ const defaultSettings: Settings = {
   haptic_diff_threshold: 15, // 左右触觉反馈差值阈值
   haptic_feedback_intensity: 0.5, // 触觉反馈强度(对齐pxplay默认NORMAL)
   gamepad_feedback_interval: 8, // 手柄输入最小间隔（刷新率），默认8ms
-  wifi_low_latency: false, // WiFi低延迟模式，默认关闭
+  wifi_performance_mode: false, // WiFi性能模式（低延迟），默认关闭
   debug: false,
 };
 
