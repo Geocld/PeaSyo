@@ -419,6 +419,18 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_session_set_controller_state(ChiakiSession 
 	return CHIAKI_ERR_SUCCESS;
 }
 
+// 设置手柄反馈最小刷新间隔
+// 保持智能自适应机制，但允许配置最小间隔以适应不同游戏场景
+CHIAKI_EXPORT void chiaki_session_set_feedback_min_interval(ChiakiSession *session, uint64_t min_interval_ms)
+{
+	ChiakiErrorCode err = chiaki_mutex_lock(&session->stream_connection.feedback_sender_mutex);
+	if(err != CHIAKI_ERR_SUCCESS)
+		return;
+	if(session->stream_connection.feedback_sender_active)
+		chiaki_feedback_sender_set_min_interval(&session->stream_connection.feedback_sender, min_interval_ms);
+	chiaki_mutex_unlock(&session->stream_connection.feedback_sender_mutex);
+}
+
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_set_login_pin(ChiakiSession *session, const uint8_t *pin, size_t pin_size)
 {
 	uint8_t *buf = malloc(pin_size);

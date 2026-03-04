@@ -31,11 +31,13 @@ import com.peasyo.input.UsbDriverService;
 import com.peasyo.input.ControllerHandler;
 import com.peasyo.lib.*;
 import com.peasyo.stream.Dpad;
+import android.content.SharedPreferences;
 
 public class MainActivity extends ReactActivity implements UsbDriverService.UsbDriverStateListener {
 
   public static MainActivity instance;
   private boolean pendingPipMode = false;
+  private WifiPerformanceManager wifiPerformanceManager;
 
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule
@@ -87,6 +89,9 @@ public class MainActivity extends ReactActivity implements UsbDriverService.UsbD
     test.say();
 
     controllerHandler = new ControllerHandler(this);
+
+    // 初始化 WiFi 性能管理器
+    wifiPerformanceManager = new WifiPerformanceManager(this);
 
     // Start the USB driver
     bindService(new Intent(this, UsbDriverService.class),
@@ -155,6 +160,40 @@ public class MainActivity extends ReactActivity implements UsbDriverService.UsbD
   @Override
   protected void onResume() {
     super.onResume();
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+
+    // Activity 销毁时确保释放 WiFi 锁
+    if (wifiPerformanceManager != null && wifiPerformanceManager.isAcquired()) {
+      wifiPerformanceManager.release();
+      Log.d("MainActivity", "WiFi performance mode disabled on destroy");
+    }
+  }
+
+  /**
+   * 启用 WiFi 性能模式（由串流页面调用）
+   */
+  public void enableWifiPerformanceMode() {
+    SharedPreferences prefs = getSharedPreferences("PeasyoSettings", MODE_PRIVATE);
+    boolean wifiPerfEnabled = prefs.getBoolean("USE_WIFI_PERFORMANCE_MODE", true);
+
+    if (wifiPerfEnabled && wifiPerformanceManager != null && !wifiPerformanceManager.isAcquired()) {
+      wifiPerformanceManager.acquire();
+      Log.d("MainActivity", "WiFi performance mode enabled for streaming");
+    }
+  }
+
+  /**
+   * 禁用 WiFi 性能模式（由串流页面调用）
+   */
+  public void disableWifiPerformanceMode() {
+    if (wifiPerformanceManager != null && wifiPerformanceManager.isAcquired()) {
+      wifiPerformanceManager.release();
+      Log.d("MainActivity", "WiFi performance mode disabled after streaming");
+    }
   }
 
   @Override

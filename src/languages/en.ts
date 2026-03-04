@@ -376,6 +376,16 @@ export default {
     LogVerboseTitle: 'Enable verbose logging',
     LogVerboseDesc:
       'Records complete streaming logs. This may significantly increase log file size and could potentially impact streaming performance. Do not enable during regular gameplay.',
+    WiFiPerformanceModeTitle: 'WiFi Low Latency Mode (Experimental)',
+    WiFiPerformanceModeDesc:
+      'Enabling this mode can reduce WiFi connection latency and improve stability, but may increase Bluetooth connection latency.',
+    GamepadFeedbackIntervalTitle: 'Gamepad Input Min Interval (Refresh Rate)',
+    GamepadFeedbackIntervalDesc:
+      'Adjust gamepad input data sending frequency. Maintains smart adaptive mechanism, only configures minimum refresh interval. Higher frequency provides faster response but consumes more resources.',
+    GamepadFeedbackIntervalUltra: 'Ultra (3ms)',
+    GamepadFeedbackIntervalHigh: 'High (5ms)',
+    GamepadFeedbackIntervalStandard: 'Standard (8ms, Recommended)',
+    GamepadFeedbackIntervalEco: 'Eco (16ms)',
     'Auto toggle hold buttons': 'Auto toggle hold buttons',
     'Select what buttons become toggle holdable':
       'Select what buttons become toggle holdable',

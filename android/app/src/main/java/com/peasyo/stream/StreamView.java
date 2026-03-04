@@ -104,6 +104,7 @@ public class StreamView extends FrameLayout {
     private int haptic_change_threshold; // 数值变化阈值(百分比)
     private int haptic_diff_threshold; // 左右触觉反馈差值阈值
     private double hapticFeedbackIntensity; // 触觉反馈强度倍率
+    private int gamepadFeedbackInterval; // 手柄输入最小间隔（刷新率），单位：毫秒
     private final Vector2d inputVector = new Vector2d();
 
     private final ReactContext reactContext;
@@ -319,6 +320,11 @@ public class StreamView extends FrameLayout {
                 : 0.5;
         int framePacing = parseFramePacing(streamInfo);
 
+        // 手柄输入最小间隔（刷新率），默认 8ms
+        int gamepadFeedbackInterval = streamInfo.hasKey("gamepadFeedbackInterval")
+                ? streamInfo.getInt("gamepadFeedbackInterval")
+                : 8;
+
         if (gamepadMaping != null) {
             updateButtonMapping(gamepadMaping);
         }
@@ -342,6 +348,7 @@ public class StreamView extends FrameLayout {
         this.haptic_diff_threshold = hapticDiffThreshold;
         this.hapticFeedbackIntensity = hapticFeedbackIntensity;
         this.framePacing = framePacing;
+        this.gamepadFeedbackInterval = gamepadFeedbackInterval;
 
         if (videoFormat != null) {
             if (videoFormat.isEmpty()) {
@@ -400,6 +407,9 @@ public class StreamView extends FrameLayout {
             @Override
             public void run() {
                 session.resume();
+                // 设置手柄输入最小间隔（刷新率）
+                session.setFeedbackMinInterval(gamepadFeedbackInterval);
+                Log.d(TAG, "Set gamepad feedback interval to " + gamepadFeedbackInterval + "ms");
             }
         }, 1000);
     }

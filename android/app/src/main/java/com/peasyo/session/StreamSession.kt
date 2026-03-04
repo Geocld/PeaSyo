@@ -224,6 +224,13 @@ class StreamSession(
 		}
 	}
 
+	// 设置手柄输入最小间隔（刷新率）
+	// 保持智能自适应机制，仅配置最小刷新间隔
+	fun setFeedbackMinInterval(minIntervalMs: Int)
+	{
+		session?.setFeedbackMinInterval(minIntervalMs)
+	}
+
 	private fun sendEvent(eventName: String, params: WritableMap?) {
 		reactContext?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)?.emit(eventName, params)
 	}

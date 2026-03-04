@@ -126,6 +126,7 @@ private class ChiakiNative
 		@JvmStatic external fun sessionSetControllerState(ptr: Long, controllerState: ControllerState)
 		@JvmStatic external fun sessionSetSensorState(ptr: Long)
 		@JvmStatic external fun sessionSetLoginPin(ptr: Long, pin: String)
+		@JvmStatic external fun sessionSetFeedbackMinInterval(ptr: Long, minIntervalMs: Int)
 		@JvmStatic external fun registStart(result: CreateResult, registInfo: RegistInfo, javaLog: ChiakiLog, javaRegist: Regist)
 		@JvmStatic external fun registStop(ptr: Long)
 		@JvmStatic external fun registFree(ptr: Long)
@@ -519,6 +520,13 @@ class Session(connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean)
 	fun setLoginPin(pin: String)
 	{
 		ChiakiNative.sessionSetLoginPin(nativePtr, pin)
+	}
+
+	// 设置手柄输入最小间隔（刷新率）
+	// 保持智能自适应机制，仅配置最小刷新间隔
+	fun setFeedbackMinInterval(minIntervalMs: Int)
+	{
+		ChiakiNative.sessionSetFeedbackMinInterval(nativePtr, minIntervalMs)
 	}
 }
 

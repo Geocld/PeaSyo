@@ -44,6 +44,16 @@ const others = [
       {value: true, text: t('Enable')},
     ],
   },
+  {
+    name: 'wifi_performance_mode',
+    type: 'radio',
+    title: t('WiFiPerformanceModeTitle'),
+    description: t('WiFiPerformanceModeDesc'),
+    data: [
+      {value: false, text: t('Disable')},
+      {value: true, text: t('Enable')},
+    ],
+  },
 ];
 
 export default others;

@@ -32,6 +32,7 @@ import Touchpad from '../components/Touchpad';
 import PerfPanel from '../components/PerfPanel';
 import {getSettings} from '../store/settingStore';
 import {debugFactory} from '../utils/debug';
+import {useWifiPerformanceMode} from '../hooks/useWifiPerformanceMode';
 
 const CONNECTED = 'connected';
 const HOLEPUNCHFINISHED = 'holepunchFinished';
@@ -80,6 +81,9 @@ const gpState = {
 
 function StreamScreen({navigation, route}) {
   const {t} = useTranslation();
+
+  // 启用 WiFi 性能模式（在组件挂载时启用，卸载时禁用）
+  useWifiPerformanceMode();
 
   const [loading, setLoading] = React.useState(false);
   const [loadingText, setLoadingText] = React.useState('');
@@ -318,6 +322,7 @@ function StreamScreen({navigation, route}) {
       haptic_diff_threshold,
       haptic_feedback_intensity,
       maxOperatingRate,
+      gamepad_feedback_interval,
     } = _settings;
 
     // local
@@ -442,6 +447,7 @@ function StreamScreen({navigation, route}) {
       maxOperatingRate: maxOperatingRate,
       audioMode: audio_output_mode,
       audioSharingMode: audio_sharing_mode,
+      gamepadFeedbackInterval: gamepad_feedback_interval || 8, // 手柄输入最小间隔，默认 8ms
     };
 
     log.info('_streamInfo:', _streamInfo);

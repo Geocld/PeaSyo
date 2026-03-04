@@ -94,6 +94,18 @@ const gamepad = [
       {value: true, text: t('Enable')},
     ],
   },
+  {
+    name: 'gamepad_feedback_interval',
+    type: 'radio',
+    title: t('GamepadFeedbackIntervalTitle'),
+    description: t('GamepadFeedbackIntervalDesc'),
+    data: [
+      {value: 3, text: t('GamepadFeedbackIntervalUltra')},
+      {value: 5, text: t('GamepadFeedbackIntervalHigh')},
+      {value: 8, text: t('GamepadFeedbackIntervalStandard')},
+      {value: 16, text: t('GamepadFeedbackIntervalEco')},
+    ],
+  },
 ];
 
 export default gamepad;

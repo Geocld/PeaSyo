@@ -387,6 +387,16 @@ export default {
     LogVerboseTitle: 'Habilitar registro detallado',
     LogVerboseDesc:
       'Registra registros completos de transmisión. Esto puede aumentar significativamente el tamaño del archivo de registro y potencialmente afectar el rendimiento de la transmisión. No lo habilites durante el juego habitual.',
+    WiFiPerformanceModeTitle: 'Modo de baja latencia WiFi (Experimental)',
+    WiFiPerformanceModeDesc:
+      'Habilitar este modo puede reducir la latencia de la conexión WiFi y mejorar la estabilidad, pero puede aumentar la latencia de la conexión Bluetooth.',
+    GamepadFeedbackIntervalTitle: 'Intervalo mínimo de entrada del gamepad (Tasa de refresco)',
+    GamepadFeedbackIntervalDesc:
+      'Ajusta la frecuencia de envío de datos de entrada del gamepad. Mantiene el mecanismo adaptativo inteligente, solo configura el intervalo mínimo de actualización. Mayor frecuencia proporciona respuesta más rápida pero consume más recursos.',
+    GamepadFeedbackIntervalUltra: 'Ultra (3ms)',
+    GamepadFeedbackIntervalHigh: 'Alto (5ms)',
+    GamepadFeedbackIntervalStandard: 'Estándar (8ms, Recomendado)',
+    GamepadFeedbackIntervalEco: 'Eco (16ms)',
     'Auto toggle hold buttons': 'Botones de retención automática',
     'Select what buttons become toggle holdable':
       'Selecciona qué botones se pueden mantener presionados',
