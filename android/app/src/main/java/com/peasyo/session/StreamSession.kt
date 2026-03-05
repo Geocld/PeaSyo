@@ -78,7 +78,7 @@ class StreamSession(
 	private val vibrateMutex = Mutex()
 	private val vibrateScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-	private val STABLE_THRESHOLD = 3         // 判定为稳定需要的次数
+	private val STABLE_THRESHOLD = 5         // 判定为稳定需要的次数
 	private val VALUE_CHANGE_THRESHOLD = 5   // 数值变化阈值(百分比)
 	private val EVENT_COOLDOWN_MS = 50L      // 事件发送冷却时间(毫秒)
 	private val CHANNEL_DIFF_THRESHOLD = 10
@@ -371,7 +371,7 @@ class StreamSession(
 						val diff = currentTime - hapticsState.lastActionTime
 						if (!shouldVibrate && (diff < 1500L) && (left > 0 || right > 0)) {
 							shouldVibrate = true
-//							Log.d("StreamView", "Vibration triggered by Situation3: L=${left}%, R=${right}%")
+//							Log.d("StreamView", "Vibration triggered by Situation3: L=${left}, R=${right}")
 						}
 					}
 
