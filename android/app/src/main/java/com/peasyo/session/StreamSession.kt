@@ -338,9 +338,11 @@ class StreamSession(
 
 					val canSendEvent = (currentTime - hapticsState.lastEventTime) >= EVENT_COOLDOWN_MS
 
+//					Log.d("StreamView", "Vibration: L=${left}, R=${right}")
+
 					if (canSendEvent) {
 						// Situation1：left != right
-						if (abs(left - right) >= haptic_diff_threshold && left > 0 && right > 0) {
+						if (abs(left - right) >= CHANNEL_DIFF_THRESHOLD && left > 0 && right > 0) {
 							shouldVibrate = true
 //							Log.d("StreamView", "Vibration triggered by Situation1: L=${left}, R=${right}")
 						}
@@ -355,8 +357,8 @@ class StreamSession(
 								abs((right - hapticsState.stableRight).toFloat() / hapticsState.stableRight) * 100
 							} else 0f
 
-							if ((leftChange >= haptic_change_threshold && leftChange < 30) ||
-								(rightChange >= haptic_change_threshold && rightChange < 30)) {
+							if ((leftChange >= VALUE_CHANGE_THRESHOLD && leftChange < 30) ||
+								(rightChange >= VALUE_CHANGE_THRESHOLD && rightChange < 30)) {
 								if(left + right  < 255) {
 									shouldVibrate = true
 									hapticsState.stableCount = 0
@@ -373,10 +375,10 @@ class StreamSession(
 						}
 					}
 
-					if (abs(left - hapticsState.lastLeft) <= haptic_change_threshold &&
-						abs(right - hapticsState.lastRight) <= haptic_change_threshold) {
+					if (abs(left - hapticsState.lastLeft) <= VALUE_CHANGE_THRESHOLD &&
+						abs(right - hapticsState.lastRight) <= VALUE_CHANGE_THRESHOLD) {
 						hapticsState.stableCount++
-						if (hapticsState.stableCount >= haptic_stable_threshold) {
+						if (hapticsState.stableCount >= STABLE_THRESHOLD) {
 							hapticsState.stableLeft = left
 							hapticsState.stableRight = right
 							hapticsState.isInitialized = true
