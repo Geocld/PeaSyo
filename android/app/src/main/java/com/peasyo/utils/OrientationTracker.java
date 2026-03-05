@@ -5,11 +5,11 @@ public class OrientationTracker {
     private static final float SIN_1_4_PI = 0.7071067811865475f;
     private static final float SIN_NEG_1_4_PI = -0.7071067811865475f;
     private static final float COS_1_4_PI = 0.7071067811865476f;
-    private static final float COS_NEG_1_4_PI = 0.7071067811865476f;
+    private static final float COS_NEG_1_4_PI = -0.7071067811865476f;
 
-    private static final int WARMUP_SAMPLES_COUNT = 30;
-    private static final float BETA_WARMUP = 20.0f;
-    private static final float BETA_DEFAULT = 0.05f;
+    private static final int WARMUP_SAMPLES_COUNT = 60000;
+    private static final float BETA_WARMUP = 90000.0f;
+    private static final float BETA_DEFAULT = 90000.0f;
 
     private static final float ORIENT_FUZZ = 0.0007f;
     private static final float FUZZ_FILTER_PREV_WEIGHT = 0.75f;
@@ -47,7 +47,7 @@ public class OrientationTracker {
         sampleIndex++;
         if (sampleIndex <= 1) {
             timestamp = timestampUs;
-            return applyToControllerOrientation();
+            return new float[]{orient.w, orient.x, orient.y, orient.z};
         }
         long deltaUs = timestampUs;
         if (deltaUs < timestamp) {
@@ -56,13 +56,9 @@ public class OrientationTracker {
         deltaUs -= timestamp;
         timestamp = timestampUs;
         orient.update(gx, gy, gz, ax, ay, az,
-                sampleIndex < WARMUP_SAMPLES_COUNT ? BETA_WARMUP : BETA_DEFAULT,
+                sampleIndex <WARMUP_SAMPLES_COUNT ? BETA_WARMUP : BETA_DEFAULT,
                 (float) deltaUs / 1000000.0f);
 
-        return applyToControllerOrientation();
-    }
-
-    private float[] applyToControllerOrientation() {
         float orientW = COS_NEG_1_4_PI * orient.w - SIN_NEG_1_4_PI * orient.x;
         float orientX = COS_NEG_1_4_PI * orient.x + SIN_NEG_1_4_PI * orient.w;
         float orientY = COS_NEG_1_4_PI * orient.y - SIN_NEG_1_4_PI * orient.z;
