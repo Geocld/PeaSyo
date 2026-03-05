@@ -344,6 +344,9 @@ class StreamSession(
 						// Situation1：left != right
 						if (abs(left - right) >= CHANNEL_DIFF_THRESHOLD && left > 0 && right > 0) {
 							shouldVibrate = true
+							if (hapticFeedbackIntensity.toFloat() < 0.2f) {
+								shouldVibrate = false
+							}
 //							Log.d("StreamView", "Vibration triggered by Situation1: L=${left}, R=${right}")
 						}
 
