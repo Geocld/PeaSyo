@@ -1193,13 +1193,15 @@ function StreamScreen({navigation, route}) {
 
       {showModal && (
         <View>
-          <View style={styles.shunDownModal}>
-            <Text variant="titleMedium">{t('Disconnect and sleep')}</Text>
-            <Switch
-              value={isShutDown}
-              onValueChange={() => setIsShutDown(!isShutDown)}
-            />
-          </View>
+          {connectState === CONNECTED && (
+            <View style={styles.shunDownModal}>
+              <Text variant="titleMedium">{t('Disconnect and sleep')}</Text>
+              <Switch
+                value={isShutDown}
+                onValueChange={() => setIsShutDown(!isShutDown)}
+              />
+            </View>
+          )}
           <View style={styles.modal}>
             <Card>
               <Card.Content>
@@ -1341,7 +1343,7 @@ const styles = StyleSheet.create({
     top: 10,
     right: '10%',
     zIndex: 998,
-    padding: 5,
+    padding: 10,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modal: {

@@ -44,8 +44,13 @@ import java.util.Objects;
 public class StreamTextureView extends FrameLayout implements TextureView.SurfaceTextureListener {
 
     static final String TAG = "StreamTextureView";
+    private static final float DS5_ACCEL_RES_PER_G = 8192.0f;
+    private static final float DS5_GYRO_RAD_PER_SEC_PER_LSB =
+            (float) ((2000.0 / 32768.0) * (Math.PI / 180.0));
+    private static final long NANO_PER_MICRO = 1000L;
 
     OrientationTracker tracker;
+    private final OrientationTracker.AccelNewZero ds5AccelZero = new OrientationTracker.AccelNewZero();
 
     ControllerState controllerState;
 
@@ -133,6 +138,7 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         this.hapticFeedbackIntensity = 0.5;
 
         tracker = new OrientationTracker();
+        ds5AccelZero.setInactive(false);
     }
 
     private static int parseFramePacing(ReadableMap streamInfo) {
@@ -776,65 +782,30 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         controllerState.setL2State(unsignedAxis(leftTrigger));
         controllerState.setR2State(unsignedAxis(rightTrigger));
 
-        float accelX = accelx / 8192f;
-        float accelY = accely / 8192f;
-        float accelZ = accelz / 8192f;
+        float accelX = accelx / DS5_ACCEL_RES_PER_G;
+        float accelY = accely / DS5_ACCEL_RES_PER_G;
+        float accelZ = accelz / DS5_ACCEL_RES_PER_G;
+        float gyroX = gyrox * DS5_GYRO_RAD_PER_SEC_PER_LSB;
+        float gyroY = gyroy * DS5_GYRO_RAD_PER_SEC_PER_LSB;
+        float gyroZ = gyroz * DS5_GYRO_RAD_PER_SEC_PER_LSB;
 
-        float[] accelArray = {accelX, accelY, accelZ};
-        boolean hasAccel = false;
-        int count = 0;
+        controllerState.setGyroX(gyroX);
+        controllerState.setGyroY(gyroY);
+        controllerState.setGyroZ(gyroZ);
+        controllerState.setAccelX(accelX);
+        controllerState.setAccelY(accelY);
+        controllerState.setAccelZ(accelZ);
 
-        for (float value : accelArray) {
-            if (Math.abs(value) > 0.3) {
-                count++;
-            }
-        }
+        float[] orientation = tracker.update(
+                gyroX, gyroY, gyroZ,
+                accelX, accelY, accelZ,
+                ds5AccelZero, true,
+                System.nanoTime() / NANO_PER_MICRO);
 
-        if (count == 3) {
-            hasAccel = true;
-        }
-
-        if ((Math.abs(gyrox / 10) > 10 || Math.abs(gyroy / 10) > 10 || Math.abs(gyroz / 10) > 10)) {
-
-            if (hasAccel) {
-                controllerState.setGyroX(gyrox);
-                controllerState.setGyroY(gyroy);
-                controllerState.setGyroZ(gyroz);
-
-                controllerState.setAccelX(accelX);
-                controllerState.setAccelY(accelY);
-                controllerState.setAccelZ(accelZ);
-
-                OrientationTracker.AccelNewZero accelZero = new OrientationTracker.AccelNewZero();
-
-                float[] orientation = tracker.update(gyrox, gyroy, gyroz,
-                        accelX, accelY, accelZ,
-                        accelZero, true,
-                        System.nanoTime() / 1000);
-
-                controllerState.setOrientX(orientation[1]);
-                controllerState.setOrientY(orientation[2]);
-                controllerState.setOrientZ(-orientation[3]);
-                controllerState.setOrientW(-orientation[0]);
-            } else {
-                controllerState.setGyroX(gyrox);
-                controllerState.setGyroY(gyroy);
-                controllerState.setGyroZ(gyroz);
-
-                OrientationTracker.AccelNewZero accelZero = new OrientationTracker.AccelNewZero();
-
-                float[] orientation = tracker.update(gyrox, gyroy, gyroz,
-                        accelX, accelY, accelZ,
-                        accelZero, true,
-                        System.nanoTime() / 1000);
-
-                // FIXME: Pitch direction is incorrect
-                controllerState.setOrientX(orientation[1]);
-                controllerState.setOrientY(orientation[2]);
-                controllerState.setOrientZ(-orientation[3]);
-                controllerState.setOrientW(-orientation[0]);
-            }
-        }
+        controllerState.setOrientX(orientation[1]);
+        controllerState.setOrientY(orientation[2]);
+        controllerState.setOrientZ(orientation[3]);
+        controllerState.setOrientW(orientation[0]);
 
         ControllerTouch[] touches = new ControllerTouch[] {
                 new ControllerTouch((short)touch0x, (short)touch0y, (byte)touch0id),
