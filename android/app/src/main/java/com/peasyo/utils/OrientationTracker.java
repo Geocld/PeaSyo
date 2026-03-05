@@ -7,9 +7,9 @@ public class OrientationTracker {
     private static final float COS_1_4_PI = 0.7071067811865476f;
     private static final float COS_NEG_1_4_PI = -0.7071067811865476f;
 
-    private static final int WARMUP_SAMPLES_COUNT = 30;
-    private static final float BETA_WARMUP = 20.0f;
-    private static final float BETA_DEFAULT = 0.05f;
+    private static final int WARMUP_SAMPLES_COUNT = 60000;
+    private static final float BETA_WARMUP = 90000.0f;
+    private static final float BETA_DEFAULT = 90000.0f;
 
     private static final float ORIENT_FUZZ = 0.0007f;
     private static final float FUZZ_FILTER_PREV_WEIGHT = 0.75f;

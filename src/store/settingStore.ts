@@ -126,7 +126,7 @@ const defaultSettings: Settings = {
   haptic_stable_threshold: 3, // 判定为稳定需要的次数
   haptic_change_threshold: 5, // 数值变化阈值(百分比)
   haptic_diff_threshold: 15, // 左右触觉反馈差值阈值
-  haptic_feedback_intensity: 0.5, // 触觉反馈强度
+  haptic_feedback_intensity: 0.5, // 触觉反馈强度(对齐pxplay默认NORMAL)
   gamepad_feedback_interval: 8, // 手柄输入最小间隔（刷新率），默认8ms
   wifi_performance_mode: false, // WiFi性能模式（低延迟），默认关闭
   debug: false,

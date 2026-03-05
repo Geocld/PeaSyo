@@ -51,10 +51,6 @@ public class StreamView extends FrameLayout {
 
     static final String TAG = "StreamView";
 
-    // DualSense IMU scaling factors
-    private static final float DUALSENSE_GYRO_SCALE = 0.00106526f;  // rad/s per LSB (±2000 dps range)
-    private static final float DUALSENSE_ACCEL_SCALE = 1.0f / 8192f; // g per LSB (±8g range)
-
     ControllerState controllerState;
 
     public static final int SCALE_MODE_FIT = 0;  // 保持宽高比
@@ -788,43 +784,72 @@ public class StreamView extends FrameLayout {
         controllerState.setL2State(unsignedAxis(leftTrigger));
         controllerState.setR2State(unsignedAxis(rightTrigger));
 
-        // Convert IMU data to physical units
-        float accelX = accelx * DUALSENSE_ACCEL_SCALE;
-        float accelY = accely * DUALSENSE_ACCEL_SCALE;
-        float accelZ = accelz * DUALSENSE_ACCEL_SCALE;
+        float accelX = accelx / 8192f;
+        float accelY = accely / 8192f;
+        float accelZ = accelz / 8192f;
 
-        float gyroX = gyrox * DUALSENSE_GYRO_SCALE;
-        float gyroY = gyroy * DUALSENSE_GYRO_SCALE;
-        float gyroZ = gyroz * DUALSENSE_GYRO_SCALE;
+        float[] accelArray = {accelX, accelY, accelZ};
+        boolean hasAccel = false;
+        int count = 0;
 
-        // Check if there's any motion (threshold: 0.01 rad/s ≈ 0.57 degrees/s)
-        if (Math.abs(gyroX) > 0.01f || Math.abs(gyroY) > 0.01f || Math.abs(gyroZ) > 0.01f) {
-            // Set gyro data (negate to match PS5 coordinate system)
-            controllerState.setGyroX(-gyroX);
-            controllerState.setGyroY(-gyroY);
-            controllerState.setGyroZ(-gyroZ);
+        for (float value : accelArray) {
+            if (Math.abs(value) > 0.3) {
+                count++;
+            }
+        }
 
-            // Set accel data
-            controllerState.setAccelX(accelX);
-            controllerState.setAccelY(accelY);
-            controllerState.setAccelZ(accelZ);
+        if (count == 3) {
+            hasAccel = true;
+        }
 
-            // Use OrientationTracker for sensor fusion
-            OrientationTracker.AccelNewZero accelZero = new OrientationTracker.AccelNewZero();
-            accelZero.setInactive(true);
+        if ((Math.abs(gyrox / 10) > 20 || Math.abs(gyroy / 20) > 10 || Math.abs(gyroz / 20) > 10)) {
 
-            float[] orientation = tracker.update(
-                gyroX, gyroY, gyroZ,
-                accelX, accelY, accelZ,
-                accelZero, true,
-                System.nanoTime() / 1000
-            );
+//            Log.d(TAG, "gyrox:" + Math.abs(gyrox / 10));
+//            Log.d(TAG, "gyroy:" + Math.abs(gyroy / 10));
+//            Log.d(TAG, "gyroz:" + Math.abs(gyroz / 10));
+//            Log.d(TAG, "accelX:" + accelX);
+//            Log.d(TAG, "accelY:" + accelY);
+//            Log.d(TAG, "accelZ:" + accelZ);
+//            Log.d(TAG, "hasAccel:" + hasAccel);
 
-            // Set quaternion orientation
-            controllerState.setOrientW(orientation[0]);
-            controllerState.setOrientX(orientation[1]);
-            controllerState.setOrientY(orientation[2]);
-            controllerState.setOrientZ(orientation[3]);
+            if (hasAccel) {
+                controllerState.setGyroX(-gyrox);
+                controllerState.setGyroY(-gyroy);
+                controllerState.setGyroZ(-gyroz);
+
+                controllerState.setAccelX(accelX);
+                controllerState.setAccelY(accelY);
+                controllerState.setAccelZ(accelZ);
+
+                OrientationTracker.AccelNewZero accelZero = new OrientationTracker.AccelNewZero();
+
+                float[] orientation = tracker.update(gyrox, gyroy, gyroz,
+                        accelX, accelY, accelZ,
+                        accelZero, true,
+                        System.nanoTime() / 1000);
+
+                controllerState.setOrientX(orientation[1]);
+                controllerState.setOrientY(orientation[2]);
+                controllerState.setOrientZ(-orientation[3]);
+                controllerState.setOrientW(-orientation[0]);
+            } else {
+                controllerState.setGyroX(gyrox);
+                controllerState.setGyroY(gyroy);
+                controllerState.setGyroZ(gyroz);
+
+                OrientationTracker.AccelNewZero accelZero = new OrientationTracker.AccelNewZero();
+
+                float[] orientation = tracker.update(gyrox, gyroy, gyroz,
+                        accelX, accelY, accelZ,
+                        accelZero, true,
+                        System.nanoTime() / 1000);
+
+                // FIXME: Pitch direction is incorrect
+                controllerState.setOrientX(orientation[1]);
+                controllerState.setOrientY(orientation[2]);
+                controllerState.setOrientZ(-orientation[3]);
+                controllerState.setOrientW(-orientation[0]);
+            }
         }
 
         ControllerTouch[] touches = new ControllerTouch[] {
