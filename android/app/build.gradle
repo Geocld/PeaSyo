@@ -80,7 +80,7 @@ android {
 
     namespace "com.peasyo"
     defaultConfig {
-        applicationId "com.peasyo"
+//        applicationId "com.peasyo"
         versionCode 2
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
@@ -97,6 +97,14 @@ android {
                         "-DCHIAKI_LIB_ENABLE_OPUS=OFF",
                         "-DCHIAKI_LIB_OPENSSL_EXTERNAL_PROJECT=ON"
             }
+        }
+    }
+    productFlavors {
+        prod {
+            applicationId "com.peasyo"
+        }
+        dev {
+            applicationId "com.peasyo.dev"  // Just for development
         }
     }
     compileOptions {
