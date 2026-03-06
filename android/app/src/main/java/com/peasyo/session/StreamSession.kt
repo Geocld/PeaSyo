@@ -2,6 +2,8 @@ package com.peasyo.session
 
 import android.util.Log
 import android.graphics.SurfaceTexture
+import android.os.Handler
+import android.os.Looper
 import android.view.*
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -65,13 +67,8 @@ class StreamSession(
 	private var surface: Surface? = null
 
 	private val RUMBLE_MIN_LEVEL = 10
-	// DualSense 直下发 rumble 通道增益（用于修正左右体感偏移）
-	private val DS_RUMBLE_HEAVY_GAIN = 0.12f
-	private val DS_RUMBLE_SOFT_GAIN = 0.85f
-	// 蓝牙/系统振动 API 的降级 rumble 也沿用同一组通道增益
-	private val BT_RUMBLE_LOW_GAIN = 0.14f
-	private val BT_RUMBLE_HIGH_GAIN = 0.85f
 	private val BT_RUMBLE_DURATION_MS = 20
+	private val BT_ZERO_RESEND_DELAY_MS = 10L
 
 	private val DSCONTROLLER_NAME = "DualSenseController"
 
@@ -80,10 +77,6 @@ class StreamSession(
 	private data class AudioHapticsState(
 		var lastLeft: Int = 0,
 		var lastRight: Int = 0,
-		var stableLeft: Int = 0,
-		var stableRight: Int = 0,
-		var stableCount: Int = 0,
-		var isInitialized: Boolean = false,
 		var isVibrating: Boolean = false,
 		var lastActionTime: Long = System.currentTimeMillis()
 	)
@@ -100,6 +93,8 @@ class StreamSession(
 	private var currentState = ControllerState()
 
 	private val hapticsState = AudioHapticsState()
+	private val btRumbleHandler = Handler(Looper.getMainLooper())
+	private var btZeroResendRunnable: Runnable? = null
 
 	fun setControllerState(controllerState: ControllerState) {
 //		Log.d("StreamView", "session setControllerState: $controllerState")
@@ -142,6 +137,9 @@ class StreamSession(
 
 	fun shutdown()
 	{
+		btZeroResendRunnable?.let { btRumbleHandler.removeCallbacks(it) }
+		btZeroResendRunnable = null
+
 		session?.stop()
 		session?.dispose()
 		session = null
@@ -273,7 +271,6 @@ class StreamSession(
 		return true
 	}
 
-	// ByteArray 转 JS 可读数组，按无符号字节上报
 	private fun triggerDataToWritableArray(data: ByteArray) = Arguments.createArray().apply {
 		data.forEach { pushInt(it.toInt() and 0xFF) }
 	}
@@ -386,7 +383,6 @@ class StreamSession(
 				sendEvent("streamStateChange", params)
 			}
 			is RumbleEvent -> {
-				// TODO: Make rumble more precise
 //				Log.d("StreamView", "RumbleEvent: $event")
 				if (rumble) {
 					// 若 DualSense 触觉已激活，跳过 rumble 降级逻辑，避免叠加振动
@@ -425,7 +421,6 @@ class StreamSession(
 
 					if (usbMode) {
 						if (usbController == DSCONTROLLER_NAME) {
-							// 直接走原生链路，避免 JS 事件回环和人为 delay
 							sendDualSenseRumbleDirect(left, right)
 						} else {
 							val INPUT_MAX = 256
@@ -434,16 +429,28 @@ class StreamSession(
 							val outRight = (right * OUTPUT_MAX / INPUT_MAX).coerceIn(0, OUTPUT_MAX)
 							getMainActivity()?.handleRumble(outLeft.toShort(), outRight.toShort())
 						}
-					} else {
-						// 非 USB 路径同样即时下发；left/right 为 0 时会触发停止
-						val gamepadManager = Gamepad(reactContext)
-						val btLow = (left * BT_RUMBLE_LOW_GAIN).toInt().coerceIn(0, 255)
-						val btHigh = (right * BT_RUMBLE_HIGH_GAIN).toInt().coerceIn(0, 255)
-						// 蓝牙双马达通道按当前映射顺序下发，避免左右体感错位。
-						gamepadManager.vibrate(BT_RUMBLE_DURATION_MS, btHigh, btLow, 0, 0, rumbleIntensity)
+						} else {
+							val gamepadManager = Gamepad(reactContext)
+							val btLow = left.coerceIn(0, 255)
+							val btHigh = right.coerceIn(0, 255)
+							btZeroResendRunnable?.let { btRumbleHandler.removeCallbacks(it) }
+							btZeroResendRunnable = null
+							gamepadManager.vibrate(BT_RUMBLE_DURATION_MS, btHigh, btLow, 0, 0, rumbleIntensity)
+
+							// Recall vibrate zero
+							if (btLow == 0 && btHigh == 0) {
+								val resendStop = Runnable {
+									if (hapticsState.lastLeft == 0 && hapticsState.lastRight == 0) {
+										Gamepad(reactContext).vibrate(BT_RUMBLE_DURATION_MS, 0, 0, 0, 0, rumbleIntensity)
+									}
+									btZeroResendRunnable = null
+								}
+								btZeroResendRunnable = resendStop
+								btRumbleHandler.postDelayed(resendStop, BT_ZERO_RESEND_DELAY_MS)
+							}
+						}
 					}
 				}
-			}
 			is HapticAudioEvent -> {
 				// 仅在 USB DualSense 模式下转发原始触觉音频
 				if (usbMode && usbController == DSCONTROLLER_NAME) {
