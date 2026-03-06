@@ -21,8 +21,8 @@ static void android_chiaki_audio_haptics_decoder_header(ChiakiAudioHeader *heade
 static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_size, void *user);
 
 // haptics->rumble 通道平衡增益（用于修正左右体感偏移）
-static const float HAPTIC_RUMBLE_LEFT_GAIN = 0.80f;
-static const float HAPTIC_RUMBLE_RIGHT_GAIN = 1.15f;
+static const float HAPTIC_RUMBLE_LEFT_GAIN = 0.82f;
+static const float HAPTIC_RUMBLE_RIGHT_GAIN = 0.92f;
 
 ChiakiErrorCode android_chiaki_audio_decoder_init(AndroidChiakiAudioDecoder *decoder, ChiakiLog *log)
 {
@@ -294,7 +294,6 @@ static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_
 
         memcpy(&amplitudel, buf + cur, sizeof(int16_t));
         memcpy(&amplituder, buf + cur + sizeof(int16_t), sizeof(int16_t));
-        // 取正向峰值，避免均值导致瞬态被抵消
         if (amplitudel > peakl) {
             peakl = amplitudel;
         }

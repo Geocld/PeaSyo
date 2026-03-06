@@ -2,8 +2,6 @@ package com.peasyo.session
 
 import android.util.Log
 import android.graphics.SurfaceTexture
-import android.os.Handler
-import android.os.Looper
 import android.view.*
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,7 +10,6 @@ import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.peasyo.MainActivity
-import com.peasyo.UsbRumbleManager
 import com.peasyo.audio.AudioRouteResolver
 import com.peasyo.lib.ConnectInfo
 import com.peasyo.lib.ConnectedEvent
@@ -29,16 +26,8 @@ import com.peasyo.lib.RumbleEvent
 import com.peasyo.lib.Session
 import com.peasyo.lib.TriggerRumbleEvent
 import com.peasyo.log.LogManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
 
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.sync.withLock
 import java.lang.Math.abs
-import android.content.Context
 
 sealed class StreamState
 object StreamStateIdle: StreamState()
@@ -75,20 +64,18 @@ class StreamSession(
 	private var surfaceTexture: SurfaceTexture? = null
 	private var surface: Surface? = null
 
-	private val vibrateMutex = Mutex()
-	private val vibrateScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-
-	private val STABLE_THRESHOLD = 5         // 判定为稳定需要的次数
-	private val VALUE_CHANGE_THRESHOLD = 5   // 数值变化阈值(百分比)
-	private val EVENT_COOLDOWN_MS = 16L      // 事件发送冷却时间(毫秒)
-	private val CHANNEL_DIFF_THRESHOLD = 10
+	private val EVENT_COOLDOWN_MS = 8L       // 事件发送冷却时间(毫秒)
+	private val RUMBLE_MIN_LEVEL = 10
 	// DualSense 直下发 rumble 通道增益（用于修正左右体感偏移）
-	private val DS_RUMBLE_HEAVY_GAIN = 0.06f
-	private val DS_RUMBLE_SOFT_GAIN = 0.70f
+	private val DS_RUMBLE_HEAVY_GAIN = 0.12f
+	private val DS_RUMBLE_SOFT_GAIN = 0.85f
+	// 蓝牙/系统振动 API 的降级 rumble 也沿用同一组通道增益
+	private val BT_RUMBLE_LOW_GAIN = 0.14f
+	private val BT_RUMBLE_HIGH_GAIN = 0.85f
+	private val BT_RUMBLE_DURATION_MS = 20
 
 	private val DSCONTROLLER_NAME = "DualSenseController"
 
-	private var isRuningVib = false
 	private val maxOperatingRate = connectInfo.videoProfile.maxOperatingRate // 从 connectInfo 获取
 
 	private data class AudioHapticsState(
@@ -104,6 +91,13 @@ class StreamSession(
 	)
 
 	private var lastProcessedEvent = RumbleEvent(0, 0)
+	// 直下发输出报告时，需要与触发器参数更新保持一致性
+	private val dsOutputLock = Any()
+	// 缓存最近一次触发器配置，rumble 下发时一并写入 0x02 报告，避免覆盖触发器状态
+	private var dsLeftTriggerType: Int = 0
+	private var dsRightTriggerType: Int = 0
+	private var dsLeftTriggerData: ByteArray = ByteArray(10)
+	private var dsRightTriggerData: ByteArray = ByteArray(10)
 
 	private var currentState = ControllerState()
 
@@ -161,7 +155,7 @@ class StreamSession(
 			getMainActivity()?.stopHaptics()
 		}
 
-		// Stop rumble
+		// 停止 rumble
 		if (rumble) {
 			if (usbMode) {
 				getMainActivity()?.handleRumble(0, 0)
@@ -350,8 +344,9 @@ class StreamSession(
 	}
 
 	private fun sendDualSenseRumbleDirect(left: Int, right: Int) {
-		val heavy = (left * DS_RUMBLE_HEAVY_GAIN).toInt().coerceIn(0, 255)
-		val soft = (right * DS_RUMBLE_SOFT_GAIN).toInt().coerceIn(0, 255)
+		// 保持现有系数：heavy=left*0.1，soft=right*0.5
+		val heavy = (left * 0.1f).toInt().coerceIn(0, 255)
+		val soft = (right * 0.5f).toInt().coerceIn(0, 255)
 		val report = buildDualSenseOutputReport(heavy, soft)
 		// 直接走原生链路下发，避免经过 JS 事件回环
 		getMainActivity()?.handleSendCommand(report)
@@ -406,108 +401,53 @@ class StreamSession(
 					}
 
 					val currentTime = System.currentTimeMillis()
-					var shouldVibrate = false
-					var left = event.left
-					var right = event.right
+					var left = event.left.coerceIn(0, 255)
+					var right = event.right.coerceIn(0, 255)
 
-					val canSendEvent = (currentTime - hapticsState.lastEventTime) >= EVENT_COOLDOWN_MS
-
-//					Log.d("StreamView", "Vibration: L=${left}, R=${right}")
-
-					if (canSendEvent) {
-						// Situation1：left != right
-						if (abs(left - right) >= CHANNEL_DIFF_THRESHOLD && left > 0 && right > 0) {
-							shouldVibrate = true
-							if (hapticFeedbackIntensity.toFloat() < 0.2f) {
-								shouldVibrate = false
-							}
-//							Log.d("StreamView", "Vibration triggered by Situation1: L=${left}, R=${right}")
-						}
-
-						// Situation2：rumble change
-						if (!shouldVibrate && hapticsState.isInitialized) {
-							val leftChange = if (hapticsState.stableLeft > 0 && left > 0) {
-								abs((left - hapticsState.stableLeft).toFloat() / hapticsState.stableLeft) * 100
-							} else 0f
-
-							val rightChange = if (hapticsState.stableRight > 0 && right > 0) {
-								abs((right - hapticsState.stableRight).toFloat() / hapticsState.stableRight) * 100
-							} else 0f
-
-							if ((leftChange >= VALUE_CHANGE_THRESHOLD && leftChange < 30) ||
-								(rightChange >= VALUE_CHANGE_THRESHOLD && rightChange < 30)) {
-								if(left + right  < 255) {
-									shouldVibrate = true
-									hapticsState.stableCount = 0
-								}
-//								Log.d("StreamView", "Vibration triggered by sudden change: L=${leftChange}%, R=${rightChange}%")
-							}
-						}
-
-						// Situation3：Rumble with click
-						val diff = currentTime - hapticsState.lastActionTime
-						if (!shouldVibrate && (diff < 1500L) && (left > 0 || right > 0)) {
-							shouldVibrate = true
-//							Log.d("StreamView", "Vibration triggered by Situation3: L=${left}, R=${right}")
-						}
+					if (left < RUMBLE_MIN_LEVEL) {
+						left = 0
+					}
+					if (right < RUMBLE_MIN_LEVEL) {
+						right = 0
 					}
 
-					if (abs(left - hapticsState.lastLeft) <= VALUE_CHANGE_THRESHOLD &&
-						abs(right - hapticsState.lastRight) <= VALUE_CHANGE_THRESHOLD) {
-						hapticsState.stableCount++
-						if (hapticsState.stableCount >= STABLE_THRESHOLD) {
-							hapticsState.stableLeft = left
-							hapticsState.stableRight = right
-							hapticsState.isInitialized = true
+					val shouldVibrate = (left > 0 || right > 0)
+					val shouldStop = hapticsState.isVibrating && !shouldVibrate
+					val canSendEvent = (currentTime - hapticsState.lastEventTime) >= EVENT_COOLDOWN_MS
+					if (!canSendEvent && !shouldStop) {
+						return
+					}
+
+					// 变化太小时直接丢弃，避免无效刷写
+					if (!shouldStop &&
+						abs(left - lastProcessedEvent.left) <= 1 &&
+						abs(right - lastProcessedEvent.right) <= 1) {
+						return
+					}
+
+					hapticsState.isVibrating = shouldVibrate
+					hapticsState.lastEventTime = currentTime
+					hapticsState.lastLeft = left
+					hapticsState.lastRight = right
+					lastProcessedEvent = RumbleEvent(left, right)
+
+					if (usbMode) {
+						if (usbController == DSCONTROLLER_NAME) {
+							// 直接走原生链路，避免 JS 事件回环和人为 delay
+							sendDualSenseRumbleDirect(left, right)
+						} else {
+							val INPUT_MAX = 256
+							val OUTPUT_MAX = 32767
+							val outLeft = (left * OUTPUT_MAX / INPUT_MAX).coerceIn(0, OUTPUT_MAX)
+							val outRight = (right * OUTPUT_MAX / INPUT_MAX).coerceIn(0, OUTPUT_MAX)
+							getMainActivity()?.handleRumble(outLeft.toShort(), outRight.toShort())
 						}
 					} else {
-						hapticsState.stableCount = 0
-					}
-
-					if ((shouldVibrate || (hapticsState.isVibrating && (left == 0 && right == 0))) && canSendEvent) {
-						hapticsState.isVibrating = shouldVibrate
-						hapticsState.lastEventTime = currentTime
-
-						if (abs(event.left - lastProcessedEvent.left) <= 0  && abs(event.right - lastProcessedEvent.right) <= 0 ) {
-							return
-						}
-
-						lastProcessedEvent = event
-
-						if (left > right) {
-							right = left
-						}
-
-						if (right > left) {
-							left = right
-						}
-
-						if (left < 10) {
-							left = 0
-						}
-
-						if (right < 10) {
-							right = 0
-						}
-
-//						Log.d("StreamView", "RumbleEvent: $event")
-
-						if (usbMode) {
-							if (usbController == DSCONTROLLER_NAME) {
-								// 直接走原生链路，避免 JS 事件回环和人为 delay
-								sendDualSenseRumbleDirect(left, right)
-							} else {
-								val INPUT_MAX = 256
-								val OUTPUT_MAX = 32767
-								val outLeft = (left * OUTPUT_MAX / INPUT_MAX).coerceIn(0, OUTPUT_MAX)
-								val outRight = (right * OUTPUT_MAX / INPUT_MAX).coerceIn(0, OUTPUT_MAX)
-								getMainActivity()?.handleRumble(outLeft.toShort(), outRight.toShort())
-							}
-						} else {
-							// 非 USB 路径同样即时下发；left/right 为 0 时会触发停止
-							val gamepadManager = Gamepad(reactContext)
-							gamepadManager.vibrate(20, left, right, 0, 0, rumbleIntensity)
-						}
+						// 非 USB 路径同样即时下发；left/right 为 0 时会触发停止
+						val gamepadManager = Gamepad(reactContext)
+						val btLow = (left * BT_RUMBLE_LOW_GAIN).toInt().coerceIn(0, 255)
+						val btHigh = (right * BT_RUMBLE_HIGH_GAIN).toInt().coerceIn(0, 255)
+						gamepadManager.vibrate(BT_RUMBLE_DURATION_MS, btLow, btHigh, 0, 0, rumbleIntensity)
 					}
 				}
 			}
@@ -520,7 +460,7 @@ class StreamSession(
 					)
 				}
 			}
-			is TriggerRumbleEvent -> { // Adaptive trigger
+			is TriggerRumbleEvent -> { // 自适应扳机
 //				Log.d("StreamView", "TriggerRumbleEvent: $event")
 
 				if (usbMode) {
@@ -532,6 +472,11 @@ class StreamSession(
 						if (event.typeRight == 0 && right_is_empty) event.typeLeft else event.typeRight
 					val right_data =
 						if (event.typeRight == 0 && right_is_empty) event.left else event.right
+
+					if (usbController == DSCONTROLLER_NAME) {
+						// 为 rumble 直下发同步最新触发器参数
+						updateDualSenseTriggerCache(left_type, left_data, right_type, right_data)
+					}
 
 					val params = Arguments.createMap().apply {
 						putInt("leftType", left_type)
