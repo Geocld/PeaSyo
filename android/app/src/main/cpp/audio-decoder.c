@@ -20,10 +20,6 @@ static void android_chiaki_audio_decoder_frame(uint8_t *buf, size_t buf_size, vo
 static void android_chiaki_audio_haptics_decoder_header(ChiakiAudioHeader *header, void *user);
 static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_size, void *user);
 
-// haptics->rumble 通道平衡增益（用于修正左右体感偏移）
-static const float HAPTIC_RUMBLE_LEFT_GAIN = 0.82f;
-static const float HAPTIC_RUMBLE_RIGHT_GAIN = 0.92f;
-
 ChiakiErrorCode android_chiaki_audio_decoder_init(AndroidChiakiAudioDecoder *decoder, ChiakiLog *log)
 {
 	decoder->log = log;
@@ -256,18 +252,6 @@ static uint8_t haptic_level_from_peak(int16_t peak)
     return (uint8_t)level;
 }
 
-static uint8_t apply_channel_gain_u8(uint8_t value, float gain)
-{
-    int scaled = (int)((double)value * (double)gain + 0.5);
-    if (scaled < 0) {
-        return 0;
-    }
-    if (scaled > 0xFF) {
-        return 0xFF;
-    }
-    return (uint8_t)scaled;
-}
-
 static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_size, void *user) {
     if (buf_size < 4) {
         return;
@@ -303,8 +287,6 @@ static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_
     }
     uint8_t left8 = haptic_level_from_peak(peakl);
     uint8_t right8 = haptic_level_from_peak(peakr);
-    left8 = apply_channel_gain_u8(left8, HAPTIC_RUMBLE_LEFT_GAIN);
-    right8 = apply_channel_gain_u8(right8, HAPTIC_RUMBLE_RIGHT_GAIN);
 
     // 2) 同时保留 rumble 降级事件，给非 DualSense 设备继续使用
     ChiakiEvent event = { 0 };

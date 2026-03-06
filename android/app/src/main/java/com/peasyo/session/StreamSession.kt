@@ -64,7 +64,6 @@ class StreamSession(
 	private var surfaceTexture: SurfaceTexture? = null
 	private var surface: Surface? = null
 
-	private val EVENT_COOLDOWN_MS = 8L       // 事件发送冷却时间(毫秒)
 	private val RUMBLE_MIN_LEVEL = 10
 	// DualSense 直下发 rumble 通道增益（用于修正左右体感偏移）
 	private val DS_RUMBLE_HEAVY_GAIN = 0.12f
@@ -86,7 +85,6 @@ class StreamSession(
 		var stableCount: Int = 0,
 		var isInitialized: Boolean = false,
 		var isVibrating: Boolean = false,
-		var lastEventTime: Long = System.currentTimeMillis(),
 		var lastActionTime: Long = System.currentTimeMillis()
 	)
 
@@ -344,9 +342,8 @@ class StreamSession(
 	}
 
 	private fun sendDualSenseRumbleDirect(left: Int, right: Int) {
-		// 保持现有系数：heavy=left*0.1，soft=right*0.5
-		val heavy = (left * 0.1f).toInt().coerceIn(0, 255)
-		val soft = (right * 0.5f).toInt().coerceIn(0, 255)
+		val heavy = left.coerceIn(0, 255)
+		val soft = right.coerceIn(0, 255)
 		val report = buildDualSenseOutputReport(heavy, soft)
 		// 直接走原生链路下发，避免经过 JS 事件回环
 		getMainActivity()?.handleSendCommand(report)
@@ -413,10 +410,6 @@ class StreamSession(
 
 					val shouldVibrate = (left > 0 || right > 0)
 					val shouldStop = hapticsState.isVibrating && !shouldVibrate
-					val canSendEvent = (currentTime - hapticsState.lastEventTime) >= EVENT_COOLDOWN_MS
-					if (!canSendEvent && !shouldStop) {
-						return
-					}
 
 					// 变化太小时直接丢弃，避免无效刷写
 					if (!shouldStop &&
@@ -426,7 +419,6 @@ class StreamSession(
 					}
 
 					hapticsState.isVibrating = shouldVibrate
-					hapticsState.lastEventTime = currentTime
 					hapticsState.lastLeft = left
 					hapticsState.lastRight = right
 					lastProcessedEvent = RumbleEvent(left, right)
