@@ -252,6 +252,25 @@ static uint8_t haptic_level_from_peak(int16_t peak)
     return (uint8_t)level;
 }
 
+static uint8_t format_peak(int16_t peak)
+{
+    if (peak <= 0) {
+        return 0;
+    }
+
+    double db = 20.0 * log10((double)peak / 0.6);
+    if (!isfinite(db) || db <= 0.0) {
+        return 0;
+    }
+
+    int level = (int)db;
+
+    if (level > 0xFF) {
+        level = 0xFF;
+    }
+    return (uint8_t)level;
+}
+
 static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_size, void *user) {
     if (buf_size < 4) {
         return;
@@ -285,16 +304,16 @@ static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_
             peakr = amplituder;
         }
     }
-    uint8_t left8 = haptic_level_from_peak(peakl);
-    uint8_t right8 = haptic_level_from_peak(peakr);
+    uint8_t left = haptic_level_from_peak(peakl);
+    uint8_t right = haptic_level_from_peak(peakr);
 
     // 2) 同时保留 rumble 降级事件，给非 DualSense 设备继续使用
     ChiakiEvent event = { 0 };
     event.type = CHIAKI_EVENT_RUMBLE;
     event.rumble.unknown = buf[0];
-    event.rumble.left = left8;
-    event.rumble.right = right8;
-    event.rumble.peakl = peakl >> 8;
-    event.rumble.peakr = peakr >> 8;
+    event.rumble.left = left;
+    event.rumble.right = right;
+    event.rumble.peakl = format_peak(peakl);
+    event.rumble.peakr = format_peak(peakr);
     session->event_cb(&event, session->event_cb_user);
 }

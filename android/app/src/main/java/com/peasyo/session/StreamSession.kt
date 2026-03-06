@@ -438,6 +438,7 @@ class StreamSession(
 										gamepadManager.vibrate(BT_RUMBLE_DURATION_MS, 0, 0, 0, 0, rumbleIntensity)
 									}
 								}
+//								Log.d("StreamView", "Rumble with action: $event")
 							} else {
 								vibrateScope.launch {
 									vibrateMutex.withLock {
