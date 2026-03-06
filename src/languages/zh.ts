@@ -122,6 +122,13 @@ export default {
       '强制PeaSyo的USB驱动接管所有受支持的Xbox/DualSense手柄，如你正在使用DualSense5控制器，开启此选项后可获得原生触觉反馈',
     bind_usb_device_tips:
       '该设置只有支持xinput或dualsense协议的手柄有线连接(OTG)才生效',
+    bind_usb_device_guide_entry: '有线OTG控制器使用说明👆',
+    bind_usb_device_guide_title: '以下情况建议使用有线USB-OTG连接你的控制器：',
+    bind_usb_device_guide_case1:
+      '1. 想体验原生DualSense5触觉反馈，需要开启「覆盖安卓驱动」设置，之后连接上DualSense5再进入串流，即可体验原生触觉反馈。',
+    bind_usb_device_guide_case2:
+      '2. 当前安卓设备不支持控制器振动，如你的控制器是Xbox协议或DualSense协议设备，同样需要开启「覆盖安卓驱动」设置，之后连接上控制器再进入串流。',
+    bind_usb_device_guide_action: '开启「覆盖安卓驱动」',
     'Force Nexus/PS button to simulate touchpad': '强制西瓜键/音量键模拟触摸板',
     bind_usb_device_force_touchpad_desc:
       '打开覆盖安卓手柄支持后，强制将xbox手柄西瓜键或DS手柄音量键模拟为触摸板点击',

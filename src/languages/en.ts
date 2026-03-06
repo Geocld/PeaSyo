@@ -118,6 +118,14 @@ export default {
       "Force PeaSyo's USB driver to take over all supported Xbox/DualSense controllers. If you are using a DualSense 5 controller, enabling this option will provide native haptic feedback.",
     bind_usb_device_tips:
       'This setting only takes effect for controllers that support XInput or DualSense protocol when connected via wired (OTG).',
+    bind_usb_device_guide_entry: 'Wired OTG Controller Guide 👆',
+    bind_usb_device_guide_title:
+      'A wired USB-OTG controller connection is recommended in the following cases:',
+    bind_usb_device_guide_case1:
+      '1. To experience native DualSense 5 haptics, enable "Override native gamepad support", connect your DualSense 5, then start streaming.',
+    bind_usb_device_guide_case2:
+      '2. If your Android device does not support controller vibration and your controller uses Xbox or DualSense protocol, also enable "Override native gamepad support", connect the controller, then start streaming.',
+    bind_usb_device_guide_action: 'Enable "Override native gamepad support"',
     'Force Nexus/PS button to simulate touchpad':
       'Force Nexus/Volume button to simulate touchpad',
     bind_usb_device_force_touchpad_desc:

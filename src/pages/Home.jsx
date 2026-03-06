@@ -16,6 +16,8 @@ import {
   Dialog,
   TextInput,
   IconButton,
+  Modal,
+  Card,
 } from 'react-native-paper';
 import RNRestart from 'react-native-restart';
 import CookieManager from '@react-native-cookies/cookies';
@@ -55,6 +57,7 @@ function HomeScreen({navigation, route}) {
   const [showRemoteModal, setShowRemoteModal] = useState(false);
   const [showWakeModal, setShowWakeModal] = useState(false);
   const [isConnected, setIsConnected] = React.useState(true);
+  const [showGuide, setShowGuide] = useState(false);
 
   const [isLogined, setIsLogined] = useState(false);
   const [consoles, setConsoles] = useState([]);
@@ -261,6 +264,46 @@ function HomeScreen({navigation, route}) {
     );
   };
 
+  const renderGuide = () => {
+    return (
+      <Portal>
+        <Modal
+          visible={showGuide}
+          onDismiss={() => {
+            setShowGuide(false);
+          }}
+          contentContainerStyle={{marginLeft: '10%', marginRight: '10%'}}>
+          <Card>
+            <Card.Content>
+              <Text variant="bodyMedium">
+                {t('bind_usb_device_guide_title')}
+              </Text>
+              <Text variant="bodyMedium" style={{marginTop: 10}}>
+                {t('bind_usb_device_guide_case1')}
+              </Text>
+
+              <Text variant="bodyMedium" style={{marginTop: 10}}>
+                {t('bind_usb_device_guide_case2')}
+              </Text>
+
+              <Button
+                mode="contained"
+                style={{marginTop: 10}}
+                onPress={() => {
+                  navigation.navigate('SettingDetail', {
+                    id: 'bind_usb_device',
+                  });
+                  setShowGuide(false);
+                }}>
+                {t('bind_usb_device_guide_action')}
+              </Button>
+            </Card.Content>
+          </Card>
+        </Modal>
+      </Portal>
+    );
+  };
+
   const renderContent = () => {
     if (!isLogined) {
       return <View style={styles.centerContainer}>{renderLogin()}</View>;
@@ -269,6 +312,14 @@ function HomeScreen({navigation, route}) {
     } else if (consoles.length) {
       return (
         <>
+          <Text
+            variant="labelMedium"
+            style={styles.guideText}
+            onPress={() => {
+              setShowGuide(true);
+            }}>
+            {t('bind_usb_device_guide_entry')}
+          </Text>
           <FlatList
             data={consoles}
             numColumns={numColumns}
@@ -720,6 +771,8 @@ function HomeScreen({navigation, route}) {
       />
 
       {renderContent()}
+
+      {renderGuide()}
     </>
   );
 }
@@ -758,6 +811,13 @@ const styles = StyleSheet.create({
   listItemV: {
     width: '50%',
     justifyContent: 'center',
+  },
+  guideText: {
+    marginTop: 10,
+    textAlign: 'center',
+    color: '#DF6069',
+    paddingTop: 5,
+    paddingBottom: 10,
   },
 });
 

@@ -119,6 +119,14 @@ export default {
       'Forzar que el controlador USB de PeaSyo tome el control de todos los mandos Xbox/DualSense compatibles. Si estás usando un controlador DualSense 5, habilitar esta opción proporcionará retroalimentación háptica nativa.',
     bind_usb_device_tips:
       'Esta configuración solo se aplica a controladores que admiten el protocolo XInput o DualSense cuando están conectados por cable (OTG).',
+    bind_usb_device_guide_entry: 'Guía de controlador OTG por cable 👆',
+    bind_usb_device_guide_title:
+      'Se recomienda usar una conexión por cable USB-OTG del controlador en los siguientes casos:',
+    bind_usb_device_guide_case1:
+      '1. Para experimentar la retroalimentación háptica nativa de DualSense 5, habilita "Anular soporte nativo del gamepad", conecta tu DualSense 5 y luego inicia la transmisión.',
+    bind_usb_device_guide_case2:
+      '2. Si tu dispositivo Android no admite vibración del controlador y tu mando usa protocolo Xbox o DualSense, también debes habilitar "Anular soporte nativo del gamepad", conectar el mando y luego iniciar la transmisión.',
+    bind_usb_device_guide_action: 'Habilitar "Anular soporte nativo del gamepad"',
     'Force Nexus/PS button to simulate touchpad':
       'Forzar el botón Nexus/Volumen para simular el panel táctil',
     bind_usb_device_force_touchpad_desc:
