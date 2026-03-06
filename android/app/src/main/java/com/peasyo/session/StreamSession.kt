@@ -28,6 +28,14 @@ import com.peasyo.lib.RumbleEvent
 import com.peasyo.lib.Session
 import com.peasyo.lib.TriggerRumbleEvent
 import com.peasyo.log.LogManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.delay
+
+import kotlinx.coroutines.sync.withLock
 
 import java.lang.Math.abs
 
@@ -66,9 +74,11 @@ class StreamSession(
 	private var surfaceTexture: SurfaceTexture? = null
 	private var surface: Surface? = null
 
+	private val vibrateMutex = Mutex()
+	private val vibrateScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
 	private val RUMBLE_MIN_LEVEL = 10
-	private val BT_RUMBLE_DURATION_MS = 20
-	private val BT_ZERO_RESEND_DELAY_MS = 10L
+	private val BT_RUMBLE_DURATION_MS = 15
 
 	private val DSCONTROLLER_NAME = "DualSenseController"
 
@@ -103,33 +113,12 @@ class StreamSession(
 
 		if (usbMode) {
 			if (controllerState.leftX > 1 || controllerState.leftY > 1 || controllerState.rightX > 1 || controllerState.rightY > 1) {
-				val leftx = if (controllerState.leftX > 1) {
-					(controllerState.leftX.toInt() and 0xFFFF).toFloat() / 65535f
-				} else {
-					0f
-				}
-				val lefty = if (controllerState.leftY > 1) {
-					(controllerState.leftY.toInt() and 0xFFFF).toFloat() / 65535f
-				} else {
-					0f
-				}
-				val rightx = if (controllerState.rightX > 1) {
-					(controllerState.rightX.toInt() and 0xFFFF).toFloat() / 65535f
-				} else {
-					0f
-				}
-				val righty = if (controllerState.rightY > 1) {
-					(controllerState.rightY.toInt() and 0xFFFF).toFloat() / 65535f
-				} else {
-					0f
-				}
-
-				if (controllerState.buttons > 0u || controllerState.l2State > 25U || controllerState.r2State > 25U || leftx > 0.2 || lefty > 0.2 || rightx > 0.2 || righty > 0.2) {
+				if (controllerState.buttons > 0u || controllerState.l2State > 25U || controllerState.r2State > 25U) {
 					hapticsState.lastActionTime = System.currentTimeMillis()
 				}
 			}
 		} else {
-			if (controllerState.buttons > 0u || controllerState.l2State > 25U || controllerState.r2State > 25U || controllerState.leftX > 0.2 || controllerState.leftY > 0.2 || controllerState.rightX > 0.2 || controllerState.rightY > 0.2) {
+			if (controllerState.buttons > 0u || controllerState.l2State > 25U || controllerState.r2State > 25U) {
 				hapticsState.lastActionTime = System.currentTimeMillis()
 			}
 		}
@@ -396,6 +385,8 @@ class StreamSession(
 					val currentTime = System.currentTimeMillis()
 					var left = event.left.coerceIn(0, 255)
 					var right = event.right.coerceIn(0, 255)
+					var peakl = event.peakl.coerceIn(0, 255)
+					var peakr = event.peakr.coerceIn(0, 255)
 
 					if (left < RUMBLE_MIN_LEVEL) {
 						left = 0
@@ -429,29 +420,37 @@ class StreamSession(
 							val outRight = (right * OUTPUT_MAX / INPUT_MAX).coerceIn(0, OUTPUT_MAX)
 							getMainActivity()?.handleRumble(outLeft.toShort(), outRight.toShort())
 						}
-						} else {
+					}
+					else {
 							val gamepadManager = Gamepad(reactContext)
 							val btLow = left.coerceIn(0, 255)
 							val btHigh = right.coerceIn(0, 255)
 							btZeroResendRunnable?.let { btRumbleHandler.removeCallbacks(it) }
 							btZeroResendRunnable = null
-							gamepadManager.vibrate(BT_RUMBLE_DURATION_MS, btHigh, btLow, 0, 0, rumbleIntensity)
 
-							// Recall vibrate zero
-							if (btLow == 0 && btHigh == 0) {
-								val resendStop = Runnable {
-									if (hapticsState.lastLeft == 0 && hapticsState.lastRight == 0) {
-										Gamepad(reactContext).vibrate(BT_RUMBLE_DURATION_MS, 0, 0, 0, 0, rumbleIntensity)
+							val diff = currentTime - hapticsState.lastActionTime
+							// Rumble with click action
+							if ((diff < 1500L) && (left == 0 && right == 0) && (peakl > RUMBLE_MIN_LEVEL || peakr > RUMBLE_MIN_LEVEL)) {
+								vibrateScope.launch {
+									vibrateMutex.withLock {
+										gamepadManager.vibrate(BT_RUMBLE_DURATION_MS, peakr, peakl, 0, 0, rumbleIntensity)
+										delay(20)
+										gamepadManager.vibrate(BT_RUMBLE_DURATION_MS, 0, 0, 0, 0, rumbleIntensity)
 									}
-									btZeroResendRunnable = null
 								}
-								btZeroResendRunnable = resendStop
-								btRumbleHandler.postDelayed(resendStop, BT_ZERO_RESEND_DELAY_MS)
+							} else {
+								vibrateScope.launch {
+									vibrateMutex.withLock {
+										gamepadManager.vibrate(BT_RUMBLE_DURATION_MS, btHigh, btLow, 0, 0, rumbleIntensity)
+										delay(20)
+										gamepadManager.vibrate(BT_RUMBLE_DURATION_MS, 0, 0, 0, 0, rumbleIntensity)
+									}
+								}
 							}
 						}
 					}
 				}
-			is HapticAudioEvent -> {
+			is HapticAudioEvent -> { // 触觉反馈
 				// 仅在 USB DualSense 模式下转发原始触觉音频
 				if (usbMode && usbController == DSCONTROLLER_NAME) {
 					getMainActivity()?.handleHapticAudio(

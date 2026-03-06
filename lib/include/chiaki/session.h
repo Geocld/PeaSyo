@@ -136,6 +136,8 @@ typedef struct chiaki_rumble_event_t
     uint8_t unknown;
     uint8_t left; // low-frequency
     uint8_t right; // high-frequency
+    int16_t peakl; // raw left-channel peak from haptic PCM, 0 when unavailable
+    int16_t peakr; // raw right-channel peak from haptic PCM, 0 when unavailable
 } ChiakiRumbleEvent;
 
 typedef struct chiaki_trigger_effects_event_t

@@ -294,5 +294,7 @@ static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_
     event.rumble.unknown = buf[0];
     event.rumble.left = left8;
     event.rumble.right = right8;
+    event.rumble.peakl = peakl >> 8;
+    event.rumble.peakr = peakr >> 8;
     session->event_cb(&event, session->event_cb_user);
 }

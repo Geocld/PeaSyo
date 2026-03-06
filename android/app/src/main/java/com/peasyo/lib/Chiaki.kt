@@ -385,7 +385,12 @@ object ConnectedEvent: Event()
 object HolepunchFinishedEvent: Event()
 data class LoginPinRequestEvent(val pinIncorrect: Boolean): Event()
 data class QuitEvent(val reason: QuitReason, val reasonString: String?): Event()
-data class RumbleEvent(val left: Int, val right: Int): Event()
+data class RumbleEvent(
+	val left: Int,
+	val right: Int,
+	val peakl: Int = 0,
+	val peakr: Int = 0
+): Event()
 // 左右触发器参数均为完整 10 字节数据
 data class TriggerRumbleEvent(
 	val typeLeft: Int,
@@ -463,9 +468,9 @@ class Session(connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean)
 
 	// 接收振动反馈
 	// 该方法在android/app/src/main/cpp/chiaki-jni.c调用
-	private fun eventRumble(left: Int, right: Int)
+	private fun eventRumble(left: Int, right: Int, peakl: Int, peakr: Int)
 	{
-		event(RumbleEvent(left, right))
+		event(RumbleEvent(left, right, peakl, peakr))
 	}
 
 	// Adaptive trigger

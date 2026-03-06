@@ -233,7 +233,9 @@ static void android_chiaki_event_cb(ChiakiEvent *event, void *user)
             E->CallVoidMethod(env, session->java_session,
                               session->java_session_event_rumble_meth,
                               (jint)event->rumble.left,
-                              (jint)event->rumble.right);
+                              (jint)event->rumble.right,
+                              (jint)event->rumble.peakl,
+                              (jint)event->rumble.peakr);
             break;
         case CHIAKI_EVENT_TRIGGER_EFFECTS: // Trigger Rumble
         {
@@ -713,7 +715,7 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
     session->java_session_event_holepunch_meth = E->GetMethodID(env, session->java_session_class, "eventHolepunchFinish", "()V");
     session->java_session_event_login_pin_request_meth = E->GetMethodID(env, session->java_session_class, "eventLoginPinRequest", "(Z)V");
     session->java_session_event_quit_meth = E->GetMethodID(env, session->java_session_class, "eventQuit", "(ILjava/lang/String;)V");
-    session->java_session_event_rumble_meth = E->GetMethodID(env, session->java_session_class, "eventRumble", "(II)V");
+    session->java_session_event_rumble_meth = E->GetMethodID(env, session->java_session_class, "eventRumble", "(IIII)V");
     // eventRumbleTigger(int, byte[], int, byte[])
     session->java_session_event_rumble_tigger_meth = E->GetMethodID(env, session->java_session_class, "eventRumbleTigger", "(I[BI[B)V");
     session->java_session_event_haptic_audio_meth = E->GetMethodID(env, session->java_session_class, "eventHapticAudio", "([B)V");

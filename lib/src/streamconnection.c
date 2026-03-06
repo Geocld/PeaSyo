@@ -512,6 +512,8 @@ static void stream_connection_takion_data_rumble(ChiakiStreamConnection *stream_
 	event.rumble.unknown = buf[0];
 	event.rumble.left = buf[1];
 	event.rumble.right = buf[2];
+	event.rumble.peakl = 0;
+	event.rumble.peakr = 0;
 	chiaki_session_send_event(stream_connection->session, &event);
 }
 
