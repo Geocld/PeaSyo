@@ -20,6 +20,10 @@ static void android_chiaki_audio_decoder_frame(uint8_t *buf, size_t buf_size, vo
 static void android_chiaki_audio_haptics_decoder_header(ChiakiAudioHeader *header, void *user);
 static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_size, void *user);
 
+// haptics->rumble 通道平衡增益（用于修正左右体感偏移）
+static const float HAPTIC_RUMBLE_LEFT_GAIN = 0.80f;
+static const float HAPTIC_RUMBLE_RIGHT_GAIN = 1.15f;
+
 ChiakiErrorCode android_chiaki_audio_decoder_init(AndroidChiakiAudioDecoder *decoder, ChiakiLog *log)
 {
 	decoder->log = log;
@@ -225,6 +229,45 @@ static uint64_t get_current_time_ms() {
     return (uint64_t)(tv.tv_sec) * 1000 + (uint64_t)(tv.tv_usec) / 1000;
 }
 
+/*
+ * 通道强度估算：
+ * 1) 取每通道正向峰值（避免均值抹平瞬态）
+ * 2) 20*log10(peak / 0.6)
+ * 3) 低于阈值 0x50 直接视为 0
+ */
+static uint8_t haptic_level_from_peak(int16_t peak)
+{
+    if (peak <= 0) {
+        return 0;
+    }
+
+    double db = 20.0 * log10((double)peak / 0.6);
+    if (!isfinite(db) || db <= 0.0) {
+        return 0;
+    }
+
+    int level = (int)db;
+    if (level <= 0x50) {
+        return 0;
+    }
+    if (level > 0xFF) {
+        level = 0xFF;
+    }
+    return (uint8_t)level;
+}
+
+static uint8_t apply_channel_gain_u8(uint8_t value, float gain)
+{
+    int scaled = (int)((double)value * (double)gain + 0.5);
+    if (scaled < 0) {
+        return 0;
+    }
+    if (scaled > 0xFF) {
+        return 0xFF;
+    }
+    return (uint8_t)scaled;
+}
+
 static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_size, void *user) {
     if (buf_size < 4) {
         return;
@@ -239,7 +282,7 @@ static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_
     session->event_cb(&haptic_event, session->event_cb_user);
 
     int16_t amplitudel = 0, amplituder = 0;
-    int32_t suml = 0, sumr = 0;
+    int16_t peakl = 0, peakr = 0;
     const size_t sample_size = 2 * sizeof(int16_t); // stereo samples
 
     size_t buf_count = buf_size / sample_size;
@@ -251,15 +294,18 @@ static void android_chiaki_audio_haptics_decoder_frame(uint8_t *buf, size_t buf_
 
         memcpy(&amplitudel, buf + cur, sizeof(int16_t));
         memcpy(&amplituder, buf + cur + sizeof(int16_t), sizeof(int16_t));
-        suml += amplitudel;
-        sumr += amplituder;
+        // 取正向峰值，避免均值导致瞬态被抵消
+        if (amplitudel > peakl) {
+            peakl = amplitudel;
+        }
+        if (amplituder > peakr) {
+            peakr = amplituder;
+        }
     }
-    uint16_t left = 0, right = 0;
-    left = suml / buf_count;
-    right = sumr / buf_count;
-
-    uint16_t left8 = left >> 8;
-    uint16_t right8 = right >> 8;
+    uint8_t left8 = haptic_level_from_peak(peakl);
+    uint8_t right8 = haptic_level_from_peak(peakr);
+    left8 = apply_channel_gain_u8(left8, HAPTIC_RUMBLE_LEFT_GAIN);
+    right8 = apply_channel_gain_u8(right8, HAPTIC_RUMBLE_RIGHT_GAIN);
 
     // 2) 同时保留 rumble 降级事件，给非 DualSense 设备继续使用
     ChiakiEvent event = { 0 };
