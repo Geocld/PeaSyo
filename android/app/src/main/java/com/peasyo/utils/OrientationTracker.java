@@ -5,7 +5,7 @@ public class OrientationTracker {
     private static final float SIN_1_4_PI = 0.7071067811865475f;
     private static final float SIN_NEG_1_4_PI = -0.7071067811865475f;
     private static final float COS_1_4_PI = 0.7071067811865476f;
-    private static final float COS_NEG_1_4_PI = -0.7071067811865476f;
+    private static final float COS_NEG_1_4_PI = 0.7071067811865476f;
 
     private static final int WARMUP_SAMPLES_COUNT = 30;
     private static final float BETA_WARMUP = 20.0f;
