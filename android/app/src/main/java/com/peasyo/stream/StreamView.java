@@ -818,11 +818,11 @@ public class StreamView extends FrameLayout {
         controllerState.setGyroY(-tracker.getGyroY());
         controllerState.setGyroZ(-tracker.getGyroZ());
 
-        // FIXME: pin direction is incorrect
+        // Keep tracker quaternion axis/sign convention to avoid yaw/pitch inversion.
         controllerState.setOrientX(orientation[1]);
         controllerState.setOrientY(orientation[2]);
-        controllerState.setOrientZ(-orientation[3]);
-        controllerState.setOrientW(-orientation[0]);
+        controllerState.setOrientZ(orientation[3]);
+        controllerState.setOrientW(orientation[0]);
 
         ControllerTouch[] touches = new ControllerTouch[] {
                 new ControllerTouch((short)touch0x, (short)touch0y, (byte)touch0id),

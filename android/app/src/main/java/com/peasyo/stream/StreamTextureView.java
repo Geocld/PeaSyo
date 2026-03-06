@@ -806,11 +806,11 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
         controllerState.setGyroY(-tracker.getGyroY());
         controllerState.setGyroZ(-tracker.getGyroZ());
 
-        // Keep pitch direction, invert yaw/roll by flipping quaternion X/Z signs.
+        // Keep tracker quaternion axis/sign convention to avoid yaw/pitch inversion.
         controllerState.setOrientX(orientation[1]);
         controllerState.setOrientY(orientation[2]);
-        controllerState.setOrientZ(-orientation[3]);
-        controllerState.setOrientW(-orientation[0]);
+        controllerState.setOrientZ(orientation[3]);
+        controllerState.setOrientW(orientation[0]);
 
         ControllerTouch[] touches = new ControllerTouch[] {
                 new ControllerTouch((short)touch0x, (short)touch0y, (byte)touch0id),
