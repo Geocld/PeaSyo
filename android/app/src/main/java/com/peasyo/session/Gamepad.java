@@ -167,7 +167,8 @@ public class Gamepad {
     }
 
     private int clampVibration(int value) {
-        return Math.max(1, Math.min(255, value));
+        // 保留 0 值，允许单侧完全停振，避免残余振动。
+        return Math.max(0, Math.min(255, value));
     }
 
     @ReactMethod
