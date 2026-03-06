@@ -80,8 +80,11 @@ class StreamSession(
 
 	private val STABLE_THRESHOLD = 5         // 判定为稳定需要的次数
 	private val VALUE_CHANGE_THRESHOLD = 5   // 数值变化阈值(百分比)
-	private val EVENT_COOLDOWN_MS = 50L      // 事件发送冷却时间(毫秒)
+	private val EVENT_COOLDOWN_MS = 16L      // 事件发送冷却时间(毫秒)
 	private val CHANNEL_DIFF_THRESHOLD = 10
+	// DualSense 直下发 rumble 通道增益（用于修正左右体感偏移）
+	private val DS_RUMBLE_HEAVY_GAIN = 0.06f
+	private val DS_RUMBLE_SOFT_GAIN = 0.70f
 
 	private val DSCONTROLLER_NAME = "DualSenseController"
 
@@ -283,6 +286,77 @@ class StreamSession(
 		data.forEach { pushInt(it.toInt() and 0xFF) }
 	}
 
+	private fun normalizeTriggerData10(data: ByteArray): ByteArray {
+		// 触发器参数固定按 10 字节存储，不足补 0，超出截断
+		val out = ByteArray(10)
+		val size = minOf(data.size, out.size)
+		System.arraycopy(data, 0, out, 0, size)
+		return out
+	}
+
+	private fun updateDualSenseTriggerCache(
+		leftType: Int,
+		leftData: ByteArray,
+		rightType: Int,
+		rightData: ByteArray,
+	) {
+		// 更新缓存，供 rumble 直下发时复用
+		synchronized(dsOutputLock) {
+			dsLeftTriggerType = leftType and 0xFF
+			dsRightTriggerType = rightType and 0xFF
+			dsLeftTriggerData = normalizeTriggerData10(leftData)
+			dsRightTriggerData = normalizeTriggerData10(rightData)
+		}
+	}
+
+	private fun buildDualSenseOutputReport(rumbleHeavy: Int, rumbleSoft: Int): ByteArray {
+		val leftType: Int
+		val rightType: Int
+		val leftData: ByteArray
+		val rightData: ByteArray
+
+		synchronized(dsOutputLock) {
+			leftType = dsLeftTriggerType
+			rightType = dsRightTriggerType
+			leftData = dsLeftTriggerData.copyOf()
+			rightData = dsRightTriggerData.copyOf()
+		}
+
+		// 组装 48 字节 DualSense 输出报告（ID=0x02）
+		return byteArrayOf(
+			0x02,
+			0xFF.toByte(),
+			0xF7.toByte(),
+			rumbleSoft.coerceIn(0, 255).toByte(),
+			rumbleHeavy.coerceIn(0, 255).toByte(),
+			0x00, 0x00, 0x00, 0x00,
+			0x00,
+			0x10,
+			(rightType and 0xFF).toByte(),
+			rightData[0], rightData[1], rightData[2], rightData[3], rightData[4],
+			rightData[5], rightData[6], rightData[7], rightData[8], rightData[9],
+			(leftType and 0xFF).toByte(),
+			leftData[0], leftData[1], leftData[2], leftData[3], leftData[4],
+			leftData[5], leftData[6], leftData[7], leftData[8], leftData[9],
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x04, // valid_flag2
+			0x02,
+			0x00,
+			0x02, // lightbar_setup
+			0x00, // player_light
+			0x00, // player_led
+			0x00, 0x00, 0x00 // RGB
+		)
+	}
+
+	private fun sendDualSenseRumbleDirect(left: Int, right: Int) {
+		val heavy = (left * DS_RUMBLE_HEAVY_GAIN).toInt().coerceIn(0, 255)
+		val soft = (right * DS_RUMBLE_SOFT_GAIN).toInt().coerceIn(0, 255)
+		val report = buildDualSenseOutputReport(heavy, soft)
+		// 直接走原生链路下发，避免经过 JS 事件回环
+		getMainActivity()?.handleSendCommand(report)
+	}
+
 	private fun eventCallback(event: Event)
 	{
 		when(event)
@@ -418,67 +492,21 @@ class StreamSession(
 
 //						Log.d("StreamView", "RumbleEvent: $event")
 
-						if (shouldVibrate) {
-							if (usbMode) {
-								if (usbController == DSCONTROLLER_NAME) {
-									val params = Arguments.createMap().apply {
-										putInt("left", left)
-										putInt("right", right)
-									}
-									val params0 = Arguments.createMap().apply {
-										putInt("left", 0)
-										putInt("right", 0)
-									}
-
-									if (isRuningVib) {
-										return
-									}
-									vibrateScope.launch {
-										vibrateMutex.withLock {
-											isRuningVib = true
-											sendEvent("dsRumble", params)
-											delay(30)
-											sendEvent("dsRumble", params0)
-											delay(5)
-											isRuningVib = false
-										}
-									}
-								} else {
-									val INPUT_MAX = 256
-									val OUTPUT_MAX = 32767
-
-									val left = (event.left * OUTPUT_MAX / INPUT_MAX).coerceAtMost(OUTPUT_MAX)
-									val right = (event.right * OUTPUT_MAX / INPUT_MAX).coerceAtMost(OUTPUT_MAX)
-
-									getMainActivity()?.handleRumble(left.toShort(), right.toShort())
-
-									vibrateScope.launch {
-										vibrateMutex.withLock {
-											getMainActivity()?.handleRumble(left.toShort(), right.toShort())
-											delay(30)
-											getMainActivity()?.handleRumble(0, 0)
-										}
-									}
-								}
+						if (usbMode) {
+							if (usbController == DSCONTROLLER_NAME) {
+								// 直接走原生链路，避免 JS 事件回环和人为 delay
+								sendDualSenseRumbleDirect(left, right)
 							} else {
-								var gamepadManager = Gamepad(reactContext)
-								if(left == 0 || right == 0) {
-									gamepadManager.vibrate(50, left, right, 0, 0, rumbleIntensity)
-								} else {
-//									val params = Arguments.createMap().apply {
-//										putInt("left", left)
-//										putInt("right", right)
-//									}
-//									sendEvent("rumble", params)
-									vibrateScope.launch {
-										vibrateMutex.withLock {
-											gamepadManager.vibrate(50, left, right, 0, 0, rumbleIntensity)
-											delay(50)
-											gamepadManager.vibrate(0, 0, 0, 0, 0, rumbleIntensity)
-										}
-									}
-								}
+								val INPUT_MAX = 256
+								val OUTPUT_MAX = 32767
+								val outLeft = (left * OUTPUT_MAX / INPUT_MAX).coerceIn(0, OUTPUT_MAX)
+								val outRight = (right * OUTPUT_MAX / INPUT_MAX).coerceIn(0, OUTPUT_MAX)
+								getMainActivity()?.handleRumble(outLeft.toShort(), outRight.toShort())
 							}
+						} else {
+							// 非 USB 路径同样即时下发；left/right 为 0 时会触发停止
+							val gamepadManager = Gamepad(reactContext)
+							gamepadManager.vibrate(20, left, right, 0, 0, rumbleIntensity)
 						}
 					}
 				}
