@@ -819,10 +819,10 @@ public class StreamView extends FrameLayout {
         controllerState.setGyroZ(-tracker.getGyroZ());
 
         // Set quaternion orientation
-        controllerState.setOrientW(orientation[0]);
-        controllerState.setOrientX(orientation[1]);
-        controllerState.setOrientY(orientation[2]);
-        controllerState.setOrientZ(orientation[3]);
+        controllerState.setOrientW(orientation[1]);
+        controllerState.setOrientX(orientation[2]);
+        controllerState.setOrientY(orientation[3]);
+        controllerState.setOrientZ(orientation[0]);
 
         ControllerTouch[] touches = new ControllerTouch[] {
                 new ControllerTouch((short)touch0x, (short)touch0y, (byte)touch0id),
