@@ -439,7 +439,8 @@ class StreamSession(
 						val gamepadManager = Gamepad(reactContext)
 						val btLow = (left * BT_RUMBLE_LOW_GAIN).toInt().coerceIn(0, 255)
 						val btHigh = (right * BT_RUMBLE_HIGH_GAIN).toInt().coerceIn(0, 255)
-						gamepadManager.vibrate(BT_RUMBLE_DURATION_MS, btLow, btHigh, 0, 0, rumbleIntensity)
+						// 蓝牙双马达通道按当前映射顺序下发，避免左右体感错位。
+						gamepadManager.vibrate(BT_RUMBLE_DURATION_MS, btHigh, btLow, 0, 0, rumbleIntensity)
 					}
 				}
 			}
