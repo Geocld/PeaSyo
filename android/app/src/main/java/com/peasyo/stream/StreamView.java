@@ -797,35 +797,32 @@ public class StreamView extends FrameLayout {
         float gyroY = gyroy * DUALSENSE_GYRO_SCALE;
         float gyroZ = gyroz * DUALSENSE_GYRO_SCALE;
 
-        // Check if there's any motion (threshold: 0.01 rad/s ≈ 0.57 degrees/s)
-        if (Math.abs(gyroX) > 0.01f || Math.abs(gyroY) > 0.01f || Math.abs(gyroZ) > 0.01f) {
-            // Set gyro data (negate to match PS5 coordinate system)
-            controllerState.setGyroX(-gyroX);
-            controllerState.setGyroY(-gyroY);
-            controllerState.setGyroZ(-gyroZ);
+        // Set accel data (always keep newest values)
+        controllerState.setAccelX(accelX);
+        controllerState.setAccelY(accelY);
+        controllerState.setAccelZ(accelZ);
 
-            // Set accel data
-            controllerState.setAccelX(accelX);
-            controllerState.setAccelY(accelY);
-            controllerState.setAccelZ(accelZ);
+        // Use OrientationTracker for sensor fusion and gyro denoise
+        OrientationTracker.AccelNewZero accelZero = new OrientationTracker.AccelNewZero();
+        accelZero.setInactive(true);
 
-            // Use OrientationTracker for sensor fusion
-            OrientationTracker.AccelNewZero accelZero = new OrientationTracker.AccelNewZero();
-            accelZero.setInactive(true);
+        float[] orientation = tracker.update(
+            gyroX, gyroY, gyroZ,
+            accelX, accelY, accelZ,
+            accelZero, true,
+            System.nanoTime() / 1000
+        );
 
-            float[] orientation = tracker.update(
-                gyroX, gyroY, gyroZ,
-                accelX, accelY, accelZ,
-                accelZero, true,
-                System.nanoTime() / 1000
-            );
+        // Set filtered gyro data (negate to match PS5 coordinate system)
+        controllerState.setGyroX(-tracker.getGyroX());
+        controllerState.setGyroY(-tracker.getGyroY());
+        controllerState.setGyroZ(-tracker.getGyroZ());
 
-            // Set quaternion orientation
-            controllerState.setOrientW(orientation[0]);
-            controllerState.setOrientX(orientation[1]);
-            controllerState.setOrientY(orientation[2]);
-            controllerState.setOrientZ(orientation[3]);
-        }
+        // Set quaternion orientation
+        controllerState.setOrientW(orientation[0]);
+        controllerState.setOrientX(orientation[1]);
+        controllerState.setOrientY(orientation[2]);
+        controllerState.setOrientZ(orientation[3]);
 
         ControllerTouch[] touches = new ControllerTouch[] {
                 new ControllerTouch((short)touch0x, (short)touch0y, (byte)touch0id),

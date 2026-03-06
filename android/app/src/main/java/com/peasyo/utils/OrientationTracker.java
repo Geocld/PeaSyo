@@ -15,9 +15,28 @@ public class OrientationTracker {
     private static final float FUZZ_FILTER_PREV_WEIGHT = 0.75f;
     private static final float FUZZ_FILTER_PREV_WEIGHT2x = 0.6f;
 
+    private static final float MAX_DELTA_SEC = 0.05f;
+    private static final float GYRO_LPF_ALPHA = 0.35f;
+    private static final float GYRO_MOVE_START = 0.22f;
+    private static final float GYRO_MOVE_STOP = 0.10f;
+    private static final int GYRO_DIRECTION_CONFIRM_SAMPLES = 3;
+    private static final int GYRO_STOP_CONFIRM_SAMPLES = 3;
+    private static final int BIAS_STABLE_SAMPLES = 5;
+    private static final float BIAS_CAPTURE_THRESHOLD = 0.45f;
+    private static final float BIAS_ALPHA = 0.02f;
+    private static final float BIAS_LIMIT = 0.8f;
+    private static final float ACCEL_STILL_MIN_G = 0.85f;
+    private static final float ACCEL_STILL_MAX_G = 1.15f;
+
     private float accelX, accelY, accelZ;
     private float gyroX, gyroY, gyroZ;
+    private float gyroRawLpfX, gyroRawLpfY, gyroRawLpfZ;
+    private float gyroBiasX, gyroBiasY, gyroBiasZ;
     private Orientation orient;
+    private final AxisMotionGate gyroXGate;
+    private final AxisMotionGate gyroYGate;
+    private final AxisMotionGate gyroZGate;
+    private int stableSampleCount;
     private long timestamp;
     private int sampleIndex;
 
@@ -26,16 +45,19 @@ public class OrientationTracker {
         accelY = 1.0f;
         accelZ = 0.0f;
         gyroX = gyroY = gyroZ = 0.0f;
+        gyroRawLpfX = gyroRawLpfY = gyroRawLpfZ = 0.0f;
+        gyroBiasX = gyroBiasY = gyroBiasZ = 0.0f;
         orient = new Orientation();
+        gyroXGate = new AxisMotionGate();
+        gyroYGate = new AxisMotionGate();
+        gyroZGate = new AxisMotionGate();
+        stableSampleCount = 0;
         timestamp = 0;
         sampleIndex = 0;
     }
 
     public float[] update(float gx, float gy, float gz, float ax, float ay, float az,
                           AccelNewZero accelZero, boolean accelZeroApplied, long timestampUs) {
-        gyroX = gx;
-        gyroY = gy;
-        gyroZ = gz;
         if (!accelZeroApplied) {
             ax -= accelZero.accelX;
             ay -= accelZero.accelY;
@@ -46,6 +68,9 @@ public class OrientationTracker {
         accelZ = az;
         sampleIndex++;
         if (sampleIndex <= 1) {
+            gyroRawLpfX = gx;
+            gyroRawLpfY = gy;
+            gyroRawLpfZ = gz;
             timestamp = timestampUs;
             return new float[]{orient.w, orient.x, orient.y, orient.z};
         }
@@ -55,9 +80,20 @@ public class OrientationTracker {
         }
         deltaUs -= timestamp;
         timestamp = timestampUs;
-        orient.update(gx, gy, gz, ax, ay, az,
+
+        float deltaSec = (float) deltaUs / 1000000.0f;
+        if (deltaSec > MAX_DELTA_SEC) {
+            deltaSec = MAX_DELTA_SEC;
+        }
+        if (deltaSec <= 0.0f) {
+            deltaSec = 0.001f;
+        }
+
+        applyGyroFilter(gx, gy, gz, ax, ay, az);
+
+        orient.update(gyroX, gyroY, gyroZ, ax, ay, az,
                 sampleIndex <WARMUP_SAMPLES_COUNT ? BETA_WARMUP : BETA_DEFAULT,
-                (float) deltaUs / 1000000.0f);
+                deltaSec);
 
         float orientW = COS_NEG_1_4_PI * orient.w - SIN_NEG_1_4_PI * orient.x;
         float orientX = COS_NEG_1_4_PI * orient.x + SIN_NEG_1_4_PI * orient.w;
@@ -65,6 +101,158 @@ public class OrientationTracker {
         float orientZ = COS_NEG_1_4_PI * orient.z + SIN_NEG_1_4_PI * orient.y;
 
         return new float[]{orientW, orientX, orientY, orientZ};
+    }
+
+    public float getGyroX() {
+        return gyroX;
+    }
+
+    public float getGyroY() {
+        return gyroY;
+    }
+
+    public float getGyroZ() {
+        return gyroZ;
+    }
+
+    private void applyGyroFilter(float gx, float gy, float gz, float ax, float ay, float az) {
+        gyroRawLpfX += GYRO_LPF_ALPHA * (gx - gyroRawLpfX);
+        gyroRawLpfY += GYRO_LPF_ALPHA * (gy - gyroRawLpfY);
+        gyroRawLpfZ += GYRO_LPF_ALPHA * (gz - gyroRawLpfZ);
+
+        boolean accelStable = isAccelStable(ax, ay, az);
+        boolean nearBias = Math.abs(gyroRawLpfX - gyroBiasX) < BIAS_CAPTURE_THRESHOLD
+                && Math.abs(gyroRawLpfY - gyroBiasY) < BIAS_CAPTURE_THRESHOLD
+                && Math.abs(gyroRawLpfZ - gyroBiasZ) < BIAS_CAPTURE_THRESHOLD;
+        boolean inMotion = gyroXGate.isMoving() || gyroYGate.isMoving() || gyroZGate.isMoving();
+
+        if (accelStable && nearBias && !inMotion) {
+            stableSampleCount++;
+            if (stableSampleCount >= BIAS_STABLE_SAMPLES) {
+                gyroBiasX = updateBias(gyroBiasX, gyroRawLpfX);
+                gyroBiasY = updateBias(gyroBiasY, gyroRawLpfY);
+                gyroBiasZ = updateBias(gyroBiasZ, gyroRawLpfZ);
+            }
+        } else {
+            stableSampleCount = 0;
+        }
+
+        float compensatedGx = gyroRawLpfX - gyroBiasX;
+        float compensatedGy = gyroRawLpfY - gyroBiasY;
+        float compensatedGz = gyroRawLpfZ - gyroBiasZ;
+
+        gyroX = gyroXGate.filter(compensatedGx);
+        gyroY = gyroYGate.filter(compensatedGy);
+        gyroZ = gyroZGate.filter(compensatedGz);
+    }
+
+    private float updateBias(float currentBias, float currentRawLpf) {
+        float nextBias = currentBias + BIAS_ALPHA * (currentRawLpf - currentBias);
+        if (nextBias > BIAS_LIMIT) {
+            return BIAS_LIMIT;
+        }
+        if (nextBias < -BIAS_LIMIT) {
+            return -BIAS_LIMIT;
+        }
+        return nextBias;
+    }
+
+    private boolean isAccelStable(float ax, float ay, float az) {
+        float accelNorm = (float) Math.sqrt(ax * ax + ay * ay + az * az);
+        return accelNorm >= ACCEL_STILL_MIN_G && accelNorm <= ACCEL_STILL_MAX_G;
+    }
+
+    private static int sign(float value) {
+        if (value > 0.0f) {
+            return 1;
+        }
+        if (value < 0.0f) {
+            return -1;
+        }
+        return 0;
+    }
+
+    private static class AxisMotionGate {
+        private int movingSign;
+        private int candidateSign;
+        private int candidateCount;
+        private int stopCount;
+
+        float filter(float value) {
+            int currentSign = sign(value);
+            float absValue = Math.abs(value);
+
+            if (movingSign == 0) {
+                if (currentSign != 0 && absValue >= GYRO_MOVE_START) {
+                    if (candidateSign == currentSign) {
+                        candidateCount++;
+                    } else {
+                        candidateSign = currentSign;
+                        candidateCount = 1;
+                    }
+                    if (candidateCount >= GYRO_DIRECTION_CONFIRM_SAMPLES) {
+                        movingSign = currentSign;
+                        candidateSign = 0;
+                        candidateCount = 0;
+                        stopCount = 0;
+                        return value;
+                    }
+                } else {
+                    candidateSign = 0;
+                    candidateCount = 0;
+                }
+                return 0.0f;
+            }
+
+            if (currentSign == movingSign && absValue > GYRO_MOVE_STOP) {
+                stopCount = 0;
+                candidateSign = 0;
+                candidateCount = 0;
+                return value;
+            }
+
+            if (currentSign == movingSign && absValue <= GYRO_MOVE_STOP) {
+                stopCount++;
+                if (stopCount >= GYRO_STOP_CONFIRM_SAMPLES) {
+                    reset();
+                }
+                return 0.0f;
+            }
+
+            if (currentSign != 0 && absValue >= GYRO_MOVE_START) {
+                if (candidateSign == currentSign) {
+                    candidateCount++;
+                } else {
+                    candidateSign = currentSign;
+                    candidateCount = 1;
+                }
+                if (candidateCount >= GYRO_DIRECTION_CONFIRM_SAMPLES) {
+                    movingSign = currentSign;
+                    stopCount = 0;
+                    candidateSign = 0;
+                    candidateCount = 0;
+                    return value;
+                }
+            } else {
+                stopCount++;
+                if (stopCount >= GYRO_STOP_CONFIRM_SAMPLES) {
+                    reset();
+                }
+            }
+
+            return 0.0f;
+        }
+
+        boolean isMoving() {
+            return movingSign != 0;
+        }
+
+        private void reset() {
+            movingSign = 0;
+            candidateSign = 0;
+            candidateCount = 0;
+            stopCount = 0;
+        }
     }
 
     private static class Orientation {
