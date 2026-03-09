@@ -208,22 +208,36 @@ public class GamepadManager extends ReactContextBaseJavaModule {
         // Try to use the InputDevice's associated vibrators first
         int[] ids = InputDevice.getDeviceIds();
 
+        float intensityFactor = 1f;
+        switch (intensity) {
+            case 1: // very weak
+                intensityFactor = 0.2f;
+                break;
+            case 2: // weak
+                intensityFactor = 0.5f;
+                break;
+            case 4: // strong
+                intensityFactor = 2f;
+                break;
+            case 5: // very strong
+                intensityFactor = 3f;
+                break;
+            default:
+                break;
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             VibratorManager vibratorManager = null;
             boolean quadVibrators = false;
-            boolean isGamepad = false;
+            Vibrator selectedGamepadVibrator = null;
             boolean hasRealGamepad = false;
 
             for (int id : ids) {
                 InputDevice dev = InputDevice.getDevice(id);
                 if (dev == null) { continue; }
 
-                if ((dev.getSources() & InputDevice.SOURCE_JOYSTICK) != 0 ||
-                        (dev.getSources() & InputDevice.SOURCE_GAMEPAD) != 0) {
-                    // This is a gamepad
-                    isGamepad = true;
-                }
-
+                boolean isGamepad = (dev.getSources() & InputDevice.SOURCE_JOYSTICK) != 0 ||
+                        (dev.getSources() & InputDevice.SOURCE_GAMEPAD) != 0;
                 if (!isGamepad) {
                     continue;
                 }
@@ -256,176 +270,163 @@ public class GamepadManager extends ReactContextBaseJavaModule {
                     if (!vm.getVibrator(vid).hasAmplitudeControl()) {
                         hasQuadAmplitudeControlledRumbleVibrators = false;
                         hasDualAmplitudeControlledRumbleVibrators = false;
+                        break;
                     }
                 }
 
                 if (hasQuadAmplitudeControlledRumbleVibrators) {
-                    vibratorManager = dev.getVibratorManager();
+                    vibratorManager = vm;
                     quadVibrators = true;
+                    selectedGamepadVibrator = null;
+                    break;
                 } else if (hasDualAmplitudeControlledRumbleVibrators) {
-                    vibratorManager = dev.getVibratorManager();
+                    vibratorManager = vm;
+                    quadVibrators = false;
+                    selectedGamepadVibrator = null;
+                    break;
                 } else if (dev.getVibrator().hasVibrator()) {
-                    vibrator = dev.getVibrator();
-                }
-
-                Log.d("GamepadManager", "vibrator:" + vibrator);
-
-                float intensityFactor = 1f;
-                switch (intensity) {
-                    case 1: // very weak
-                        intensityFactor = 0.2f;
-                        break;
-                    case 2: // weak
-                        intensityFactor = 0.5f;
-                        break;
-                    case 4: // strong
-                        intensityFactor = 2f;
-                        break;
-                    case 5: // very strong
-                        intensityFactor = 3f;
-                        break;
-                    default:
-                        break;
-                }
-
-                // Prefer the documented Android 12 rumble API which can handle dual vibrators on PS/Xbox controllers
-                if (vibratorManager != null) {
-
-                    // rumbleQuadVibrators
-                    if (quadVibrators) {
-                        // If they're all zero, we can just call cancel().
-                        if (_lowFreqMotor == 0 && _highFreqMotor == 0 && _leftTrigger == 0 && _rightTrigger == 0) {
-                            vibratorManager.cancel();
-                            return;
-                        }
-
-                        // This is a guess based upon the behavior of FF_RUMBLE, but untested due to lack of Linux
-                        // support for trigger rumble!
-                        int[] quadVibratorIds = vibratorManager.getVibratorIds();
-
-                        int[] vibratorAmplitudes = new int[] {
-                                clampVibration((int)(_highFreqMotor * intensityFactor)),
-                                clampVibration((int)(_lowFreqMotor * intensityFactor)),
-                                clampVibration((int)(_leftTrigger * intensityFactor)),
-                                clampVibration((int)(_rightTrigger * intensityFactor))
-                        };
-
-                        CombinedVibration.ParallelCombination combo = CombinedVibration.startParallel();
-
-                        for (int i = 0; i < quadVibratorIds.length; i++) {
-                            // It's illegal to create a VibrationEffect with an amplitude of 0.
-                            // Simply excluding that vibrator from our ParallelCombination will turn it off.
-                            if (vibratorAmplitudes[i] != 0) {
-                                combo.addVibrator(quadVibratorIds[i], VibrationEffect.createOneShot(duration, vibratorAmplitudes[i]));
-                            }
-                        }
-
-                        VibrationAttributes.Builder vibrationAttributes = new VibrationAttributes.Builder();
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            vibrationAttributes.setUsage(VibrationAttributes.USAGE_MEDIA);
-                        }
-
-                        vibratorManager.vibrate(combo.combine(), vibrationAttributes.build());
+                    if (selectedGamepadVibrator == null) {
+                        selectedGamepadVibrator = dev.getVibrator();
                     }
-                    // rumbleDualVibrators
-                    else {
-                        // If they're both zero, we can just call cancel().
-                        if (lowFreqMotor == 0 && highFreqMotor == 0) {
-                            vibratorManager.cancel();
-                            return;
-                        }
-
-                        // There's no documentation that states that vibrators for FF_RUMBLE input devices will
-                        // always be enumerated in this order, but it seems consistent between Xbox Series X (USB),
-                        // PS3 (USB), and PS4 (USB+BT) controllers on Android 12 Beta 3.
-                        int[] qualVibratorIds = vibratorManager.getVibratorIds();
-                        int[] vibratorAmplitudes = new int[] {
-                                clampVibration((int)(_highFreqMotor * intensityFactor)),
-                                clampVibration((int)(_lowFreqMotor * intensityFactor)),
-                        };
-
-                        CombinedVibration.ParallelCombination combo = CombinedVibration.startParallel();
-
-                        for (int i = 0; i < qualVibratorIds.length; i++) {
-                            // It's illegal to create a VibrationEffect with an amplitude of 0.
-                            // Simply excluding that vibrator from our ParallelCombination will turn it off.
-                            if (vibratorAmplitudes[i] != 0) {
-                                combo.addVibrator(qualVibratorIds[i], VibrationEffect.createOneShot(duration, vibratorAmplitudes[i]));
-                            }
-                        }
-
-                        VibrationAttributes.Builder vibrationAttributes = new VibrationAttributes.Builder();
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            vibrationAttributes.setUsage(VibrationAttributes.USAGE_MEDIA);
-                        }
-
-                        Log.d("GamepadManager", "rumbleDualVibrators:" + vibrator);
-                        vibratorManager.vibrate(combo.combine(), vibrationAttributes.build());
-                    }
-                }
-                // If all else fails, we have to try the old Vibrator API
-                else if (vibrator != null) {
-                    Log.d("GamepadManager", "rumbleSingleVibrator:");
-                    rumbleSingleVibrator(vibrator, duration, _lowFreqMotor, _highFreqMotor, intensity);
-                }
-                // Force device rumble
-                else {
-                    Log.d("GamepadManager", "Force device rumble");
-                    rumbleSingleVibrator(deviceVibrator, duration, _lowFreqMotor, _highFreqMotor, intensity);
                 }
             }
 
-            if (!hasRealGamepad) {
-                executorService.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            rumbleSingleVibrator(deviceVibrator, duration, _lowFreqMotor, _highFreqMotor, intensity);
-                        } catch (Exception e) {}
+            if (vibratorManager != null) {
+                // rumbleQuadVibrators
+                if (quadVibrators) {
+                    // If they're all zero, we can just call cancel().
+                    if (_lowFreqMotor == 0 && _highFreqMotor == 0 && _leftTrigger == 0 && _rightTrigger == 0) {
+                        vibratorManager.cancel();
+                        return;
                     }
-                });
+
+                    // This is a guess based upon the behavior of FF_RUMBLE, but untested due to lack of Linux
+                    // support for trigger rumble!
+                    int[] quadVibratorIds = vibratorManager.getVibratorIds();
+
+                    int[] vibratorAmplitudes = new int[] {
+                            clampVibration((int)(_highFreqMotor * intensityFactor)),
+                            clampVibration((int)(_lowFreqMotor * intensityFactor)),
+                            clampVibration((int)(_leftTrigger * intensityFactor)),
+                            clampVibration((int)(_rightTrigger * intensityFactor))
+                    };
+
+                    CombinedVibration.ParallelCombination combo = CombinedVibration.startParallel();
+
+                    for (int i = 0; i < quadVibratorIds.length; i++) {
+                        // It's illegal to create a VibrationEffect with an amplitude of 0.
+                        // Simply excluding that vibrator from our ParallelCombination will turn it off.
+                        if (vibratorAmplitudes[i] != 0) {
+                            combo.addVibrator(quadVibratorIds[i], VibrationEffect.createOneShot(duration, vibratorAmplitudes[i]));
+                        }
+                    }
+
+                    VibrationAttributes.Builder vibrationAttributes = new VibrationAttributes.Builder();
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        vibrationAttributes.setUsage(VibrationAttributes.USAGE_MEDIA);
+                    }
+
+                    vibratorManager.vibrate(combo.combine(), vibrationAttributes.build());
+                }
+                // rumbleDualVibrators
+                else {
+                    // If they're both zero, we can just call cancel().
+                    if (lowFreqMotor == 0 && highFreqMotor == 0) {
+                        vibratorManager.cancel();
+                        return;
+                    }
+
+                    // There's no documentation that states that vibrators for FF_RUMBLE input devices will
+                    // always be enumerated in this order, but it seems consistent between Xbox Series X (USB),
+                    // PS3 (USB), and PS4 (USB+BT) controllers on Android 12 Beta 3.
+                    int[] qualVibratorIds = vibratorManager.getVibratorIds();
+                    int[] vibratorAmplitudes = new int[] {
+                            clampVibration((int)(_highFreqMotor * intensityFactor)),
+                            clampVibration((int)(_lowFreqMotor * intensityFactor)),
+                    };
+
+                    CombinedVibration.ParallelCombination combo = CombinedVibration.startParallel();
+
+                    for (int i = 0; i < qualVibratorIds.length; i++) {
+                        // It's illegal to create a VibrationEffect with an amplitude of 0.
+                        // Simply excluding that vibrator from our ParallelCombination will turn it off.
+                        if (vibratorAmplitudes[i] != 0) {
+                            combo.addVibrator(qualVibratorIds[i], VibrationEffect.createOneShot(duration, vibratorAmplitudes[i]));
+                        }
+                    }
+
+                    VibrationAttributes.Builder vibrationAttributes = new VibrationAttributes.Builder();
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        vibrationAttributes.setUsage(VibrationAttributes.USAGE_MEDIA);
+                    }
+
+                    vibratorManager.vibrate(combo.combine(), vibrationAttributes.build());
+                }
+            }
+            // If all else fails, we have to try the old Vibrator API
+            else if (selectedGamepadVibrator != null) {
+                Log.d("GamepadManager", "rumbleSingleVibrator:");
+                rumbleSingleVibrator(selectedGamepadVibrator, duration, _lowFreqMotor, _highFreqMotor, intensity);
+            } else {
+                // Force device rumble
+                Log.d("GamepadManager", hasRealGamepad
+                        ? "Force device rumble: gamepad has no vibrator"
+                        : "Force device rumble: no real gamepad");
+
+                if (!hasRealGamepad) {
+                    executorService.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                rumbleSingleVibrator(deviceVibrator, duration, _lowFreqMotor, _highFreqMotor, intensity);
+                            } catch (Exception e) {}
+                        }
+                    });
+                }
             }
 
 
         } else {
-            boolean isGamepad = false;
+            boolean hasGamepad = false;
             Log.d("GamepadManager", "Old sdk entrying...");
             for (int id : ids) {
                 InputDevice dev = InputDevice.getDevice(id);
 
                 if (dev == null) { continue; }
 
-                if ((dev.getSources() & InputDevice.SOURCE_JOYSTICK) != 0 ||
-                        (dev.getSources() & InputDevice.SOURCE_GAMEPAD) != 0) {
-                    // This is a gamepad
-                    isGamepad = true;
-                }
-
+                // This is a gamepad
+                boolean isGamepad = (dev.getSources() & InputDevice.SOURCE_JOYSTICK) != 0 ||
+                        (dev.getSources() & InputDevice.SOURCE_GAMEPAD) != 0;
                 if (!isGamepad) {
-                    return;
+                    continue;
                 }
+                hasGamepad = true;
 
                 if (dev.getVibrator().hasVibrator()) {
                     vibrator = dev.getVibrator();
-                }
-
-                Log.d("GamepadManager", "vibrator:" + vibrator);
-
-                if (vibrator != null) {
-                    Log.d("GamepadManager", "Old sdk rumbleSingleVibrator:");
-                    if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) { // Android 11
-                        rumbleSingleVibrator(deviceVibrator, duration, _lowFreqMotor, _highFreqMotor, intensity);
-                    } else {
-                        rumbleSingleVibrator(vibrator, duration, _lowFreqMotor, _highFreqMotor, intensity);
-                    }
-
                     break;
                 }
-                // Force device rumble
-                else {
-                    Log.d("GamepadManager", "Old sdk device rumble:");
+            }
+
+            Log.d("GamepadManager", "vibrator:" + vibrator);
+
+            if (vibrator != null) {
+                Log.d("GamepadManager", "Old sdk rumbleSingleVibrator:");
+                if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) { // Android 11
+                    rumbleSingleVibrator(deviceVibrator, duration, _lowFreqMotor, _highFreqMotor, intensity);
+                } else {
+                    rumbleSingleVibrator(vibrator, duration, _lowFreqMotor, _highFreqMotor, intensity);
+                }
+            }
+            // Force device rumble
+            else {
+                Log.d("GamepadManager", hasGamepad
+                        ? "Old sdk device rumble: gamepad has no vibrator"
+                        : "Old sdk device rumble: no gamepad");
+
+                if (!hasGamepad) {
                     executorService.execute(new Runnable() {
                         @Override
                         public void run() {
