@@ -1151,6 +1151,15 @@ function StreamScreen({navigation, route}) {
     );
   };
 
+  // Is device is HUAWEI with HarmonyOS syetem
+  const isHuaweiDevices = () => {
+    const deviceInfos = FullScreenManager.getDeviceInfos();
+    if (deviceInfos && deviceInfos.factor.indexOf('HUAWEI') > -1) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <View>
       {showInitOverlay && (
@@ -1179,7 +1188,7 @@ function StreamScreen({navigation, route}) {
 
       {renderPinModal()}
 
-      {settings.show_menu && (
+      {(settings.show_menu || isHuaweiDevices()) && (
         <View style={styles.quickMenu}>
           <IconButton
             icon="menu"
@@ -1361,7 +1370,7 @@ const styles = StyleSheet.create({
     left: 0,
     marginLeft: '25%',
     marginRight: '25%',
-    zIndex: 998,
+    zIndex: 9998,
   },
   touchpad: {
     position: 'absolute',
@@ -1414,7 +1423,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 5,
     bottom: 5,
-    zIndex: 10,
+    zIndex: 9998,
     opacity: 0.6,
   },
 });
