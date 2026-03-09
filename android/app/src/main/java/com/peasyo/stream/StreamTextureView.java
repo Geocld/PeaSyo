@@ -618,6 +618,9 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
 
         if (this.isShortTrigger) {
             if (event.getKeyCode() == KeyEvent.KEYCODE_BUTTON_L2) {
+                if (!this.isTriggerWork) {
+                    this.isTriggerWork = true;
+                }
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     controllerState.setL2State(unsignedAxis(1));
                 } else {
@@ -625,6 +628,9 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
                 }
             }
             if (event.getKeyCode() == KeyEvent.KEYCODE_BUTTON_R2) {
+                if (!this.isTriggerWork) {
+                    this.isTriggerWork = true;
+                }
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     controllerState.setR2State(unsignedAxis(1));
                 } else {
@@ -1266,9 +1272,9 @@ public class StreamTextureView extends FrameLayout implements TextureView.Surfac
 //            Log.d(TAG, "Right Trigger:" + rTrigger);
 
             // Notice: some controllers will emit onTrigger and onGamepadKeyDown at the same time
-            if(!this.isTriggerWork && (lTrigger > 0 || rTrigger > 0)) {
-                this.isTriggerWork = true;
-            }
+//            if(!this.isTriggerWork && (lTrigger > 0 || rTrigger > 0)) {
+//                this.isTriggerWork = true;
+//            }
 
             // Short trigger
             if (this.isShortTrigger && !this.isTriggerWork) {

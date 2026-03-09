@@ -626,6 +626,10 @@ public class StreamView extends FrameLayout {
 
         if (this.isShortTrigger) {
             if (event.getKeyCode() == KeyEvent.KEYCODE_BUTTON_L2) {
+                if (!this.isTriggerWork) {
+                    this.isTriggerWork = true;
+                }
+
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     controllerState.setL2State(unsignedAxis(1));
                 } else {
@@ -633,6 +637,9 @@ public class StreamView extends FrameLayout {
                 }
             }
             if (event.getKeyCode() == KeyEvent.KEYCODE_BUTTON_R2) {
+                if (!this.isTriggerWork) {
+                    this.isTriggerWork = true;
+                }
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     controllerState.setR2State(unsignedAxis(1));
                 } else {
@@ -1280,9 +1287,9 @@ public class StreamView extends FrameLayout {
 //            Log.d(TAG, "Right Trigger:" + rTrigger);
 
             // Notice: some controllers will emit onTrigger and onGamepadKeyDown at the same time
-            if(!this.isTriggerWork && (lTrigger > 0 || rTrigger > 0)) {
-                this.isTriggerWork = true;
-            }
+//            if(!this.isTriggerWork && (lTrigger > 0 || rTrigger > 0)) {
+//                this.isTriggerWork = true;
+//            }
 
             // Short trigger
             if (this.isShortTrigger && !this.isTriggerWork) {
