@@ -205,7 +205,11 @@ public class MainActivity extends ReactActivity implements UsbDriverService.UsbD
     if (!currentScreen.equals("stream")) {
       return super.onKeyDown(keyCode, event);
     }
-    if ((event.getSource() & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD) {
+    if (!shouldHandleGamepadKeyEvent(keyCode, event)) {
+      return super.onKeyDown(keyCode, event);
+    }
+
+    if (isControllerInputSource(event)) {
       WritableMap params = Arguments.createMap();
       params.putInt("keyCode", keyCode);
       Log.d("MainActivity", "keyCode down2:" + params);
@@ -222,7 +226,11 @@ public class MainActivity extends ReactActivity implements UsbDriverService.UsbD
     if (!currentScreen.equals("stream")) {
       return super.onKeyUp(keyCode, event);
     }
-    if ((event.getSource() & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD) {
+    if (!shouldHandleGamepadKeyEvent(keyCode, event)) {
+      return super.onKeyUp(keyCode, event);
+    }
+
+    if (isControllerInputSource(event)) {
       WritableMap params = Arguments.createMap();
       params.putInt("keyCode", keyCode);
       Log.d("MainActivity", "keyCode up:" + params);
@@ -255,6 +263,24 @@ public class MainActivity extends ReactActivity implements UsbDriverService.UsbD
       }
     }
     return true;
+  }
+
+  private boolean shouldHandleGamepadKeyEvent(int keyCode, KeyEvent event) {
+    if (event == null) {
+      return false;
+    }
+
+    if (keyCode == KeyEvent.KEYCODE_BACK && event.getDeviceId() == -1) {
+      return false;
+    }
+
+    return keyCode != KeyEvent.KEYCODE_VOLUME_DOWN && keyCode != KeyEvent.KEYCODE_VOLUME_UP;
+  }
+
+  private boolean isControllerInputSource(KeyEvent event) {
+    int source = event.getSource();
+    return (source & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD
+        || (source & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK;
   }
 
   /**
