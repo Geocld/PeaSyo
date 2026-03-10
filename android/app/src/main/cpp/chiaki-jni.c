@@ -15,6 +15,7 @@
 #include <linux/in.h>
 #include <linux/in6.h>
 #include <arpa/inet.h>
+#include <time.h>
 
 #include "video-decoder.h"
 #include "audio-decoder.h"
@@ -55,6 +56,14 @@ static jbyteArray jnibytearray_create(JNIEnv *env, const uint8_t *buf, size_t bu
     jbyteArray r = E->NewByteArray(env, buf_size);
     E->SetByteArrayRegion(env, r, 0, buf_size, (const jbyte *)buf);
     return r;
+}
+
+static void sleep_ms(uint32_t ms)
+{
+    struct timespec ts;
+    ts.tv_sec = (time_t)(ms / 1000);
+    ts.tv_nsec = (long)((ms % 1000) * 1000000L);
+    nanosleep(&ts, NULL);
 }
 
 static jobject get_kotlin_global_object(JNIEnv *env, const char *id)
@@ -760,29 +769,28 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
     // PSN自动连接
     if (nick_name_cstr != NULL && access_token_cstr != NULL && nick_name_length > 0 && access_token_length > 0 && connect_info.holepunch_session != NULL) {
 
-        ChiakiHolepunchConsoleType console_type = CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5;
         ChiakiHolepunchDeviceInfo *device_info_ps5;
         size_t num_devices_ps5;
 
-        ChiakiErrorCode err = chiaki_holepunch_list_devices(access_token_cstr, CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5, &device_info_ps5, &num_devices_ps5, &global_log);
+        device_info_ps5 = NULL;
+        num_devices_ps5 = 0;
+
+        const int device_list_max_attempts = 3;
+        for(int attempt = 1; attempt <= device_list_max_attempts; attempt++)
+        {
+            err = chiaki_holepunch_list_devices(access_token_cstr, CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5, &device_info_ps5, &num_devices_ps5, &global_log);
+            if(err == CHIAKI_ERR_SUCCESS)
+                break;
+            CHIAKI_LOGW(&global_log, "holepunch !! Failed to get PS5 devices (attempt %d/%d): %s",
+                        attempt, device_list_max_attempts, chiaki_error_string(err));
+            if(attempt < device_list_max_attempts)
+                sleep_ms(200);
+        }
         if (err != CHIAKI_ERR_SUCCESS)
         {
-            CHIAKI_LOGE(&global_log, "holepunch !! Failed to get PS5 devices, try again");
-
-            // Try again
-            ChiakiErrorCode err2 = chiaki_holepunch_list_devices(access_token_cstr, CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5, &device_info_ps5, &num_devices_ps5, &global_log);
-            if (err2 != CHIAKI_ERR_SUCCESS)
-            {
-                CHIAKI_LOGE(&global_log, "holepunch !! Failed to get PS5 devices");
-
-                // Try again
-                ChiakiErrorCode err3 = chiaki_holepunch_list_devices(access_token_cstr, CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5, &device_info_ps5, &num_devices_ps5, &global_log);
-                if (err3 != CHIAKI_ERR_SUCCESS)
-                {
-                    CHIAKI_LOGE(&global_log, "holepunch !! Failed to get PS5 devices");
-                    goto beach;
-                }
-            }
+            if(device_info_ps5)
+                chiaki_holepunch_free_device_list(&device_info_ps5);
+            goto beach;
         }
         CHIAKI_LOGE(&global_log, ">> holepunch Found %zu devices\n", num_devices_ps5);
 
@@ -805,51 +813,96 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
 
         if (!device_found) {
             CHIAKI_LOGE(&global_log, "holepunch !! Failed to find ps");
+            if(device_info_ps5)
+                chiaki_holepunch_free_device_list(&device_info_ps5);
             goto beach;
         }
 
-        err = chiaki_holepunch_upnp_discover(connect_info.holepunch_session);
+        const int holepunch_max_attempts = 10;
+        uint32_t backoff_ms = 200;
+
+        for(int attempt = 1; attempt <= holepunch_max_attempts; attempt++)
+        {
+            if(attempt > 1)
+            {
+                CHIAKI_LOGW(&global_log, "holepunch retrying... (attempt %d/%d)", attempt, holepunch_max_attempts);
+                sleep_ms(backoff_ms);
+                if(backoff_ms < 2000)
+                    backoff_ms *= 2;
+
+                if(session->session.holepunch_session)
+                {
+                    chiaki_holepunch_session_fini(session->session.holepunch_session);
+                    session->session.holepunch_session = NULL;
+                }
+
+                ChiakiHolepunchSession new_hp_session = chiaki_holepunch_session_init(access_token_cstr, &global_log);
+                if(!new_hp_session)
+                {
+                    err = CHIAKI_ERR_MEMORY;
+                    break;
+                }
+                session->session.holepunch_session = new_hp_session;
+                connect_info.holepunch_session = new_hp_session;
+            }
+
+            ChiakiHolepunchSession hp_session = session->session.holepunch_session;
+            if(!hp_session)
+            {
+                err = CHIAKI_ERR_UNINITIALIZED;
+                break;
+            }
+
+            err = chiaki_holepunch_upnp_discover(hp_session);
+            if(err != CHIAKI_ERR_SUCCESS)
+            {
+                CHIAKI_LOGW(&global_log, "holepunch !! upnp discover failed (attempt %d/%d): %s",
+                            attempt, holepunch_max_attempts, chiaki_error_string(err));
+                continue;
+            }
+
+            err = chiaki_holepunch_session_create(hp_session);
+            if (err != CHIAKI_ERR_SUCCESS)
+            {
+                CHIAKI_LOGW(&global_log, "holepunch !! Failed to create session (attempt %d/%d): %s",
+                            attempt, holepunch_max_attempts, chiaki_error_string(err));
+                continue;
+            }
+
+            err = holepunch_session_create_offer(hp_session);
+            if (err != CHIAKI_ERR_SUCCESS)
+            {
+                CHIAKI_LOGW(&global_log, "holepunch !! Failed to create offer msg for ctrl connection (attempt %d/%d): %s",
+                            attempt, holepunch_max_attempts, chiaki_error_string(err));
+                continue;
+            }
+
+            err = chiaki_holepunch_session_start(hp_session, device_uid, CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5);
+            if (err != CHIAKI_ERR_SUCCESS)
+            {
+                CHIAKI_LOGW(&global_log, "holepunch !! Failed to start session (attempt %d/%d): %s",
+                            attempt, holepunch_max_attempts, chiaki_error_string(err));
+                continue;
+            }
+
+            err = chiaki_holepunch_session_punch_hole(hp_session, CHIAKI_HOLEPUNCH_PORT_TYPE_CTRL);
+            if (err != CHIAKI_ERR_SUCCESS)
+            {
+                CHIAKI_LOGW(&global_log, "holepunch !! Failed to punch hole for control connection (attempt %d/%d): %s",
+                            attempt, holepunch_max_attempts, chiaki_error_string(err));
+                continue;
+            }
+
+            CHIAKI_LOGI(&global_log, ">> holepunch Punched hole for control connection!");
+            CHIAKI_LOGI(&global_log, ">> holepunch Punched success!");
+            break;
+        }
+
+        if(device_info_ps5)
+            chiaki_holepunch_free_device_list(&device_info_ps5);
+
         if(err != CHIAKI_ERR_SUCCESS)
-        {
-            CHIAKI_LOGE(&global_log, "holepunch !! Failed to run upnp discover");
             goto beach;
-        }
-
-        err = chiaki_holepunch_session_create(connect_info.holepunch_session);
-        if (err != CHIAKI_ERR_SUCCESS)
-        {
-            CHIAKI_LOGE(&global_log, "holepunch !! Failed to create session\n");
-            goto beach;
-        }
-        CHIAKI_LOGE(&global_log, ">> holepunch Created session success\n");
-
-        err = holepunch_session_create_offer(connect_info.holepunch_session);
-        if (err != CHIAKI_ERR_SUCCESS)
-        {
-            CHIAKI_LOGE(&global_log, "holepunch !! Failed to create offer msg for ctrl connection\n");
-            goto beach;
-        }
-        CHIAKI_LOGE(&global_log, ">> holepunch Created offer msg for ctrl connection\n");
-
-
-        err = chiaki_holepunch_session_start(connect_info.holepunch_session, device_uid, CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5);
-        if (err != CHIAKI_ERR_SUCCESS)
-        {
-            CHIAKI_LOGE(&global_log, "holepunch !! Failed to start session\n");
-            chiaki_holepunch_session_fini(connect_info.holepunch_session);
-            goto beach;
-        }
-        CHIAKI_LOGE(&global_log, ">> holepunch Started session\n");
-
-        err = chiaki_holepunch_session_punch_hole(connect_info.holepunch_session, CHIAKI_HOLEPUNCH_PORT_TYPE_CTRL);
-        if (err != CHIAKI_ERR_SUCCESS)
-        {
-            CHIAKI_LOGE(&global_log, "!! holepunch Failed to punch hole for control connection.");
-            goto beach;
-        }
-        CHIAKI_LOGI(&global_log, ">> holepunch Punched hole for control connection!");
-
-        CHIAKI_LOGI(&global_log, ">> holepunch Punched success!");
     }
 
     beach:
