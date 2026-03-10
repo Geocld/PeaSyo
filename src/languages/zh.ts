@@ -273,7 +273,7 @@ export default {
     Connected: '连接成功',
     Connecting: '连接中...',
     PSNConnecting:
-      'PSN连接中,过程可能要几分钟，请耐心等待，该步骤如三分钟后无响应请关闭APP重试',
+      'PSN连接中,过程可能要几分钟，请耐心等待，该步骤如五分钟后无响应请关闭APP重试',
     HolepunchFinished: 'PSN打洞成功，正在连接主机',
     'Toggle Performance': '展示/隐藏性能信息',
     'Toggle Virtual Gamepad': '展示/隐藏虚拟手柄',

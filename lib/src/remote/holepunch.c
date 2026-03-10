@@ -1473,46 +1473,84 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_session_punch_hole(Session* sessi
     }
     chiaki_mutex_unlock(&session->stop_mutex);
 
-    // Send our own OFFER
-    const int our_offer_req_id = session->local_req_id;
-    session->local_req_id++;
-    session->our_offer_msg->req_id = our_offer_req_id;
-    send_offer(session);
-
-    // Wait for ACK of OFFER, ignore other OFFERs, simply ACK them
-    err = wait_for_session_message_ack(
-            session, our_offer_req_id, SESSION_START_TIMEOUT_SEC * 1000);
-    if (err == CHIAKI_ERR_TIMEOUT)
-    {
-        CHIAKI_LOGE(session->log, "chiaki_holepunch_session_punch_holes: Timed out waiting for ACK of our connection offer.");
-        goto cleanup;
-    }
-    else if (err == CHIAKI_ERR_CANCELED)
-    {
-        CHIAKI_LOGI(session->log, "chiaki_holepunch_session_punch_holes: canceled");
-        goto cleanup;
-    }
-    else if (err != CHIAKI_ERR_SUCCESS)
-    {
-        CHIAKI_LOGE(session->log, "chiaki_holepunch_session_punch_holes: Failed to wait for ACK of our connection offer.");
-        goto cleanup;
-    }
-    http_check_session(session, true);
-
     // Find candidate that we can use to connect to the console
-    chiaki_socket_t sock = CHIAKI_INVALID_SOCKET;
     for(size_t i = 0; i < console_req->num_candidates; i++)
     {
         print_candidate(session->log, &console_req->candidates[i]);
     }
+
+    const int max_attempts = port_type == CHIAKI_HOLEPUNCH_PORT_TYPE_DATA ? 10 : 1;
+    uint64_t backoff_ms = 200;
+    chiaki_socket_t sock = CHIAKI_INVALID_SOCKET;
     Candidate selected_candidate;
-    err = check_candidates(session, session->local_candidates, console_req->candidates, console_req->num_candidates, &sock, &selected_candidate);
-    if (err != CHIAKI_ERR_SUCCESS)
+
+    for(int attempt = 1; attempt <= max_attempts; attempt++)
     {
-        CHIAKI_LOGE(
-                session->log, "chiaki_holepunch_session_punch_holes: Failed to find reachable candidate for %s connection.",
-                port_type == CHIAKI_HOLEPUNCH_PORT_TYPE_CTRL ? "control" : "data");
-        goto cleanup;
+        if(attempt > 1)
+        {
+            CHIAKI_LOGW(session->log,
+                        "chiaki_holepunch_session_punch_holes: Retrying data hole punch (attempt %d/%d) after %"PRIu64"ms backoff",
+                        attempt, max_attempts, backoff_ms);
+            ChiakiErrorCode sleep_err = chiaki_stop_pipe_sleep(&session->select_pipe, backoff_ms);
+            if(sleep_err == CHIAKI_ERR_CANCELED)
+            {
+                err = sleep_err;
+                goto cleanup;
+            }
+            if(backoff_ms < 2000)
+                backoff_ms *= 2;
+
+            err = holepunch_session_create_offer(session);
+            if(err != CHIAKI_ERR_SUCCESS)
+            {
+                CHIAKI_LOGE(session->log, "chiaki_holepunch_session_punch_holes: Failed to recreate offer for retry: %s",
+                            chiaki_error_string(err));
+                goto cleanup;
+            }
+        }
+
+        // Send our own OFFER
+        const int our_offer_req_id = session->local_req_id;
+        session->local_req_id++;
+        session->our_offer_msg->req_id = our_offer_req_id;
+        send_offer(session);
+
+        // Wait for ACK of OFFER, ignore other OFFERs, simply ACK them
+        err = wait_for_session_message_ack(
+                session, our_offer_req_id, SESSION_START_TIMEOUT_SEC * 1000);
+        if (err == CHIAKI_ERR_TIMEOUT)
+        {
+            CHIAKI_LOGE(session->log, "chiaki_holepunch_session_punch_holes: Timed out waiting for ACK of our connection offer.");
+            goto cleanup;
+        }
+        else if (err == CHIAKI_ERR_CANCELED)
+        {
+            CHIAKI_LOGI(session->log, "chiaki_holepunch_session_punch_holes: canceled");
+            goto cleanup;
+        }
+        else if (err != CHIAKI_ERR_SUCCESS)
+        {
+            CHIAKI_LOGE(session->log, "chiaki_holepunch_session_punch_holes: Failed to wait for ACK of our connection offer.");
+            goto cleanup;
+        }
+        http_check_session(session, true);
+
+        sock = CHIAKI_INVALID_SOCKET;
+        err = check_candidates(session, session->local_candidates, console_req->candidates, console_req->num_candidates, &sock, &selected_candidate);
+        if (err == CHIAKI_ERR_SUCCESS)
+            break;
+
+        if(port_type != CHIAKI_HOLEPUNCH_PORT_TYPE_DATA || attempt == max_attempts)
+        {
+            CHIAKI_LOGE(
+                    session->log, "chiaki_holepunch_session_punch_holes: Failed to find reachable candidate for %s connection.",
+                    port_type == CHIAKI_HOLEPUNCH_PORT_TYPE_CTRL ? "control" : "data");
+            goto cleanup;
+        }
+
+        CHIAKI_LOGW(session->log,
+                    "chiaki_holepunch_session_punch_holes: Failed to find reachable candidate for data connection (attempt %d/%d): %s",
+                    attempt, max_attempts, chiaki_error_string(err));
     }
     chiaki_mutex_lock(&session->stop_mutex);
     if(session->main_should_stop)

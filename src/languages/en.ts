@@ -272,7 +272,7 @@ export default {
     SurfaceRenderDesc:
       'Currently using performance rendering mode, interface initializing',
     PSNConnecting:
-      'Connecting to PSN, this process may take a few minutes. Please wait patiently. If there is no response after 3 minutes, please close the app and try again.',
+      'Connecting to PSN, this process may take a few minutes. Please wait patiently. If there is no response after 5 minutes, please close the app and try again.',
     HolepunchFinished: 'PSN hole punching successful, connecting to console...',
     // Transfer
     ExportSuccess: 'Configuration exported successfully',

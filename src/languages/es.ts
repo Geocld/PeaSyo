@@ -126,7 +126,8 @@ export default {
       '1. Para experimentar la retroalimentación háptica nativa de DualSense 5, habilita "Anular soporte nativo del gamepad", conecta tu DualSense 5 y luego inicia la transmisión.',
     bind_usb_device_guide_case2:
       '2. Si tu dispositivo Android no admite vibración del controlador y tu mando usa protocolo Xbox o DualSense, también debes habilitar "Anular soporte nativo del gamepad", conectar el mando y luego iniciar la transmisión.',
-    bind_usb_device_guide_action: 'Habilitar "Anular soporte nativo del gamepad"',
+    bind_usb_device_guide_action:
+      'Habilitar "Anular soporte nativo del gamepad"',
     'Force Nexus/PS button to simulate touchpad':
       'Forzar el botón Nexus/Volumen para simular el panel táctil',
     bind_usb_device_force_touchpad_desc:
@@ -281,7 +282,7 @@ export default {
     SurfaceRenderDesc:
       'Actualmente usando el modo de renderizado de rendimiento, inicializando la interfaz',
     PSNConnecting:
-      'Conectando a PSN, este proceso puede tardar unos minutos. Por favor espera pacientemente. Si no hay respuesta después de 3 minutos, cierra la aplicación e intenta nuevamente.',
+      'Conectando a PSN, este proceso puede tardar unos minutos. Por favor espera pacientemente. Si no hay respuesta después de 5 minutos, cierra la aplicación e intenta nuevamente.',
     HolepunchFinished: 'Perforación de PSN exitosa, conectando a la consola...',
     // Transfer
     ExportSuccess: 'Configuración exportada con éxito',

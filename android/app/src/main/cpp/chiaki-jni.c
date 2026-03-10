@@ -775,7 +775,7 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
         device_info_ps5 = NULL;
         num_devices_ps5 = 0;
 
-        const int device_list_max_attempts = 3;
+        const int device_list_max_attempts = 20;
         for(int attempt = 1; attempt <= device_list_max_attempts; attempt++)
         {
             err = chiaki_holepunch_list_devices(access_token_cstr, CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5, &device_info_ps5, &num_devices_ps5, &global_log);
