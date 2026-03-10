@@ -131,14 +131,6 @@ function DebugScreen({navigation, route}) {
           }, 1000);
         }}
       />
-
-      <SettingItem
-        title={'Haptic test'}
-        description={''}
-        onPress={() => {
-          HapticModule.sendAudioSignal();
-        }}
-      />
     </ScrollView>
   );
 }
