@@ -81,6 +81,7 @@ class StreamSession(
 	private val BT_RUMBLE_DURATION_MS = 15
 
 	private val DSCONTROLLER_NAME = "DualSenseController"
+	private val RAZER_KISHI_CONTROLLER_NAME = "RazerKishiController"
 
 	private val maxOperatingRate = connectInfo.videoProfile.maxOperatingRate // 从 connectInfo 获取
 
@@ -136,7 +137,7 @@ class StreamSession(
 		//surfaceTexture?.release()
 
 		// 断流时关闭触觉模式，避免控制器停在异常状态
-		if (usbMode && usbController == DSCONTROLLER_NAME) {
+		if (usbMode && (usbController == DSCONTROLLER_NAME || usbController == RAZER_KISHI_CONTROLLER_NAME)) {
 			getMainActivity()?.stopHaptics()
 		}
 
@@ -347,8 +348,8 @@ class StreamSession(
 				}
 				sendEvent("streamStateChange", params)
 
-				// 连接成功后尝试打开 DualSense 触觉模式
-				if (usbMode && usbController == DSCONTROLLER_NAME) {
+				// 连接成功后尝试打开 DualSense/Razer Kishi 触觉模式
+				if (usbMode && (usbController == DSCONTROLLER_NAME || usbController == RAZER_KISHI_CONTROLLER_NAME)) {
 					getMainActivity()?.startHaptics()
 				}
 			}
@@ -374,8 +375,8 @@ class StreamSession(
 			is RumbleEvent -> {
 //				Log.d("StreamView", "RumbleEvent: $event")
 				if (rumble) {
-					// 若 DualSense 触觉已激活，跳过 rumble 降级逻辑，避免叠加振动
-					if (usbMode && usbController == DSCONTROLLER_NAME) {
+					// 若 DualSense/Razer Kishi 触觉已激活，跳过 rumble 降级逻辑，避免叠加振动
+					if (usbMode && (usbController == DSCONTROLLER_NAME || usbController == RAZER_KISHI_CONTROLLER_NAME)) {
 						val hapticsActive = getMainActivity()?.isDualSenseHapticsActive() ?: false
 						if (hapticsActive) {
 							return
@@ -411,7 +412,7 @@ class StreamSession(
 					lastProcessedEvent = RumbleEvent(left, right)
 
 					if (usbMode) {
-						if (usbController == DSCONTROLLER_NAME) {
+						if (usbController == DSCONTROLLER_NAME || usbController == RAZER_KISHI_CONTROLLER_NAME) {
 							sendDualSenseRumbleDirect(left, right)
 						} else {
 							val INPUT_MAX = 256
@@ -452,8 +453,8 @@ class StreamSession(
 					}
 				}
 			is HapticAudioEvent -> { // 触觉反馈
-				// 仅在 USB DualSense 模式下转发原始触觉音频
-				if (usbMode && usbController == DSCONTROLLER_NAME) {
+				// 仅在 USB DualSense/Razer Kishi 模式下转发原始触觉音频
+				if (usbMode && (usbController == DSCONTROLLER_NAME || usbController == RAZER_KISHI_CONTROLLER_NAME)) {
 					getMainActivity()?.handleHapticAudio(
 						event.pcmData,
 						hapticFeedbackIntensity.toFloat()
@@ -473,7 +474,7 @@ class StreamSession(
 					val right_data =
 						if (event.typeRight == 0 && right_is_empty) event.left else event.right
 
-					if (usbController == DSCONTROLLER_NAME) {
+					if (usbController == DSCONTROLLER_NAME || usbController == RAZER_KISHI_CONTROLLER_NAME) {
 						// 为 rumble 直下发同步最新触发器参数
 						updateDualSenseTriggerCache(left_type, left_data, right_type, right_data)
 					}
@@ -496,10 +497,10 @@ class StreamSession(
 					putDouble("decodeTime", event.decodeTime)
 					putDouble("fps", event.fps)
 					putDouble("frameLost", event.frameLost)
-					// 给前端性能条附带触觉状态：仅 DualSense 触觉真正激活时为 true
+					// 给前端性能条附带触觉状态：仅 DualSense/Razer Kishi 触觉真正激活时为 true
 					putBoolean(
 						"hapticsActive",
-						if (usbMode && usbController == DSCONTROLLER_NAME) {
+						if (usbMode && (usbController == DSCONTROLLER_NAME || usbController == RAZER_KISHI_CONTROLLER_NAME)) {
 							getMainActivity()?.isDualSenseHapticsActive() ?: false
 						} else {
 							false

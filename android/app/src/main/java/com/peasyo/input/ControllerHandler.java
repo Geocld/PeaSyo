@@ -201,7 +201,7 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
     }
 
     /**
-     * 把一帧 PS5 触觉音频数据分发给已连接的 DualSense 控制器，并附带强度倍率
+     * 把一帧 PS5 触觉音频数据分发给已连接的 DualSense/Razer Kishi 控制器，并附带强度倍率
      */
     public void handleHapticAudio(byte[] pcmData, float intensityGain) {
         if (pcmData == null || pcmData.length == 0) {
@@ -212,6 +212,8 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
             UsbDeviceContext deviceContext = usbDeviceContexts.valueAt(i);
             if (deviceContext.device instanceof AbstractDualSenseController) {
                 ((AbstractDualSenseController) deviceContext.device).enqueueHapticData(pcmData, gain);
+            } else if (deviceContext.device instanceof RazerKishiController) {
+                ((RazerKishiController) deviceContext.device).enqueueHapticData(pcmData, gain);
             }
         }
     }
@@ -230,7 +232,7 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
     }
 
     /**
-     * 启动所有 DualSense 的触觉模式，至少一个成功就返回 true
+     * 启动所有 DualSense/Razer Kishi 的触觉模式，至少一个成功就返回 true
      */
     public boolean startHaptics() {
         boolean anyStarted = false;
@@ -241,31 +243,42 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
                 if (ds.hasHapticEndpoint() && ds.startHaptics()) {
                     anyStarted = true;
                 }
+            } else if (deviceContext.device instanceof RazerKishiController) {
+                RazerKishiController rk = (RazerKishiController) deviceContext.device;
+                if (rk.hasHapticEndpoint() && rk.startHaptics()) {
+                    anyStarted = true;
+                }
             }
         }
         return anyStarted;
     }
 
     /**
-     * 停止所有 DualSense 的触觉模式
+     * 停止所有 DualSense/Razer Kishi 的触觉模式
      */
     public void stopHaptics() {
         for (int i = 0; i < usbDeviceContexts.size(); i++) {
             UsbDeviceContext deviceContext = usbDeviceContexts.valueAt(i);
             if (deviceContext.device instanceof AbstractDualSenseController) {
                 ((AbstractDualSenseController) deviceContext.device).stopHaptics();
+            } else if (deviceContext.device instanceof RazerKishiController) {
+                ((RazerKishiController) deviceContext.device).stopHaptics();
             }
         }
     }
 
     /**
-     * 是否存在处于触觉模式的 DualSense
+     * 是否存在处于触觉模式的 DualSense/Razer Kishi
      */
     public boolean isAnyDualSenseHapticsActive() {
         for (int i = 0; i < usbDeviceContexts.size(); i++) {
             UsbDeviceContext deviceContext = usbDeviceContexts.valueAt(i);
             if (deviceContext.device instanceof AbstractDualSenseController) {
                 if (((AbstractDualSenseController) deviceContext.device).isHapticEnabled()) {
+                    return true;
+                }
+            } else if (deviceContext.device instanceof RazerKishiController) {
+                if (((RazerKishiController) deviceContext.device).isHapticEnabled()) {
                     return true;
                 }
             }
