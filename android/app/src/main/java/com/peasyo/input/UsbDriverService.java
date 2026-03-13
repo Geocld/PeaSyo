@@ -235,6 +235,11 @@ public class UsbDriverService extends Service implements UsbDriverListener {
                 UsbRumbleManager.setUsbController("DualSenseController");
                 controller = new DualSenseController(device, connection, nextDeviceId++, this);
             }
+            else if (RazerKishiController.canClaimDevice(device)) {
+                Log.d("UsbDriverService", "RazerKishiController");
+                UsbRumbleManager.setUsbController("RazerKishiController");
+                controller = new RazerKishiController(device, connection, nextDeviceId++, this);
+            }
             else {
                 // 理论不可达
                 return;
@@ -322,7 +327,8 @@ public class UsbDriverService extends Service implements UsbDriverListener {
                 ((!isRecognizedInputDevice(device) || claimAllAvailable) && Xbox360Controller.canClaimDevice(device)) ||
                 // 无线控制器与接收器 PID 不同，这里不能依赖 isRecognizedInputDevice() 判断。
                 ((!kernelSupportsXbox360W() || claimAllAvailable) && Xbox360WirelessDongle.canClaimDevice(device)) ||
-                (DualSenseController.canClaimDevice((device)) && claimAllAvailable);
+                (DualSenseController.canClaimDevice((device)) && claimAllAvailable) ||
+                (RazerKishiController.canClaimDevice(device) && claimAllAvailable);
     }
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
