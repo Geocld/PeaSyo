@@ -22,6 +22,10 @@ PeaSyo，也称貔貅（pixiu），使用中国古代神兽命名，是一款PS4
 
 > 注意: 如果你使用貔貅串流PS4，你的主机系统固件版本需要升级到8+。
 
+## Windows/MacOS/Linux(steamOS)
+
+如果你在找 Windows/MacOS/Linux(steamOS) 平台的PS5/4串流应用, 请移步PeaSyo桌面版 [PeaSyo4Desk](https://github.com/Geocld/PeaSyo4Desk).
+
 ## 功能
 
 - 支持多主机注册

@@ -23,6 +23,10 @@ PeaSyo, also known as Pixiu, is a PS4/5 streaming application for Android that s
 
 > Notice: PeaSyo is only compatible with PS4 systems running firmware version 8.0 or higher
 
+## Windows/MacOS/Linux(steamOS)
+
+If you are looking for Windows/MacOS/Linux(steamOS) Playstation remote play application, you can use PeaSyo desktop version [PeaSyo4Desk](https://github.com/Geocld/PeaSyo4Desk).
+
 ## Features
 
 - Support for multiple console registration
