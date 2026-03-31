@@ -18,6 +18,7 @@ precision mediump float;
 uniform samplerExternalOES inputTexture; // 纹理
 // uniform vec2 inputTextureSize; // 输入纹理大小
 uniform vec2 outputTextureSize; // 输出纹理大小
+uniform float uHdrToneMap; // 是否启用 HDR 色调映射
 
 in vec2 vTexCoord; // 从顶点着色器传过来的纹理坐标
 out vec4 fragColor; // 输出颜色
@@ -40,6 +41,43 @@ float ARsqH1(float x) {
 
 float ASatH1(float x) {
     return clamp(x, 0.0, 1.0);
+}
+
+vec3 applyHdrToneMap(vec3 color) {
+    if (uHdrToneMap < 0.5) {
+        return color;
+    }
+
+    const float m1 = 0.1593017578125;
+    const float m2 = 78.84375;
+    const float c1 = 0.8359375;
+    const float c2 = 18.8515625;
+    const float c3 = 18.6875;
+    const float acesA = 2.51;
+    const float acesB = 0.03;
+    const float acesC = 2.43;
+    const float acesD = 0.59;
+    const float acesE = 0.14;
+
+    vec3 powered = pow(max(color, vec3(0.0)), vec3(1.0 / m2));
+    vec3 numerator = max(powered - vec3(c1), vec3(0.0));
+    vec3 denominator = max(vec3(c2) - vec3(c3) * powered, vec3(1e-6));
+    vec3 linearHdr = pow(numerator / denominator, vec3(1.0 / m1)) * (10000.0 / 203.0);
+    vec3 linearSdr = clamp(
+        (linearHdr * (acesA * linearHdr + acesB))
+            / (linearHdr * (acesC * linearHdr + acesD) + acesE),
+        0.0,
+        1.0
+    );
+
+    vec3 lower = linearSdr * 12.92;
+    vec3 higher = 1.055 * pow(max(linearSdr, vec3(0.0)), vec3(1.0 / 2.4)) - 0.055;
+    vec3 cutoff = step(vec3(0.0031308), linearSdr);
+    return mix(lower, higher, cutoff);
+}
+
+vec3 sampleInput(vec2 uv) {
+    return applyHdrToneMap(textureLod(inputTexture, uv, 0.0).rgb);
 }
 
 #define FSR_RCAS_LIMIT (0.25 - (1.0 / 16.0))
@@ -127,17 +165,17 @@ void FsrMobile(
     //    E
     vec2 pp = ip * con0.xy + con0.zw;
     vec2 tc = (pp + vec2(0.5)) * con1.xy;
-    vec3 sC = textureLod(inputTexture, tc, 0.0).rgb;
+    vec3 sC = sampleInput(tc);
 #if 0  // Set to 1 to make FSR only affect the screen's central region.
     if (any(abs(tc - 0.5) > float(0.75 / 2.0))) {
         pix = sC;
         return;
     }
 #endif
-    vec3 sA = textureLod(inputTexture, tc - vec2(0, con1.y), 0.0).rgb;
-    vec3 sB = textureLod(inputTexture, tc - vec2(con1.x, 0), 0.0).rgb;
-    vec3 sD = textureLod(inputTexture, tc + vec2(con1.x, 0), 0.0).rgb;
-    vec3 sE = textureLod(inputTexture, tc + vec2(0, con1.y), 0.0).rgb;
+    vec3 sA = sampleInput(tc - vec2(0, con1.y));
+    vec3 sB = sampleInput(tc - vec2(con1.x, 0));
+    vec3 sD = sampleInput(tc + vec2(con1.x, 0));
+    vec3 sE = sampleInput(tc + vec2(0, con1.y));
 //------------------------------------------------------------------------------------------------------------------------------ 
     // Combined RCAS: Min and max of ring.
     float mn4R = min(AMin3H1(sA.r, sB.r, sD.r), sE.r);
@@ -224,18 +262,18 @@ void FsrMobile(
     // vec4 nokjG = FsrEasuGH(p3);
     // vec4 nokjB = FsrEasuBH(p3);
     // 由于 textureGather 仅在3.1版本中可用，所以这里(OpenGL ES 3.0)使用 textureLod 代替
-    vec3 b = textureLod(inputTexture, (fp + vec2( 0.5, -0.5)) * con1.xy, 0.0).rgb;
-    vec3 c = textureLod(inputTexture, (fp + vec2( 1.5, -0.5)) * con1.xy, 0.0).rgb;
-    vec3 e = textureLod(inputTexture, (fp + vec2(-0.5,  0.5)) * con1.xy, 0.0).rgb;
-    vec3 f = textureLod(inputTexture, (fp + vec2( 0.5,  0.5)) * con1.xy, 0.0).rgb;
-    vec3 g = textureLod(inputTexture, (fp + vec2( 1.5,  0.5)) * con1.xy, 0.0).rgb;
-    vec3 h = textureLod(inputTexture, (fp + vec2( 2.5,  0.5)) * con1.xy, 0.0).rgb;
-    vec3 i = textureLod(inputTexture, (fp + vec2(-0.5,  1.5)) * con1.xy, 0.0).rgb;
-    vec3 j = textureLod(inputTexture, (fp + vec2( 0.5,  1.5)) * con1.xy, 0.0).rgb;
-    vec3 k = textureLod(inputTexture, (fp + vec2( 1.5,  1.5)) * con1.xy, 0.0).rgb;
-    vec3 l = textureLod(inputTexture, (fp + vec2( 2.5,  1.5)) * con1.xy, 0.0).rgb;
-    vec3 n = textureLod(inputTexture, (fp + vec2( 0.5,  2.5)) * con1.xy, 0.0).rgb;
-    vec3 o = textureLod(inputTexture, (fp + vec2( 1.5,  2.5)) * con1.xy, 0.0).rgb;
+    vec3 b = sampleInput((fp + vec2( 0.5, -0.5)) * con1.xy);
+    vec3 c = sampleInput((fp + vec2( 1.5, -0.5)) * con1.xy);
+    vec3 e = sampleInput((fp + vec2(-0.5,  0.5)) * con1.xy);
+    vec3 f = sampleInput((fp + vec2( 0.5,  0.5)) * con1.xy);
+    vec3 g = sampleInput((fp + vec2( 1.5,  0.5)) * con1.xy);
+    vec3 h = sampleInput((fp + vec2( 2.5,  0.5)) * con1.xy);
+    vec3 i = sampleInput((fp + vec2(-0.5,  1.5)) * con1.xy);
+    vec3 j = sampleInput((fp + vec2( 0.5,  1.5)) * con1.xy);
+    vec3 k = sampleInput((fp + vec2( 1.5,  1.5)) * con1.xy);
+    vec3 l = sampleInput((fp + vec2( 2.5,  1.5)) * con1.xy);
+    vec3 n = sampleInput((fp + vec2( 0.5,  2.5)) * con1.xy);
+    vec3 o = sampleInput((fp + vec2( 1.5,  2.5)) * con1.xy);
     vec4 fgcbR = vec4(f.r, g.r, c.r, b.r);
     vec4 fgcbG = vec4(f.g, g.g, c.g, b.g);
     vec4 fgcbB = vec4(f.b, g.b, c.b, b.b);
@@ -274,7 +312,7 @@ void main() {
                 texSize.x, texSize.y,
                 outputTextureSize.x, outputTextureSize.y);
     if (con0.x > 1.0 || con0.y > 1.0) {
-        fragColor = texture(inputTexture, vTexCoord);
+        fragColor = vec4(sampleInput(vTexCoord), 1.0);
     } else {
         vec3 pix;
         vec2 ip = vTexCoord * outputTextureSize;

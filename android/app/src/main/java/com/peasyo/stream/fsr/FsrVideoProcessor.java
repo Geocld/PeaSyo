@@ -110,12 +110,13 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         }
 
         // If two-pass FSR hits driver compiler bugs, fallback to mobile single-pass FSR (still has sharpening).
-        boolean preferredHasMobileExtras = "fsr/2.0/".equals(preferredDir);
+        boolean preferredHasHdrToneMap = true;
+        boolean preferredHasSharpness = "fsr/2.0/".equals(preferredDir);
         if (tryInitMobileSinglePass(
                 preferredDir,
                 preferredNeedInputSize,
-                preferredHasMobileExtras,
-                preferredHasMobileExtras
+                preferredHasHdrToneMap,
+                preferredHasSharpness
         )
                 || (!"fsr/2.0/".equals(preferredDir)
                 && tryInitMobileSinglePass("fsr/2.0/", true, true, true))) {
@@ -566,12 +567,13 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         pipelineMode = PIPELINE_NONE;
         activeShaderDir = "none";
 
-        boolean failedHasMobileExtras = "fsr/2.0/".equals(failedShaderDir);
+        boolean failedHasHdrToneMap = true;
+        boolean failedHasSharpness = "fsr/2.0/".equals(failedShaderDir);
         if (tryInitMobileSinglePass(
                 failedShaderDir,
                 failedNeedInputSize,
-                failedHasMobileExtras,
-                failedHasMobileExtras
+                failedHasHdrToneMap,
+                failedHasSharpness
         )) {
             return;
         }
