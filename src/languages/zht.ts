@@ -432,7 +432,7 @@ export default {
     HistoryDesc: '查看PeaSyo历史更新日志',
     FSRTitle: '超解析度(AMD FSR 1.0)',
     FSRDesc:
-      '啟用AMD FSR 1.0超解析度技術，該功能為實驗性功能可能會有相容性或穩定性問題，建議在高性能設備上使用(暂无法使用HDR)',
+      '啟用AMD FSR 1.0超解析度技術，該功能為實驗性功能可能會有相容性或穩定性問題，建議在高性能設備上使用',
     frame_pacing_title: '視訊影格調步',
     frame_pacing_desc: '指定如何平衡視訊延遲和平滑度',
     latency: '偏好低延遲',

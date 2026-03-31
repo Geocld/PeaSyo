@@ -431,7 +431,7 @@ export default {
     HistoryDesc: 'View update histories of PeaSyo',
     FSRTitle: 'Super Resolución (AMD FSR 1.0)',
     FSRDesc:
-      'Habilitar la tecnología de super resolución AMD FSR 1.0, que es una función experimental que puede tener problemas de compatibilidad o estabilidad. Se recomienda usar en dispositivos de alto rendimiento (HDR no funciona)',
+      'Habilitar la tecnología de super resolución AMD FSR 1.0, que es una función experimental que puede tener problemas de compatibilidad o estabilidad. Se recomienda usar en dispositivos de alto rendimiento',
     frame_pacing_title: 'Ritmo de cuadros por segundo en video',
     frame_pacing_desc:
       'Especificar como balancear la latencia de video y la fluidez',

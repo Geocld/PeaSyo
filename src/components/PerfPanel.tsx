@@ -5,6 +5,7 @@ import {useTranslation} from 'react-i18next';
 import {getSettings} from '../store/settingStore';
 
 type Props = {
+  isRemote: boolean;
   resolution: string;
   performance: any;
   hapticsActive?: boolean;
@@ -13,6 +14,7 @@ type Props = {
 const {BatteryModule} = NativeModules;
 
 const PerfPanel: React.FC<Props> = ({
+  isRemote = false,
   resolution = '',
   performance = {},
   hapticsActive = false,
@@ -47,7 +49,13 @@ const PerfPanel: React.FC<Props> = ({
   }, []);
 
   const isHorizon = settings.performance_style;
-  const codec = settings.codec.indexOf('H265') > -1 ? 'HEVC' : 'AVC';
+  const codecMode = isRemote ? settings.remote_codec : settings.codec;
+  const codec =
+    codecMode.indexOf('H265') > -1
+      ? codecMode.indexOf('HDR') > -1
+        ? 'HEVC-HDR'
+        : 'HEVC'
+      : 'AVC';
 
   const computedRtt = (value: number | undefined): string => {
     if (value === undefined) {

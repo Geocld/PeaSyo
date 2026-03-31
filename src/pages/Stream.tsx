@@ -112,6 +112,7 @@ function StreamScreen({navigation, route}) {
   const [loginPin, setLoginPin] = React.useState('');
   const [showPinModal, setShowPinModal] = React.useState(false);
   const [pinIncorrect, setPinIncorrect] = React.useState(false);
+  const [isRemoteMode, setIsRemoteMode] = React.useState(false);
 
   const stateEventListener = React.useRef<any>(undefined);
   const usbGpEventListener = React.useRef<any>(undefined);
@@ -394,6 +395,8 @@ function StreamScreen({navigation, route}) {
       }
     }
 
+    setIsRemoteMode(isRemote);
+
     if (isRemote) {
       setResolution(`${remote_width} X ${remote_height}`);
     } else {
@@ -403,8 +406,6 @@ function StreamScreen({navigation, route}) {
     const _isTouchpadDual = touchpad_type === 2;
     setIsTouchpadFull(_isTouchpadFull);
     setIsTouchpadDual(_isTouchpadDual);
-
-    let _codec = isRemote ? remote_codec : codec;
 
     const _streamInfo = {
       ps5: _consoleInfo.apName.indexOf('PS5') > -1,
@@ -422,7 +423,7 @@ function StreamScreen({navigation, route}) {
       height: isRemote ? remote_height : height,
       fps: isRemote ? remote_fps : fps,
       bitrate: isRemote ? remote_bitrate : bitrate,
-      codec: _codec,
+      codec: isRemote ? remote_codec : codec,
       framePacing: frame_pacing,
       rumble,
       rumbleIntensity: rumble_intensity,
@@ -1170,6 +1171,7 @@ function StreamScreen({navigation, route}) {
 
       {showPerformance && (
         <PerfPanel
+          isRemote={isRemoteMode}
           resolution={resolution}
           performance={avgPerformance}
           hapticsActive={hapticsActive}
