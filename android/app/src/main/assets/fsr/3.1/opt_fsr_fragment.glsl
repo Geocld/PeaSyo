@@ -53,11 +53,6 @@ vec3 applyHdrToneMap(vec3 color) {
     const float c1 = 0.8359375;
     const float c2 = 18.8515625;
     const float c3 = 18.6875;
-    const float acesA = 2.51;
-    const float acesB = 0.03;
-    const float acesC = 2.43;
-    const float acesD = 0.59;
-    const float acesE = 0.14;
 
     vec3 powered = pow(max(color, vec3(0.0)), vec3(1.0 / m2));
     vec3 numerator = max(powered - vec3(c1), vec3(0.0));
@@ -70,13 +65,9 @@ vec3 applyHdrToneMap(vec3 color) {
         dot(linearHdr2020, vec3(-0.0182, -0.1006, 1.1187))
     ), vec3(0.0));
     vec3 linearScene = linearHdr709 / 203.0;
-
-    vec3 linearSdr = clamp(
-        (linearScene * (acesA * linearScene + acesB))
-            / (linearScene * (acesC * linearScene + acesD) + acesE),
-        0.0,
-        1.0
-    );
+    vec3 linearSdr = linearScene / (vec3(1.0) + linearScene);
+    linearSdr = mix(linearSdr, sqrt(max(linearSdr, vec3(0.0))), 0.10);
+    linearSdr = clamp(linearSdr, 0.0, 1.0);
 
     vec3 lower = linearSdr * 12.92;
     vec3 higher = 1.055 * pow(max(linearSdr, vec3(0.0)), vec3(1.0 / 2.4)) - 0.055;
