@@ -62,10 +62,20 @@ vec3 applyHdrToneMap(vec3 color) {
     vec3 powered = pow(max(color, vec3(0.0)), vec3(1.0 / m2));
     vec3 numerator = max(powered - vec3(c1), vec3(0.0));
     vec3 denominator = max(vec3(c2) - vec3(c3) * powered, vec3(1e-6));
-    vec3 linearHdr = pow(numerator / denominator, vec3(1.0 / m1)) * (10000.0 / 203.0);
+
+    // Decode PQ (BT.2020) to linear nits.
+    vec3 linearHdr2020 = pow(numerator / denominator, vec3(1.0 / m1)) * 10000.0;
+    // Map BT.2020 primaries into BT.709 before SDR tone mapping.
+    vec3 linearHdr709 = max(vec3(
+        dot(linearHdr2020, vec3(1.6605, -0.5876, -0.0728)),
+        dot(linearHdr2020, vec3(-0.1246, 1.1329, -0.0083)),
+        dot(linearHdr2020, vec3(-0.0182, -0.1006, 1.1187))
+    ), vec3(0.0));
+    vec3 linearScene = linearHdr709 / 203.0;
+
     vec3 linearSdr = clamp(
-        (linearHdr * (acesA * linearHdr + acesB))
-            / (linearHdr * (acesC * linearHdr + acesD) + acesE),
+        (linearScene * (acesA * linearScene + acesB))
+            / (linearScene * (acesC * linearScene + acesD) + acesE),
         0.0,
         1.0
     );

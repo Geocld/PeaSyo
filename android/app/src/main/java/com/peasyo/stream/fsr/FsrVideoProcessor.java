@@ -1,6 +1,7 @@
 package com.peasyo.stream.fsr;
 
 import android.content.Context;
+import android.opengl.EGL14;
 import android.opengl.GLES20;
 import android.util.Log;
 
@@ -20,6 +21,12 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
     private static final boolean ENABLE_TWO_PASS_PIPELINE = true;
     // Some drivers fail with invalid operation on 3.1 two-pass uniforms; prefer 3.1 mobile instead.
     private static final boolean ENABLE_TWO_PASS_FOR_31 = false;
+    // Enable software HDR->SDR mapping for SDR output windows.
+    private static final boolean FORCE_SOFTWARE_HDR_TONE_MAP = true;
+
+    private static final int EGL_EXTENSIONS = 0x3055;
+    private static final int EGL_GL_COLORSPACE_KHR = 0x309D;
+    private static final int EGL_GL_COLORSPACE_BT2020_PQ_EXT = 0x3340;
 
     private static final int PIPELINE_NONE = 0;
     private static final int PIPELINE_TWO_PASS = 1;
@@ -53,7 +60,8 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
     private boolean twoPassFailureLogged;
 
     private boolean fsrEnabled = true;
-    private boolean hdrToneMappingEnabled;
+    private boolean hdrInputEnabled;
+    private boolean usingPqWindow;
 
     private int outputWidth = -1;
     private int outputHeight = -1;
@@ -67,6 +75,7 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
     public void initialize(int glMajorVersion, int glMinorVersion, String extensions) {
         resetPrograms();
         deleteFramebuffer();
+        detectHdrWindowState();
 
         boolean supportsExternalOesEssl3 = extensions != null
                 && extensions.contains("GL_OES_EGL_image_external_essl3");
@@ -183,7 +192,13 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
     }
 
     public void setHdrToneMappingEnabled(boolean enabled) {
-        hdrToneMappingEnabled = enabled;
+        hdrInputEnabled = enabled;
+        if (enabled && !FORCE_SOFTWARE_HDR_TONE_MAP) {
+            Log.i(
+                    TAG,
+                    "HDR stream detected; software HDR tone-map disabled (pxplay-compatible SDR path)."
+            );
+        }
     }
 
     public void setSharpness(float value) {
@@ -417,7 +432,7 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
             program.setFloatsUniform("outputTextureSize", outputSize);
             program.setFloatsUniform("uTexTransform", transformMatrix);
             if (mobileHasHdrToneMap) {
-                program.setFloatUniform("uHdrToneMap", hdrToneMappingEnabled ? 1f : 0f);
+                program.setFloatUniform("uHdrToneMap", shouldApplySoftwareHdrToneMap() ? 1f : 0f);
             }
             if (mobileHasSharpness) {
                 program.setFloatUniform("sharpness", mobileSharpness);
@@ -494,7 +509,7 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
             program = ensurePassthroughProgram();
             program.setSamplerTexIdUniform("inputTexture", frameTexture, 0);
             program.setFloatsUniform("uTexTransform", transformMatrix);
-            program.setFloatUniform("uHdrToneMap", hdrToneMappingEnabled ? 1f : 0f);
+            program.setFloatUniform("uHdrToneMap", shouldApplySoftwareHdrToneMap() ? 1f : 0f);
             program.bindAttributesAndUniforms();
         } catch (GlException | IOException e) {
             Log.e(TAG, "Failed to bind passthrough shader program", e);
@@ -608,6 +623,47 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
             return;
         }
         Log.i(TAG, "Effective sharpness [" + reason + "]: pipeline=none");
+    }
+
+    private boolean shouldApplySoftwareHdrToneMap() {
+        if (!hdrInputEnabled) {
+            return false;
+        }
+        if (usingPqWindow) {
+            // PQ output window should preserve HDR signal and avoid SDR tone map in this shader path.
+            return false;
+        }
+        return FORCE_SOFTWARE_HDR_TONE_MAP;
+    }
+
+    private void detectHdrWindowState() {
+        usingPqWindow = false;
+        android.opengl.EGLDisplay display = EGL14.eglGetCurrentDisplay();
+        android.opengl.EGLSurface drawSurface = EGL14.eglGetCurrentSurface(EGL14.EGL_DRAW);
+        if (display == null || display == EGL14.EGL_NO_DISPLAY
+                || drawSurface == null || drawSurface == EGL14.EGL_NO_SURFACE) {
+            return;
+        }
+
+        String eglExtensions = EGL14.eglQueryString(display, EGL_EXTENSIONS);
+        boolean supportsPqColorspace = eglExtensions != null
+                && eglExtensions.contains("EGL_KHR_gl_colorspace")
+                && eglExtensions.contains("EGL_EXT_gl_colorspace_bt2020_pq");
+        if (!supportsPqColorspace) {
+            Log.i(TAG, "EGL PQ colorspace extension unavailable; use SDR window path.");
+            return;
+        }
+
+        int[] colorspace = new int[1];
+        if (EGL14.eglQuerySurface(display, drawSurface, EGL_GL_COLORSPACE_KHR, colorspace, 0)) {
+            usingPqWindow = colorspace[0] == EGL_GL_COLORSPACE_BT2020_PQ_EXT;
+        }
+
+        Log.i(
+                TAG,
+                "HDR surface state: usingPqWindow=" + usingPqWindow
+                        + ", forceSoftwareToneMap=" + FORCE_SOFTWARE_HDR_TONE_MAP
+        );
     }
 
     private void safeDeleteProgram(@Nullable GlProgram program) {
