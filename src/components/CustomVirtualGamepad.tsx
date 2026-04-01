@@ -8,6 +8,7 @@ import {getSettings} from '../store/gamepadStore';
 type Props = {
   title: string;
   opacity: number;
+  isTouchpadDual?: boolean;
   onPressIn: (name: string) => void;
   onPressOut: (name: string) => void;
   onStickMove: (id: string, position: any) => void;
@@ -16,6 +17,7 @@ type Props = {
 const CustomVirtualGamepad: React.FC<Props> = ({
   title,
   opacity = 0.6,
+  isTouchpadDual = false,
   onPressIn,
   onPressOut,
   onStickMove,
@@ -200,7 +202,16 @@ const CustomVirtualGamepad: React.FC<Props> = ({
   return (
     <View style={styles.wrap} pointerEvents="box-none">
       {buttons.map((button: any) => {
-        if (!button.show) {
+        const isDualModeButton =
+          button.name === 'View' ||
+          button.name === 'Nexus' ||
+          button.name === 'Menu';
+
+        if (isTouchpadDual && !isDualModeButton) {
+          return null;
+        }
+
+        if (!isTouchpadDual && !button.show) {
           return null;
         }
         if (button.name === 'LeftStick') {

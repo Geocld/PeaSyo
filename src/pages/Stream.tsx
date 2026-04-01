@@ -499,11 +499,7 @@ function StreamScreen({navigation, route}) {
 
           setTimeout(() => {
             // Alway show virtual gamepad
-            if (
-              _settings.show_virtual_gamead &&
-              !_isTouchpadFull &&
-              !_isTouchpadDual
-            ) {
+            if (_settings.show_virtual_gamead && !_isTouchpadFull) {
               setShowVirtualGamepad(true);
             }
 
@@ -966,6 +962,7 @@ function StreamScreen({navigation, route}) {
         <CustomVirtualGamepad
           title={settings.custom_virtual_gamepad}
           opacity={settings.virtual_gamepad_opacity}
+          isTouchpadDual={isTouchpadDual}
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
           onStickMove={handleStickMove}
@@ -975,6 +972,7 @@ function StreamScreen({navigation, route}) {
       return (
         <VirtualGamepad
           opacity={settings.virtual_gamepad_opacity}
+          isTouchpadDual={isTouchpadDual}
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
           onStickMove={handleStickMove}
@@ -1226,7 +1224,6 @@ function StreamScreen({navigation, route}) {
                     )}
                     {connectState === CONNECTED &&
                       !isTouchpadFull &&
-                      !isTouchpadDual &&
                       !isUsbDs5 && (
                         <List.Item
                           title={t('Toggle Virtual Gamepad')}

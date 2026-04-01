@@ -157,7 +157,8 @@ export default {
     'Always display touchpad': '始终显示触摸板',
     'Touchpad type': '触摸板类型',
     TouchpadTypeDesc: '修改触摸板类型，可以设置为全屏/对称触摸板',
-    TouchpadTypeTips: '触摸板使用全屏/对称模式后虚拟按键将无法使用',
+    TouchpadTypeTips:
+      '触摸板使用全屏模式后虚拟按键将无法使用,对称模式只能使用share/ps/options功能键',
     TouchpadScaleTitle: '触摸板缩放',
     TouchpadScaleDesc:
       '如果虚拟触摸板大小不符合预期，可以在这里设置触摸板缩放比例',

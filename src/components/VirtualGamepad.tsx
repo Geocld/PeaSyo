@@ -6,6 +6,7 @@ import {getSettings} from '../store/settingStore';
 
 type Props = {
   opacity: number;
+  isTouchpadDual?: boolean;
   onPressIn: (name: string) => void;
   onPressOut: (name: string) => void;
   onStickMove: (id: string, position: any) => void;
@@ -13,6 +14,7 @@ type Props = {
 
 const VirtualGamepad: React.FC<Props> = ({
   opacity = 0.7,
+  isTouchpadDual = false,
   onPressIn,
   onPressOut,
   onStickMove,
@@ -39,6 +41,33 @@ const VirtualGamepad: React.FC<Props> = ({
   const viewLeft = width * 0.5 - 100;
   const menuLeft = width * 0.5 + 60;
   const touchpadLeft = width * 0.5 - 200;
+
+  if (isTouchpadDual) {
+    return (
+      <View style={styles.wrap} pointerEvents="box-none">
+        <ButtonView
+          style={[styles.button, styles.view, {left: viewLeft, opacity}]}
+          buttonName="control_button_share"
+          onPressIn={() => handlePressIn('SHARE')}
+          onPressOut={() => handlePressOut('SHARE')}
+        />
+
+        <ButtonView
+          style={[styles.button, styles.nexus, {left: nexusLeft, opacity}]}
+          buttonName="control_button_home"
+          onPressIn={() => handlePressIn('PS')}
+          onPressOut={() => handlePressOut('PS')}
+        />
+
+        <ButtonView
+          style={[styles.button, styles.menu, {left: menuLeft, opacity}]}
+          buttonName="control_button_options"
+          onPressIn={() => handlePressIn('OPTIONS')}
+          onPressOut={() => handlePressOut('OPTIONS')}
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.wrap} pointerEvents="box-none">

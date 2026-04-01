@@ -169,7 +169,7 @@ export default {
     TouchpadTypeDesc:
       'Modificar el tipo de panel táctil, puede configurarse como Pantalla completa/Doble panel táctil',
     TouchpadTypeTips:
-      'Al usar Pantalla completa/Doble para el panel táctil, los botones virtuales no estarán disponibles',
+      'Al usar Pantalla completa/ Doble para el panel táctil, los botones virtuales no estarán disponibles, el modo Doble solo puede usar los botones de función share/ps/options',
     TouchpadScaleTitle: 'Escala del panel táctil',
     TouchpadScaleDesc:
       'Si el tamaño del panel táctil virtual no cumple con las expectativas, puedes configurar la proporción de escala aquí.',

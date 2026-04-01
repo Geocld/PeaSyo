@@ -164,7 +164,7 @@ export default {
     TouchpadTypeDesc:
       'Modify touchpad type, can be set to Fullscreen/Dual touchpad',
     TouchpadTypeTips:
-      'When using Fullscreen/Dual for touchpad, virtual buttons will be unavailable',
+      'When using Fullscreen for touchpad, virtual buttons will be unavailable, Dual mode can only use share/ps/options function keys',
     TouchpadScaleTitle: 'Touchpad Scale',
     TouchpadScaleDesc:
       'If the size of the virtual touchpad does not meet expectations, you can set the touchpad scaling ratio here.',
