@@ -36,6 +36,18 @@ function AboutScreen({navigation, route}) {
                 https://github.com/Geocld/PeaSyo
               </LinkText>
             </View>
+
+            <View style={styles.mt15}>
+              <Text variant="titleMedium">
+                桌面端 PeaSyo4Desk(Windows/MacOS/SteamOS):
+              </Text>
+            </View>
+            <View>
+              <LinkText url={'https://github.com/Geocld/PeaSyo4Desk'}>
+                https://github.com/Geocld/PeaSyo4Desk
+              </LinkText>
+            </View>
+
             <View>
               <Text variant="titleMedium">
                 如果你喜欢这个项目，欢迎给项目点一个star。
@@ -112,6 +124,17 @@ function AboutScreen({navigation, route}) {
                 https://github.com/Geocld/PeaSyo
               </LinkText>
             </View>
+
+            <View style={styles.mt15}>
+              <Text variant="titleMedium">
+                PC side - PeaSyo4Desk(Windows/MacOS/SteamOS):
+              </Text>
+            </View>
+            <View>
+              <LinkText url={'https://github.com/Geocld/PeaSyo4Desk'}>
+                https://github.com/Geocld/PeaSyo4Desk
+              </LinkText>
+            </View>
           </View>
 
           <View style={styles.block}>
@@ -172,6 +195,9 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: 10,
+  },
+  mt15: {
+    marginTop: 15,
   },
 });
 
