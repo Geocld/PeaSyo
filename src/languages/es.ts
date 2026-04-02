@@ -242,6 +242,7 @@ export default {
       'Si la consola está en modo de suspensión, ¿quieres activarla? Activarla tardará aproximadamente un minuto.',
     OnlyConnect: 'Solo conectar',
     WakeAndConnect: 'Activar y conectar',
+    WakePacketSent: 'Wake packet send',
     Waking: 'Activando...',
     FindConsole: 'Buscando consola...',
     ConsoleNotFound:

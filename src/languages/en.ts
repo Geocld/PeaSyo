@@ -234,6 +234,7 @@ export default {
       'If the console is in sleep mode, you want to wake it up. Waking up takes about one minute.',
     OnlyConnect: 'Connect only',
     WakeAndConnect: 'Wake and connect',
+    WakePacketSent: 'Wake packet send',
     Waking: 'Waking...',
     FindConsole: 'Finding console...',
     ConsoleNotFound:

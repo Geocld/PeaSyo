@@ -238,6 +238,7 @@ export default {
     OnlyConnect: '仅连接',
     WakeAndConnect: '唤醒并连接',
     'Local Wake': '本地唤醒',
+    WakePacketSent: '已发送唤醒包',
     Waking: '正在唤醒主机...',
     FindConsole: '正在寻找主机...',
     ConSoleNotFound:
