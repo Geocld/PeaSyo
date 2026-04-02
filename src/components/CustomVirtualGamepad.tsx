@@ -200,7 +200,9 @@ const CustomVirtualGamepad: React.FC<Props> = ({
   };
 
   return (
-    <View style={styles.wrap} pointerEvents="box-none">
+    <View
+      style={[styles.wrap, isTouchpadDual && styles.dualTopLayer]}
+      pointerEvents="box-none">
       {buttons.map((button: any) => {
         const isDualModeButton =
           button.name === 'View' ||
@@ -348,6 +350,10 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0,
     zIndex: 9,
+  },
+  dualTopLayer: {
+    zIndex: 120,
+    elevation: 120,
   },
   button: {
     opacity: 0.6,

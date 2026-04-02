@@ -996,7 +996,7 @@ function StreamScreen({navigation, route}) {
     // Dual
     if (touchpad_type === 2) {
       return (
-        <View style={touchpadStyle}>
+        <View style={touchpadStyle} pointerEvents="box-none">
           <View
             style={[
               styles.touchLeft,
@@ -1176,9 +1176,17 @@ function StreamScreen({navigation, route}) {
         />
       )}
 
-      {renderVirtualGamepad()}
-
-      {renderTouchpad()}
+      {isTouchpadDual ? (
+        <>
+          {renderTouchpad()}
+          {renderVirtualGamepad()}
+        </>
+      ) : (
+        <>
+          {renderVirtualGamepad()}
+          {renderTouchpad()}
+        </>
+      )}
 
       {renderMessageModal()}
 

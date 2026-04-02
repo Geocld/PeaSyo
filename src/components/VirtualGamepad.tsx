@@ -44,7 +44,7 @@ const VirtualGamepad: React.FC<Props> = ({
 
   if (isTouchpadDual) {
     return (
-      <View style={styles.wrap} pointerEvents="box-none">
+      <View style={[styles.wrap, styles.dualTopLayer]} pointerEvents="box-none">
         <ButtonView
           style={[styles.button, styles.view, {left: viewLeft, opacity}]}
           buttonName="control_button_share"
@@ -279,6 +279,10 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0,
     zIndex: 9,
+  },
+  dualTopLayer: {
+    zIndex: 120,
+    elevation: 120,
   },
   button: {
     width: 50,
