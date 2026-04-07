@@ -14,6 +14,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.peasyo.MainActivity
 import com.peasyo.audio.AudioRouteResolver
 import com.peasyo.lib.ConnectInfo
+import com.peasyo.lib.ConnectionProgressEvent
 import com.peasyo.lib.ConnectedEvent
 import com.peasyo.lib.HolepunchFinishedEvent
 import com.peasyo.lib.ControllerState
@@ -356,6 +357,13 @@ class StreamSession(
 			is HolepunchFinishedEvent -> {
 				val params = Arguments.createMap().apply {
 					putString("type", "holepunchFinished")
+				}
+				sendEvent("streamStateChange", params)
+			}
+			is ConnectionProgressEvent -> {
+				val params = Arguments.createMap().apply {
+					putString("type", "progress")
+					putString("stage", event.stage)
 				}
 				sendEvent("streamStateChange", params)
 			}

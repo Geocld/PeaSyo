@@ -383,6 +383,7 @@ class QuitReason(val value: Int)
 sealed class Event
 object ConnectedEvent: Event()
 object HolepunchFinishedEvent: Event()
+data class ConnectionProgressEvent(val stage: String): Event()
 data class LoginPinRequestEvent(val pinIncorrect: Boolean): Event()
 data class QuitEvent(val reason: QuitReason, val reasonString: String?): Event()
 data class RumbleEvent(
@@ -411,7 +412,23 @@ class Session(connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean)
 	}
 
 	private var nativePtr: Long
+	private val pendingEvents = mutableListOf<Event>()
 	var eventCallback: ((event: Event) -> Unit)? = null
+		set(value)
+		{
+			field = value
+			if(value != null)
+			{
+				val eventsToDispatch = synchronized(pendingEvents) {
+					if(pendingEvents.isEmpty())
+						return@synchronized emptyList()
+					val copy = pendingEvents.toList()
+					pendingEvents.clear()
+					copy
+				}
+				eventsToDispatch.forEach { value(it) }
+			}
+		}
 
 	init
 	{
@@ -443,7 +460,11 @@ class Session(connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean)
 
 	private fun event(event: Event)
 	{
-		eventCallback?.let { it(event) }
+		val cb = eventCallback
+		if(cb != null)
+			cb(event)
+		else
+			synchronized(pendingEvents) { pendingEvents.add(event) }
 	}
 
 	private fun eventConnected()
@@ -454,6 +475,11 @@ class Session(connectInfo: ConnectInfo, logFile: String?, logVerbose: Boolean)
 	private fun eventHolepunchFinish()
 	{
 		event(HolepunchFinishedEvent)
+	}
+
+	private fun eventConnectionProgress(stage: String)
+	{
+		event(ConnectionProgressEvent(stage))
 	}
 
 	private fun eventLoginPinRequest(pinIncorrect: Boolean)

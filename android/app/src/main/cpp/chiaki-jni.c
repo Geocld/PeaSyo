@@ -165,6 +165,7 @@ typedef struct android_chiaki_session_t
     jclass java_session_class;
     jmethodID java_session_event_connected_meth;
     jmethodID java_session_event_holepunch_meth;
+    jmethodID java_session_event_connection_progress_meth;
     jmethodID java_session_event_login_pin_request_meth;
     jmethodID java_session_event_quit_meth;
     jmethodID java_session_event_rumble_meth;
@@ -199,6 +200,18 @@ typedef struct android_chiaki_session_t
     void *audio_output;
 } AndroidChiakiSession;
 
+static void android_chiaki_emit_connection_progress(JNIEnv *env, AndroidChiakiSession *session, const char *stage)
+{
+    if(!env || !session || !stage || !session->java_session_event_connection_progress_meth)
+        return;
+    CHIAKI_LOGI(&global_log, "holepunch progress stage: %s", stage);
+    jstring stage_java = E->NewStringUTF(env, stage);
+    if(!stage_java)
+        return;
+    E->CallVoidMethod(env, session->java_session, session->java_session_event_connection_progress_meth, stage_java);
+    E->DeleteLocalRef(env, stage_java);
+}
+
 static void android_chiaki_event_cb(ChiakiEvent *event, void *user)
 {
     AndroidChiakiSession *session = user;
@@ -221,8 +234,16 @@ static void android_chiaki_event_cb(ChiakiEvent *event, void *user)
         case CHIAKI_EVENT_HOLEPUNCH:
         {
             CHIAKI_LOGE(&global_log, "holepunch !! CHIAKI_EVENT_HOLEPUNCH");
-            E->CallVoidMethod(env, session->java_session,
-                              session->java_session_event_holepunch_meth);
+            if(event->data_holepunch.finished)
+            {
+                android_chiaki_emit_connection_progress(env, session, "connecting");
+                E->CallVoidMethod(env, session->java_session,
+                                  session->java_session_event_holepunch_meth);
+            }
+            else
+            {
+                android_chiaki_emit_connection_progress(env, session, "testingConnection");
+            }
             break;
         }
         case CHIAKI_EVENT_QUIT:
@@ -722,6 +743,7 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
     session->java_session_class = E->NewGlobalRef(env, E->GetObjectClass(env, session->java_session));
     session->java_session_event_connected_meth = E->GetMethodID(env, session->java_session_class, "eventConnected", "()V");
     session->java_session_event_holepunch_meth = E->GetMethodID(env, session->java_session_class, "eventHolepunchFinish", "()V");
+    session->java_session_event_connection_progress_meth = E->GetMethodID(env, session->java_session_class, "eventConnectionProgress", "(Ljava/lang/String;)V");
     session->java_session_event_login_pin_request_meth = E->GetMethodID(env, session->java_session_class, "eventLoginPinRequest", "(Z)V");
     session->java_session_event_quit_meth = E->GetMethodID(env, session->java_session_class, "eventQuit", "(ILjava/lang/String;)V");
     session->java_session_event_rumble_meth = E->GetMethodID(env, session->java_session_class, "eventRumble", "(IIII)V");
@@ -853,6 +875,7 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
                 break;
             }
 
+            android_chiaki_emit_connection_progress(env, session, "checkingNetworkType");
             err = chiaki_holepunch_upnp_discover(hp_session);
             if(err != CHIAKI_ERR_SUCCESS)
             {
@@ -861,6 +884,7 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
                 continue;
             }
 
+            android_chiaki_emit_connection_progress(env, session, "preparingRemoteSession");
             err = chiaki_holepunch_session_create(hp_session);
             if (err != CHIAKI_ERR_SUCCESS)
             {
@@ -885,6 +909,7 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
                 continue;
             }
 
+            android_chiaki_emit_connection_progress(env, session, "linkingYourConsole");
             err = chiaki_holepunch_session_punch_hole(hp_session, CHIAKI_HOLEPUNCH_PORT_TYPE_CTRL);
             if (err != CHIAKI_ERR_SUCCESS)
             {

@@ -282,6 +282,11 @@ export default {
     // Stream
     SurfaceRenderDesc:
       'Actualmente usando el modo de renderizado de rendimiento, inicializando la interfaz',
+    checkingNetworkType: 'Comprobando tipo de red…',
+    preparingRemoteSession: 'Preparando sesión remota…',
+    linkingYourConsole: 'Vinculando tu consola…',
+    testingConnection: 'Probando la conexión…',
+    connecting: 'Conectando…',
     PSNConnecting:
       'Conectando a PSN, este proceso puede tardar unos minutos. Por favor espera pacientemente. Si no hay respuesta después de 5 minutos, cierra la aplicación e intenta nuevamente.',
     HolepunchFinished: 'Perforación de PSN exitosa, conectando a la consola...',

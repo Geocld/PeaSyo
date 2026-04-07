@@ -271,6 +271,11 @@ export default {
     SurfaceRenderDesc: '當前正在使用性能渲染模式，界面初始化中',
     Connected: '連接成功',
     Connecting: '連接中...',
+    checkingNetworkType: '正在檢查網路類型…',
+    preparingRemoteSession: '正在準備遠端會話…',
+    linkingYourConsole: '正在鏈接您的控制台…',
+    testingConnection: '正在測試連接…',
+    connecting: '正在連接…',
     PSNConnecting:
       'PSN連接中，過程可能要幾分鐘，請耐心等待，該步驟如五分鐘後無響應請關閉APP重試',
     HolepunchFinished: 'PSN打洞成功，正在連接主機',

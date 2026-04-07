@@ -38,6 +38,12 @@ import {useWifiPerformanceMode} from '../hooks/useWifiPerformanceMode';
 const CONNECTED = 'connected';
 const HOLEPUNCHFINISHED = 'holepunchFinished';
 const PINREQUEST = 'pinRequest';
+const PROGRESS = 'progress';
+const STAGE_CHECKING_NETWORK_TYPE = 'checkingNetworkType';
+const STAGE_PREPARING_REMOTE_SESSION = 'preparingRemoteSession';
+const STAGE_LINKING_YOUR_CONSOLE = 'linkingYourConsole';
+const STAGE_TESTING_CONNECTION = 'testingConnection';
+const STAGE_CONNECTING = 'connecting';
 const DSCONTROLLER_NAME = 'DualSenseController';
 
 const {
@@ -524,7 +530,29 @@ function StreamScreen({navigation, route}) {
             streamViewRef.current?.getPerformance();
           }, 500);
         } else if (event.type === HOLEPUNCHFINISHED) {
-          setLoadingText(t('HolepunchFinished'));
+          setLoadingText(t('connecting'));
+        } else if (event.type === PROGRESS) {
+          const stage = event.stage || '';
+          switch (stage) {
+            case STAGE_CHECKING_NETWORK_TYPE:
+              setLoadingText(t('checkingNetworkType'));
+              break;
+            case STAGE_PREPARING_REMOTE_SESSION:
+              setLoadingText(t('preparingRemoteSession'));
+              break;
+            case STAGE_LINKING_YOUR_CONSOLE:
+              setLoadingText(t('linkingYourConsole'));
+              break;
+            case STAGE_TESTING_CONNECTION:
+              setLoadingText(t('testingConnection'));
+              break;
+            case STAGE_CONNECTING:
+              setLoadingText(t('connecting'));
+              break;
+            default:
+              setLoadingText(t('PSNConnecting'));
+              break;
+          }
         } else if (event.type === PINREQUEST) {
           setPinIncorrect(event.pinIncorrect || false);
           setShowPinModal(true);
@@ -836,7 +864,7 @@ function StreamScreen({navigation, route}) {
 
         // PSN connect
         if (_streamInfo.accessToken) {
-          setLoadingText(t('PSNConnecting'));
+          setLoadingText(t('checkingNetworkType'));
         } else {
           // Normal connect
           setLoadingText(t('Connecting'));
