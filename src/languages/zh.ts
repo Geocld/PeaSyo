@@ -279,6 +279,7 @@ export default {
     linkingYourConsole: '正在连接您的控制台…',
     testingConnection: '正在测试连接…',
     connecting: '正在连接…',
+    psnTokenExpired: 'PSN登录已过期，请重新登录。',
     PSNConnecting:
       'PSN连接中,过程可能要几分钟，请耐心等待，该步骤如五分钟后无响应请关闭APP重试',
     HolepunchFinished: 'PSN打洞成功，正在连接主机',

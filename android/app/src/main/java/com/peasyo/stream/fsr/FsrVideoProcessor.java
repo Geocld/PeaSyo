@@ -196,7 +196,7 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
         if (enabled && !FORCE_SOFTWARE_HDR_TONE_MAP) {
             Log.i(
                     TAG,
-                    "HDR stream detected; software HDR tone-map disabled (pxplay-compatible SDR path)."
+                    "HDR stream detected; software HDR tone-map disabled."
             );
         }
     }

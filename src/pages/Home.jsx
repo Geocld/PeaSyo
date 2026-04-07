@@ -501,7 +501,7 @@ function HomeScreen({navigation, route}) {
       return;
     }
 
-    // token已过期，需刷新
+    // token expired, refresh it
     if (new Date().getTime() - tokenExpiry > 0) {
       // refresh token
       refreshAccessToken(refreshToken)
@@ -520,7 +520,7 @@ function HomeScreen({navigation, route}) {
                 params: {
                   consoleInfo: {
                     ...currentConsole,
-                    accessToken,
+                    accessToken: access_token,
                     psnAccountId: token.account_id,
                   },
                 },

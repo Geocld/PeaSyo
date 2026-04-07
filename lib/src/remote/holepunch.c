@@ -19,6 +19,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <ctype.h>
 #include <sys/types.h>
 #include <assert.h>
 #include <inttypes.h>
@@ -435,6 +436,33 @@ static ChiakiErrorCode send_response_ps(Session *session, uint8_t *req, chiaki_s
 static ChiakiErrorCode send_responseto_ps(Session *session, uint8_t *req, chiaki_socket_t *sock,
                                           Candidate *candidate, struct sockaddr *addr, socklen_t len);
 
+static bool str_contains_case_insensitive(const char *haystack, const char *needle)
+{
+    if(!haystack || !needle)
+        return false;
+    size_t needle_len = strlen(needle);
+    if(needle_len == 0)
+        return true;
+    for(const char *h = haystack; *h; h++)
+    {
+        size_t i = 0;
+        while(i < needle_len && h[i] &&
+              (char)tolower((unsigned char)h[i]) == (char)tolower((unsigned char)needle[i]))
+            i++;
+        if(i == needle_len)
+            return true;
+    }
+    return false;
+}
+
+static bool response_indicates_invalid_token(const HttpResponseData *response_data)
+{
+    if(!response_data || !response_data->data || response_data->size == 0)
+        return false;
+    return str_contains_case_insensitive(response_data->data, "invalid token")
+            || str_contains_case_insensitive(response_data->data, "invalid_token");
+}
+
 CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_list_devices(
         const char* psn_oauth2_token, ChiakiHolepunchConsoleType console_type,
         ChiakiHolepunchDeviceInfo **devices, size_t *device_count,
@@ -472,10 +500,13 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_list_devices(
     CHIAKI_LOGE(log, "holepunch chiaki_holepunch_list_devices headers: %s", oauth_header);
 
     struct curl_slist *headers = NULL;
-    headers = curl_slist_append(headers, "Accept-Language: jp");
+    headers = curl_slist_append(headers, "Host: web.np.playstation.com");
+    headers = curl_slist_append(headers, "Accept-Language: ja-JP");
+    headers = curl_slist_append(headers, "Connection: Keep-Alive");
+    headers = curl_slist_append(headers, "User-Agent: RpNetHttpUtilImpl");
     headers = curl_slist_append(headers, oauth_header);
 
-    CURLcode res = curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
+    CURLcode res = curl_easy_setopt(curl, CURLOPT_FAILONERROR, 0L);
     if(res != CURLE_OK)
         CHIAKI_LOGW(log, "chiaki_holepunch_list_devices: CURL setopt CURLOPT_FAILONERROR failed with CURL error %s", curl_easy_strerror(res));
     res = curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5L);
@@ -505,17 +536,8 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_list_devices(
     curl_slist_free_all(headers);
     if (res != CURLE_OK)
     {
-        if (res == CURLE_HTTP_RETURNED_ERROR)
-        {
-            long http_code = 0;
-            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
-            CHIAKI_LOGE(log, "chiaki_holepunch_list_devices: Fetching device list from %s failed with HTTP code %ld", url, http_code);
-            CHIAKI_LOGV(log, "chiaki_holepunch_list_devices Response Body: %.*s.", (int)response_data.size, response_data.data);
-            err = CHIAKI_ERR_HTTP_NONOK;
-        } else {
-            CHIAKI_LOGE(log, "chiaki_holepunch_list_devices: Fetching device list from %s failed with CURL error %s", url, curl_easy_strerror(res));
-            err = CHIAKI_ERR_NETWORK;
-        }
+        CHIAKI_LOGE(log, "chiaki_holepunch_list_devices: Fetching device list from %s failed with CURL error %s", url, curl_easy_strerror(res));
+        err = CHIAKI_ERR_NETWORK;
         goto cleanup;
     }
 
@@ -524,7 +546,11 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_list_devices(
     if (http_code != 200)
     {
         CHIAKI_LOGE(log, "chiaki_holepunch_list_devices: Fetching device list from %s failed with HTTP code %ld", url, http_code);
-        err = CHIAKI_ERR_HTTP_NONOK;
+        CHIAKI_LOGV(log, "chiaki_holepunch_list_devices Response Body: %.*s.", (int)response_data.size, response_data.data);
+        if (http_code == 401 || response_indicates_invalid_token(&response_data))
+            err = CHIAKI_ERR_PSN_TOKEN_INVALID;
+        else
+            err = CHIAKI_ERR_HTTP_NONOK;
         goto cleanup;
     }
     json_tokener *tok = json_tokener_new();
@@ -545,12 +571,18 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_list_devices(
     if (!json_object_object_get_ex(json, "clients", &clients))
     {
         CHIAKI_LOGE(log, "chiaki_holepunch_list_devices: JSON does not contain \"clients\" field");
-        err = CHIAKI_ERR_UNKNOWN;
+        if(response_indicates_invalid_token(&response_data))
+            err = CHIAKI_ERR_PSN_TOKEN_INVALID;
+        else
+            err = CHIAKI_ERR_UNKNOWN;
         goto cleanup_json;
     } else if (!json_object_is_type(clients, json_type_array))
     {
         CHIAKI_LOGE(log, "chiaki_holepunch_list_devices: JSON \"clients\" field is not an array");
-        err = CHIAKI_ERR_UNKNOWN;
+        if(response_indicates_invalid_token(&response_data))
+            err = CHIAKI_ERR_PSN_TOKEN_INVALID;
+        else
+            err = CHIAKI_ERR_UNKNOWN;
         goto cleanup_json;
     }
     CHIAKI_LOGV(log, console_type == CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5 ? "PS5 devices: ": "PS4 devices: ");
@@ -2469,7 +2501,7 @@ CHIAKI_EXPORT ChiakiErrorCode holepunch_session_create_offer(Session *session)
 
     uint8_t local_nat_type = 2;
     msg.conn_request->sid = session->sid_local;
-    // PxPlay sends peerSid=0 in OFFER and only fills peerSid in ACCEPT.
+    // sends peerSid=0 in OFFER and only fills peerSid in ACCEPT.
     msg.conn_request->peer_sid = 0;
     msg.conn_request->nat_type = local_nat_type;
     memset(msg.conn_request->skey, 0, sizeof(msg.conn_request->skey));
@@ -2542,7 +2574,7 @@ CHIAKI_EXPORT ChiakiErrorCode holepunch_session_create_offer(Session *session)
             uint16_t stun_port = candidate_stun->port;
             if(session->stun_allocation_increment != 0 || session->stun_random_allocation)
             {
-                // Align with PxPlay: for symmetric NAT only advertise a small STUN window.
+                // for symmetric NAT only advertise a small STUN window.
                 local_nat_type = 3;
                 Candidate original_candidates[3];
                 memcpy(original_candidates, msg.conn_request->candidates, sizeof(Candidate) * 3);

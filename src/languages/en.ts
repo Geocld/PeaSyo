@@ -277,6 +277,7 @@ export default {
     linkingYourConsole: 'Linking your console…',
     testingConnection: 'Testing connection…',
     connecting: 'Connecting…',
+    psnTokenExpired: 'PSN login expired. Please sign in again.',
     PSNConnecting:
       'Connecting to PSN, this process may take a few minutes. Please wait patiently. If there is no response after 5 minutes, please close the app and try again.',
     HolepunchFinished: 'PSN hole punching successful, connecting to console...',

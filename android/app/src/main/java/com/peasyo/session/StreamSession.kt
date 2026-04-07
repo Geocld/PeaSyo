@@ -202,11 +202,14 @@ class StreamSession(
 			}
 			this.session = session
 		}
-		catch(e: CreateError)
-		{
-			_state.value = StreamStateCreateError(e)
+			catch(e: CreateError)
+			{
+				val state = StreamStateCreateError(e)
+				_state.value = state
+				val params = createEventParams(state)
+				sendEvent("streamStateChange", params)
+			}
 		}
-	}
 
 	// 设置手柄输入最小间隔（刷新率）
 	// 保持智能自适应机制，仅配置最小刷新间隔
@@ -233,7 +236,7 @@ class StreamSession(
 			}
 			is StreamStateCreateError -> {
 				params.putString("type", "error")
-				params.putString("error", state.error.toString())
+				params.putString("error", state.error.errorCode.toString())
 			}
 			is StreamStateQuit -> {
 				params.putString("type", "quit")

@@ -39,11 +39,13 @@ const CONNECTED = 'connected';
 const HOLEPUNCHFINISHED = 'holepunchFinished';
 const PINREQUEST = 'pinRequest';
 const PROGRESS = 'progress';
+const ERROR = 'error';
 const STAGE_CHECKING_NETWORK_TYPE = 'checkingNetworkType';
 const STAGE_PREPARING_REMOTE_SESSION = 'preparingRemoteSession';
 const STAGE_LINKING_YOUR_CONSOLE = 'linkingYourConsole';
 const STAGE_TESTING_CONNECTION = 'testingConnection';
 const STAGE_CONNECTING = 'connecting';
+const STAGE_PSN_TOKEN_EXPIRED = 'psnTokenExpired';
 const DSCONTROLLER_NAME = 'DualSenseController';
 
 const {
@@ -549,10 +551,31 @@ function StreamScreen({navigation, route}) {
             case STAGE_CONNECTING:
               setLoadingText(t('connecting'));
               break;
+            case STAGE_PSN_TOKEN_EXPIRED:
+              setLoadingText(t('psnTokenExpired'));
+              break;
             default:
-              setLoadingText(t('PSNConnecting'));
               break;
           }
+        } else if (event.type === ERROR) {
+          setLoading(false);
+          const errorMessage = event.error || t('Unknown');
+          Alert.alert(t('Warning'), `Connect fail: ${errorMessage}`, [
+            {
+              text: t('Confirm'),
+              style: 'default',
+              onPress: () => {
+                streamViewRef.current?.stopSession();
+                GamepadManager.vibrate(0, 0, 0, 0, 0, 3);
+                if (_settings.sensor) {
+                  streamViewRef.current?.stopSensor();
+                }
+                setTimeout(() => {
+                  navigation.navigate('Home');
+                }, 300);
+              },
+            },
+          ], {cancelable: false});
         } else if (event.type === PINREQUEST) {
           setPinIncorrect(event.pinIncorrect || false);
           setShowPinModal(true);

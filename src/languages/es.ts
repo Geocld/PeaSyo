@@ -287,6 +287,7 @@ export default {
     linkingYourConsole: 'Vinculando tu consola…',
     testingConnection: 'Probando la conexión…',
     connecting: 'Conectando…',
+    psnTokenExpired: 'La sesión de PSN expiró. Inicia sesión nuevamente.',
     PSNConnecting:
       'Conectando a PSN, este proceso puede tardar unos minutos. Por favor espera pacientemente. Si no hay respuesta después de 5 minutos, cierra la aplicación e intenta nuevamente.',
     HolepunchFinished: 'Perforación de PSN exitosa, conectando a la consola...',

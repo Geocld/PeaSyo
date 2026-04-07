@@ -26,6 +26,8 @@ CHIAKI_EXPORT const char *chiaki_error_string(ChiakiErrorCode code)
 			return "Thread error";
 		case CHIAKI_ERR_MEMORY:
 			return "Memory error";
+		case CHIAKI_ERR_OVERFLOW:
+			return "Overflow";
 		case CHIAKI_ERR_NETWORK:
 			return "Network error";
 		case CHIAKI_ERR_CONNECTION_REFUSED:
@@ -54,6 +56,12 @@ CHIAKI_EXPORT const char *chiaki_error_string(ChiakiErrorCode code)
 			return "Uninitialized";
 		case CHIAKI_ERR_FEC_FAILED:
 			return "FEC failed";
+		case CHIAKI_ERR_VERSION_MISMATCH:
+			return "Version mismatch";
+		case CHIAKI_ERR_HTTP_NONOK:
+			return "HTTP response not OK";
+		case CHIAKI_ERR_PSN_TOKEN_INVALID:
+			return "PSN token invalid or expired";
 		default:
 			return "Unknown";
 	}

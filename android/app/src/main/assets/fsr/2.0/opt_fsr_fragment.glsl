@@ -67,7 +67,7 @@ vec3 applyHdrToneMap(vec3 color) {
         dot(linearHdr2020, vec3(-0.0182, -0.1006, 1.1187))
     ), vec3(0.0));
     vec3 linearScene = linearHdr709 / 203.0;
-    // pxplay-like conservative HDR compression: avoid clipped highlights and crushed shadows.
+    //conservative HDR compression: avoid clipped highlights and crushed shadows.
     vec3 linearSdr = linearScene / (vec3(1.0) + linearScene);
     linearSdr = mix(linearSdr, sqrt(max(linearSdr, vec3(0.0))), 0.10);
     linearSdr = clamp(linearSdr, 0.0, 1.0);

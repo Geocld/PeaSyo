@@ -450,7 +450,9 @@ JNIEXPORT jstring JNICALL JNI_FCN(getPsnDuid)(JNIEnv *env, jobject obj, jstring 
     ChiakiErrorCode err = chiaki_holepunch_list_devices(psn_oauth2_token, CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5, &device_info_ps5, &num_devices_ps5, &global_log);
     if (err != CHIAKI_ERR_SUCCESS)
     {
-        CHIAKI_LOGE(&global_log, "holepunch !! Failed to get PS5 devices");
+        CHIAKI_LOGE(&global_log, "holepunch !! Failed to get PS5 devices: %s", chiaki_error_string(err));
+        if(err == CHIAKI_ERR_PSN_TOKEN_INVALID)
+            return (*env)->NewStringUTF(env, "Error: PSN token invalid");
         return (*env)->NewStringUTF(env, "Error: Failed to list devices");
     }
     CHIAKI_LOGE(&global_log, ">> holepunch Found %zu devices\n", num_devices_ps5);
@@ -496,7 +498,9 @@ JNIEXPORT jstring JNICALL JNI_FCN(connectPsnConnection)(JNIEnv *env, jobject obj
     ChiakiErrorCode err = chiaki_holepunch_list_devices(psn_oauth2_token, CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5, &device_info_ps5, &num_devices_ps5, &global_log);
     if (err != CHIAKI_ERR_SUCCESS)
     {
-        CHIAKI_LOGE(&global_log, "holepunch !! Failed to get PS5 devices");
+        CHIAKI_LOGE(&global_log, "holepunch !! Failed to get PS5 devices: %s", chiaki_error_string(err));
+        if(err == CHIAKI_ERR_PSN_TOKEN_INVALID)
+            return (*env)->NewStringUTF(env, "Error: PSN token invalid");
         return (*env)->NewStringUTF(env, "Error: Failed to list devices");
     }
     CHIAKI_LOGE(&global_log, ">> holepunch Found %zu devices\n", num_devices_ps5);
@@ -797,7 +801,7 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
         device_info_ps5 = NULL;
         num_devices_ps5 = 0;
 
-        const int device_list_max_attempts = 20;
+        const int device_list_max_attempts = 5;
         for(int attempt = 1; attempt <= device_list_max_attempts; attempt++)
         {
             err = chiaki_holepunch_list_devices(access_token_cstr, CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5, &device_info_ps5, &num_devices_ps5, &global_log);
@@ -805,6 +809,20 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
                 break;
             CHIAKI_LOGW(&global_log, "holepunch !! Failed to get PS5 devices (attempt %d/%d): %s",
                         attempt, device_list_max_attempts, chiaki_error_string(err));
+
+            if(err == CHIAKI_ERR_PSN_TOKEN_INVALID)
+            {
+                CHIAKI_LOGE(&global_log, "holepunch !! PSN token is invalid/expired. Stop retrying and request re-login.");
+                android_chiaki_emit_connection_progress(env, session, "psnTokenExpired");
+                break;
+            }
+
+            if(err == CHIAKI_ERR_HTTP_NONOK || err == CHIAKI_ERR_INVALID_DATA || err == CHIAKI_ERR_INVALID_RESPONSE)
+            {
+                CHIAKI_LOGW(&global_log, "holepunch !! Non-retriable list-devices error, stop retry loop.");
+                break;
+            }
+
             if(attempt < device_list_max_attempts)
                 sleep_ms(200);
         }
@@ -840,7 +858,7 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
             goto beach;
         }
 
-        const int holepunch_max_attempts = 10;
+        const int holepunch_max_attempts = 3;
         uint32_t backoff_ms = 200;
 
         for(int attempt = 1; attempt <= holepunch_max_attempts; attempt++)
