@@ -28,9 +28,46 @@ precision mediump float;
 uniform samplerExternalOES inputTexture; // 纹理
 // uniform vec2 inputTextureSize; // 输入纹理大小
 uniform vec2 outputTextureSize; // 输出纹理大小
+uniform float uHdrToneMap; // HDR tone mapping 开关
 
 in vec2 vTexCoord; // 从顶点着色器传过来的纹理坐标
 out vec4 fragColor; // 输出颜色
+
+vec3 applyHdrToneMap(vec3 color) {
+    if (uHdrToneMap < 0.5) {
+        return color;
+    }
+
+    const float m1 = 0.1593017578125;
+    const float m2 = 78.84375;
+    const float c1 = 0.8359375;
+    const float c2 = 18.8515625;
+    const float c3 = 18.6875;
+
+    vec3 powered = pow(max(color, vec3(0.0)), vec3(1.0 / m2));
+    vec3 numerator = max(powered - vec3(c1), vec3(0.0));
+    vec3 denominator = max(vec3(c2) - vec3(c3) * powered, vec3(1e-6));
+
+    vec3 linearHdr2020 = pow(numerator / denominator, vec3(1.0 / m1)) * 10000.0;
+    vec3 linearHdr709 = max(vec3(
+        dot(linearHdr2020, vec3(1.6605, -0.5876, -0.0728)),
+        dot(linearHdr2020, vec3(-0.1246, 1.1329, -0.0083)),
+        dot(linearHdr2020, vec3(-0.0182, -0.1006, 1.1187))
+    ), vec3(0.0));
+    vec3 linearScene = linearHdr709 / 203.0;
+    vec3 linearSdr = linearScene / (vec3(1.0) + linearScene);
+    linearSdr = mix(linearSdr, sqrt(max(linearSdr, vec3(0.0))), 0.10);
+    linearSdr = clamp(linearSdr, 0.0, 1.0);
+
+    vec3 lower = linearSdr * 12.92;
+    vec3 higher = 1.055 * pow(max(linearSdr, vec3(0.0)), vec3(1.0 / 2.4)) - 0.055;
+    vec3 cutoff = step(vec3(0.0031308), linearSdr);
+    return mix(lower, higher, cutoff);
+}
+
+vec3 sampleInput(vec2 uv) {
+    return applyHdrToneMap(texture(inputTexture, uv).rgb);
+}
 
 //==============================================================================================================================
 //
@@ -254,18 +291,18 @@ void FsrEasuF(
     //      |   |   |
     //      +---+---+
 
-    vec3 b = texture(tex, (fp + vec2( 0.5, -0.5)) * con1.xy).rgb;
-    vec3 c = texture(tex, (fp + vec2( 1.5, -0.5)) * con1.xy).rgb;
-    vec3 e = texture(tex, (fp + vec2(-0.5,  0.5)) * con1.xy).rgb;
-    vec3 f = texture(tex, (fp + vec2( 0.5,  0.5)) * con1.xy).rgb;
-    vec3 g = texture(tex, (fp + vec2( 1.5,  0.5)) * con1.xy).rgb;
-    vec3 h = texture(tex, (fp + vec2( 2.5,  0.5)) * con1.xy).rgb;
-    vec3 i = texture(tex, (fp + vec2(-0.5,  1.5)) * con1.xy).rgb;
-    vec3 j = texture(tex, (fp + vec2( 0.5,  1.5)) * con1.xy).rgb;
-    vec3 k = texture(tex, (fp + vec2( 1.5,  1.5)) * con1.xy).rgb;
-    vec3 l = texture(tex, (fp + vec2( 2.5,  1.5)) * con1.xy).rgb;
-    vec3 n = texture(tex, (fp + vec2( 0.5,  2.5)) * con1.xy).rgb;
-    vec3 o = texture(tex, (fp + vec2( 1.5,  2.5)) * con1.xy).rgb;
+    vec3 b = sampleInput((fp + vec2( 0.5, -0.5)) * con1.xy);
+    vec3 c = sampleInput((fp + vec2( 1.5, -0.5)) * con1.xy);
+    vec3 e = sampleInput((fp + vec2(-0.5,  0.5)) * con1.xy);
+    vec3 f = sampleInput((fp + vec2( 0.5,  0.5)) * con1.xy);
+    vec3 g = sampleInput((fp + vec2( 1.5,  0.5)) * con1.xy);
+    vec3 h = sampleInput((fp + vec2( 2.5,  0.5)) * con1.xy);
+    vec3 i = sampleInput((fp + vec2(-0.5,  1.5)) * con1.xy);
+    vec3 j = sampleInput((fp + vec2( 0.5,  1.5)) * con1.xy);
+    vec3 k = sampleInput((fp + vec2( 1.5,  1.5)) * con1.xy);
+    vec3 l = sampleInput((fp + vec2( 2.5,  1.5)) * con1.xy);
+    vec3 n = sampleInput((fp + vec2( 0.5,  2.5)) * con1.xy);
+    vec3 o = sampleInput((fp + vec2( 1.5,  2.5)) * con1.xy);
 
     // vec3 b = texture(tex, vTexCoord + vec2( 0.5, -0.5) * con1.xy).rgb;
     // vec3 c = texture(tex, vTexCoord + vec2( 1.5, -0.5) * con1.xy).rgb;

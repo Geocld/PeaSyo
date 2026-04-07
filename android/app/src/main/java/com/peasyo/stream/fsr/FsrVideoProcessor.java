@@ -368,6 +368,7 @@ public class FsrVideoProcessor implements VideoProcessingGLSurfaceView.VideoProc
             }
             easu.setFloatsUniform("outputTextureSize", outputSize);
             easu.setFloatsUniform("uTexTransform", transformMatrix);
+            easu.setFloatUniform("uHdrToneMap", shouldApplySoftwareHdrToneMap() ? 1f : 0f);
             easu.bindAttributesAndUniforms();
         } catch (GlException e) {
             Log.e(TAG, "Failed to bind EASU shader program (" + activeShaderDir + ")", e);
