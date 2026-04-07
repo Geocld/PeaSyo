@@ -62,6 +62,7 @@
 #include <chiaki/thread.h>
 #include <chiaki/base64.h>
 #include <chiaki/random.h>
+#include <chiaki/rpcrypt.h>
 #include <chiaki/sock.h>
 #include <chiaki/time.h>
 
@@ -319,6 +320,7 @@ typedef struct session_t
     uint8_t local_mac_addr[6];
     uint16_t local_port_ctrl;
     uint16_t local_port_data;
+    uint8_t local_nat_type;
     int32_t stun_allocation_increment;
     bool stun_random_allocation;
     StunServer stun_server_list[10];
@@ -392,7 +394,7 @@ static bool get_client_addr_remote_stun(Session *session, char *address, uint16_
 static ChiakiErrorCode get_stun_servers(Session *session);
 // static bool get_mac_addr(ChiakiLog *log, uint8_t *mac_addr);
 static void log_session_state(Session *session);
-static ChiakiErrorCode decode_customdata1(const char *customdata1, uint8_t *out, size_t out_len);
+static ChiakiErrorCode decode_customdata1(Session *session, const char *customdata1, uint8_t *out, size_t out_len);
 static ChiakiErrorCode check_candidates(
         Session *session, Candidate *local_candidates, Candidate *candidates_received, size_t num_candidates, chiaki_socket_t *out,
         Candidate *out_candidate);
@@ -750,6 +752,7 @@ CHIAKI_EXPORT Session* chiaki_holepunch_session_init(
     session->local_req_id = 1;
     session->local_port_ctrl = 0;
     session->local_port_data = 0;
+    session->local_nat_type = 2;
     session->stun_random_allocation = false;
     session->stun_allocation_increment = -1;
     session->num_stun_servers = 0;
@@ -1102,13 +1105,13 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_holepunch_session_start(
                 break;
             }
             const char *custom_data1 = json_object_get_string(custom_data1_json);
-            if (strlen(custom_data1) != 32)
+            if (strlen(custom_data1) == 0)
             {
-                CHIAKI_LOGE(session->log, "chiaki_holepunch_session_start: \"customData1\" has unexpected length, got %zu, expected 32", strlen(custom_data1));
+                CHIAKI_LOGE(session->log, "chiaki_holepunch_session_start: \"customData1\" is empty");
                 err = CHIAKI_ERR_UNKNOWN;
                 break;
             }
-            err = decode_customdata1(custom_data1, session->custom_data1, sizeof(session->custom_data1));
+            err = decode_customdata1(session, custom_data1, session->custom_data1, sizeof(session->custom_data1));
             if (err != CHIAKI_ERR_SUCCESS)
             {
                 CHIAKI_LOGE(session->log, "chiaki_holepunch_session_start: Failed to decode \"customData1\": '%s' with error %s", custom_data1, chiaki_error_string(err));
@@ -1860,8 +1863,9 @@ static ChiakiErrorCode get_websocket_fqdn(Session *session, char **fqdn)
     }
 
     struct curl_slist *headers = NULL;
-    CHIAKI_LOGE(session->log, "holepunch oauth_header: %s", session->oauth_header);
     headers = curl_slist_append(headers, session->oauth_header);
+    headers = curl_slist_append(headers, "Host: mobile-pushcl.np.communication.playstation.net");
+    headers = curl_slist_append(headers, "Connection: Keep-Alive");
 
     CURLcode res = curl_easy_setopt(curl, CURLOPT_SHARE, session->curl_share);
     if(res != CURLE_OK)
@@ -1875,7 +1879,6 @@ static ChiakiErrorCode get_websocket_fqdn(Session *session, char **fqdn)
     res = curl_easy_setopt(curl, CURLOPT_URL, ws_fqdn_api_url);
     if(res != CURLE_OK)
         CHIAKI_LOGW(session->log, "holepunch get_websocket_fqdn: CURL setopt CURLOPT_URL failed with CURL error %s", curl_easy_strerror(res));
-    // FIXME: 只要set headers就会闪退
     res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     if(res != CURLE_OK)
         CHIAKI_LOGW(session->log, "holepunch get_websocket_fqdn: CURL setopt CURLOPT_HTTPHEADER failed with CURL error %s", curl_easy_strerror(res));
@@ -2043,8 +2046,11 @@ static void* websocket_thread_func(void *user) {
         return NULL;
     }
     struct curl_slist *headers = NULL;
+    char ws_host_header[192] = {0};
+    snprintf(ws_host_header, sizeof(ws_host_header), "Host: %s", session->ws_fqdn);
     headers = curl_slist_append(headers, session->oauth_header);
     headers = curl_slist_append(headers, "Sec-WebSocket-Protocol: np-pushpacket");
+    headers = curl_slist_append(headers, ws_host_header);
     headers = curl_slist_append(headers, "User-Agent: WebSocket++/0.8.2");
     headers = curl_slist_append(headers, "X-PSN-APP-TYPE: REMOTE_PLAY");
     headers = curl_slist_append(headers, "X-PSN-APP-VER: RemotePlay/1.0");
@@ -2461,9 +2467,11 @@ CHIAKI_EXPORT ChiakiErrorCode holepunch_session_create_offer(Session *session)
     else
         session->local_port_data = local_port;
 
+    uint8_t local_nat_type = 2;
     msg.conn_request->sid = session->sid_local;
-    msg.conn_request->peer_sid = session->sid_console;
-    msg.conn_request->nat_type = 2;
+    // PxPlay sends peerSid=0 in OFFER and only fills peerSid in ACCEPT.
+    msg.conn_request->peer_sid = 0;
+    msg.conn_request->nat_type = local_nat_type;
     memset(msg.conn_request->skey, 0, sizeof(msg.conn_request->skey));
     memset(msg.conn_request->default_route_mac_addr, 0, sizeof(msg.conn_request->default_route_mac_addr));
     memcpy(msg.conn_request->local_hashed_id, session->hashed_id_local, sizeof(session->hashed_id_local));
@@ -2508,6 +2516,8 @@ CHIAKI_EXPORT ChiakiErrorCode holepunch_session_create_offer(Session *session)
             {
                 CHIAKI_LOGI(session->log, "holepunch_session_create_offer: Added local UPNP port mapping to port %u", local_port);
                 have_addr = get_client_addr_remote_upnp(session->log, &session->gw, candidate_remote->addr);
+                if(have_addr)
+                    local_nat_type = 1;
             }
             else
             {
@@ -2530,80 +2540,43 @@ CHIAKI_EXPORT ChiakiErrorCode holepunch_session_create_offer(Session *session)
             memcpy(candidate_remote->addr, candidate_stun->addr, sizeof(candidate_stun->addr));
             // Local port is used externally so don't make duplicate STUN candidate since STATIC candidate will have same ip and port number
             uint16_t stun_port = candidate_stun->port;
-            if(session->stun_allocation_increment != 0)
+            if(session->stun_allocation_increment != 0 || session->stun_random_allocation)
             {
+                // Align with PxPlay: for symmetric NAT only advertise a small STUN window.
+                local_nat_type = 3;
                 Candidate original_candidates[3];
                 memcpy(original_candidates, msg.conn_request->candidates, sizeof(Candidate) * 3);
-                candidate_stun = &original_candidates[0];
-                if(!session->stun_random_allocation)
+                Candidate *tmp = realloc(msg.conn_request->candidates, sizeof(Candidate) * 6);
+                if(!tmp)
                 {
-                    Candidate *tmp = NULL;
-                    tmp = realloc(msg.conn_request->candidates, sizeof(Candidate) * 11);
-                    if(tmp)
-                        msg.conn_request->candidates = tmp;
-                    else
-                    {
-                        err = CHIAKI_ERR_MEMORY;
-                        goto cleanup;
-                    }
-                    int32_t port_check = candidate_stun->port;
-                    // Setup extra stun candidate in case there was an allocation in between the stun request and our allocation
-                    for(int i=0; i<8; i++)
-                    {
-                        Candidate *candidate_stun2 = &msg.conn_request->candidates[i];
-                        candidate_stun2->type = CANDIDATE_TYPE_STUN;
-                        memcpy(candidate_stun2->addr_mapped, "0.0.0.0", 8);
-                        candidate_stun2->port_mapped = 0;
-                        memcpy(candidate_stun2->addr, candidate_stun->addr, sizeof(candidate_stun->addr));
-                        int32_t tmp = port_check;
-                        // skip well known ports 0-1024 unless current allocation is within that range since most routers don't (implies router uses those ports)
-                        port_check += session->stun_allocation_increment;
-                        if(port_check < 1024 && tmp > 1024)
-                            port_check = UINT16_MAX - (1024 - port_check);
-                        else if(port_check < 1)
-                            port_check += UINT16_MAX;
-                        else if(port_check > UINT16_MAX)
-                            port_check = port_check - UINT16_MAX + 1024;
-                        candidate_stun2->port = port_check;
-                    }
-                    memcpy(&msg.conn_request->candidates[8], &original_candidates[1], sizeof(Candidate));
-                    memcpy(&msg.conn_request->candidates[9], &original_candidates[2], sizeof(Candidate));
-                    candidate_remote = &msg.conn_request->candidates[8];
-                    candidate_local = &msg.conn_request->candidates[9];
-                    msg.conn_request->num_candidates = 10;
+                    err = CHIAKI_ERR_MEMORY;
+                    goto cleanup;
                 }
+                msg.conn_request->candidates = tmp;
+
+                Candidate *candidate_stun_primary = &msg.conn_request->candidates[0];
+                Candidate *candidate_stun_secondary = &msg.conn_request->candidates[1];
+                memcpy(candidate_stun_primary, &original_candidates[0], sizeof(Candidate));
+                memcpy(candidate_stun_secondary, &original_candidates[0], sizeof(Candidate));
+                candidate_stun_secondary->type = CANDIDATE_TYPE_STUN;
+                int32_t second_port = (int32_t)candidate_stun_primary->port;
+                if(session->stun_random_allocation)
+                    second_port += 1;
                 else
-                {
-                    Candidate *tmp = NULL;
-                    tmp = realloc(msg.conn_request->candidates, sizeof(Candidate) * (RANDOM_ALLOCATION_GUESSES_NUMBER + 3));
-                    if(tmp)
-                        msg.conn_request->candidates = tmp;
-                    else
-                    {
-                        err = CHIAKI_ERR_MEMORY;
-                        goto cleanup;
-                    }
-                    int32_t port_check = candidate_stun->port;
-                    // Setup RANDOM_ALLOCATION_GUESSES_NUMBER STUN candidates because we have a random allocation and usually 64 port blocks are minimum
-                    for(int i=0; i<RANDOM_ALLOCATION_GUESSES_NUMBER; i++)
-                    {
-                        Candidate *candidate_stun2 = &msg.conn_request->candidates[i];
-                        candidate_stun2->type = CANDIDATE_TYPE_STUN;
-                        memcpy(candidate_stun2->addr_mapped, "0.0.0.0", 8);
-                        candidate_stun2->port_mapped = 0;
-                        candidate_stun2->port = port_check;
-                        memcpy(candidate_stun2->addr, candidate_stun->addr, sizeof(candidate_stun->addr));
-                        port_check += 1;
-                        // use ports in IANA dynamic range if possible
-                        if(port_check > UINT16_MAX)
-                            port_check = 49152;
-                    }
-                    memcpy(&msg.conn_request->candidates[RANDOM_ALLOCATION_GUESSES_NUMBER], &original_candidates[1], sizeof(Candidate));
-                    memcpy(&msg.conn_request->candidates[RANDOM_ALLOCATION_GUESSES_NUMBER + 1], &original_candidates[2], sizeof(Candidate));
-                    candidate_remote = &msg.conn_request->candidates[RANDOM_ALLOCATION_GUESSES_NUMBER];
-                    candidate_local = &msg.conn_request->candidates[RANDOM_ALLOCATION_GUESSES_NUMBER + 1];
-                    msg.conn_request->num_candidates = RANDOM_ALLOCATION_GUESSES_NUMBER + 2;
-                }
+                    second_port += session->stun_allocation_increment;
+                if(second_port <= 0)
+                    second_port += UINT16_MAX;
+                if(second_port > UINT16_MAX)
+                    second_port -= UINT16_MAX;
+                if(second_port == 0)
+                    second_port = 1;
+                candidate_stun_secondary->port = (uint16_t)second_port;
+
+                memcpy(&msg.conn_request->candidates[2], &original_candidates[1], sizeof(Candidate));
+                memcpy(&msg.conn_request->candidates[3], &original_candidates[2], sizeof(Candidate));
+                candidate_remote = &msg.conn_request->candidates[2];
+                candidate_local = &msg.conn_request->candidates[3];
+                msg.conn_request->num_candidates = 4;
             }
             else
             {
@@ -2697,6 +2670,8 @@ CHIAKI_EXPORT ChiakiErrorCode holepunch_session_create_offer(Session *session)
         err = CHIAKI_ERR_UNKNOWN;
         goto cleanup;
     }
+    msg.conn_request->nat_type = local_nat_type;
+    session->local_nat_type = local_nat_type;
     err = chiaki_socket_set_nonblock(session->ipv4_sock, true);
     if(err != CHIAKI_ERR_SUCCESS)
     {
@@ -2782,7 +2757,7 @@ static ChiakiErrorCode send_accept(Session *session, int req_id, Candidate *sele
         return CHIAKI_ERR_MEMORY;
     msg.conn_request->sid = session->sid_local;
     msg.conn_request->peer_sid = session->sid_console;
-    msg.conn_request->nat_type = 0;
+    msg.conn_request->nat_type = session->local_nat_type;
     memset(msg.conn_request->skey, 0, sizeof(msg.conn_request->skey));
     memset(msg.conn_request->default_route_mac_addr, 0, sizeof(msg.conn_request->default_route_mac_addr));
     memset(msg.conn_request->local_hashed_id, 0, sizeof(msg.conn_request->local_hashed_id));
@@ -4549,18 +4524,61 @@ static void log_session_state(Session *session)
  * @param[out] out_len The length of the decoded customdata1
 */
 
-static ChiakiErrorCode decode_customdata1(const char *customdata1, uint8_t *out, size_t out_len)
+static ChiakiErrorCode decode_customdata1(Session *session, const char *customdata1, uint8_t *out, size_t out_len)
 {
-    uint8_t customdata1_round1[24];
-    size_t decoded_len = sizeof(customdata1_round1);
-    ChiakiErrorCode err = chiaki_base64_decode(customdata1, strlen(customdata1), customdata1_round1, &decoded_len);
+    if (!session || !customdata1 || !out || out_len != CHIAKI_RPCRYPT_KEY_SIZE)
+        return CHIAKI_ERR_INVALID_DATA;
+
+    size_t customdata1_len = strlen(customdata1);
+    if (customdata1_len == 0)
+        return CHIAKI_ERR_INVALID_DATA;
+
+    // Server payload behavior:
+    // 1) base64 decode "customData1"
+    // 2) interpret output as UTF-8/base64 text and decode again
+    // 3) keep first 16 bytes for regist pipeline
+    //
+    // NOTE:
+    // The PSN regist path (chiaki_rpcrypt_init_regist_psn) performs the required
+    // data1/data2 crypto transform itself, so we must not encrypt here again.
+    uint8_t *customdata1_round1 = calloc(customdata1_len + 1, 1);
+    if (!customdata1_round1)
+        return CHIAKI_ERR_MEMORY;
+
+    size_t round1_len = customdata1_len;
+    ChiakiErrorCode err = chiaki_base64_decode(customdata1, customdata1_len, customdata1_round1, &round1_len);
     if (err != CHIAKI_ERR_SUCCESS)
+    {
+        free(customdata1_round1);
         return err;
-    err = chiaki_base64_decode((const char*)customdata1_round1, decoded_len, out, &decoded_len);
+    }
+    customdata1_round1[round1_len] = '\0';
+
+    uint8_t *customdata1_round2 = calloc(round1_len + 1, 1);
+    if (!customdata1_round2)
+    {
+        free(customdata1_round1);
+        return CHIAKI_ERR_MEMORY;
+    }
+    size_t round2_len = round1_len;
+    err = chiaki_base64_decode((const char *)customdata1_round1, round1_len, customdata1_round2, &round2_len);
+    free(customdata1_round1);
     if (err != CHIAKI_ERR_SUCCESS)
+    {
+        free(customdata1_round2);
         return err;
-    if (decoded_len != out_len)
-        return CHIAKI_ERR_UNKNOWN;
+    }
+
+    if (round2_len < out_len)
+    {
+        free(customdata1_round2);
+        return CHIAKI_ERR_INVALID_DATA;
+    }
+    if(round2_len != out_len)
+        CHIAKI_LOGW(session->log, "decode_customdata1: Decoded payload length is %zu, using first %zu bytes", round2_len, out_len);
+    memcpy(out, customdata1_round2, out_len);
+    free(customdata1_round2);
+
     return CHIAKI_ERR_SUCCESS;
 }
 

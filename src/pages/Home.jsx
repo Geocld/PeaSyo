@@ -204,7 +204,7 @@ function HomeScreen({navigation, route}) {
 
     return () => {
       subscription?.remove();
-      unsubscribe();
+      // unsubscribe();
     };
   }, [t, route.params?.xalUrl, navigation]);
 
@@ -359,11 +359,6 @@ function HomeScreen({navigation, route}) {
   };
 
   const handleLocalStream = item => {
-    if (!isConnected) {
-      noNetWarning();
-      return;
-    }
-
     const isPS5 = item.apName.indexOf('PS5') > -1;
 
     setLoading(true);
@@ -449,10 +444,6 @@ function HomeScreen({navigation, route}) {
   };
 
   const handleRemoteStream = item => {
-    if (!isConnected) {
-      noNetWarning();
-      return;
-    }
     setCurrentConsole(item);
     setShowRemoteModal(true);
     setRemoteHost(item.remoteHost || '');
