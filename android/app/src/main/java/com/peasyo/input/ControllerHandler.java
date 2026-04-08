@@ -923,7 +923,7 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
         params.putBoolean("touch1active", touch1active);
         params.putInt("touch1id", touch1id);
         params.putInt("touch1x", touch1x);
-        params.putInt("touch1y", touch1x);
+        params.putInt("touch1y", touch1y);
 
         if(this.activityContext != null) {
             this.activityContext.sendEvent("onDsGamepadReport", params);

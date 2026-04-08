@@ -46,6 +46,22 @@ function GameMap({navigation, route}) {
           // eslint-disable-next-line no-bitwise
           _buttonStates[buttonName] = (flags & buttonFlag) !== 0;
         }
+        const touches = [];
+        if (states.touch0active) {
+          touches.push({
+            touchId: states.touch0id,
+            x: states.touch0x,
+            y: states.touch0y,
+          });
+        }
+        if (states.touch1active) {
+          touches.push({
+            touchId: states.touch1id,
+            x: states.touch1x,
+            y: states.touch1y,
+          });
+        }
+
         const _states = {
           axes: {
             leftStickX: states.leftStickX,
@@ -83,18 +99,7 @@ function GameMap({navigation, route}) {
             mute: _buttonStates.MUTE,
           },
           touchpad: {
-            touches: [
-              {
-                touchId: states.touch0id,
-                x: states.touch0x,
-                y: states.touch0y,
-              },
-              {
-                touchId: states.touch1id,
-                x: states.touch1x,
-                y: states.touch1y,
-              },
-            ],
+            touches,
           },
         };
         postData2Webview('gpStates', _states);

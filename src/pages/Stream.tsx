@@ -560,22 +560,27 @@ function StreamScreen({navigation, route}) {
         } else if (event.type === ERROR) {
           setLoading(false);
           const errorMessage = event.error || t('Unknown');
-          Alert.alert(t('Warning'), `Connect fail: ${errorMessage}`, [
-            {
-              text: t('Confirm'),
-              style: 'default',
-              onPress: () => {
-                streamViewRef.current?.stopSession();
-                GamepadManager.vibrate(0, 0, 0, 0, 0, 3);
-                if (_settings.sensor) {
-                  streamViewRef.current?.stopSensor();
-                }
-                setTimeout(() => {
-                  navigation.navigate('Home');
-                }, 300);
+          Alert.alert(
+            t('Warning'),
+            `Connect fail: ${errorMessage}`,
+            [
+              {
+                text: t('Confirm'),
+                style: 'default',
+                onPress: () => {
+                  streamViewRef.current?.stopSession();
+                  GamepadManager.vibrate(0, 0, 0, 0, 0, 3);
+                  if (_settings.sensor) {
+                    streamViewRef.current?.stopSensor();
+                  }
+                  setTimeout(() => {
+                    navigation.navigate('Home');
+                  }, 300);
+                },
               },
-            },
-          ], {cancelable: false});
+            ],
+            {cancelable: false},
+          );
         } else if (event.type === PINREQUEST) {
           setPinIncorrect(event.pinIncorrect || false);
           setShowPinModal(true);
@@ -631,8 +636,17 @@ function StreamScreen({navigation, route}) {
       'onDsGamepadReport',
       states => {
         // console.log('onDsGamepadReport:', states);
+        const normalizedStates = {
+          ...states,
+          touch0id: states.touch0active ? states.touch0id : -1,
+          touch0x: states.touch0active ? states.touch0x : 0,
+          touch0y: states.touch0active ? states.touch0y : 0,
+          touch1id: states.touch1active ? states.touch1id : -1,
+          touch1x: states.touch1active ? states.touch1x : 0,
+          touch1y: states.touch1active ? states.touch1y : 0,
+        };
         if (_settings.bind_usb_device_force_touchpad) {
-          let buttonFlags = states.flags;
+          let buttonFlags = normalizedStates.flags;
           // Check if MUTE button is pressed
           // eslint-disable-next-line no-bitwise
           if (buttonFlags & (1 << 16)) {
@@ -643,10 +657,10 @@ function StreamScreen({navigation, route}) {
             // eslint-disable-next-line no-bitwise
             buttonFlags |= 1 << 14; // BUTTON_TOUCHPAD
 
-            states.flags = buttonFlags;
+            normalizedStates.flags = buttonFlags;
           }
         }
-        streamViewRef.current?.usbDsController(states);
+        streamViewRef.current?.usbDsController(normalizedStates);
       },
     );
 
