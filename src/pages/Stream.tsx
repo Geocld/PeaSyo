@@ -135,6 +135,14 @@ function StreamScreen({navigation, route}) {
 
   const sensorEventListener = React.useRef<any>(undefined);
   const isRightstickMoving = React.useRef(false);
+  const dsTouchStateRef = React.useRef<any>({
+    touch0id: -1,
+    touch0x: 0,
+    touch0y: 0,
+    touch1id: -1,
+    touch1x: 0,
+    touch1y: 0,
+  });
 
   const leftTriggerType = React.useRef(0);
   const leftTriggerData = React.useRef<any>([]);
@@ -636,14 +644,85 @@ function StreamScreen({navigation, route}) {
       'onDsGamepadReport',
       states => {
         // console.log('onDsGamepadReport:', states);
+        const prevTouch = dsTouchStateRef.current;
+
+        const activeTouches: any[] = [];
+        if (states.touch0active) {
+          activeTouches.push({
+            id: states.touch0id,
+            x: states.touch0x,
+            y: states.touch0y,
+          });
+        }
+        if (states.touch1active) {
+          activeTouches.push({
+            id: states.touch1id,
+            x: states.touch1x,
+            y: states.touch1y,
+          });
+        }
+
+        let normalizedTouch0 = {id: -1, x: 0, y: 0};
+        let normalizedTouch1 = {id: -1, x: 0, y: 0};
+
+        if (activeTouches.length > 0) {
+          // Keep slot stability by matching previous ids first, then fill free slots.
+          let nextTouch0: any = null;
+          let nextTouch1: any = null;
+          const remaining = [...activeTouches];
+
+          const matchPrev0Idx = remaining.findIndex(
+            t => t.id === prevTouch.touch0id,
+          );
+          if (matchPrev0Idx >= 0) {
+            nextTouch0 = remaining.splice(matchPrev0Idx, 1)[0];
+          }
+
+          const matchPrev1Idx = remaining.findIndex(
+            t => t.id === prevTouch.touch1id,
+          );
+          if (matchPrev1Idx >= 0) {
+            nextTouch1 = remaining.splice(matchPrev1Idx, 1)[0];
+          }
+
+          if (!nextTouch0 && remaining.length > 0) {
+            nextTouch0 = remaining.shift();
+          }
+          if (!nextTouch1 && remaining.length > 0) {
+            nextTouch1 = remaining.shift();
+          }
+
+          // Single finger should always occupy slot0 to avoid slot flapping.
+          if (!nextTouch0 && nextTouch1) {
+            nextTouch0 = nextTouch1;
+            nextTouch1 = null;
+          }
+
+          normalizedTouch0 = nextTouch0
+            ? {id: nextTouch0.id, x: nextTouch0.x, y: nextTouch0.y}
+            : {id: -1, x: 0, y: 0};
+          normalizedTouch1 = nextTouch1
+            ? {id: nextTouch1.id, x: nextTouch1.x, y: nextTouch1.y}
+            : {id: -1, x: 0, y: 0};
+        }
+
+        dsTouchStateRef.current = {
+          touch0id: normalizedTouch0.id,
+          touch0x: normalizedTouch0.x,
+          touch0y: normalizedTouch0.y,
+          touch1id: normalizedTouch1.id,
+          touch1x: normalizedTouch1.x,
+          touch1y: normalizedTouch1.y,
+        };
+
         const normalizedStates = {
           ...states,
-          touch0id: states.touch0active ? states.touch0id : -1,
-          touch0x: states.touch0active ? states.touch0x : 0,
-          touch0y: states.touch0active ? states.touch0y : 0,
-          touch1id: states.touch1active ? states.touch1id : -1,
-          touch1x: states.touch1active ? states.touch1x : 0,
-          touch1y: states.touch1active ? states.touch1y : 0,
+          touch0id: normalizedTouch0.id,
+          touch0x: normalizedTouch0.x,
+          touch0y: normalizedTouch0.y,
+          touch1id: normalizedTouch1.id,
+          touch1x: normalizedTouch1.x,
+          touch1y: normalizedTouch1.y,
         };
         if (_settings.bind_usb_device_force_touchpad) {
           let buttonFlags = normalizedStates.flags;
