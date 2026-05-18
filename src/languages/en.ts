@@ -14,12 +14,26 @@ export default {
     Select: 'Select',
     Apply: 'Apply',
     Edit: 'Edit',
+    Hide: 'Hide',
     Default: 'Default',
     About: 'About',
     Enable: 'Enable',
     Disable: 'Disable',
+    Experiment: 'Experimental',
     Light: 'Light',
     Dark: 'Dark',
+    'Update Warning': 'Update available',
+    Download: 'Download',
+    'Downloading update': 'Downloading update...',
+    'Update download': 'Downloading update',
+    Downloaded: 'Downloaded',
+    'Preparing installation': 'Download complete. Opening installer...',
+    'Auto install': 'Auto install',
+    'Manual download': 'Manual download',
+    InstallPermissionRequired:
+      'Allow PeaSyo to install unknown apps in system settings, then tap auto install again.',
+    AutoInstallFailed:
+      'Automatic download and installation failed. Please try manual download.',
     Feedback: 'Feedback and Support',
     Logout: 'Logout',
     Current: 'Current',
@@ -33,6 +47,37 @@ export default {
     'Customize virtual buttons': 'Customize virtual buttons',
     'Customize buttons of virtual gamepad':
       'Customize buttons of virtual gamepad',
+    'Virtual macro button': 'Virtual macro button',
+    'Enable virtual macro button': 'Enable virtual macro button',
+    'Virtual macro settings': 'Virtual macro settings',
+    'Enable macro button and edit its action sequence':
+      'Enable macro button and edit its action sequence',
+    'Configure one continuous macro chain. Steps execute from top to bottom when pressing macro button.':
+      'Configure one continuous macro chain. Steps execute from top to bottom when pressing macro button.',
+    'Enable macro button and edit its action sequence in one place.':
+      'Enable macro button and edit its action sequence in one place.',
+    'Macro action sequence': 'Macro action sequence',
+    'Tap + to add sequence step': 'Tap + to add sequence step',
+    'No action steps, tap + to add': 'No action steps, tap + to add',
+    'Edit action': 'Edit action',
+    'Add action': 'Add action',
+    Buttons: 'Buttons',
+    Hold: 'Hold',
+    Wait: 'Wait',
+    Move: 'Move',
+    'Loop macro': 'Loop macro',
+    'Press macro once to loop, press again to stop':
+      'Press macro once to loop, press again to stop',
+    'Loop interval': 'Loop interval',
+    'Action type': 'Action type',
+    'Button macro': 'Button macro',
+    'Stick macro': 'Stick macro',
+    Stick: 'Stick',
+    'Left stick': 'Left stick',
+    'Right stick': 'Right stick',
+    'Hold duration': 'Hold duration',
+    'Move duration': 'Move duration',
+    'Wait after action': 'Wait after action',
     'Click on an element to set its size and display':
       '👆Click on an element to set its size and display',
     'Drag elements to adjust their position':
@@ -53,6 +98,12 @@ export default {
     'Video stream format': 'Aspect ratio',
     VideoFormatDesc:
       'If you want the video stream to fill the full screen, you can modify the corresponding ratio here',
+    'Force portrait stream': 'Force portrait stream',
+    ForcePortraitStreamDesc:
+      'Keep streaming in portrait. The video uses device width at 16:9',
+    'Picture in picture': 'Picture in picture',
+    PictureInPictureDesc:
+      'Enter Android picture-in-picture and keep video visible when streaming goes to the background',
     'Aspect ratio': 'Maintain aspect ratio (16:9)',
     Stretch: 'Stretch',
     Zoom: 'Zoom',
@@ -73,6 +124,9 @@ export default {
     RemoteCodecDesc:
       'Set the remote video playback codec. H264 uses AVC decoding, H265 uses HEVC decoding',
     FPS: 'FPS',
+    FL: 'Frame Loss',
+    JT: 'Jitter',
+    HL: 'Host',
     FPSDesc: 'Set the streaming frame rate',
     RemoteFPS: 'FPS',
     RemoteFPSDesc: 'Set the remote streaming frame rate',
@@ -90,6 +144,10 @@ export default {
       'Choose Oboe sharing mode. Shared is more compatible; Exclusive may have lower latency on some devices.',
     'Shared (Recommended)': 'Shared (Recommended)',
     'Exclusive (Low latency)': 'Exclusive (Low latency)',
+    'Software volume control': 'Software volume control',
+    SoftwareVolumeControlDesc:
+      'Show an in-stream menu control for adjusting app audio output volume.',
+    'Stream volume': 'Stream volume',
     'Performance render': 'Performance Rendering',
     PerformanceRenderDesc:
       'Use high-performance video rendering. By default, high-performance rendering is used, but note that streaming will stop when the app is sent to the background. If you need to frequently switch to the background while maintaining streaming, please turn off high-performance rendering mode',
@@ -112,24 +170,31 @@ export default {
     Rumble: 'Rumble',
     RumbleDesc:
       'If the gamepad supports rumble, you can set whether to enable rumble in-game',
-    'Override native Xbox gamepad support':
-      'Override native Xbox gamepad support',
+    'Override native gamepad support': 'Override Android gamepad driver',
     bind_usb_device_description:
-      "Force PeaSyo's USB driver to take over all supported Xbox/DualSense controllers. If you are using a DualSense 5 controller, enabling this option will provide native haptic feedback.",
+      "Force PeaSyo's USB driver to take over all supported Xbox / DualSense / Razer Kishi controllers. If you are using a DualSense 5 controller, enabling this option will provide native haptic feedback.",
     bind_usb_device_tips:
-      'This setting only takes effect for controllers that support XInput or DualSense protocol when connected via wired (OTG).',
-    bind_usb_device_guide_entry: 'Wired OTG Controller Guide 👆',
-    bind_usb_device_guide_title:
-      'A wired USB-OTG controller connection is recommended in the following cases:',
+      'This setting only takes effect when a supported Xbox / DualSense / Razer Kishi controller is connected via wired OTG.',
+    bind_usb_device_guide_entry:
+      'Wired OTG and Razer Kishi Controller Guide 👆',
+    bind_usb_device_guide_title: 'Wired OTG and Razer Kishi Controller Guide',
+    bind_usb_device_guide_hint:
+      'Tap to view connection order, permissions, and driver override setup',
+    bind_usb_device_guide_switch_on:
+      'Enabled. PeaSyo will take over supported wired OTG controllers.',
+    bind_usb_device_guide_switch_off:
+      'Disabled. Enable it here for haptics or controller takeover.',
     bind_usb_device_guide_case1:
-      '1. To experience native DualSense 5 haptics, enable "Override native gamepad support", connect your DualSense 5, then start streaming.',
+      '1. To experience native DualSense 5 haptics, enable "Override Android gamepad driver", connect your DualSense 5, then start streaming.',
     bind_usb_device_guide_case2:
-      '2. If your Android device does not support controller vibration and your controller uses Xbox or DualSense protocol, also enable "Override native gamepad support", connect the controller, then start streaming.',
-    bind_usb_device_guide_action: 'Enable "Override native gamepad support"',
+      '2. If your Android device does not support controller vibration, or you need PeaSyo to take over a supported Xbox / DualSense / Razer Kishi controller, also enable "Override Android gamepad driver", connect the controller, then start streaming.',
+    bind_usb_device_guide_case3:
+      '3. To use a Razer Kishi controller for near-native haptic feedback, enable driver override and grant the controller permission to PeaSyo instead of Nexus.',
+    bind_usb_device_guide_action: 'Enable "Override Android gamepad driver"',
     'Force Nexus/PS button to simulate touchpad':
       'Force Nexus/Volume button to simulate touchpad',
     bind_usb_device_force_touchpad_desc:
-      'After enabling Android controller support override, force Xbox controller Nexus button or DS controller volume button to simulate touchpad clicks',
+      'After enabling the Android gamepad driver override, force the Xbox controller Nexus button or DS controller volume button to simulate touchpad clicks',
     'Rumble intensity': 'Rumble intensity',
     RumbleIntensityDesc: 'Set the controller rumble intensity',
     'Haptic feedback intensity': 'Haptic feedback intensity',
@@ -187,7 +252,7 @@ export default {
     NicknameError: 'Console name cannot be empty',
     ConsoleDeleteWarn:
       'Are you sure you want to delete this console? Re-registration will be required after deletion',
-    RemotePlayTitle: 'PSN Remote Play (Experimental)',
+    RemotePlayTitle: 'PSN Remote Play',
     RemotePlayDesc:
       'If you don’t have a public IP or a local network setup, you can connect remotely directly through PSN servers. This requires logging into PSN, and your console must be updated to the latest system version(PS4 is not supported).',
     RemotePlayTips:
@@ -247,16 +312,46 @@ export default {
     AutoConnect: 'Auto connect',
     // Regsistry
     RegistTips:
-      'Note: Only supports registering PS5 or PS4 (firmware version 8 or above) consoles',
+      'Note: Supports registering PS5 and all PS4 firmware ranges. PS4 systems below 7.0 require the current account PSN online ID.',
     LookConsole: 'Searching for console',
     HostError: 'Host IP cannot be empty',
     PINError: 'PIN cannot be empty',
     PINLenError: 'Incorrect PIN length',
     TokenisEmpty: 'Token is empty, please re-login',
+    LegacyPs4OnlineIdError:
+      'PS4 systems below 7.0 require a valid PSN online ID. Please sign in with a normal PSN account and try again.',
     RegistrySuccess: 'Registration successful',
+    SelectRegisterType: 'Please select a registration type',
+    RegisterTypeLocal: 'Local registration',
+    RegisterTypeRemote: 'Remote registration',
+    RemoteRegisterTips:
+      'Make sure your console is updated, connected to PSN, and turned on or in Rest Mode. This feature may not work in all network environments.',
+    RemoteRegisterSummary:
+      'Remote registration uses the currently discovered PS5 directly, then completes registration over a PSN remote session without asking you to type the console name manually.',
+    RemoteRegisterPs5Only:
+      'Remote registration currently only supports the PS5 path.',
+    RemoteRegisterConsoleName: 'Console name',
+    RemoteRegisterConsoleNameRequired: 'Please enter the console name.',
+    RemoteRegisterConsoleRequired:
+      'Please select an available PS5 console first.',
+    RemoteRegisterFailed:
+      'Remote registration failed. Check the console name, PSN sign-in state, and network environment.',
+    RemoteRegisterLoginRequiredMessage:
+      'Remote registration requires a PSN sign-in. Make sure your console is updated, signed in to PSN, and powered on or in Rest Mode. If your sign-in has expired, please sign in again and retry.',
+    RemoteRegisterPinTitle: 'Enter console login PIN',
+    RemoteRegisterPinTips:
+      'The console requested a login PIN. Check it on the console and enter it here.',
+    RemoteRegisterPinIncorrect: 'Incorrect PIN, please try again.',
     SelectConsoleType: 'Please select console type',
+    SelectPs4Version: 'Please select the PS4 firmware range',
     SelectConsole: 'Please select a console',
     NoConsole: 'No console found, please enter the host IP manually',
+    RegistPs5: 'PS5',
+    RegistPs4Ge8: 'PS4 (firmware 8.0 and above)',
+    RegistPs4Ge7: 'PS4 (firmware 7.0 - 7.99)',
+    RegistPs4Lt7: 'PS4 (firmware below 7.0)',
+    LegacyPs4OnlineIdHint:
+      'This mode uses the current signed-in account PSN online ID for registration instead of the account ID.',
     RegistFailed:
       'Registration failed. Please check if the PIN code is correct and verify that the host login account matches the current account',
     SwapDpadTitle: 'D-pad Simulate Left Joystick',
@@ -268,15 +363,23 @@ export default {
     // Console
     RegistryTime: 'Regist',
     LocalStream: 'Local stream',
+    LocalHostRequiredMessage:
+      'Local streaming requires the console LAN IP address. Please open console editing and fill in the local address before starting local streaming.',
     RemoteStream: 'Remote Stream',
     // Stream
     SurfaceRenderDesc:
       'Currently using performance rendering mode, interface initializing',
+    'Enable Microphone': 'Enable Microphone',
+    'Disconnect and sleep': 'Disconnect and sleep',
+    'Microphone Permission': 'Microphone Permission',
+    'PeaSyo needs microphone permission to send your voice to the host.':
+      'PeaSyo needs microphone permission to send your voice to the host.',
+    'Microphone permission denied': 'Microphone permission denied',
     checkingNetworkType: 'Checking Network Type…',
     preparingRemoteSession: 'Preparing Remote Session…',
     linkingYourConsole: 'Linking your console…',
     testingConnection: 'Testing connection…',
-    connecting: 'Connecting…',
+    connecting: 'Connecting',
     psnTokenExpired: 'PSN login expired. Please sign in again.',
     PSNConnecting:
       'Connecting to PSN, this process may take a few minutes. Please wait patiently. If there is no response after 5 minutes, please close the app and try again.',
@@ -304,10 +407,10 @@ export default {
       'If you have a PeaSyo configuration, you can import the configuration file directly without re-registering hosts.',
     DS_test_title: 'DualSense 5 Controller Test',
     DS_test_desc:
-      'To test the DualSense 5, ensure that the Android overlay driver is enabled(Settings - Override native gamepad support - Enable) and the DualSense 5 controller is connected via a wired connection.',
+      'To test the DualSense 5, ensure that the Android gamepad driver override is enabled (Settings - Override Android gamepad driver - Enable) and the DualSense 5 controller is connected via a wired connection.',
     DS_RGB_title: 'Set DS5 Controller LED Strip Color',
     DS_RGB_desc:
-      'When the DS5 controller is connected to PeaSyo via USB, you can modify the LED strip color(ensure that the Android overlay driver is enabled(Settings - Override native gamepad support - Enable)).',
+      'When the DS5 controller is connected to PeaSyo via USB, you can modify the LED strip color (ensure that the Android gamepad driver override is enabled: Settings - Override Android gamepad driver - Enable).',
     'PSN username': 'PSN Username',
     Login_username_title:
       'You can log in directly using your PSN username (online ID), note that it is not your PSN account.',
@@ -315,6 +418,8 @@ export default {
       "Your privacy settings need to allow 'Anyone' to find you in search. Otherwise, login will fail.",
     Login_base64_title:
       "You can log in directly using your PSN account's base64 ID, which can be obtained through third-party websites (result like: ABCD==).",
+    Login_base64_desc:
+      'You can look it up through the third-party web app below:',
     User_not_found:
       'User not found, please confirm that your PSN username is entered correctly.',
     PSN_username: 'PSN Username',
@@ -386,6 +491,61 @@ export default {
     'Stop rumble': 'Stop rumble',
     ControllerRumble: 'Controller Rumble',
     Refresh: 'Refresh',
+    RazerNativeConfig: 'Razer Native Config',
+    RazerNativeConfigDesc:
+      'Configure the controller-native deadzone and trigger settings for Kishi Ultra / V3 / V3 Pro. These settings do not sync with the current PeaSyo dead_zone / short_trigger options',
+    RazerNativeConfigPageNote:
+      'This page writes the controller-native configuration and does not share settings with the current PeaSyo dead_zone / short_trigger options.',
+    RazerDeviceStatus: 'Device status',
+    RazerDeviceDetected: 'Supported Razer controller detected',
+    RazerPermissionGranted: 'USB permission granted',
+    RazerPermissionRequired:
+      'USB permission is required before reading or writing device settings',
+    RazerRequestPermission: 'Request USB Permission',
+    RazerRefreshFromDevice: 'Read From Device',
+    RazerApplyToDevice: 'Write To Device',
+    RazerRgbSyncTitle: 'RGB Sync',
+    RazerRgbSyncDescription:
+      'When enabled, the Razer controller RGB follows the PS5 stream LED color. When disabled, RGB is turned off completely.',
+    RazerRgbSyncEnabled: 'RGB Sync Enabled',
+    RazerRgbSyncDisabled: 'RGB Off',
+    RazerRgbSyncEnabledHint:
+      'The controller now follows the PS5 stream LED color in real time',
+    RazerRgbSyncDisabledHint: 'The controller RGB is fully turned off',
+    RazerRgbBrightnessTitle: 'RGB brightness',
+    RazerRgbBrightnessDescription: 'Adjust the controller lighting brightness.',
+    RazerPollingRateTitle: 'Controller polling rate',
+    RazerPollingRateDescription:
+      'Writes the USB High Speed Polling Period for the Android profile. Available options come from the controller supported-rate query.',
+    RazerPollingRateCurrent: 'Current polling rate',
+    RazerDeadzoneSection: 'Stick Deadzone',
+    RazerLeftStickDeadzone: 'Left stick deadzone',
+    RazerRightStickDeadzone: 'Right stick deadzone',
+    RazerDeadzonePresetHint: 'Adjust the stick center deadzone.',
+    RazerCircularityMode: 'Circularity mode',
+    RazerCircularityModeHint:
+      'Standard keeps diagonals more pronounced, while Circular makes stick curves rounder.',
+    RazerCircularityModeStandard: 'Standard',
+    RazerCircularityModeCircular: 'Circular',
+    RazerCircularityDeviation: 'Dev',
+    RazerCircularityCoverage: 'Cov',
+    RazerCircularityReset: 'Clear',
+    RazerLeftTrigger: 'L2 Trigger',
+    RazerRightTrigger: 'R2 Trigger',
+    RazerTriggerMode: 'Current mode',
+    RazerTriggerModeAnalog: 'Analog trigger',
+    RazerTriggerModeDigital: 'Digital trigger',
+    RazerAnalogStart: 'Analog start',
+    RazerAnalogEnd: 'Analog end',
+    RazerDigitalActuation: 'Digital actuation',
+    RazerRapidTrigger: 'Rapid trigger',
+    RazerConfigReadSuccess: 'Device configuration loaded',
+    RazerConfigApplySuccess: 'Device configuration written',
+    RazerConfigPermissionRequested:
+      'USB permission was requested. Grant it in the system dialog, then read again.',
+    RazerConfigUnsupported:
+      'No supported Razer Kishi Ultra / V3 / V3 Pro controller was detected',
+    RazerConfigOnlyAndroid: 'This page is only available on Android',
     Model: 'Model',
     'Android Version': 'Android Version',
     'API Version': 'API Version',
@@ -404,7 +564,7 @@ export default {
     LogVerboseTitle: 'Enable verbose logging',
     LogVerboseDesc:
       'Records complete streaming logs. This may significantly increase log file size and could potentially impact streaming performance. Do not enable during regular gameplay.',
-    WiFiPerformanceModeTitle: 'WiFi Low Latency Mode (Experimental)',
+    WiFiPerformanceModeTitle: 'WiFi Low Latency Mode',
     WiFiPerformanceModeDesc:
       'Enabling this mode can reduce WiFi connection latency and improve stability, but may increase Bluetooth connection latency.',
     GamepadFeedbackIntervalTitle: 'Gamepad Input Min Interval (Refresh Rate)',
@@ -426,6 +586,12 @@ export default {
     FSRTitle: 'Super Resolution (AMD FSR 1.0)',
     FSRDesc:
       'Enable AMD FSR 1.0 super resolution technology, which is an experimental feature that may have compatibility or stability issues. It is recommended for use on high-performance devices',
+    SmartFrameGenerationTitle: 'Smart frame generation',
+    SmartFrameGenerationDesc:
+      'Use smart frame generation to interpolate some game video streams for smoother results. Note that not all devices are supported.\nTip: If the current game only runs at 30 FPS, setting the stream to 30 FPS usually gives the best result.',
+    SmartFrameRecoveryTitle: 'Smart frame recovery (Bitstream parsing)',
+    SmartFrameRecoveryDesc:
+      'Analyzes incoming video frames and repairs missing frame references during network hiccups, reducing stutter, visual glitches, and freezes. Uses a little more CPU and can be disabled on very stable networks.',
     frame_pacing_title: 'Video frame pacing',
     frame_pacing_desc: 'Specify how to balance video latency and smoothness',
     latency: 'Prefer lowest latency',

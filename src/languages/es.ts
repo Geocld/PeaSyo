@@ -10,16 +10,30 @@ export default {
     Save: 'Guardar',
     Reset: 'Restablecer',
     Others: 'Otros',
+    Experiment: 'Experimental',
     Back: 'Atrás',
     Select: 'Seleccionar',
     Apply: 'Aplicar',
     Edit: 'Editar',
+    Hide: 'Ocultar',
     Default: 'Predeterminado',
     About: 'Acerca de',
     Enable: 'Habilitar',
     Disable: 'Deshabilitar',
     Light: 'Claro',
     Dark: 'Oscuro',
+    'Update Warning': 'Actualización disponible',
+    Download: 'Descargar',
+    'Downloading update': 'Descargando actualización...',
+    'Update download': 'Descargando actualización',
+    Downloaded: 'Descargado',
+    'Preparing installation': 'Descarga completa. Abriendo instalador...',
+    'Auto install': 'Instalar automáticamente',
+    'Manual download': 'Descarga manual',
+    InstallPermissionRequired:
+      'Permite que PeaSyo instale apps desconocidas en los ajustes del sistema y vuelve a tocar instalación automática.',
+    AutoInstallFailed:
+      'La descarga e instalación automática falló. Prueba la descarga manual.',
     Feedback: 'Comentarios y soporte',
     Logout: 'Cerrar sesión',
     Current: 'Actual',
@@ -34,6 +48,37 @@ export default {
     'Customize virtual buttons': 'Personalizar botones virtuales',
     'Customize buttons of virtual gamepad':
       'Personalizar los botones del gamepad virtual',
+    'Virtual macro button': 'Botón macro virtual',
+    'Enable virtual macro button': 'Habilitar botón macro virtual',
+    'Virtual macro settings': 'Configuración del macro virtual',
+    'Enable macro button and edit its action sequence':
+      'Habilitar el botón macro y editar su secuencia de acciones',
+    'Configure one continuous macro chain. Steps execute from top to bottom when pressing macro button.':
+      'Configura una cadena macro continua. Los pasos se ejecutan de arriba hacia abajo al pulsar el botón macro.',
+    'Enable macro button and edit its action sequence in one place.':
+      'Habilita el botón macro y edita su secuencia de acciones en un solo lugar.',
+    'Macro action sequence': 'Secuencia de acciones macro',
+    'Tap + to add sequence step': 'Toca + para agregar un paso',
+    'No action steps, tap + to add': 'No hay pasos, toca + para agregar',
+    'Edit action': 'Editar acción',
+    'Add action': 'Agregar acción',
+    Buttons: 'Botones',
+    Hold: 'Mantener',
+    Wait: 'Esperar',
+    Move: 'Mover',
+    'Loop macro': 'Repetir macro',
+    'Press macro once to loop, press again to stop':
+      'Pulsa el macro una vez para repetir y otra vez para detener',
+    'Loop interval': 'Intervalo de repetición',
+    'Action type': 'Tipo de acción',
+    'Button macro': 'Macro de botones',
+    'Stick macro': 'Macro de joystick',
+    Stick: 'Joystick',
+    'Left stick': 'Joystick izquierdo',
+    'Right stick': 'Joystick derecho',
+    'Hold duration': 'Duración de pulsación',
+    'Move duration': 'Duración del movimiento',
+    'Wait after action': 'Espera tras la acción',
     'Click on an element to set its size and display':
       '👆Haz clic en un elemento para ajustar su tamaño y visibilidad',
     'Drag elements to adjust their position':
@@ -54,6 +99,12 @@ export default {
     'Video stream format': 'Formato de transmisión de video',
     VideoFormatDesc:
       'Si deseas que el video se ajuste a pantalla completa, puedes modificar la proporción correspondiente aquí',
+    'Force portrait stream': 'Forzar transmisión vertical',
+    ForcePortraitStreamDesc:
+      'Mantiene la transmisión en vertical. El video usa el ancho del dispositivo en 16:9 y los controles virtuales aparecen debajo.',
+    'Picture in picture': 'Imagen en imagen',
+    PictureInPictureDesc:
+      'Entra en imagen en imagen de Android y mantiene el video visible cuando la transmisión pasa a segundo plano',
     'Aspect ratio': 'Mantener proporción de aspecto (16:9)',
     Stretch: 'Estirar',
     Zoom: 'Zoom',
@@ -74,6 +125,9 @@ export default {
     RemoteCodecDesc:
       'Establecer el códec de reproducción de video remoto. H264 utiliza decodificación AVC, H265 utiliza decodificación HEVC',
     FPS: 'FPS',
+    FL: 'Pérdida de fotogramas',
+    JT: 'Jitter',
+    HL: 'Host',
     FPSDesc: 'Establecer la tasa de fotogramas de transmisión',
     RemoteFPS: 'FPS remoto',
     RemoteFPSDesc: 'Establecer la tasa de fotogramas de transmisión remota',
@@ -91,6 +145,10 @@ export default {
       'Elige el modo de uso compartido de Oboe. Shared es más compatible; Exclusive puede tener menor latencia en algunos dispositivos.',
     'Shared (Recommended)': 'Shared (Recomendado)',
     'Exclusive (Low latency)': 'Exclusive (Baja latencia)',
+    'Software volume control': 'Control de volumen por software',
+    SoftwareVolumeControlDesc:
+      'Muestra un control en el menú de transmisión para ajustar el volumen de audio de la app.',
+    'Stream volume': 'Volumen de transmisión',
     'Performance render': 'Renderizado de rendimiento',
     PerformanceRenderDesc:
       'Usar renderizado de video de alto rendimiento. Por defecto, se utiliza renderizado de alto rendimiento, pero ten en cuenta que la transmisión se detendrá si la aplicación se envía al fondo. Si necesitas cambiar frecuentemente al fondo mientras mantienes la transmisión, desactiva el modo de renderizado de alto rendimiento',
@@ -113,25 +171,34 @@ export default {
     Rumble: 'Vibración',
     RumbleDesc:
       'Si el gamepad admite vibración, puedes configurar si habilitarla en el juego',
-    'Override native Xbox gamepad support':
-      'Anular soporte nativo del gamepad de Xbox',
+    'Override native gamepad support':
+      'Anular el controlador de gamepad de Android',
     bind_usb_device_description:
-      'Forzar que el controlador USB de PeaSyo tome el control de todos los mandos Xbox/DualSense compatibles. Si estás usando un controlador DualSense 5, habilitar esta opción proporcionará retroalimentación háptica nativa.',
+      'Forzar que el controlador USB de PeaSyo tome el control de todos los mandos Xbox / DualSense / Razer Kishi compatibles. Si estás usando un controlador DualSense 5, habilitar esta opción proporcionará retroalimentación háptica nativa.',
     bind_usb_device_tips:
-      'Esta configuración solo se aplica a controladores que admiten el protocolo XInput o DualSense cuando están conectados por cable (OTG).',
-    bind_usb_device_guide_entry: 'Guía de controlador OTG por cable 👆',
+      'Esta configuración solo se aplica cuando un mando Xbox / DualSense / Razer Kishi compatible está conectado por cable OTG.',
+    bind_usb_device_guide_entry:
+      'Guía de controladores OTG por cable y Razer Kishi 👆',
     bind_usb_device_guide_title:
-      'Se recomienda usar una conexión por cable USB-OTG del controlador en los siguientes casos:',
+      'Guía de controladores OTG por cable y Razer Kishi',
+    bind_usb_device_guide_hint:
+      'Toca para ver el orden de conexión, permisos y anulación del controlador',
+    bind_usb_device_guide_switch_on:
+      'Activado. PeaSyo tomará el control de los mandos OTG compatibles.',
+    bind_usb_device_guide_switch_off:
+      'Desactivado. Actívalo aquí para háptica o control del mando.',
     bind_usb_device_guide_case1:
-      '1. Para experimentar la retroalimentación háptica nativa de DualSense 5, habilita "Anular soporte nativo del gamepad", conecta tu DualSense 5 y luego inicia la transmisión.',
+      '1. Para experimentar la retroalimentación háptica nativa de DualSense 5, habilita "Anular el controlador de gamepad de Android", conecta tu DualSense 5 y luego inicia la transmisión.',
     bind_usb_device_guide_case2:
-      '2. Si tu dispositivo Android no admite vibración del controlador y tu mando usa protocolo Xbox o DualSense, también debes habilitar "Anular soporte nativo del gamepad", conectar el mando y luego iniciar la transmisión.',
+      '2. Si tu dispositivo Android no admite vibración del controlador, o necesitas que PeaSyo tome el control de un mando Xbox / DualSense / Razer Kishi compatible, también debes habilitar "Anular el controlador de gamepad de Android", conectar el mando y luego iniciar la transmisión.',
+    bind_usb_device_guide_case3:
+      '3. Para usar un mando Razer Kishi y obtener una respuesta háptica cercana a la nativa, habilita la anulación del controlador y concede el permiso del mando a PeaSyo en lugar de Nexus.',
     bind_usb_device_guide_action:
-      'Habilitar "Anular soporte nativo del gamepad"',
+      'Habilitar "Anular el controlador de gamepad de Android"',
     'Force Nexus/PS button to simulate touchpad':
       'Forzar el botón Nexus/Volumen para simular el panel táctil',
     bind_usb_device_force_touchpad_desc:
-      'Después de habilitar la anulación del soporte del controlador de Android, fuerza el botón Nexus del controlador Xbox o el botón de volumen del controlador DualSense para simular clics en el panel táctil',
+      'Después de habilitar la anulación del controlador de gamepad de Android, fuerza el botón Nexus del controlador Xbox o el botón de volumen del controlador DualSense para simular clics en el panel táctil',
     'Rumble intensity': 'Intensidad de vibración',
     RumbleIntensityDesc:
       'Establecer la intensidad de vibración del controlador',
@@ -193,7 +260,7 @@ export default {
     NicknameError: 'El nombre de la consola no puede estar vacío',
     ConsoleDeleteWarn:
       '¿Estás seguro de que deseas eliminar esta consola? Será necesario registrarla nuevamente después de eliminarla',
-    RemotePlayTitle: 'PSN Remote Play (Experimental)',
+    RemotePlayTitle: 'PSN Remote Play',
     RemotePlayDesc:
       'Si no tienes una IP pública o una configuración de red local, puedes conectarte remotamente directamente a través de los servidores de PSN. Esto requiere iniciar sesión en PSN, y tu consola debe estar actualizada a la última versión del sistema (PS4 no es compatible).',
     RemotePlayTips:
@@ -255,17 +322,48 @@ export default {
     AutoConnect: 'conexión automática',
     // Registry
     RegistTips:
-      'Nota: Solo se admite registrar consolas PS5 o PS4 (versión de firmware 8 o superior)',
+      'Nota: Se admite registrar PS5 y todas las versiones de firmware de PS4. Los sistemas PS4 por debajo de 7.0 requieren el ID en línea de PSN de la cuenta actual.',
     LookConsole: 'Buscando consola',
     HostError: 'La IP del host no puede estar vacía',
     PINError: 'El PIN no puede estar vacío',
     PINLenError: 'Longitud del PIN incorrecta',
     TokenisEmpty: 'El token está vacío, por favor inicia sesión nuevamente',
+    LegacyPs4OnlineIdError:
+      'Los sistemas PS4 por debajo de 7.0 requieren un ID en línea de PSN válido. Inicia sesión con una cuenta PSN normal y vuelve a intentarlo.',
     RegistrySuccess: 'Registro exitoso',
+    SelectRegisterType: 'Selecciona el tipo de registro',
+    RegisterTypeLocal: 'Registro local',
+    RegisterTypeRemote: 'Registro remoto',
+    RemoteRegisterTips:
+      'Asegúrate de que la consola esté actualizada, conectada a PSN y encendida o en modo de reposo. Esta función puede no funcionar en todos los entornos de red.',
+    RemoteRegisterSummary:
+      'El registro remoto usa directamente la PS5 detectada actualmente y completa el registro mediante una sesión remota de PSN, sin pedirte que escribas manualmente el nombre de la consola.',
+    RemoteRegisterPs5Only:
+      'El registro remoto actualmente solo admite la ruta de PS5.',
+    RemoteRegisterConsoleName: 'Nombre de la consola',
+    RemoteRegisterConsoleNameRequired:
+      'Por favor ingresa el nombre de la consola.',
+    RemoteRegisterConsoleRequired:
+      'Selecciona primero una consola PS5 disponible.',
+    RemoteRegisterFailed:
+      'El registro remoto falló. Verifica el nombre de la consola, el estado de inicio de sesión de PSN y el entorno de red.',
+    RemoteRegisterLoginRequiredMessage:
+      'El registro remoto requiere iniciar sesión en PSN. Asegúrate de que la consola esté actualizada, conectada a PSN y encendida o en modo de reposo. Si la sesión expiró, vuelve a iniciar sesión e inténtalo de nuevo.',
+    RemoteRegisterPinTitle: 'Ingresa el PIN de inicio de sesión de la consola',
+    RemoteRegisterPinTips:
+      'La consola solicitó un PIN de inicio de sesión. Revísalo en la consola e ingrésalo aquí.',
+    RemoteRegisterPinIncorrect: 'PIN incorrecto, por favor inténtalo de nuevo.',
     SelectConsoleType: 'Por favor selecciona el tipo de consola',
+    SelectPs4Version: 'Selecciona el rango de firmware de PS4',
     SelectConsole: 'Por favor selecciona una consola',
     NoConsole:
       'No se encontró ninguna consola, por favor ingresa la IP del host manualmente',
+    RegistPs5: 'PS5',
+    RegistPs4Ge8: 'PS4 (firmware 8.0 o superior)',
+    RegistPs4Ge7: 'PS4 (firmware 7.0 - 7.99)',
+    RegistPs4Lt7: 'PS4 (firmware inferior a 7.0)',
+    LegacyPs4OnlineIdHint:
+      'Este modo usa el ID en línea de PSN de la cuenta actual para el registro en lugar del ID de cuenta.',
     RegistFailed:
       'Error de registro. Por favor verifica si el código PIN es correcto y asegúrate de que la cuenta de inicio de sesión del host coincida con la cuenta actual',
     SwapDpadTitle: 'D-pad simula el joystick izquierdo',
@@ -278,15 +376,23 @@ export default {
     // Console
     RegistryTime: 'Registro',
     LocalStream: 'Transmisión local',
+    LocalHostRequiredMessage:
+      'La transmisión local requiere la dirección IP LAN de la consola. Abre la edición de la consola y completa la dirección local antes de iniciar la transmisión local.',
     RemoteStream: 'Transmisión remota',
     // Stream
     SurfaceRenderDesc:
       'Actualmente usando el modo de renderizado de rendimiento, inicializando la interfaz',
+    'Enable Microphone': 'Activar micrófono',
+    'Disconnect and sleep': 'Desconectar y suspender',
+    'Microphone Permission': 'Permiso del micrófono',
+    'PeaSyo needs microphone permission to send your voice to the host.':
+      'PeaSyo necesita permiso de micrófono para enviar tu voz a la consola.',
+    'Microphone permission denied': 'Permiso del micrófono denegado',
     checkingNetworkType: 'Comprobando tipo de red…',
     preparingRemoteSession: 'Preparando sesión remota…',
     linkingYourConsole: 'Vinculando tu consola…',
     testingConnection: 'Probando la conexión…',
-    connecting: 'Conectando…',
+    connecting: 'Conectando',
     psnTokenExpired: 'La sesión de PSN expiró. Inicia sesión nuevamente.',
     PSNConnecting:
       'Conectando a PSN, este proceso puede tardar unos minutos. Por favor espera pacientemente. Si no hay respuesta después de 5 minutos, cierra la aplicación e intenta nuevamente.',
@@ -325,6 +431,8 @@ export default {
       "Tu configuración de privacidad debe permitir que 'Cualquiera' te encuentre en la búsqueda. De lo contrario, el inicio de sesión fallará.",
     Login_base64_title:
       'Puedes iniciar sesión directamente usando el ID base64 de tu cuenta de PSN, que puede obtenerse a través de sitios web de terceros (ejemplo: ABCD==).',
+    Login_base64_desc:
+      'Puedes consultarlo a través de la aplicación web de terceros que aparece abajo:',
     User_not_found:
       'Usuario no encontrado, por favor confirma que tu nombre de usuario de PSN está ingresado correctamente.',
     PSN_username: 'Nombre de usuario de PSN',
@@ -416,7 +524,7 @@ export default {
     LogVerboseTitle: 'Habilitar registro detallado',
     LogVerboseDesc:
       'Registra registros completos de transmisión. Esto puede aumentar significativamente el tamaño del archivo de registro y potencialmente afectar el rendimiento de la transmisión. No lo habilites durante el juego habitual.',
-    WiFiPerformanceModeTitle: 'Modo de baja latencia WiFi (Experimental)',
+    WiFiPerformanceModeTitle: 'Modo de baja latencia WiFi',
     WiFiPerformanceModeDesc:
       'Habilitar este modo puede reducir la latencia de la conexión WiFi y mejorar la estabilidad, pero puede aumentar la latencia de la conexión Bluetooth.',
     GamepadFeedbackIntervalTitle:
@@ -438,7 +546,14 @@ export default {
     HistoryDesc: 'View update histories of PeaSyo',
     FSRTitle: 'Super Resolución (AMD FSR 1.0)',
     FSRDesc:
-      'Habilitar la tecnología de super resolución AMD FSR 1.0, que es una función experimental que puede tener problemas de compatibilidad o estabilidad. Se recomienda usar en dispositivos de alto rendimiento',
+      'Habilitar la tecnología de super resolución AMD FSR 1.0, que es una función experimental que puede tener problemas de compatibilidad o estabilidad. Se recomienda usarla en dispositivos de alto rendimiento.',
+    SmartFrameGenerationTitle: 'Generación inteligente de fotogramas',
+    SmartFrameGenerationDesc:
+      'Usa la generación inteligente de fotogramas para interpolar algunos flujos de video de juegos y lograr un resultado más fluido. Ten en cuenta que no todos los dispositivos son compatibles.\nConsejo: si el juego actual solo funciona a 30 FPS, configurar la transmisión a 30 FPS suele dar el mejor resultado.',
+    SmartFrameRecoveryTitle:
+      'Recuperación inteligente de fotogramas (Análisis del bitstream)',
+    SmartFrameRecoveryDesc:
+      'Analiza los fotogramas de video entrantes y repara referencias de fotogramas perdidas durante inestabilidad de red, reduciendo tirones, artefactos visuales y congelamientos. Usa un poco más de CPU y puede desactivarse en redes muy estables.',
     frame_pacing_title: 'Ritmo de cuadros por segundo en video',
     frame_pacing_desc:
       'Especificar como balancear la latencia de video y la fluidez',
