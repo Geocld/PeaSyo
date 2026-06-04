@@ -1,3 +1,14 @@
+> [!IMPORTANT]
+> 
+> ## 🔔 Announcement 🔔
+> 
+> **PeaSyo v2 has been officially released. The entire v2 codebase has been rewritten in Rust and no longer relies on Chiaki's connection protocol implementation. PeaSyo v2 offers more stable connections and better performance. PeaSyo is committed to being permanently free — enjoy it!**
+>
+> PeaSyo v2 project and download: [PeaSyo-rs](https://github.com/Geocld/PeaSyo-rs)
+> 
+> **To protect the intellectual property of the PeaSyo development team and prevent certain third-party projects from borrowing this work without complying with the AGPL license or engaging in activities detrimental to PeaSyo's image, PeaSyo v2 will no longer be open source. If this concerns you, you are welcome to continue using all open-source versions up to v1.8.3. Thank you for your support.**
+> ---
+
 <p align="center">
   <a href="https://github.com/Geocld/PeaSyo">
     <img src="https://raw.githubusercontent.com/Geocld/PeaSyo/main/images/logo.png" width="100">
