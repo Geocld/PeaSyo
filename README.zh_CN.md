@@ -2,12 +2,13 @@
 > 
 > ## 🔔 告知 🔔
 > 
-> **PeaSyo 已正式发布 v2 版本。v2 版本全部逻辑使用 Rust 重构，不再依赖 Chiaki 的连接协议实现，连接更稳定，性能更佳，PeaSyo承诺永久免费，欢迎使用。**
+> **PeaSyo 已正式发布 v2 版本。v2 版本全部逻辑使用 Rust 重构，不再依赖 Chiaki 的连接协议实现，连接更稳定，性能更佳，PeaSyo承诺永久免费，后续继续给串流玩家提供最佳最新的串流体验。**
 >
 > PeaSyo v2 项目地址及下载地址：[PeaSyo-rs](https://github.com/Geocld/PeaSyo-rs)
 > 
 > **为保护 PeaSyo 开发团队的知识产权，避免部分第三方项目借鉴后不遵守 AGPL 协议或做出不利于 PeaSyo 形象的行为，PeaSyo v2 版本将不再开源。如果你介意，可以继续使用 v1.8.3 在内的所有开源版本，感谢你的关注。**
-> ---
+
+---
 
 <p align="center">
   <a href="https://github.com/Geocld/PeaSyo">
