@@ -15,6 +15,8 @@ void android_chiaki_audio_output_free(void *audio_output);
 void android_chiaki_audio_output_set_device_id(int32_t device_id, void *audio_output);
 void android_chiaki_audio_output_set_sharing_mode(int32_t sharing_mode, void *audio_output);
 void android_chiaki_audio_output_settings(uint32_t channels, uint32_t rate, void *audio_output);
+// 流已打开时按当前 preferred_device_id 重新打开（用于串流中切换输出设备，如外接显示器）
+void android_chiaki_audio_output_reopen(void *audio_output);
 void android_chiaki_audio_output_frame(int16_t *buf, size_t samples_count, void *audio_output);
 
 #ifdef __cplusplus

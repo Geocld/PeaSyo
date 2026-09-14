@@ -65,6 +65,9 @@ export type Settings = {
   haptic_feedback_intensity: number;
   gamepad_feedback_interval: number;
   wifi_performance_mode: boolean;
+  external_display_output: string; // 'off' | 'on' | 'auto_pseudo'
+  external_display_refresh_rate: number; // 外屏刷新率：0 自动（跟随串流帧率）/ 60 / 120
+  pip_on_suspend: boolean; // 挂起（切后台）时进入画中画小窗
   debug: boolean;
 };
 
@@ -129,6 +132,9 @@ const defaultSettings: Settings = {
   haptic_feedback_intensity: 0.5, // 触觉反馈强度
   gamepad_feedback_interval: 8, // 手柄输入最小间隔（刷新率），默认8ms
   wifi_performance_mode: false, // WiFi性能模式（低延迟），默认关闭
+  external_display_output: 'off', // 连接后自动输出到外接显示器：off 关 / on 开 / auto_pseudo 开（自动伪息屏）
+  external_display_refresh_rate: 0, // 外屏刷新率：0 自动（跟随串流帧率）/ 60 / 120
+  pip_on_suspend: true, // 挂起（切后台）时进入画中画小窗，串流不中断
   debug: false,
 };
 
@@ -145,7 +151,18 @@ export const getSettings = (): Settings => {
   }
   try {
     const _settings = JSON.parse(settings) as Settings;
-    return Object.assign({}, defaultSettings, _settings);
+    const merged = Object.assign({}, defaultSettings, _settings) as Settings;
+    // 迁移旧版 external_display_output 的值（boolean: true -> 'on'，false -> 'off'；
+    // 已移除的 'auto_lock'（真息屏）统一降级为 'auto_pseudo'）
+    const legacy = merged as any;
+    if (typeof legacy.external_display_output === 'boolean') {
+      merged.external_display_output = legacy.external_display_output
+        ? 'on'
+        : 'off';
+    } else if (legacy.external_display_output === 'auto_lock') {
+      merged.external_display_output = 'auto_pseudo';
+    }
+    return merged;
   } catch {
     return defaultSettings;
   }

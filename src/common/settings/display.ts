@@ -91,6 +91,38 @@ const display = [
       {value: true, text: t('Enable')},
     ],
   },
+  {
+    name: 'external_display_output',
+    type: 'radio',
+    title: t('ExternalDisplayOutputTitle'),
+    description: t('ExternalDisplayOutputDesc'),
+    data: [
+      {value: 'off', text: t('Disable')},
+      {value: 'on', text: t('Enable')},
+      {value: 'auto_pseudo', text: t('On (auto pseudo screen off)')},
+    ],
+  },
+  {
+    name: 'external_display_refresh_rate',
+    type: 'radio',
+    title: t('ExtDisplayRefreshRateTitle'),
+    description: t('ExtDisplayRefreshRateDesc'),
+    data: [
+      {value: 0, text: t('Auto')},
+      {value: 60, text: '60Hz'},
+      {value: 120, text: '120Hz'},
+    ],
+  },
+  {
+    name: 'pip_on_suspend',
+    type: 'radio',
+    title: t('PipOnSuspendTitle'),
+    description: t('PipOnSuspendDesc'),
+    data: [
+      {value: true, text: t('Enable')},
+      {value: false, text: t('Disable')},
+    ],
+  },
 ];
 
 export default display;

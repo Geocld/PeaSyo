@@ -270,6 +270,9 @@ public final class AudioRouteResolver {
 
     private static boolean isHdmiType(AudioDeviceInfo device) {
         int type = device.getType();
+        // 注意：AudioDeviceInfo 没有 TYPE_DISPLAY_PORT 常量；
+        // USB-C DP Alt Mode 显示器的音频设备在系统中通常枚举为 TYPE_USB_DEVICE，
+        // 因此外屏输出时先按 HDMI 匹配、再按 USB 兜底（见 StreamSession.switchToExternal）。
         return type == AudioDeviceInfo.TYPE_HDMI
                 || type == AudioDeviceInfo.TYPE_HDMI_ARC
                 || type == AudioDeviceInfo.TYPE_HDMI_EARC;
