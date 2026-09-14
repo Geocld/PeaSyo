@@ -1455,7 +1455,12 @@ class Message(ProtoElement):
         optional_only.name += str(id(self))
 
         desc = google.protobuf.descriptor.MakeDescriptor(optional_only)
-        msg = reflection.MakeClass(desc)()
+        try:
+            msg = reflection.MakeClass(desc)()
+        except AttributeError:
+            # protobuf >= 7 removed reflection.MakeClass; message_factory is the replacement
+            from google.protobuf import message_factory
+            msg = message_factory.GetMessageClass(desc)()
 
         for field in optional_only.field:
             if field.type == FieldD.TYPE_STRING:

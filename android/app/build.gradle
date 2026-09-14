@@ -15,7 +15,7 @@ react {
     // reactNativeDir = file("../node_modules/react-native")
     //   The folder where the react-native Codegen package is. Default is ../node_modules/@react-native/codegen
     // codegenDir = file("../node_modules/@react-native/codegen")
-    //   The cli.js file which is the React Native CLI entrypoint. Default is ../node_modules/react-native/cli.js
+    //   The cli.js file that is the React Native CLI entrypoint. Default is ../node_modules/react-native/cli.js
     // cliFile = file("../node_modules/react-native/cli.js")
 
     /* Variants */
@@ -73,6 +73,12 @@ def webkit_version = rootProject.ext.has('webkitVersion') ? rootProject.ext.get(
 
 def rootCMakeLists = "../../CMakeLists.txt"
 
+// ABI 列表来自 gradle.properties 的 reactNativeArchitectures（可用 -P 覆盖）
+def reactNativeArchitectures() {
+    def value = project.getProperties().get("reactNativeArchitectures")
+    return value ? value.split(",") : ["armeabi-v7a", "arm64-v8a", "x86", "x86_64"]
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
 
@@ -85,6 +91,9 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionName "1.8.2"
+        ndk {
+            abiFilters (*reactNativeArchitectures())
+        }
         externalNativeBuild {
             cmake {
                 arguments "-DCHIAKI_ENABLE_TESTS=OFF",

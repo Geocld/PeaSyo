@@ -11,16 +11,10 @@ add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/takion.pb"
 set(SOURCE_FILES "${CMAKE_CURRENT_BINARY_DIR}/takion.pb.c")
 set(HEADER_FILES "${CMAKE_CURRENT_BINARY_DIR}/takion.pb.h")
 
-if(UNIX AND IS_ABSOLUTE "${PROTOC}")
-	# make sure protoc is in PATH when invoking the generator below, which needs it.
-	get_filename_component(PROTOC_PATH "${PROTOC}" DIRECTORY)
-	set(GEN_PREFIX "${CMAKE_COMMAND}" -E env "PATH=${PROTOC_PATH}:$ENV{PATH}")
-else()
-	set(GEN_PREFIX "")
-endif()
-
+# nanopb_generator.py 处理已生成的 .pb descriptor 时不需要 protoc，
+# 直接调用即可（经 cmake -E env 透传含分号的 Windows PATH 会导致参数拆散）。
 add_custom_command(OUTPUT ${SOURCE_FILES} ${HEADER_FILES}
-		COMMAND ${GEN_PREFIX} "${PYTHON_EXECUTABLE}" "${NANOPB_GENERATOR_PY}" "${CMAKE_CURRENT_BINARY_DIR}/takion.pb"
+		COMMAND "${PYTHON_EXECUTABLE}" "${NANOPB_GENERATOR_PY}" "${CMAKE_CURRENT_BINARY_DIR}/takion.pb"
 		MAIN_DEPENDENCY "${CMAKE_CURRENT_BINARY_DIR}/takion.pb")
 
 set(CHIAKI_LIB_PROTO_SOURCE_FILES "${SOURCE_FILES}" PARENT_SCOPE)
