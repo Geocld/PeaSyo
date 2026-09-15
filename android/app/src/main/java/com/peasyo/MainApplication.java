@@ -58,6 +58,7 @@ public class MainApplication extends Application implements ReactApplication {
             packages.add(new HapticPackage());
             packages.add(new StreamFsrViewPackage());
             packages.add(new WifiPerformancePackage());
+            packages.add(new com.peasyo.external.ExternalDisplayPackage());
           return packages;
         }
 

@@ -498,6 +498,33 @@ export default {
     show_menu_title: 'Mostrar menú rápido',
     show_menu_desc:
       'El menú rápido siempre se muestra en la esquina inferior derecha de la página de transmisión.',
+    ExternalDisplayOutputTitle: 'Salida a pantalla externa',
+    ExternalDisplayOutputDesc:
+      'Enviar automáticamente el vídeo y el audio a la pantalla externa (USB-C/HDMI) tras conectar.',
+    ExtDisplayRefreshRateTitle: 'Frecuencia de pantalla externa',
+    ExtDisplayRefreshRateDesc:
+      'Igualar la frecuencia de refresco de la pantalla externa (Automático sigue los FPS del streaming). Si no es compatible, se mantiene el valor por defecto.',
+    PipOnSuspendTitle: 'Imagen en imagen al suspender',
+    PipOnSuspendDesc:
+      'Entrar en modo imagen en imagen al suspender sin pantalla externa, la transmisión continúa.',
+    'External output enabled': 'Enviando a pantalla externa',
+    'External output disabled': 'Vuelta a la pantalla del teléfono',
+    'External display disconnected':
+      'Pantalla externa desconectada, se volvió a la pantalla del teléfono',
+    'No external display': 'No se detectó pantalla externa',
+    'No active session': 'No hay sesión de transmisión activa',
+    'Pseudo screen off (double tap to wake)':
+      'Apagado simulado (doble toque para despertar)',
+    'External output placeholder':
+      'El vídeo se está mostrando en la pantalla externa',
+    'Stop external output': 'Dejar de enviar a la pantalla externa',
+    'On (auto pseudo screen off)':
+      'Activado (apagado simulado automático)',
+    'Suspend (bluetooth gamepad disabled while suspended)':
+      'Suspender (el mando Bluetooth no funcionará al suspender)',
+    Suspend: 'Suspender',
+    'Pseudo screen off hint':
+      'Apagado simulado activado. Doble toque para despertar.',
     ExitRemoteKb: 'Salir del teclado remoto',
     'Device testing': 'Prueba de dispositivo',
     'Testing current device and controller':

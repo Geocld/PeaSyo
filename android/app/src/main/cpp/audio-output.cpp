@@ -9,6 +9,8 @@
 
 #include <oboe/Oboe.h>
 
+#include <mutex>
+
 #define BUFFER_CHUNK_SIZE 1024
 #define BUFFER_CHUNKS_COUNT 32
 
@@ -38,8 +40,13 @@ struct AudioOutput
 	oboe::SharingMode sharing_mode;
 	uint64_t callback_count;  // 记录 onAudioReady 被调用的次数
 	uint64_t frame_count;     // 记录推送的音频帧数
+	// 开流参数缓存，供切换输出设备时 reopen 使用
+	uint32_t cached_channels;
+	uint32_t cached_rate;
+	bool stream_open;
+	std::mutex lifecycle_mutex;
 
-	AudioOutput() : stream_callback(this), preferred_device_id(-1), sharing_mode(oboe::SharingMode::Shared), callback_count(0), frame_count(0) {}
+	AudioOutput() : stream_callback(this), preferred_device_id(-1), sharing_mode(oboe::SharingMode::Shared), callback_count(0), frame_count(0), cached_channels(0), cached_rate(0), stream_open(false) {}
 };
 
 extern "C" void *android_chiaki_audio_output_new(ChiakiLog *log)
@@ -54,7 +61,11 @@ extern "C" void android_chiaki_audio_output_free(void *audio_output)
 	if(!audio_output)
 		return;
 	auto ao = reinterpret_cast<AudioOutput *>(audio_output);
-	ao->stream = nullptr;
+	{
+		std::lock_guard<std::mutex> lock(ao->lifecycle_mutex);
+		ao->stream = nullptr;
+		ao->stream_open = false;
+	}
 	delete ao;
 }
 
@@ -65,6 +76,8 @@ extern "C" void android_chiaki_audio_output_set_device_id(int32_t device_id, voi
 	auto ao = reinterpret_cast<AudioOutput *>(audio_output);
 	ao->preferred_device_id = device_id;
 	CHIAKI_LOGI(ao->log, "Audio Output preferred device id set to %d", device_id);
+	// 流已打开时立即按新设备重开（串流中切换输出设备）
+	android_chiaki_audio_output_reopen(audio_output);
 }
 
 extern "C" void android_chiaki_audio_output_set_sharing_mode(int32_t sharing_mode, void *audio_output)
@@ -80,11 +93,9 @@ extern "C" void android_chiaki_audio_output_set_sharing_mode(int32_t sharing_mod
 	CHIAKI_LOGI(ao->log, "Audio Output sharing mode set to %s", sharing_mode == 1 ? "exclusive" : "shared");
 }
 
-extern "C" void android_chiaki_audio_output_settings(uint32_t channels, uint32_t rate, void *audio_output)
+// 按当前配置打开并启动音频流，调用方需持有 lifecycle_mutex
+static bool open_stream_locked(AudioOutput *ao)
 {
-	auto ao = reinterpret_cast<AudioOutput *>(audio_output);
-
-	CHIAKI_LOGI(ao->log, "Audio Output settings: channels=%u, rate=%u", channels, rate);
 	CHIAKI_LOGI(ao->log, "Audio Output preferred_device_id=%d", ao->preferred_device_id);
 	CHIAKI_LOGI(ao->log, "Audio Output requested sharing_mode=%s",
 		ao->sharing_mode == oboe::SharingMode::Exclusive ? "Exclusive" : "Shared");
@@ -101,8 +112,8 @@ extern "C" void android_chiaki_audio_output_settings(uint32_t channels, uint32_t
 	builder.setPerformanceMode(oboe::PerformanceMode::LowLatency)
 		->setSharingMode(actual_sharing_mode)
 		->setFormat(oboe::AudioFormat::I16)
-		->setChannelCount(channels)
-		->setSampleRate(rate)
+		->setChannelCount(ao->cached_channels)
+		->setSampleRate(ao->cached_rate)
 		->setCallback(&ao->stream_callback);
 
 	if(ao->preferred_device_id >= 0)
@@ -116,40 +127,70 @@ extern "C" void android_chiaki_audio_output_settings(uint32_t channels, uint32_t
 	}
 
 	auto result = builder.openManagedStream(ao->stream);
-	if(result == oboe::Result::OK)
-	{
-		CHIAKI_LOGI(ao->log, "Audio Output opened Oboe stream successfully");
-
-		// 记录实际打开的流的配置
-		auto stream = ao->stream.get();
-		CHIAKI_LOGI(ao->log, "Audio Output stream actual config:");
-		CHIAKI_LOGI(ao->log, "  - Device ID: %d", stream->getDeviceId());
-		CHIAKI_LOGI(ao->log, "  - Sample Rate: %d", stream->getSampleRate());
-		CHIAKI_LOGI(ao->log, "  - Channel Count: %d", stream->getChannelCount());
-		CHIAKI_LOGI(ao->log, "  - Format: %s", oboe::convertToText(stream->getFormat()));
-		CHIAKI_LOGI(ao->log, "  - Sharing Mode: %s", oboe::convertToText(stream->getSharingMode()));
-		CHIAKI_LOGI(ao->log, "  - Performance Mode: %s", oboe::convertToText(stream->getPerformanceMode()));
-		CHIAKI_LOGI(ao->log, "  - Buffer Capacity (frames): %d", stream->getBufferCapacityInFrames());
-		CHIAKI_LOGI(ao->log, "  - Buffer Size (frames): %d", stream->getBufferSizeInFrames());
-		CHIAKI_LOGI(ao->log, "  - Frames Per Burst: %d", stream->getFramesPerBurst());
-		CHIAKI_LOGI(ao->log, "  - Bytes Per Frame: %d", stream->getBytesPerFrame());
-	}
-	else
+	if(result != oboe::Result::OK)
 	{
 		CHIAKI_LOGE(ao->log, "Audio Output failed to open Oboe stream: %s", oboe::convertToText(result));
-		return;
+		ao->stream_open = false;
+		return false;
 	}
 
+	CHIAKI_LOGI(ao->log, "Audio Output opened Oboe stream successfully");
+
+	// 记录实际打开的流的配置
+	auto stream = ao->stream.get();
+	CHIAKI_LOGI(ao->log, "Audio Output stream actual config:");
+	CHIAKI_LOGI(ao->log, "  - Device ID: %d", stream->getDeviceId());
+	CHIAKI_LOGI(ao->log, "  - Sample Rate: %d", stream->getSampleRate());
+	CHIAKI_LOGI(ao->log, "  - Channel Count: %d", stream->getChannelCount());
+	CHIAKI_LOGI(ao->log, "  - Format: %s", oboe::convertToText(stream->getFormat()));
+	CHIAKI_LOGI(ao->log, "  - Sharing Mode: %s", oboe::convertToText(stream->getSharingMode()));
+	CHIAKI_LOGI(ao->log, "  - Performance Mode: %s", oboe::convertToText(stream->getPerformanceMode()));
+	CHIAKI_LOGI(ao->log, "  - Buffer Capacity (frames): %d", stream->getBufferCapacityInFrames());
+	CHIAKI_LOGI(ao->log, "  - Buffer Size (frames): %d", stream->getBufferSizeInFrames());
+	CHIAKI_LOGI(ao->log, "  - Frames Per Burst: %d", stream->getFramesPerBurst());
+
 	result = ao->stream->start();
-	if(result == oboe::Result::OK)
-	{
-		CHIAKI_LOGI(ao->log, "Audio Output started Oboe stream successfully");
-		CHIAKI_LOGI(ao->log, "Audio Output stream state: %s", oboe::convertToText(ao->stream->getState()));
-	}
-	else
+	if(result != oboe::Result::OK)
 	{
 		CHIAKI_LOGE(ao->log, "Audio Output failed to start Oboe stream: %s", oboe::convertToText(result));
+		ao->stream_open = false;
+		return false;
 	}
+
+	CHIAKI_LOGI(ao->log, "Audio Output started Oboe stream successfully");
+	CHIAKI_LOGI(ao->log, "Audio Output stream state: %s", oboe::convertToText(ao->stream->getState()));
+	ao->stream_open = true;
+	return true;
+}
+
+extern "C" void android_chiaki_audio_output_settings(uint32_t channels, uint32_t rate, void *audio_output)
+{
+	auto ao = reinterpret_cast<AudioOutput *>(audio_output);
+
+	CHIAKI_LOGI(ao->log, "Audio Output settings: channels=%u, rate=%u", channels, rate);
+
+	std::lock_guard<std::mutex> lock(ao->lifecycle_mutex);
+	ao->cached_channels = channels;
+	ao->cached_rate = rate;
+	ao->stream = nullptr; // 关闭已有流（ManagedStream 赋空即 close）
+	open_stream_locked(ao);
+}
+
+extern "C" void android_chiaki_audio_output_reopen(void *audio_output)
+{
+	auto ao = reinterpret_cast<AudioOutput *>(audio_output);
+	if(!ao)
+		return;
+
+	std::lock_guard<std::mutex> lock(ao->lifecycle_mutex);
+	// 流未打开（尚未收到音频帧）时无需重开，参数将在 settings 时生效
+	if(!ao->stream_open || ao->cached_channels == 0 || ao->cached_rate == 0)
+		return;
+
+	CHIAKI_LOGI(ao->log, "Audio Output reopening stream with device_id=%d", ao->preferred_device_id);
+	// 保留环形缓冲区数据，避免重开瞬间出现爆音
+	ao->stream = nullptr;
+	open_stream_locked(ao);
 }
 
 extern "C" void android_chiaki_audio_output_frame(int16_t *buf, size_t samples_count, void *audio_output)

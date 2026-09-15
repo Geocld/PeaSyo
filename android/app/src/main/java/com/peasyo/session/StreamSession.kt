@@ -66,6 +66,12 @@ class StreamSession(
 	val framePacing: Int,
 )
 {
+	companion object {
+		// 当前活跃的会话，供外接显示器控制器等全局组件访问
+		@Volatile
+		var activeSession: StreamSession? = null
+	}
+
 	var session: Session? = null
 		private set
 
@@ -74,6 +80,20 @@ class StreamSession(
 
 	private var surfaceTexture: SurfaceTexture? = null
 	private var surface: Surface? = null
+
+	// ===== 外接显示器输出 =====
+	// 手机侧 Surface 引用（SurfaceView 模式由 holder 回调维护）
+	@Volatile
+	var phoneSurface: Surface? = null
+	// 外屏输出是否激活：激活期间手机 Surface 的创建/销毁不应切换解码器渲染目标
+	@Volatile
+	var externalDisplayActive: Boolean = false
+	private var externalSurface: Surface? = null
+	private val mainHandler = Handler(Looper.getMainLooper())
+
+	init {
+		activeSession = this
+	}
 
 	private val vibrateMutex = Mutex()
 	private val vibrateScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -130,6 +150,15 @@ class StreamSession(
 	{
 		btZeroResendRunnable?.let { btRumbleHandler.removeCallbacks(it) }
 		btZeroResendRunnable = null
+
+		// 会话结束前先退出外屏输出模式，避免守卫阻止解码器回收
+		if (externalDisplayActive) {
+			externalDisplayActive = false
+			externalSurface = null
+		}
+		if (activeSession === this) {
+			activeSession = null
+		}
 
 		session?.stop()
 		session?.dispose()
@@ -529,6 +558,7 @@ class StreamSession(
 			val currentSurface = surfaceView.holder.surface
 			if (currentSurface != null && currentSurface.isValid) {
 				this@StreamSession.surface = currentSurface
+				this@StreamSession.phoneSurface = currentSurface
 				session?.setSurface(currentSurface, maxOperatingRate, framePacing)
 			}
 		}
@@ -541,6 +571,11 @@ class StreamSession(
 				val surface = holder.surface
 				Log.d("StreamView", "surfaceChanged:" + surface)
 				this@StreamSession.surface = surface
+				this@StreamSession.phoneSurface = surface
+				// 外屏输出激活时仅记录手机 Surface，不切换解码器渲染目标
+				if (externalDisplayActive) {
+					return
+				}
 				session?.setSurface(surface, maxOperatingRate, framePacing)
 			}
 
@@ -548,6 +583,11 @@ class StreamSession(
 			{
 				Log.d("StreamView", "surfaceDestroyed:" + surface)
 				this@StreamSession.surface = null
+				this@StreamSession.phoneSurface = null
+				// 外屏输出激活时保持解码器渲染到外屏，避免黑屏断流
+				if (externalDisplayActive) {
+					return
+				}
 				session?.setSurface(null, 0x7FFF, framePacing) // or a sensible default when surface is destroyed
 			}
 		})
@@ -560,17 +600,80 @@ class StreamSession(
 		this@StreamSession.surface?.release()
 		val newSurface = Surface(surfaceTexture)
 		this@StreamSession.surface = newSurface
+		this@StreamSession.phoneSurface = newSurface
+		// 外屏输出激活时仅记录手机 Surface，不切换解码器渲染目标
+		if (externalDisplayActive) {
+			return
+		}
 		session?.setSurface(newSurface, maxOperatingRate, framePacing)
 	}
 
 	fun handleSessionClearSurface() {
 		Log.d("StreamView", "handleSessionClearSurface")
 		surfaceTexture = null
-		session?.setSurface(null, 0x7FFF, framePacing)
 		this@StreamSession.surface?.let {
 			it.release()
 		}
 		this@StreamSession.surface = null
+		this@StreamSession.phoneSurface = null
+		// 外屏输出激活时保持解码器渲染到外屏，不杀掉解码器
+		if (externalDisplayActive) {
+			return
+		}
+		session?.setSurface(null, 0x7FFF, framePacing)
+	}
+
+	// ===== 外接显示器输出 =====
+
+	// 解析并切换音频输出路由（mode 为 AudioRouteResolver 的模式常量）
+	private fun switchAudioRoute(mode: String) {
+		val appContext = reactContext?.applicationContext ?: return
+		val deviceId = AudioRouteResolver.resolveOutputDeviceId(appContext, mode, usbMode, usbController)
+		session?.setAudioOutputDevice(deviceId)
+	}
+
+	// 将解码器渲染目标切换到外屏 Surface，并把音频路由到外接显示设备（HDMI/DP）
+	fun switchToExternal(surface: Surface) {
+		mainHandler.post {
+			Log.d("StreamView", "switchToExternal: $surface")
+			externalDisplayActive = true
+			externalSurface = surface
+			session?.setSurface(surface, maxOperatingRate, framePacing)
+			val appContext = reactContext?.applicationContext
+			if (appContext != null) {
+				// 先按 HDMI/DP 匹配，找不到（DP Alt Mode 显示器音频通常枚举为 USB 设备）再按 USB 兜底
+				var deviceId = AudioRouteResolver.resolveOutputDeviceId(
+					appContext,
+					AudioRouteResolver.MODE_HDMI,
+					usbMode,
+					usbController
+				)
+				if (deviceId == AudioRouteResolver.DEVICE_ID_UNSPECIFIED) {
+					deviceId = AudioRouteResolver.resolveOutputDeviceId(
+						appContext,
+						AudioRouteResolver.MODE_USB,
+						usbMode,
+						usbController
+					)
+				}
+				// 外接显示设备存在音频输出时才切换，否则保持原路由
+				if (deviceId != AudioRouteResolver.DEVICE_ID_UNSPECIFIED) {
+					session?.setAudioOutputDevice(deviceId)
+				}
+			}
+		}
+	}
+
+	// 将解码器渲染目标切回手机屏幕，并恢复用户配置的音频路由
+	fun switchToPhone() {
+		mainHandler.post {
+			Log.d("StreamView", "switchToPhone")
+			externalDisplayActive = false
+			externalSurface = null
+			val target = surface
+			session?.setSurface(target, maxOperatingRate, framePacing)
+			switchAudioRoute(audioMode)
+		}
 	}
 
 	fun setLoginPin(pin: String)

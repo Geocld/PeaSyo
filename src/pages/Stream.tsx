@@ -9,6 +9,8 @@ import {
   Dimensions,
   NativeModules,
   NativeEventEmitter,
+  TouchableWithoutFeedback,
+  PermissionsAndroid,
 } from 'react-native';
 import {
   Card,
@@ -21,6 +23,7 @@ import {
   HelperText,
 } from 'react-native-paper';
 import {useTranslation} from 'react-i18next';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Spinner from '../components/Spinner';
 import Orientation from 'react-native-orientation-locker';
 import StreamView from '../components/StreamView';
@@ -54,6 +57,8 @@ const {
   UsbRumbleManager,
   SensorModule,
   GamepadSensorModule,
+  ExternalDisplayManager,
+  PipManager,
 } = NativeModules;
 
 const eventEmitter = new NativeEventEmitter();
@@ -121,6 +126,29 @@ function StreamScreen({navigation, route}) {
   const [showPinModal, setShowPinModal] = React.useState(false);
   const [pinIncorrect, setPinIncorrect] = React.useState(false);
   const [isRemoteMode, setIsRemoteMode] = React.useState(false);
+
+  // ===== 外接显示器输出 =====
+  const [extOutputActive, setExtOutputActive] = React.useState(false);
+  const [pseudoScreenOff, setPseudoScreenOff] = React.useState(false);
+  // 伪息屏提示文字：进入后显示 5 秒自动隐藏，之后保持全黑（OLED 防烧屏）
+  const [pseudoHintVisible, setPseudoHintVisible] = React.useState(true);
+  React.useEffect(() => {
+    if (!pseudoScreenOff) {
+      return;
+    }
+    setPseudoHintVisible(true);
+    const timer = setTimeout(() => setPseudoHintVisible(false), 5000);
+    return () => clearTimeout(timer);
+  }, [pseudoScreenOff]);
+  const extActiveRef = React.useRef(false);
+  const extDisplayListener = React.useRef<any>(undefined);
+  const extPseudoListener = React.useRef<any>(undefined);
+  const pseudoTapTimeRef = React.useRef(0);
+  // 伪息屏状态 ref（供原生事件回调读取最新值）
+  const pseudoOffRef = React.useRef(false);
+  React.useEffect(() => {
+    pseudoOffRef.current = pseudoScreenOff;
+  }, [pseudoScreenOff]);
 
   const stateEventListener = React.useRef<any>(undefined);
   const usbGpEventListener = React.useRef<any>(undefined);
@@ -471,6 +499,11 @@ function StreamScreen({navigation, route}) {
 
     FullScreenManager.immersiveModeOn();
 
+    // Android 13+ 通知权限（外屏输出的前台服务常驻通知含"伪息屏"快速按钮）
+    PermissionsAndroid.request(
+      'android.permission.POST_NOTIFICATIONS',
+    ).catch(() => {});
+
     navigation.addListener('beforeRemove', e => {
       GamepadManager.vibrate(0, 0, 0, 0, 0, 3);
       if (e.data.action.type !== 'GO_BACK') {
@@ -482,13 +515,57 @@ function StreamScreen({navigation, route}) {
       }
     });
 
+    // 外接显示器状态监听
+    extDisplayListener.current = eventEmitter.addListener(
+      'onExternalDisplayStateChange',
+      (event: any) => {
+        const active = !!event.active;
+        extActiveRef.current = active;
+        setExtOutputActive(active);
+        if (active) {
+          ToastAndroid.show(t('External output enabled'), ToastAndroid.SHORT);
+        } else {
+          setPseudoScreenOff(false);
+          ExternalDisplayManager.setScreenBrightness(-1);
+          if (event.reason === 'displayRemoved') {
+            ToastAndroid.show(
+              t('External display disconnected'),
+              ToastAndroid.SHORT,
+            );
+          }
+        }
+      },
+    );
+
+    // 常驻通知"伪息屏"按钮：切换伪息屏（挂起时点击会先拉回前台再进入伪息屏）
+    extPseudoListener.current = eventEmitter.addListener(
+      'onTogglePseudoScreenOff',
+      () => {
+        if (pseudoOffRef.current) {
+          setPseudoScreenOff(false);
+          ExternalDisplayManager.setScreenBrightness(-1);
+        } else {
+          ExternalDisplayManager.setScreenBrightness(0.01);
+          setPseudoScreenOff(true);
+        }
+      },
+    );
+
     appStateSubscription.current = AppState.addEventListener(
       'change',
       state => {
         if (state === 'background') {
-          // PipManager.enterPipMode();
+          // 外屏输出激活时切后台保持串流（前台服务保活，画面声音继续在外屏输出）
+          if (extActiveRef.current) {
+            return;
+          }
+          // 非外屏挂起：画中画小窗保持串流（设置可关）
+          if (_settings.pip_on_suspend) {
+            PipManager.enterPipMode();
+            return;
+          }
+          // 画中画关闭：恢复原有行为（SurfaceView 模式切后台断开串流）
           if (useSurface) {
-            // Will exit if use surfaceView
             streamViewRef.current?.stopSession();
             GamepadManager.vibrate(0, 0, 0, 0, 0, 3);
             if (_settings.sensor) {
@@ -497,6 +574,12 @@ function StreamScreen({navigation, route}) {
             navigation.navigate({
               name: 'Home',
             });
+          }
+        } else if (state === 'active') {
+          // 挂起后重新打开 app：外屏激活时恢复提示页
+          if (extActiveRef.current) {
+            setShowVirtualGamepad(false);
+            setShowTouchpad(false);
           }
         }
       },
@@ -539,6 +622,34 @@ function StreamScreen({navigation, route}) {
           perfTimer.current = setInterval(() => {
             streamViewRef.current?.getPerformance();
           }, 500);
+
+          // 自动输出到外接显示器（on / auto_pseudo）
+          const extOutputMode = _settings.external_display_output;
+          if (extOutputMode && extOutputMode !== 'off') {
+            // 外屏刷新率偏好（0 自动 / 60 / 120）
+            ExternalDisplayManager.setRefreshRatePreference(
+              Number(_settings.external_display_refresh_rate) || 0,
+            );
+            setTimeout(() => {
+              if (!ExternalDisplayManager.isAvailable()) {
+                return;
+              }
+              ExternalDisplayManager.enableOutput()
+                .then(() => {
+                  extActiveRef.current = true;
+                  setExtOutputActive(true);
+                  // 外屏输出成功后自动伪息屏
+                  if (extOutputMode === 'auto_pseudo') {
+                    // 收起虚拟手柄/触控板：唤醒后直接显示提示页
+                    setShowVirtualGamepad(false);
+                    setShowTouchpad(false);
+                    ExternalDisplayManager.setScreenBrightness(0.01);
+                    setPseudoScreenOff(true);
+                  }
+                })
+                .catch(() => {});
+            }, 1500);
+          }
         } else if (event.type === HOLEPUNCHFINISHED) {
           setLoadingText(t('connecting'));
         } else if (event.type === PROGRESS) {
@@ -1013,6 +1124,8 @@ function StreamScreen({navigation, route}) {
       Orientation.unlockAllOrientations();
       FullScreenManager.immersiveModeOff();
       stateEventListener.current && stateEventListener.current.remove();
+      extDisplayListener.current && extDisplayListener.current.remove();
+      extPseudoListener.current && extPseudoListener.current.remove();
       usbGpEventListener.current && usbGpEventListener.current.remove();
       usbDsGpEventListener.current && usbDsGpEventListener.current.remove();
       rumbleEventListener.current && rumbleEventListener.current.remove();
@@ -1038,6 +1151,15 @@ function StreamScreen({navigation, route}) {
   const handleExit = () => {
     isExiting.current = true;
     try {
+      // 外屏相关清理
+      if (extActiveRef.current) {
+        ExternalDisplayManager.disableOutput();
+        extActiveRef.current = false;
+        setExtOutputActive(false);
+      }
+      setPseudoScreenOff(false);
+      ExternalDisplayManager.setScreenBrightness(-1);
+
       handleDisconnect();
       handleCloseModal();
       setShowPerformance(false);
@@ -1064,6 +1186,59 @@ function StreamScreen({navigation, route}) {
       streamViewRef.current?.stopSensor();
     }
   };
+
+  // ===== 外接显示器输出 =====
+
+  // 停止外屏输出：画面 + 声音切回手机（串流菜单）
+  const handleStopExtOutput = () => {
+    handleCloseModal();
+    if (!extActiveRef.current) {
+      return;
+    }
+    ExternalDisplayManager.disableOutput()
+      .then(() => {
+        extActiveRef.current = false;
+        setExtOutputActive(false);
+        ToastAndroid.show(t('External output disabled'), ToastAndroid.SHORT);
+      })
+      .catch(() => {});
+  };
+
+  // 挂起：外屏输出时切后台（前台服务保活，外屏继续输出，手机可用其它 app）；
+  // 非外屏时按设置进入画中画小窗或直接切后台（由 AppState 统一处理）
+  const handleSuspend = () => {
+    handleCloseModal();
+    if (extActiveRef.current) {
+      ExternalDisplayManager.moveToBackground();
+    } else if (_settings.pip_on_suspend) {
+      PipManager.enterPipMode();
+    } else {
+      ExternalDisplayManager.moveToBackground();
+    }
+  };
+
+  // 双击唤醒
+  const handleWakeFromPseudo = () => {
+    const now = Date.now();
+    if (now - pseudoTapTimeRef.current < 400) {
+      pseudoTapTimeRef.current = 0;
+      setPseudoScreenOff(false);
+      ExternalDisplayManager.setScreenBrightness(-1);
+    } else {
+      pseudoTapTimeRef.current = now;
+    }
+  };
+
+  // 伪息屏：亮度降到最低 + 黑色遮罩，串流继续
+  const handlePseudoScreenOff = () => {
+    handleCloseModal();
+    // 收起虚拟手柄/触控板：唤醒后直接显示提示页（外屏激活时）
+    setShowVirtualGamepad(false);
+    setShowTouchpad(false);
+    ExternalDisplayManager.setScreenBrightness(0.01);
+    setPseudoScreenOff(true);
+  };
+
 
   const renderStreamView = () => {
     if (!streamInfo || !showStreamView) {
@@ -1196,6 +1371,49 @@ function StreamScreen({navigation, route}) {
         </View>
       );
     }
+  };
+
+  // 外屏激活时手机端的提示页（用户打开虚拟手柄/触控板时自动让位，手机作为手柄使用）
+  const renderExtOutputPlaceholder = () => {
+    if (!extOutputActive || showVirtualGamepad || showTouchpad) {
+      return null;
+    }
+    return (
+      <View style={styles.extOutputPlaceholder}>
+        <Ionicons name="tv-outline" size={64} color="#DF6069" />
+        <Text style={styles.extOutputPlaceholderText}>
+          {t('External output placeholder')}
+        </Text>
+        <Button
+          mode="contained"
+          style={styles.extOutputPlaceholderBtn}
+          onPress={handlePseudoScreenOff}>
+          {t('Pseudo screen off (double tap to wake)')}
+        </Button>
+        <Button
+          mode="contained"
+          style={styles.extOutputPlaceholderBtn}
+          onPress={handleSuspend}>
+          {t('Suspend')}
+        </Button>
+        <Button
+          mode="outlined"
+          style={styles.extOutputPlaceholderBtn}
+          onPress={() => {
+            // 逻辑同菜单"断开"：尊重"断开并休眠"开关
+            if (isShutDown) {
+              streamViewRef.current?.sleep();
+              setTimeout(() => {
+                handleExit();
+              }, 1000);
+            } else {
+              handleExit();
+            }
+          }}>
+          {t('Disconnect')}
+        </Button>
+      </View>
+    );
   };
 
   const handleSendMessage = () => {
@@ -1332,6 +1550,20 @@ function StreamScreen({navigation, route}) {
         </>
       )}
 
+      {renderExtOutputPlaceholder()}
+
+      {pseudoScreenOff && (
+        <TouchableWithoutFeedback onPress={handleWakeFromPseudo}>
+          <View style={styles.pseudoOffOverlay}>
+            {pseudoHintVisible && (
+              <Text style={styles.pseudoOffHint}>
+                {t('Pseudo screen off hint')}
+              </Text>
+            )}
+          </View>
+        </TouchableWithoutFeedback>
+      )}
+
       {renderMessageModal()}
 
       {renderPinModal()}
@@ -1416,6 +1648,27 @@ function StreamScreen({navigation, route}) {
                           setTimeout(() => handlePressOut('PS'), 350);
                           handleCloseModal();
                         }}
+                      />
+                    )}
+                    {connectState === CONNECTED && extOutputActive && (
+                      <List.Item
+                        title={t('Pseudo screen off (double tap to wake)')}
+                        background={background}
+                        onPress={handlePseudoScreenOff}
+                      />
+                    )}
+                    {connectState === CONNECTED && extOutputActive && (
+                      <List.Item
+                        title={t('Stop external output')}
+                        background={background}
+                        onPress={handleStopExtOutput}
+                      />
+                    )}
+                    {connectState === CONNECTED && (
+                      <List.Item
+                        title={t('Suspend (bluetooth gamepad disabled while suspended)')}
+                        background={background}
+                        onPress={handleSuspend}
                       />
                     )}
                     {/* {connectState === CONNECTED && settings.keyboard && (
@@ -1572,6 +1825,44 @@ const styles = StyleSheet.create({
     bottom: 5,
     zIndex: 9998,
     opacity: 0.6,
+  },
+  pseudoOffOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 10000,
+    backgroundColor: 'black',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  pseudoOffHint: {
+    color: 'rgba(255, 255, 255, 0.15)',
+    fontSize: 13,
+    marginBottom: 30,
+  },
+  extOutputPlaceholder: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 98,
+    backgroundColor: 'black',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  extOutputPlaceholderText: {
+    color: 'white',
+    fontSize: 16,
+    marginTop: 20,
+    marginBottom: 40,
+    textAlign: 'center',
+  },
+  extOutputPlaceholderBtn: {
+    width: 220,
+    marginTop: 10,
   },
 });
 

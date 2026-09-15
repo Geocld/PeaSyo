@@ -158,6 +158,15 @@ public class MainActivity extends ReactActivity implements UsbDriverService.UsbD
   }
 
   @Override
+  public void onNewIntent(Intent intent) {
+    super.onNewIntent(intent);
+    // 常驻通知"伪息屏"按钮：转发给 JS 切换伪息屏状态
+    if ("com.peasyo.TOGGLE_PSEUDO_SCREEN_OFF".equals(intent.getAction())) {
+      sendEvent("onTogglePseudoScreenOff", Arguments.createMap());
+    }
+  }
+
+  @Override
   protected void onResume() {
     super.onResume();
   }

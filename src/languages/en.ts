@@ -483,6 +483,32 @@ export default {
     show_menu_title: 'Display Quick Menu',
     show_menu_desc:
       'The quick menu is always displayed in the lower right corner of the streaming page.',
+    ExternalDisplayOutputTitle: 'External display output',
+    ExternalDisplayOutputDesc:
+      'Automatically output video and audio to the external display (USB-C/HDMI) after connected.',
+    ExtDisplayRefreshRateTitle: 'External display refresh rate',
+    ExtDisplayRefreshRateDesc:
+      'Match the refresh rate of the external display (Auto follows streaming FPS). Falls back to default if unsupported.',
+    PipOnSuspendTitle: 'Picture-in-picture on suspend',
+    PipOnSuspendDesc:
+      'Enter picture-in-picture mode when suspended without external display, streaming continues.',
+    'External output enabled': 'External output enabled',
+    'External output disabled': 'Switched back to phone screen',
+    'External display disconnected':
+      'External display removed, switched back to phone',
+    'No external display': 'No external display detected',
+    'No active session': 'No active streaming session',
+    'Pseudo screen off (double tap to wake)':
+      'Pseudo screen off (double tap to wake)',
+    'External output placeholder':
+      'Video is being output to the external display',
+    'Stop external output': 'Stop outputting to external display',
+    'On (auto pseudo screen off)': 'On (auto pseudo screen off)',
+    'Suspend (bluetooth gamepad disabled while suspended)':
+      'Suspend (Bluetooth gamepad cannot control while suspended)',
+    Suspend: 'Suspend',
+    'Pseudo screen off hint':
+      'Pseudo screen off enabled. Double tap to wake.',
     ExitRemoteKb: 'Exit Remote keyboard',
     'Device testing': 'Device testing',
     'Testing current device and controller':

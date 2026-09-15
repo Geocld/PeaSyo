@@ -1,0 +1,5 @@
+<resources>
+    <string name="ext_display_channel_name">外接显示器输出</string>
+    <string name="ext_display_notif_text">正在串流到外接显示器</string>
+    <string name="ext_display_pseudo_action">伪息屏（双击亮屏）</string>
+</resources>
